@@ -1,3 +1,4 @@
+/* ===== Theme tokens ===== */
 :root{
   /* UAMS-like maroon theme */
   --bg:#f6f5f5;
@@ -22,11 +23,25 @@
   --ring:#374151;
 }
 
-/* Base */
+/* ===== Base ===== */
 html, body { background: var(--bg); color: var(--text); }
 
-/* Cards & text */
-.quiz-card{ background:var(--card); border-radius:1rem; box-shadow:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -2px rgba(0,0,0,.05); padding:1rem 1.25rem; border:1px solid var(--ring); }
+/* Optional shared card class (index + quiz) */
+.card{
+  background:var(--card);
+  border:1px solid var(--ring);
+  border-radius:1rem;
+  box-shadow:0 10px 15px -3px rgba(0,0,0,.08), 0 4px 6px -2px rgba(0,0,0,.04);
+}
+
+/* ===== Quiz card & text ===== */
+.quiz-card{
+  background:var(--card);
+  border-radius:1rem;
+  box-shadow:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -2px rgba(0,0,0,.05);
+  padding:1rem 1.25rem;
+  border:1px solid var(--ring);
+}
 .explain{ display:none; margin-top:.75rem; font-size:.95rem; color:var(--muted); }
 .explain.show{ display:block; }
 .correct{ outline:2px solid var(--good); border-radius:.75rem; }
@@ -34,7 +49,7 @@ html, body { background: var(--bg); color: var(--text); }
 .quiz-link{ color:var(--accent); text-decoration:underline; }
 .quiz-link:hover{ text-decoration:none; }
 
-/* Buttons */
+/* ===== Buttons ===== */
 .btn{ border-radius:.75rem; padding:.6rem 1rem; font-weight:600; min-height:44px; }
 .btn-ghost{ background:transparent; border:1px solid var(--ring); }
 .btn-blue{ background:var(--accent); color:#fff; }
@@ -43,17 +58,41 @@ html, body { background: var(--bg); color: var(--text); }
 .btn-gray{ background:#e5e7eb; }
 .dark .btn-gray{ background:#374151; color:#e5e7eb; }
 
-/* Progress bar + flame */
-.progress-bar-container{ position:relative; width:100%; height:8px; background-color:var(--ring); border-radius:9999px; margin:.75rem 0 1rem; overflow:visible; }
-.progress-bar{ height:100%; background-color:var(--accent); transition:width .3s ease-in-out; position:relative; z-index:1; border-radius:9999px; }
-.fire-flame{ position:absolute; right:0; top:50%; transform:translateY(-50%) translateX(100%); font-size:1.5rem; animation:pulse-fire 1s infinite alternate; z-index:2; }
+/* ===== Progress bar + flame ===== */
+.progress-bar-container{
+  position:relative; width:100%; height:8px;
+  background-color:var(--ring); border-radius:9999px;
+  margin:.75rem 0 1rem; overflow:visible;
+}
+.progress-bar{
+  height:100%; background-color:var(--accent);
+  transition:width .3s ease-in-out; position:relative; z-index:1; border-radius:9999px;
+}
+.fire-flame{
+  position:absolute; right:0; top:50%;
+  transform:translateY(-50%) translateX(100%);
+  font-size:1.5rem; animation:pulse-fire 1s infinite alternate; z-index:2;
+}
 .hidden{ display:none; }
 @keyframes pulse-fire{
   from{ transform:translateY(-50%) translateX(100%) scale(var(--flame-scale,1)); }
   to{   transform:translateY(-50%) translateX(100%) scale(calc(var(--flame-scale,1)+.1)); }
 }
 
-/* Accessibility niceties */
+/* ===== Segmented control (Questions: 5 / 10 / 20 / All) ===== */
+.segmented {
+  display:inline-flex; border:1px solid var(--ring);
+  border-radius:.75rem; background:var(--card); overflow:hidden;
+}
+.segmented button{
+  padding:.45rem .7rem; font-weight:600; min-height:44px;
+  border:none; background:transparent; color:var(--text);
+}
+.segmented button + button{ border-left:1px solid var(--ring); }
+.segmented button.active{ background:var(--accent); color:#fff; }
+.segmented button:focus-visible{ outline:3px solid var(--accent); outline-offset:2px; }
+
+/* ===== Accessibility niceties ===== */
 .btn:focus-visible, .quiz-link:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 label:has(input:focus-visible){ outline: 2px dashed var(--accent); border-radius: .5rem; }
 #prompt, #options { word-wrap: break-word; overflow-wrap: anywhere; }
