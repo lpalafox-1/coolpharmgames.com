@@ -1,1 +1,289 @@
-
+{
+  "id": "lab-cumulative-quiz1-3",
+  "title": "Cumulative Quiz 1–3 — Antihypertensives + Antilipemics",
+  "pools": {
+    "easy": [
+      {
+        "type": "mcq",
+        "prompt": "Lisinopril belongs to:",
+        "choices": [
+          "ACE inhibitor",
+          "ARB",
+          "Thiazide",
+          "Non‑DHP CCB"
+        ],
+        "answer": "ACE inhibitor"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Amlodipine is a:",
+        "choices": [
+          "DHP CCB",
+          "Non‑DHP CCB",
+          "Beta blocker",
+          "ARB"
+        ],
+        "answer": "DHP CCB"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Hydrochlorothiazide is a:",
+        "choices": [
+          "Thiazide diuretic",
+          "Loop diuretic",
+          "Aldosterone antagonist",
+          "ACE inhibitor"
+        ],
+        "answer": "Thiazide diuretic"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Spironolactone is a(n):",
+        "choices": [
+          "Aldosterone antagonist",
+          "Beta blocker",
+          "ARB",
+          "Thiazide"
+        ],
+        "answer": "Aldosterone antagonist"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Metoprolol is:",
+        "choices": [
+          "β1‑selective blocker",
+          "Non‑selective beta blocker",
+          "Alpha‑1 blocker",
+          "ARB"
+        ],
+        "answer": "β1‑selective blocker"
+      },
+      {
+        "type": "tf",
+        "prompt": "ACE inhibitors can cause cough due to bradykinin.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Atorvastatin belongs to which class?",
+        "choices": [
+          "Statin (HMG‑CoA reductase inhibitor)",
+          "Fibrate",
+          "Bile acid sequestrant",
+          "Omega‑3 fatty acid"
+        ],
+        "answer": "Statin (HMG‑CoA reductase inhibitor)"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Ezetimibe is:",
+        "choices": [
+          "Cholesterol absorption inhibitor",
+          "PCSK9 inhibitor",
+          "Fibrate",
+          "Niacin"
+        ],
+        "answer": "Cholesterol absorption inhibitor"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Fenofibrate is a:",
+        "choices": [
+          "Fibrate",
+          "Statin",
+          "Bile acid sequestrant",
+          "Ezetimibe"
+        ],
+        "answer": "Fibrate"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Alirocumab is a:",
+        "choices": [
+          "PCSK9 monoclonal antibody",
+          "Ezetimibe",
+          "Niacin",
+          "Bempedoic acid"
+        ],
+        "answer": "PCSK9 monoclonal antibody"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Icosapent ethyl (Vascepa) is:",
+        "choices": [
+          "EPA omega‑3",
+          "Fibrate",
+          "Statin",
+          "Bile acid sequestrant"
+        ],
+        "answer": "EPA omega‑3"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Cholestyramine is a:",
+        "choices": [
+          "Bile acid sequestrant",
+          "Statin",
+          "PCSK9 inhibitor",
+          "Fibrate"
+        ],
+        "answer": "Bile acid sequestrant"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Bempedoic acid is a(n):",
+        "choices": [
+          "ATP‑citrate lyase inhibitor",
+          "Cholesterol absorption inhibitor",
+          "Fibrate",
+          "Niacin"
+        ],
+        "answer": "ATP‑citrate lyase inhibitor"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which is a high‑intensity statin dose?",
+        "choices": [
+          "Atorvastatin 40–80 mg",
+          "Simvastatin 20 mg",
+          "Pravastatin 40 mg",
+          "Lovastatin 40 mg"
+        ],
+        "answer": "Atorvastatin 40–80 mg"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Crestor is the brand for:",
+        "choices": [
+          "Rosuvastatin",
+          "Simvastatin",
+          "Atorvastatin",
+          "Pitavastatin"
+        ],
+        "answer": "Rosuvastatin"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Zetia is the brand for:",
+        "choices": [
+          "Ezetimibe",
+          "Bempedoic acid",
+          "Gemfibrozil",
+          "Colesevelam"
+        ],
+        "answer": "Ezetimibe"
+      },
+      {
+        "type": "tf",
+        "prompt": "Niacin commonly causes flushing.",
+        "answer": "True"
+      },
+      {
+        "type": "tf",
+        "prompt": "Bile acid sequestrants often cause constipation.",
+        "answer": "True"
+      }
+    ],
+    "hard": [
+      {
+        "type": "mcq",
+        "prompt": "Which combo is most prone to myopathy?",
+        "choices": [
+          "Gemfibrozil + statin",
+          "Ezetimibe + BAS",
+          "Niacin + BAS",
+          "Fenofibrate + omega‑3"
+        ],
+        "answer": "Gemfibrozil + statin"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Ezetimibe targets which transporter?",
+        "choices": [
+          "NPC1L1",
+          "ABCG5/8",
+          "SGLT1",
+          "CETP"
+        ],
+        "answer": "NPC1L1"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Bempedoic acid primarily acts in:",
+        "choices": [
+          "Hepatocytes",
+          "Skeletal muscle",
+          "Intestinal mucosa",
+          "Adipose tissue"
+        ],
+        "answer": "Hepatocytes"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Inclisiran maintenance dosing is:",
+        "choices": [
+          "Every 6 months",
+          "Monthly",
+          "Every 3 months",
+          "Annually"
+        ],
+        "answer": "Every 6 months"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which lipid effect is strongest for fibrates?",
+        "choices": [
+          "↓ TG greatly",
+          "↓ LDL greatly",
+          "↑ HDL greatly",
+          "No major effects"
+        ],
+        "answer": "↓ TG greatly"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which statin is least dependent on CYP3A4?",
+        "choices": [
+          "Pravastatin",
+          "Simvastatin",
+          "Lovastatin",
+          "Atorvastatin"
+        ],
+        "answer": "Pravastatin"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which therapy directly increases hepatic LDL receptors by preventing degradation?",
+        "choices": [
+          "PCSK9 inhibitors",
+          "Niacin",
+          "Omega‑3 fatty acids",
+          "BAS"
+        ],
+        "answer": "PCSK9 inhibitors"
+      },
+      {
+        "type": "tf",
+        "prompt": "Ezetimibe inhibits HMG‑CoA reductase.",
+        "answer": "False"
+      },
+      {
+        "type": "short",
+        "prompt": "Name one PCSK9 monoclonal antibody.",
+        "answerText": [
+          "alirocumab",
+          "evolocumab"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Name one bile acid sequestrant.",
+        "answerText": [
+          "cholestyramine",
+          "colestipol",
+          "colesevelam"
+        ]
+      }
+    ]
+  }
+}
