@@ -1,145 +1,163 @@
-// assets/js/home.js
-(() => {
-  const THEME_KEY = "quiz-theme";
-  const WELCOME_KEY = "pharmlet.welcomeSeen";
-  const RESUME_PREFIX = "pharmlet."; // used by quizEngine.js
-  const FRESH_DAYS = 7;              // "New" window
-
+// home.js — runs only on index.html
+document.addEventListener("DOMContentLoaded", () => {
   /* ---------- Theme toggle ---------- */
-  (function initTheme(){
-    const btn = document.getElementById('theme-toggle');
-    const saved = localStorage.getItem(THEME_KEY);
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const start = saved || (prefersDark ? 'dark' : 'light');
-    document.documentElement.classList.toggle('dark', start === 'dark');
-    if (btn) btn.textContent = start === "dark" ? "☀️ Light" : "🌙 Dark";
-
-    btn?.addEventListener('click', () => {
-      const next = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
-      document.documentElement.classList.toggle('dark', next === 'dark');
+  const THEME_KEY = "quiz-theme";
+  const themeBtn = document.getElementById("theme-toggle");
+  const startTheme =
+    localStorage.getItem(THEME_KEY) ||
+    (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  document.documentElement.classList.toggle("dark", startTheme === "dark");
+  if (themeBtn) {
+    themeBtn.textContent = startTheme === "dark" ? "☀️ Light" : "🌙 Dark";
+    themeBtn.addEventListener("click", () => {
+      const next = document.documentElement.classList.contains("dark") ? "light" : "dark";
+      document.documentElement.classList.toggle("dark", next === "dark");
       localStorage.setItem(THEME_KEY, next);
-      if (btn) btn.textContent = next === "dark" ? "☀️ Light" : "🌙 Dark";
+      themeBtn.textContent = next === "dark" ? "☀️ Light" : "🌙 Dark";
     });
-  })();
-// Add badge only to the *first* matching element per quiz
-document.querySelectorAll("[data-quiz-id]").forEach(link => {
-  const id = link.dataset.quizId;
-  if (newQuizzes.includes(id) && !link.querySelector(".badge-new")) {
-    const badge = document.createElement("span");
-    badge.className = "badge badge-new";
-    badge.textContent = "New";
-    link.appendChild(badge);
+  }
+
+  /* ---------- Welcome screen show/hide ---------- */
+  const WELCOME_KEY = "pharmlet.welcome.seen";
+  const welcome = document.getElementById("welcome");
+  const menu = document.getElementById("menu");
+  const seen = localStorage.getItem(WELCOME_KEY) === "1";
+  if (welcome && menu) {
+    if (seen) { welcome.style.display = "none"; menu.style.display = ""; }
+    else { welcome.style.display = ""; menu.style.display = "none"; }
+    document.getElementById("start-now")?.addEventListener("click", dismissWelcome);
+    document.getElementById("skip")?.addEventListener("click", dismissWelcome);
+  }
+  function dismissWelcome(){
+    localStorage.setItem(WELCOME_KEY, "1");
+    if (welcome) welcome.style.display = "none";
+    if (menu) menu.style.display = "";
+  }
+
+  /* ---------- Resume last quiz (if stored by quizEngine) ---------- */
+  try {
+    const keys = Object.keys(localStorage);
+    const last = keys.find(k => k.startsWith("pharmlet.") && k.endsWith(".easy") || k.endsWith(".hard"));
+    if (last) {
+      const parts = last.split(".");
+      const qid = parts[1];
+      const mode = parts[2];
+      const link = document.getElementById("resume-link");
+      const wrap = document.getElementById("resume-wrap");
+      if (link && wrap) {
+        link.href = `quiz.html?id=${qid}&mode=${mode}`;
+        wrap.style.display = "";
+      }
+    }
+  } catch {}
+
+  /* ---------- Quick filter (client-side) ---------- */
+  const filter = document.getElementById("class-filter");
+  if (filter) {
+    filter.addEventListener("input", () => {
+      const q = filter.value.toLowerCase().trim();
+      for (const card of document.querySelectorAll("#classes .card")) {
+        const text = card.textContent.toLowerCase();
+        card.style.display = text.includes(q) ? "" : "none";
+      }
+    });
+  }
+
+  /* ---------- Badges: NEW / FEATURED / TBD ---------- */
+  // Edit these lists as you add/remove content
+  const FEATURED_IDS = [
+    "cumulative-quiz1-4",
+    "lab-quiz5-antiarrhythmics",
+    "popp-practice-exam1"
+  ];
+  const NEW_IDS = [
+    // mark as 'new' for freshness; see freshnessDays below
+    "lab-quiz4-anticoagulants",
+    "lab-quiz5-antiarrhythmics",
+    "cumulative-quiz1-4",
+    "calc-units-quick-easy",
+    "calc-units-quick-hard",
+    "calc-exam1-prep-ch1-4-easy",
+    "calc-exam1-prep-ch1-4-hard"
+  ];
+  const TBD_IDS = [
+    "calc-practice-exam1",        // if you're still drafting
+    "calc-cumulative-quiz1-2",    // if still WIP
+    // add more as needed
+  ];
+
+  // Optional: auto-expire NEW after N days (per quiz, persisted)
+  const freshnessDays = 7;
+  const NEW_KEY = "pharmlet.new.addedAt"; // stores { quizId: ISODate }
+  let addedAt = {};
+  try { addedAt = JSON.parse(localStorage.getItem(NEW_KEY) || "{}"); } catch {}
+
+  const now = Date.now();
+  for (const id of NEW_IDS) {
+    const was = addedAt[id] ? Date.parse(addedAt[id]) : null;
+    if (!was || (now - was) > freshnessDays*24*60*60*1000) {
+      // set/refresh the timestamp so 'New' shows for the next N days
+      addedAt[id] = new Date().toISOString();
+    }
+  }
+  localStorage.setItem(NEW_KEY, JSON.stringify(addedAt));
+
+  // Helper: find the best place to attach a single badge per quiz
+  const seen = new Set();
+  const links = Array.from(document.querySelectorAll("a[href*='quiz.html']"));
+
+  links.forEach(link => {
+    const id = getQuizIdFromLink(link);
+    if (!id || seen.has(id)) return;
+
+    // Prefer a dedicated slot inside the same card if present
+    const card = link.closest(".quiz-card, .card");
+    const slot = card?.querySelector(".badge-slot");
+
+    // Build badges for this id
+    const elements = [];
+
+    if (FEATURED_IDS.includes(id)) {
+      elements.push(makeBadge("Featured", "badge-featured"));
+    }
+
+    // only show NEW if within freshness window
+    if (NEW_IDS.includes(id)) {
+      const ts = addedAt[id] ? Date.parse(addedAt[id]) : 0;
+      if (now - ts <= freshnessDays*24*60*60*1000) {
+        elements.push(makeBadge("New", "badge-new"));
+      }
+    }
+
+    if (TBD_IDS.includes(id)) {
+      elements.push(makeBadge("TBD", "badge-tbd"));
+    }
+
+    if (elements.length) {
+      const target = slot || link; // attach once per quiz
+      elements.forEach(b => target.appendChild(b));
+      seen.add(id);
+    }
+  });
+
+  function getQuizIdFromLink(el){
+    // If data-quiz-id exists, use it
+    const d = el.getAttribute("data-quiz-id");
+    if (d) return d;
+    try {
+      const u = new URL(el.href);
+      return u.searchParams.get("id") || null;
+    } catch { return null; }
+  }
+
+  function makeBadge(text, cls){
+    const span = document.createElement("span");
+    span.className = `badge ${cls}`;
+    const dot = document.createElement("span");
+    dot.className = "badge-dot";
+    span.appendChild(dot);
+    span.appendChild(document.createTextNode(text));
+    return span;
+    // (You can add title tooltips later if you want)
   }
 });
-  /* ---------- Welcome gate ---------- */
-  (function welcomeGate(){
-    const seen = localStorage.getItem(WELCOME_KEY) === '1';
-    const welcome = document.getElementById('welcome');
-    const menu = document.getElementById('menu');
-    if (!welcome || !menu) return;
-
-    if (seen) {
-      welcome.style.display = 'none';
-      menu.style.display = '';
-    } else {
-      welcome.style.display = '';
-      menu.style.display = 'none';
-    }
-    document.getElementById('start-now')?.addEventListener('click', () => {
-      localStorage.setItem(WELCOME_KEY, '1');
-      welcome.style.display = 'none';
-      menu.style.display = '';
-    });
-    document.getElementById('skip')?.addEventListener('click', () => {
-      localStorage.setItem(WELCOME_KEY, '1');
-      welcome.style.display = 'none';
-      menu.style.display = '';
-    });
-  })();
-
-  /* ---------- Resume last quiz ---------- */
-  (function resumeLast(){
-    try{
-      const keys = Object.keys(localStorage).filter(k => k.startsWith(RESUME_PREFIX));
-      if (!keys.length) return;
-      // pick the most recently modified key (not perfect but works)
-      keys.sort((a, b) => {
-        try {
-          const A = JSON.parse(localStorage.getItem(a) || 'null');
-          const B = JSON.parse(localStorage.getItem(b) || 'null');
-          // Score as “freshness”: use internal score or index, fall back to length
-          const aVal = A?.index ?? 0;
-          const bVal = B?.index ?? 0;
-          return bVal - aVal;
-        } catch { return 0; }
-      });
-      const [first] = keys;
-      // key shape: pharmlet.<quizId>.<mode>
-      const parts = first.split('.');
-      if (parts.length < 3) return;
-      const quizId = parts[1];
-      const mode = parts[2];
-      const resumeWrap = document.getElementById('resume-wrap');
-      const resumeLink = document.getElementById('resume-link');
-      if (resumeWrap && resumeLink) {
-        resumeWrap.style.display = '';
-        const u = new URL(location.origin + location.pathname.replace(/index\.html?$/, 'quiz.html'));
-        u.searchParams.set('id', quizId);
-        u.searchParams.set('mode', mode);
-        resumeLink.setAttribute('href', u.toString());
-      }
-    } catch {}
-  })();
-
-  /* ---------- Class filter ---------- */
-  (function filterInit(){
-    const input = document.getElementById('class-filter');
-    if (!input) return;
-    input.addEventListener('input', () => {
-      const q = input.value.trim().toLowerCase();
-      // Hide/show entire cards based on content match
-      document.querySelectorAll('#classes .card').forEach(card => {
-        const text = card.textContent.toLowerCase();
-        card.style.display = text.includes(q) ? '' : 'none';
-      });
-    });
-  })();
-
-  /* ---------- Badges: auto “New” pills ----------- */
-  (function newPills(){
-    const isFresh = (isoDate, days) => {
-      if (!isoDate) return false;
-      const added = new Date(isoDate + 'T00:00:00');
-      const now = new Date();
-      const ms = (now - added);
-      return ms >= 0 && ms <= days * 24 * 60 * 60 * 1000;
-    };
-
-    // For each actions row or link group with data-added, add a “New” pill if fresh
-    document.querySelectorAll('[data-added]').forEach(el => {
-      const dateStr = el.getAttribute('data-added');
-      if (!isFresh(dateStr, FRESH_DAYS)) return;
-
-      // Find a logical place to append the pill (row with buttons/links)
-      const row = el.classList.contains('actions-row') ? el : el.closest('.actions-row') || el.parentElement;
-      if (!row) return;
-
-      // Avoid duplicates
-      if (row.querySelector('.pill-new')) return;
-
-      const pill = document.createElement('span');
-      pill.className = 'pill pill-new';
-      pill.innerHTML = '<svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M3 10a7 7 0 1114 0 7 7 0 01-14 0zm4.5-.5l2 2 3-3 1 1-4 4-3-3 1-1z"/></svg> New';
-      row.appendChild(pill);
-    });
-  })();
-
-  /* ---------- Optional: ensure rows have consistent layout ---------- */
-  (function wireActionRows(){
-    document.querySelectorAll('.mt-2.flex').forEach(row => {
-      // Add actions-row to get consistent spacing with pills
-      row.classList.add('actions-row');
-    });
-  })();
-
-})();
