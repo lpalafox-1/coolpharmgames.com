@@ -1,13 +1,19 @@
 // Reusable quiz engine with flame, limit, seeded shuffle, keyboard shortcuts,
 // review mode, resume state, shuffled answers, a11y announcements, and friendly errors.
-// Includes explicit "Correct answer:" reveal.
+// Includes explicit "Correct answer:" reveal.  (bullet-proofed)
 
-const params = new URLSearchParams(location.search);
-const quizId = params.get("id");
-const mode   = (params.get("mode") || "easy").toLowerCase();
-const limitParam = parseInt(params.get("limit") || "", 10);
-const seedParam  = parseInt(params.get("seed")  || "", 10);
+// ---- Params ----
+const params     = new URLSearchParams(location.search);
+const quizId     = params.get("id");
+const mode       = (params.get("mode") || "easy").toLowerCase();
+const limitParam = parseInt(params.get("limit") || "", 10);   // e.g., 5,10,20, NaN => All
+const seedParam  = parseInt(params.get("seed")  || "", 10);   // optional repeatable shuffle
 
+// ---- Debug toggle (set true if you want logs) ----
+const DEBUG = false;
+const dbg = (...a)=>{ if (DEBUG) console.log(...a); };
+
+// ---- Elements ----
 const els = {
   title: document.getElementById("quiz-title"),
   qnum: document.getElementById("qnum"),
@@ -32,6 +38,7 @@ const els = {
   themeToggle: document.getElementById("theme-toggle"),
 };
 
+// ---- Theme (same behavior, just centralized) ----
 const THEME_KEY = "quiz-theme";
 applyTheme(localStorage.getItem(THEME_KEY) || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
 els.themeToggle?.addEventListener("click", () => {
@@ -43,13 +50,21 @@ function applyTheme(mode){
   if (els.themeToggle) els.themeToggle.textContent = mode === "dark" ? "☀️ Light" : "🌙 Dark";
 }
 
+// ---- State ----
 const state = { title: "", questions: [], index: 0, score: 0, review:false };
-const STORAGE_KEY = () => `pharmlet.${quizId}.${mode}.${limitParam || 'all'}`;
 
+// Storage key includes quiz, mode, **limit** and **seed** so sessions never collide
+const STORAGE_KEY = () => {
+  const L = Number.isFinite(limitParam) && limitParam > 0 ? `L${limitParam}` : "Lall";
+  const S = Number.isFinite(seedParam) ? `S${seedParam}` : "Sr";
+  return `pharmlet.${quizId}.${mode}.${L}.${S}`;
+};
+
+// ---- Main ----
 main().catch(err => {
   console.error(err);
-  els.title.textContent = 'Quiz not found';
-  els.card.innerHTML = `<p style="color:var(--muted)">Could not load <code>quizzes/${quizId}.json</code>. Check the file name and path.</p>`;
+  if (els.title) els.title.textContent = 'Quiz not found';
+  if (els.card)  els.card.innerHTML = `<p style="color:var(--muted)">Could not load <code>quizzes/${quizId}.json</code>. Check the file name and path.</p>`;
 });
 
 async function main() {
@@ -64,40 +79,60 @@ async function main() {
     throw e;
   }
 
-  const allPool = (data.pools && data.pools[mode]) || data.questions || [];
+  const allPool  = (data.pools && data.pools[mode]) || data.questions || [];
   const poolCopy = [...allPool];
+
+  // shuffle (seeded or random)
   if (Number.isFinite(seedParam)) seededShuffle(poolCopy, seedParam);
   else shuffleInPlace(poolCopy);
 
-  const limit = Number.isFinite(limitParam) && limitParam > 0 ? limitParam : null;
-  const pool = limit ? poolCopy.slice(0, Math.min(limit, poolCopy.length)) : poolCopy;
-console.log(
-  "[engine] quizId:", quizId,
-  "mode:", mode,
-  "limitParam:", limitParam,
-  "total available:", poolCopy.length,
-  "→ using:", pool.length
-);
+  // Apply limit (clamped to available)
+  const limit = Number.isFinite(limitParam) && limitParam > 0 ? Math.max(1, Math.min(limitParam, poolCopy.length)) : null;
+  const pool  = limit ? poolCopy.slice(0, limit) : poolCopy;
 
+  // Title shows limit if set
   state.title = data.title || "Quiz";
+  if (els.title) els.title.textContent = `${state.title} — ${capitalize(mode)}${limit ? ` · ${limit} Q` : ''}`;
+
+  // Build questions
   state.questions = pool.map(q => ({
     ...q,
     _answered:false, _correct:false, _user:null,
     _choices: Array.isArray(q.choices) ? shuffledCopy(q.choices) : (q.type === "tf" ? ["True","False"] : null)
   }));
 
-  // restore saved session if present (and same length)
+  // Try restore (only if it exactly matches same id/mode/limit/seed and length)
   try {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY()) || "null");
-    if (saved && Array.isArray(saved.questions) && saved.questions.length === state.questions.length) {
-      Object.assign(state, saved, { review:false }); // never resume in review
+    const savedRaw = localStorage.getItem(STORAGE_KEY());
+    if (savedRaw) {
+      const saved = JSON.parse(savedRaw);
+      const ok =
+        saved &&
+        saved.meta &&
+        saved.meta.quizId === quizId &&
+        saved.meta.mode   === mode &&
+        (saved.meta.limit ?? null) === (limit ?? null) &&
+        (saved.meta.seed  ?? null) === (Number.isFinite(seedParam) ? seedParam : null) &&
+        Array.isArray(saved.questions) &&
+        saved.questions.length === state.questions.length;
+
+      if (ok) {
+        Object.assign(state, saved, { review:false }); // never resume directly into review
+        dbg("[restore] resumed session", saved.meta);
+      } else {
+        dbg("[restore] ignored stale session (mismatch)");
+      }
     }
-  } catch {}
+  } catch (e) { dbg("[restore] failed", e); }
 
-  els.title.textContent = `${state.title} — ${capitalize(mode)}`;
-  els.qtotal.textContent = state.questions.length;
+  if (els.qtotal) els.qtotal.textContent = state.questions.length;
 
-  wireEvents(); render();
+  wireEvents();
+  render();
+
+  dbg("[engine] id:", quizId, "mode:", mode,
+      "limitParam:", limitParam, "available:", poolCopy.length,
+      "→ using:", state.questions.length, "seed:", Number.isFinite(seedParam) ? seedParam : "random");
 }
 
 /* ---------- events ---------- */
@@ -109,6 +144,7 @@ function wireEvents(){
   });
   els.check.addEventListener("click", () => {
     const q = currentQ();
+    if (!q) return;
     if (q.type === "mcq" || q.type === "tf") {
       const chosen = els.options.querySelector("input[type='radio']:checked");
       if (!chosen) return;
@@ -170,7 +206,7 @@ function render(){
     els.options.innerHTML = `<p style="color:var(--muted)">Unsupported question type.</p>`;
   }
 
-  // NEW: explicit answer reveal on answered or in review mode
+  // explicit answer reveal on answered or in review mode
   if (q._answered || state.review) {
     renderAnswerReveal(q);
   }
@@ -192,7 +228,7 @@ function scoreCurrent(userValRaw){
     if (correct) state.score += 1;
   }
 
-  // NEW: show "Correct answer:" line + explanation (if any)
+  // Show "Correct answer:" line + explanation (if any)
   renderAnswerReveal(q);
 
   els.card.classList.toggle("correct", correct);
@@ -222,7 +258,7 @@ function showResults(){
     els.results.appendChild(btn);
   }
 
-  // Clear saved session on finish to avoid stale resumes
+  // Clear ONLY this session key to avoid stale resumes with different limits later
   try { localStorage.removeItem(STORAGE_KEY()); } catch {}
 }
 
@@ -266,7 +302,7 @@ function isCorrectChoice(q, choice){
   return false;
 }
 
-// --- NEW: Correct-answer reveal helpers ---
+// --- Correct-answer reveal helpers ---
 function getCorrectAnswers(q){
   if (Array.isArray(q.answer)) return q.answer.map(String);
   if (Array.isArray(q.answerText)) return q.answerText.map(String);
@@ -304,5 +340,19 @@ function shuffledCopy(a){ const b=[...a]; shuffleInPlace(b); return b; }
 function seededShuffle(arr, seed=1){ let s=seed; const rand=()=> (s=(s*9301+49297)%233280)/233280;
   for(let i=arr.length-1;i>0;i--){ const j=Math.floor(rand()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } }
 function capitalize(s){ return s ? s[0].toUpperCase()+s.slice(1) : s; }
-function save(){ try { localStorage.setItem(STORAGE_KEY(), JSON.stringify(state)); } catch {} }
+
+// Persist with meta so we can validate on restore
+function save(){
+  try {
+    const meta = {
+      quizId, mode,
+      limit: Number.isFinite(limitParam) && limitParam > 0 ? limitParam : null,
+      seed:  Number.isFinite(seedParam)  ? seedParam  : null,
+      count: state.questions.length,
+      ver: 1
+    };
+    localStorage.setItem(STORAGE_KEY(), JSON.stringify({ ...state, meta }));
+  } catch {}
+}
+
 function announce(msg){ if (els.live) els.live.textContent = msg; }
