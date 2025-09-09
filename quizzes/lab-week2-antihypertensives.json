@@ -1,0 +1,19 @@
+{
+  "title": "Lab Week 2 — Antihypertensives",
+  "pools": {
+    "easy": [
+      { "type": "mcq", "prompt": "What is the brand name of Hydralazine?", "choices": ["Diovan","Vasotec","Apresoline","Catapres"], "answer": "Apresoline" },
+      { "type": "short", "prompt": "Generic for Diovan?", "answerText": ["Valsartan","valsartan"] },
+      { "type": "mcq", "prompt": "Which of these is a vasodilator?", "choices": ["Spironolactone","Hydralazine","Metoprolol","Valsartan"], "answer": "Hydralazine" },
+      { "type": "short", "prompt": "Brand for Olmesartan?", "answerText": ["Benicar","benicar"] },
+      { "type": "mcq", "prompt": "Enalapril drug class?", "choices": ["Beta Blocker","ACE Inhibitor","ARB","Diuretic"], "answer": "ACE Inhibitor" }
+    ],
+    "hard": [
+      { "type": "short", "prompt": "Drug that directly relaxes arteriolar smooth muscle?", "answerText": ["Hydralazine","hydralazine"] },
+      { "type": "mcq", "prompt": "Valsartan blocks binding of…", "choices": ["Angiotensin I","Angiotensin II","Aldosterone","Calcium ions"], "answer": "Angiotensin II" },
+      { "type": "mcq", "prompt": "Effect of Diltiazem on heart?", "choices": ["↑ HR","No effect","↓ HR/contractility","Irregular HR"], "answer": "↓ HR/contractility" },
+      { "type": "mcq", "prompt": "Pair with same class & MOA?", "choices": ["Hydralazine+Enalapril","Valsartan+Olmesartan","Metoprolol+Spironolactone","Clonidine+Diltiazem"], "answer": "Valsartan+Olmesartan" },
+      { "type": "mcq", "prompt": "Selective β1 blocker?", "choices": ["Clonidine","Spironolactone","Metoprolol","Enalapril"], "answer": "Metoprolol" }
+    ]
+  }
+}
