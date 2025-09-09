@@ -21,7 +21,16 @@
       if (btn) btn.textContent = next === "dark" ? "☀️ Light" : "🌙 Dark";
     });
   })();
-
+// Add badge only to the *first* matching element per quiz
+document.querySelectorAll("[data-quiz-id]").forEach(link => {
+  const id = link.dataset.quizId;
+  if (newQuizzes.includes(id) && !link.querySelector(".badge-new")) {
+    const badge = document.createElement("span");
+    badge.className = "badge badge-new";
+    badge.textContent = "New";
+    link.appendChild(badge);
+  }
+});
   /* ---------- Welcome gate ---------- */
   (function welcomeGate(){
     const seen = localStorage.getItem(WELCOME_KEY) === '1';
