@@ -4,7 +4,6 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Pharm-let — P1 Fall 2025 Hub</title>
-
   <meta name="description" content="P1 Fall 2025 study quizzes with dark mode, flame streak, and a clean UI." />
   <meta property="og:title" content="Pharm-let — P1 Fall 2025 Hub" />
   <meta property="og:description" content="Practice quizzes for pharmacy classes. Dark mode. 🔥 streak." />
@@ -12,7 +11,7 @@
   <meta name="theme-color" content="#8b1e3f" />
   <link rel="icon" href="assets/icon.png" />
 
-  <!-- CSP -->
+  <!-- CSP (allow Tailwind + self assets/fetch) -->
   <meta http-equiv="Content-Security-Policy"
     content="default-src 'self';
              img-src 'self' data:;
@@ -24,7 +23,8 @@
   <link rel="stylesheet" href="assets/css/styles.css" />
 
   <style>
-    .hero{
+    /* soft maroon glow */
+    .hero {
       background:
         radial-gradient(1200px 600px at 10% -20%, rgba(139,30,63,.18), transparent 40%),
         radial-gradient(800px 400px at 100% 0%, rgba(139,30,63,.10), transparent 45%);
@@ -34,12 +34,12 @@
 
 <body class="bg-[var(--bg)] text-[var(--text)]">
   <!-- Header -->
-  <header class="sticky-header flex justify-between items-center px-4 py-3">
+  <header class="flex justify-between items-center px-4 py-3 border-b border-[var(--ring)]">
     <h1 class="font-bold text-lg">Pharm-let</h1>
     <button id="theme-toggle" class="btn btn-ghost" type="button">🌙 Dark</button>
   </header>
 
-  <!-- Welcome -->
+  <!-- Welcome (shown once per browser via home.js) -->
   <section id="welcome" class="min-h-[60vh] flex items-center justify-center px-4" style="display:none;">
     <div class="card max-w-xl w-full p-6">
       <h1 class="text-2xl font-bold">Welcome to Pharm-let 👋</h1>
@@ -50,78 +50,64 @@
         <button id="start-now" class="btn btn-blue">Let’s go</button>
         <button id="skip" class="btn btn-ghost">Skip</button>
       </div>
-      <p class="mt-3 text-sm" style="color:var(--muted)">Toggle dark/light themes anytime with the button above.</p>
+      <p class="mt-3 text-sm" style="color:var(--muted)">
+        Toggle dark/light themes anytime with the button above.
+      </p>
     </div>
   </section>
 
   <!-- Main menu -->
   <section id="menu" style="display:none;">
-    <!-- Hero + featured -->
+    <!-- Hero -->
     <section class="hero">
       <div class="max-w-5xl mx-auto px-4 pt-10 pb-8">
         <div class="grid md:grid-cols-[1.2fr_.8fr] gap-6 items-start">
           <div>
-            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">P1 Fall 2025 — Practice Hub</h1>
+            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">
+              P1 Fall 2025 — Practice Hub
+            </h1>
             <p class="mt-2 text-lg" style="color:var(--muted)">
               Targeted practice for P1 courses. Clean UI, dark mode, and a 🔥 streak for sustained accuracy.
             </p>
 
-            <!-- Resume last quiz -->
+            <!-- Resume last quiz (auto-shows if available) -->
             <div class="mt-4 flex flex-wrap gap-3" id="resume-wrap" style="display:none;">
               <a id="resume-link" class="btn btn-ghost">Resume last quiz</a>
             </div>
-
-            <!-- Recently added strip (filled by JS) -->
-            <div id="recent-strip" class="mt-3 text-sm" style="color:var(--muted)"></div>
           </div>
 
           <!-- Featured column -->
           <div class="space-y-4">
-            <!-- Cumulative 1–4 -->
-            <div class="card p-4 on-accent">
-              <div class="text-sm opacity-90">Featured cumulative</div>
-              <div class="font-semibold">
-                Cumulative Quiz 1–4
+            <!-- Cumulative 1–4 (Featured) -->
+            <div class="card p-4">
+              <div class="text-sm" style="color:var(--muted)">Featured cumulative</div>
+              <div class="font-semibold">Cumulative Quiz 1–4</div>
+              <div class="mt-2 flex gap-2 items-center" data-subject="lab" data-added="2025-09-09">
+                <a class="btn btn-blue" href="quiz.html?id=cumulative-quiz1-4&mode=easy&limit=20" data-added="2025-09-09">Start (Easy)</a>
+                <a class="btn btn-blue" href="quiz.html?id=cumulative-quiz1-4&mode=hard&limit=20" data-added="2025-09-09">Start (Hard)</a>
                 <span class="pill pill-featured">Featured</span>
-              </div>
-              <div class="mt-2 flex gap-2 items-center">
-                <a class="btn btn-blue" href="quiz.html?id=cumulative-quiz1-4&mode=easy&limit=20"
-                   data-new-days="7" data-added="2025-09-09">Start (Easy)</a>
-                <a class="btn btn-blue" href="quiz.html?id=cumulative-quiz1-4&mode=hard&limit=20"
-                   data-new-days="7" data-added="2025-09-09">Start (Hard)</a>
-                <span class="pill pill-new">New</span>
               </div>
             </div>
 
-            <!-- Lab 5 -->
-            <div class="card p-4 on-accent">
-              <div class="text-sm opacity-90">Latest unit</div>
-              <div class="font-semibold">
-                Lab Quiz 5 — Antiarrhythmics
+            <!-- Lab Quiz 5 (Featured) -->
+            <div class="card p-4">
+              <div class="text-sm" style="color:var(--muted)">Featured</div>
+              <div class="font-semibold">Lab Quiz 5 — Antiarrhythmics</div>
+              <div class="mt-2 flex gap-2 items-center" data-subject="lab" data-added="2025-09-09">
+                <a class="btn btn-blue" href="quiz.html?id=lab-quiz5-antiarrhythmics&mode=easy&limit=20" data-added="2025-09-09">Start (Easy)</a>
+                <a class="btn btn-blue" href="quiz.html?id=lab-quiz5-antiarrhythmics&mode=hard&limit=20" data-added="2025-09-09">Start (Hard)</a>
                 <span class="pill pill-featured">Featured</span>
-              </div>
-              <div class="mt-2 flex gap-2 items-center">
-                <a class="btn btn-blue" href="quiz.html?id=lab-quiz5-antiarrhythmics&mode=easy&limit=20"
-                   data-new-days="7" data-added="2025-09-09">Start (Easy)</a>
-                <a class="btn btn-blue" href="quiz.html?id=lab-quiz5-antiarrhythmics&mode=hard&limit=20"
-                   data-new-days="7" data-added="2025-09-09">Start (Hard)</a>
-                <span class="pill pill-new">New</span>
               </div>
             </div>
 
-            <!-- POPP exam 1 -->
-            <div class="card p-4 on-accent">
-              <div class="text-sm opacity-90">Featured exam</div>
-              <div class="font-semibold">
-                Principles of Pharmacy Practice — Practice Exam 1
+            <!-- POPP Practice Exam 1 (Featured) -->
+            <div class="card p-4">
+              <div class="text-sm" style="color:var(--muted)">Featured exam</div>
+              <div class="font-semibold">Principles of Pharmacy Practice — Practice Exam 1</div>
+              <div class="mt-2 flex gap-2 items-center" data-subject="popp" data-added="2025-09-09">
+                <a class="btn btn-blue" href="quiz.html?id=popp-practice-exam1&mode=easy&limit=20" data-added="2025-09-09">Start (Easy)</a>
+                <a class="btn btn-blue" href="quiz.html?id=popp-practice-exam1&mode=hard&limit=20" data-added="2025-09-09">Start (Hard)</a>
                 <span class="pill pill-featured">Featured</span>
-              </div>
-              <div class="mt-2 flex gap-2 items-center">
-                <a class="btn btn-blue" href="quiz.html?id=popp-practice-exam1&mode=easy&limit=20"
-                   data-new-days="7" data-added="2025-09-09">Start (Easy)</a>
-                <a class="btn btn-blue" href="quiz.html?id=popp-practice-exam1&mode=hard&limit=20"
-                   data-new-days="7" data-added="2025-09-09">Start (Hard)</a>
-                <span class="pill pill-new">New</span>
               </div>
             </div>
           </div>
@@ -133,9 +119,11 @@
     <main id="classes" class="max-w-5xl mx-auto px-4 pb-16">
       <div class="flex items-end justify-between gap-4 mb-4">
         <h2 class="text-xl font-bold">Classes</h2>
-        <input id="class-filter" class="w-64 rounded-xl border px-3 py-2"
+        <!-- Quick filter -->
+        <input id="class-filter"
+               class="w-64 rounded-xl border px-3 py-2"
                style="border-color:var(--ring); background:var(--card); color:var(--text)"
-               placeholder="Filter: e.g., Anticoagulants, Easy" />
+               placeholder="Filter: e.g., Anticoagulants, Easy, POPP" />
       </div>
 
       <div class="grid md:grid-cols-2 gap-4">
@@ -143,157 +131,181 @@
         <div class="card p-4">
           <h3 class="font-semibold">Pharmaceutics I</h3>
           <ul class="mt-2 space-y-1 text-sm">
-            <li><a class="quiz-link" href="quiz.html?id=ceutics-practice-1&mode=easy&limit=20">Practice 1 — Easy</a></li>
-            <li><a class="quiz-link" href="quiz.html?id=ceutics-practice-1&mode=hard&limit=20">Practice 1 — Hard</a></li>
+            <li>
+              <div class="flex items-center gap-2" data-subject="ceutics" data-added="2025-09-01">
+                <a class="quiz-link" href="quiz.html?id=ceutics-practice-1&mode=easy&limit=20" data-added="2025-09-01">Practice 1 — Easy</a>
+                <a class="quiz-link" href="quiz.html?id=ceutics-practice-1&mode=hard&limit=20" data-added="2025-09-01">Practice 1 — Hard</a>
+              </div>
+            </li>
           </ul>
         </div>
 
-        <!-- Lab: Unit Quizzes -->
+        <!-- Longitudinal Lab — Unit Quizzes -->
         <div class="card p-4">
           <h3 class="font-semibold">Longitudinal Lab — Unit Quizzes</h3>
-          <ul class="mt-2 space-y-1 text-sm">
-            <li><a class="quiz-link" href="quiz.html?id=lab-quiz1-antihypertensives&mode=easy&limit=20">Lab Quiz 1 — Antihypertensives (Easy)</a></li>
-            <li><a class="quiz-link" href="quiz.html?id=lab-quiz1-antihypertensives&mode=hard&limit=20">Lab Quiz 1 — Antihypertensives (Hard)</a></li>
-
-            <li><a class="quiz-link" href="quiz.html?id=lab-quiz2-antihypertensives&mode=easy&limit=20">Lab Quiz 2 — Antihypertensives (Easy)</a></li>
-            <li><a class="quiz-link" href="quiz.html?id=lab-quiz2-antihypertensives&mode=hard&limit=20">Lab Quiz 2 — Antihypertensives (Hard)</a></li>
-
-            <li><a class="quiz-link" href="quiz.html?id=lab-quiz3-antilipemics&mode=easy&limit=20">Lab Quiz 3 — Antilipemics (Easy)</a></li>
-            <li><a class="quiz-link" href="quiz.html?id=lab-quiz3-antilipemics&mode=hard&limit=20">Lab Quiz 3 — Antilipemics (Hard)</a></li>
-
-            <!-- Inline featured blocks -->
+          <ul class="mt-2 space-y-2 text-sm">
             <li>
-              <div class="quiz-card p-3 mt-2">
+              <div class="flex items-center gap-2" data-subject="lab" data-added="2025-09-05">
+                <a class="quiz-link" href="quiz.html?id=lab-quiz1-antihypertensives&mode=easy&limit=20" data-added="2025-09-05">Lab Quiz 1 — Antihypertensives (Easy)</a>
+                <a class="quiz-link" href="quiz.html?id=lab-quiz1-antihypertensives&mode=hard&limit=20" data-added="2025-09-05">Hard</a>
+              </div>
+            </li>
+
+            <li>
+              <div class="flex items-center gap-2" data-subject="lab" data-added="2025-09-06">
+                <a class="quiz-link" href="quiz.html?id=lab-quiz2-antihypertensives&mode=easy&limit=20" data-added="2025-09-06">Lab Quiz 2 — Antihypertensives (Easy)</a>
+                <a class="quiz-link" href="quiz.html?id=lab-quiz2-antihypertensives&mode=hard&limit=20" data-added="2025-09-06">Hard</a>
+              </div>
+            </li>
+
+            <li>
+              <div class="flex items-center gap-2" data-subject="lab" data-added="2025-09-07">
+                <a class="quiz-link" href="quiz.html?id=lab-quiz3-antilipemics&mode=easy&limit=20" data-added="2025-09-07">Lab Quiz 3 — Antilipemics (Easy)</a>
+                <a class="quiz-link" href="quiz.html?id=lab-quiz3-antilipemics&mode=hard&limit=20" data-added="2025-09-07">Hard</a>
+              </div>
+            </li>
+
+            <!-- Lab 4 inline highlight -->
+            <li>
+              <div class="quiz-card p-3 bg-[var(--accent)]/10 border border-[var(--accent)]/30 rounded-xl">
                 <div class="flex items-center justify-between">
                   <span class="font-semibold">Lab Quiz 4 — Anticoagulants</span>
-                  <span class="pill pill-featured">Featured</span>
                 </div>
-                <div class="mt-2 flex gap-2 items-center">
-                  <a class="btn btn-blue" href="quiz.html?id=lab-quiz4-anticoagulants&mode=easy&limit=20"
-                     data-new-days="7" data-added="2025-09-09">Start (Easy)</a>
-                  <a class="btn btn-blue" href="quiz.html?id=lab-quiz4-anticoagulants&mode=hard&limit=20"
-                     data-new-days="7" data-added="2025-09-09">Start (Hard)</a>
-                  <span class="pill pill-new">New</span>
+                <div class="mt-2 flex gap-2 items-center" data-subject="lab" data-added="2025-09-08">
+                  <a class="btn btn-blue" href="quiz.html?id=lab-quiz4-anticoagulants&mode=easy&limit=20" data-added="2025-09-08">Start (Easy)</a>
+                  <a class="btn btn-blue" href="quiz.html?id=lab-quiz4-anticoagulants&mode=hard&limit=20" data-added="2025-09-08">Start (Hard)</a>
                 </div>
               </div>
             </li>
 
+            <!-- Lab 5 inline highlight (also in Featured above) -->
             <li>
-              <div class="quiz-card p-3 mt-2">
+              <div class="quiz-card p-3 bg-[var(--accent)]/10 border border-[var(--accent)]/30 rounded-xl">
                 <div class="flex items-center justify-between">
                   <span class="font-semibold">Lab Quiz 5 — Antiarrhythmics</span>
-                  <span class="pill pill-featured">Featured</span>
                 </div>
-                <div class="mt-2 flex gap-2 items-center">
-                  <a class="btn btn-blue" href="quiz.html?id=lab-quiz5-antiarrhythmics&mode=easy&limit=20"
-                     data-new-days="7" data-added="2025-09-09">Start (Easy)</a>
-                  <a class="btn btn-blue" href="quiz.html?id=lab-quiz5-antiarrhythmics&mode=hard&limit=20"
-                     data-new-days="7" data-added="2025-09-09">Start (Hard)</a>
-                  <span class="pill pill-new">New</span>
+                <div class="mt-2 flex gap-2 items-center" data-subject="lab" data-added="2025-09-09">
+                  <a class="btn btn-blue" href="quiz.html?id=lab-quiz5-antiarrhythmics&mode=easy&limit=20" data-added="2025-09-09">Start (Easy)</a>
+                  <a class="btn btn-blue" href="quiz.html?id=lab-quiz5-antiarrhythmics&mode=hard&limit=20" data-added="2025-09-09">Start (Hard)</a>
                 </div>
               </div>
             </li>
           </ul>
         </div>
 
-        <!-- Lab: Cumulative -->
+        <!-- Longitudinal Lab — Cumulative Practice -->
         <div class="card p-4">
           <h3 class="font-semibold">Longitudinal Lab — Cumulative Practice</h3>
-          <ul class="mt-2 space-y-1 text-sm">
-            <li><a class="quiz-link" href="quiz.html?id=cumulative-quiz1-2&mode=easy&limit=20">Cumulative Quiz 1–2 (Easy)</a></li>
-            <li><a class="quiz-link" href="quiz.html?id=cumulative-quiz1-2&mode=hard&limit=20">Cumulative Quiz 1–2 (Hard)</a></li>
-            <li><a class="quiz-link" href="quiz.html?id=cumulative-quiz1-3&mode=easy&limit=20">Cumulative Quiz 1–3 (Easy)</a></li>
-            <li><a class="quiz-link" href="quiz.html?id=cumulative-quiz1-3&mode=hard&limit=20">Cumulative Quiz 1–3 (Hard)</a></li>
+          <ul class="mt-2 space-y-2 text-sm">
             <li>
-              <div class="quiz-card p-3 mt-2">
+              <div class="flex items-center gap-2" data-subject="lab" data-added="2025-09-06">
+                <a class="quiz-link" href="quiz.html?id=cumulative-quiz1-2&mode=easy&limit=20" data-added="2025-09-06">Cumulative Quiz 1–2 (Easy)</a>
+                <a class="quiz-link" href="quiz.html?id=cumulative-quiz1-2&mode=hard&limit=20" data-added="2025-09-06">Hard</a>
+              </div>
+            </li>
+            <li>
+              <div class="flex items-center gap-2" data-subject="lab" data-added="2025-09-07">
+                <a class="quiz-link" href="quiz.html?id=cumulative-quiz1-3&mode=easy&limit=20" data-added="2025-09-07">Cumulative Quiz 1–3 (Easy)</a>
+                <a class="quiz-link" href="quiz.html?id=cumulative-quiz1-3&mode=hard&limit=20" data-added="2025-09-07">Hard</a>
+              </div>
+            </li>
+            <!-- Cumulative 1–4 inline highlight (also Featured) -->
+            <li>
+              <div class="quiz-card p-3 bg-[var(--accent)]/10 border border-[var(--accent)]/30 rounded-xl">
                 <div class="flex items-center justify-between">
                   <span class="font-semibold">Cumulative Quiz 1–4</span>
-                  <span class="pill pill-featured">Featured</span>
                 </div>
-                <div class="mt-2 flex gap-2 items-center">
-                  <a class="btn btn-blue" href="quiz.html?id=cumulative-quiz1-4&mode=easy&limit=20"
-                     data-new-days="7" data-added="2025-09-09">Start (Easy)</a>
-                  <a class="btn btn-blue" href="quiz.html?id=cumulative-quiz1-4&mode=hard&limit=20"
-                     data-new-days="7" data-added="2025-09-09">Start (Hard)</a>
-                  <span class="pill pill-new">New</span>
+                <div class="mt-2 flex gap-2 items-center" data-subject="lab" data-added="2025-09-09">
+                  <a class="btn btn-blue" href="quiz.html?id=cumulative-quiz1-4&mode=easy&limit=20" data-added="2025-09-09">Start (Easy)</a>
+                  <a class="btn btn-blue" href="quiz.html?id=cumulative-quiz1-4&mode=hard&limit=20" data-added="2025-09-09">Start (Hard)</a>
+                  <span class="pill pill-featured">Featured</span>
                 </div>
               </div>
             </li>
           </ul>
         </div>
 
-        <!-- POPP -->
+        <!-- Principles of Pharmacy Practice I (POPP) -->
         <div class="card p-4">
           <h3 class="font-semibold">Principles of Pharmacy Practice I (POPP)</h3>
-          <ul class="mt-2 space-y-1 text-sm">
+          <ul class="mt-2 space-y-2 text-sm">
             <li>
-              <div class="quiz-card p-3 mt-1">
+              <div class="quiz-card p-3 bg-[var(--accent)]/10 border border-[var(--accent)]/30 rounded-xl">
                 <div class="flex items-center justify-between">
                   <span class="font-semibold">Practice Exam 1</span>
-                  <span class="pill pill-featured">Featured</span>
                 </div>
-                <div class="mt-2 flex gap-2 items-center">
-                  <a class="btn btn-blue" href="quiz.html?id=popp-practice-exam1&mode=easy&limit=20"
-                     data-new-days="7" data-added="2025-09-09">Start (Easy)</a>
-                  <a class="btn btn-blue" href="quiz.html?id=popp-practice-exam1&mode=hard&limit=20"
-                     data-new-days="7" data-added="2025-09-09">Start (Hard)</a>
-                  <span class="pill pill-new">New</span>
+                <div class="mt-2 flex gap-2 items-center" data-subject="popp" data-added="2025-09-09">
+                  <a class="btn btn-blue" href="quiz.html?id=popp-practice-exam1&mode=easy&limit=20" data-added="2025-09-09">Start (Easy)</a>
+                  <a class="btn btn-blue" href="quiz.html?id=popp-practice-exam1&mode=hard&limit=20" data-added="2025-09-09">Start (Hard)</a>
+                  <span class="pill pill-featured">Featured</span>
                 </div>
               </div>
             </li>
-            <li><span class="text-muted">Practice Exam — Pharmacy Law (Coming soon)</span></li>
+            <li>
+              <div class="flex items-center gap-2" data-subject="popp" data-added="2025-09-09">
+                <a class="quiz-link" href="quiz.html?id=popp-practice-law&mode=easy&limit=20" data-added="2025-09-09">
+                  Pharmacy Law — Practice Quiz 1 (Easy)
+                </a>
+                <a class="quiz-link" href="quiz.html?id=popp-practice-law&mode=hard&limit=20" data-added="2025-09-09">
+                  Hard
+                </a>
+              </div>
+            </li>
           </ul>
         </div>
 
-        <!-- Basis (placeholders) -->
+        <!-- Basis for Drug Therapy I (placeholders) -->
         <div class="card p-4">
           <h3 class="font-semibold">Basis for Drug Therapy I</h3>
           <ul class="mt-2 space-y-1 text-sm">
-            <li><span class="text-muted">Practice Quiz 2 — (Coming soon)</span></li>
-            <li><span class="text-muted">Practice Exam 1 — (Coming soon)</span></li>
+            <li><span style="color:var(--muted)">Practice Quiz 2 — (Coming soon)</span></li>
+            <li><span style="color:var(--muted)">Practice Exam 1 — (Coming soon)</span></li>
           </ul>
         </div>
 
-        <!-- Calculations -->
+        <!-- Pharmaceutical Calculations -->
         <div class="card p-4">
           <h3 class="font-semibold">Pharmaceutical Calculations</h3>
           <ul class="mt-2 space-y-2 text-sm">
             <li class="flex items-center justify-between">
-              <a class="quiz-link" href="quiz.html?id=calc-units-quick-easy&mode=easy&limit=20" data-new-days="7" data-added="2025-09-09">Units Quick Drill — Easy</a>
-              <span class="pill pill-new">New</span>
-            </li>
-            <li class="flex items-center justify-between">
-              <a class="quiz-link" href="quiz.html?id=calc-units-quick-hard&mode=hard&limit=20" data-new-days="7" data-added="2025-09-09">Units Quick Drill — Hard</a>
-              <span class="pill pill-new">New</span>
-            </li>
-            <li class="flex items-center justify-between">
-              <a class="quiz-link" href="quiz.html?id=calc-exam1-prep-easy&mode=easy&limit=20" data-new-days="7" data-added="2025-09-09">Exam 1 Prep (Ch. 1–4) — Easy</a>
-              <span class="pill pill-new">New</span>
-            </li>
-            <li class="flex items-center justify-between">
-              <a class="quiz-link" href="quiz.html?id=calc-exam1-prep-hard&mode=hard&limit=20" data-new-days="7" data-added="2025-09-09">Exam 1 Prep (Ch. 1–4) — Hard</a>
-              <span class="pill pill-new">New</span>
-            </li>
-            <li class="flex items-center justify-between">
-              <span class="quiz-link opacity-80 cursor-not-allowed">2024 Supplem. Exam 1</span>
+              <a class="quiz-link" href="quiz.html?id=calc-practice-exam1&mode=easy&limit=20">Practice Exam 1 (Easy)</a>
               <span class="pill pill-tbd">TBD</span>
             </li>
             <li class="flex items-center justify-between">
-              <span class="quiz-link opacity-80 cursor-not-allowed">Practice Exam 2</span>
+              <a class="quiz-link" href="quiz.html?id=calc-practice-exam1&mode=hard&limit=20">Practice Exam 1 (Hard)</a>
               <span class="pill pill-tbd">TBD</span>
             </li>
+            <li class="flex items-center justify-between">
+              <a class="quiz-link" href="quiz.html?id=calc-cumulative-quiz1-2&mode=easy&limit=20">Cumulative Practice 1–2 (Easy)</a>
+              <span class="pill pill-tbd">TBD</span>
+            </li>
+            <li class="flex items-center justify-between">
+              <a class="quiz-link" href="quiz.html?id=calc-cumulative-quiz1-2&mode=hard&limit=20">Cumulative Practice 1–2 (Hard)</a>
+              <span class="pill pill-tbd">TBD</span>
+            </li>
+            <!-- (Optional future) Units quick drill link — add when JSON is ready -->
+            <!--
+            <li>
+              <div class="flex items-center gap-2" data-subject="calc" data-added="2025-09-09">
+                <a class="quiz-link" href="quiz.html?id=calc-units-quick&mode=easy&limit=20" data-added="2025-09-09">
+                  Units Quick Drill — Easy
+                </a>
+              </div>
+            </li>
+            -->
           </ul>
         </div>
 
-        <!-- SAS -->
+        <!-- SAS I -->
         <div class="card p-4">
           <h3 class="font-semibold">SAS I</h3>
           <ul class="mt-2 space-y-1 text-sm">
-            <li><span class="text-muted">Practice items — (Coming soon)</span></li>
+            <li><span style="color:var(--muted)">Practice items — (Coming soon)</span></li>
           </ul>
         </div>
       </div>
 
+      <!-- Footer -->
       <footer class="text-center text-sm py-10 mt-8" style="color:var(--muted)">
         Pharm-let © 2025 — Study smarter, not harder ✨
       </footer>
