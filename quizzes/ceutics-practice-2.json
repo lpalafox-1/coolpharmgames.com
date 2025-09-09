@@ -1,0 +1,36 @@
+{
+  "id": "lab-quiz3-antilipemics",
+  "title": "Lab Quiz 3 — Antilipemics",
+  "pools": {
+    "easy": [
+      {
+        "type": "mcq",
+        "prompt": "What is the brand name of atorvastatin?",
+        "choices": ["Lipitor", "Zocor", "Crestor", "Pravachol"],
+        "answer": "Lipitor",
+        "explain": "Atorvastatin is marketed under the brand name Lipitor."
+      },
+      {
+        "type": "mcq",
+        "prompt": "Statins belong to which drug class?",
+        "choices": ["HMG-CoA reductase inhibitors", "Beta blockers", "ACE inhibitors", "Diuretics"],
+        "answer": "HMG-CoA reductase inhibitors"
+      }
+      // add ~15–20 total
+    ],
+    "hard": [
+      {
+        "type": "mcq",
+        "prompt": "Which enzyme do statins inhibit?",
+        "choices": ["HMG-CoA reductase", "Angiotensin converting enzyme", "Adenyl cyclase", "Cyclooxygenase"],
+        "answer": "HMG-CoA reductase"
+      },
+      {
+        "type": "short",
+        "prompt": "What is the mechanism of ezetimibe?",
+        "answerText": "Inhibits intestinal absorption of cholesterol via NPC1L1 transporter"
+      }
+      // add ~15–20 total
+    ]
+  }
+}
