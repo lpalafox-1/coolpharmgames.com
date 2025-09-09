@@ -13,6 +13,7 @@
       <div class="flex items-center justify-between gap-3">
         <a href="index.html" class="quiz-link">← Back to Library</a>
         <div class="flex items-center gap-3">
+          <button id="share" class="btn btn-ghost" type="button">Share</button>
           <div class="flex items-center gap-2">
             <label for="qcount" class="text-sm" style="color:var(--muted)">Questions:</label>
             <select id="qcount" class="btn btn-ghost">
@@ -22,7 +23,7 @@
               <option value="">All</option>
             </select>
           </div>
-          <button id="theme-toggle" class="btn btn-ghost">🌙 Dark</button>
+          <button id="theme-toggle" class="btn btn-ghost" type="button">🌙 Dark</button>
         </div>
       </div>
 
@@ -42,17 +43,16 @@
       <h2 id="prompt" class="font-semibold" aria-live="polite">Loading question…</h2>
       <div id="options" class="mt-3 space-y-2"></div>
       <div id="short-wrap" class="mt-3 hidden">
-        <input id="short-input"
-               class="w-full rounded-xl border border-slate-300 px-3 py-2"
-               placeholder="Type your answer…" />
+        <input id="short-input" class="w-full rounded-xl border border-slate-300 px-3 py-2" placeholder="Type your answer…" />
       </div>
       <div id="explain" class="explain"></div>
+      <div id="live" aria-live="polite" class="sr-only"></div>
     </section>
 
     <footer class="mt-6 flex flex-wrap gap-3">
-      <button id="prev" class="btn btn-gray" type="button">Previous</button>
-      <button id="check" class="btn btn-blue" type="button">Check</button>
-      <button id="next" class="btn btn-green hidden" type="button">Next</button>
+      <button id="prev" class="btn btn-gray" type="button">Previous (P)</button>
+      <button id="check" class="btn btn-blue" type="button">Check (C)</button>
+      <button id="next" class="btn btn-green hidden" type="button">Next (N)</button>
       <button id="restart" class="btn btn-ghost ml-auto" type="button">Restart</button>
     </footer>
 
@@ -78,8 +78,13 @@
         const u = new URL(location.href);
         if (next) u.searchParams.set('limit', next);
         else u.searchParams.delete('limit');
-        // reload with updated query
         location.href = u.toString();
+      });
+
+      // Share button
+      document.getElementById('share')?.addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(location.href); alert('Link copied!'); }
+        catch { alert('Copy failed. You can manually copy the URL.'); }
       });
     })();
   </script>
