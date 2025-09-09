@@ -113,3 +113,43 @@ label:has(input:focus-visible){outline:2px dashed var(--accent);border-radius:.5
   .btn{padding:.55rem .8rem}
   .segmented .seg-link,.segmented button{padding:.4rem .6rem;min-width:2.4rem}
 }
+/* ========= Pills (New / Featured / TBD) ========= */
+.pill{
+  display:inline-flex; align-items:center; gap:.35rem;
+  font-weight:700; font-size:.72rem; line-height:1;
+  padding:.28rem .5rem; border-radius:9999px;
+  border:1px solid transparent; user-select:none;
+}
+.pill svg{ width:.9rem; height:.9rem; }
+
+.pill-new{
+  background:#d1fae5; color:#065f46; border-color:#a7f3d0;
+}
+.dark .pill-new{
+  background:#064e3b; color:#d1fae5; border-color:#047857;
+}
+
+.pill-featured{
+  background:#dbeafe; color:#1e40af; border-color:#bfdbfe;
+}
+.dark .pill-featured{
+  background:#1e3a8a; color:#dbeafe; border-color:#1d4ed8;
+}
+
+.pill-tbd{
+  background:#fef3c7; color:#92400e; border-color:#fde68a;
+}
+.dark .pill-tbd{
+  background:#78350f; color:#fde68a; border-color:#f59e0b;
+}
+
+/* Button polish so Start buttons look consistent next to pills */
+.btn{ border-radius:.75rem; padding:.6rem 1rem; font-weight:600; min-height:44px; }
+.btn-ghost{ background:transparent; border:1px solid var(--ring); }
+.btn-blue{ background:var(--accent); color:#fff; }
+.btn-blue:hover{ background:var(--accent-600); }
+.btn-green{ background:#16a34a; color:#fff; }
+.btn-gray{ background:#e5e7eb; } .dark .btn-gray{ background:#374151; color:#e5e7eb; }
+
+/* Ensure pills don’t break layout in rows */
+.actions-row{ display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; }
