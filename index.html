@@ -19,14 +19,23 @@
              script-src 'self' https://cdn.tailwindcss.com;
              connect-src 'self';">
 
+  <!-- Tailwind + site styles -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="assets/css/styles.css" />
+
   <style>
-    .hero {
+    /* soft maroon glow in hero */
+    .hero{
       background:
         radial-gradient(1200px 600px at 10% -20%, rgba(139,30,63,.18), transparent 40%),
         radial-gradient(800px 400px at 100% 0%, rgba(139,30,63,.10), transparent 45%);
     }
+    /* tiny pills for NEW / FEATURED / TBD */
+    .pill{display:inline-flex;align-items:center;gap:.35rem;font-size:.72rem;font-weight:700;
+      padding:.18rem .5rem;border-radius:9999px;line-height:1;vertical-align:middle}
+    .pill-new{background:#10b981;color:#062b22}
+    .pill-featured{background:#3b82f6;color:#061a34}
+    .pill-tbd{background:#f59e0b;color:#111827}
   </style>
 </head>
 
@@ -37,7 +46,7 @@
     <button id="theme-toggle" class="btn btn-ghost" type="button">🌙 Dark</button>
   </header>
 
-  <!-- Welcome (kept but hidden by default so you never get a white page) -->
+  <!-- Welcome (hidden by default; home.js will show on first visit) -->
   <section id="welcome" class="min-h-[60vh] flex items-center justify-center px-4" style="display:none;">
     <div class="card max-w-xl w-full p-6">
       <h1 class="text-2xl font-bold">Welcome to Pharm-let 👋</h1>
@@ -52,9 +61,9 @@
     </div>
   </section>
 
-  <!-- MENU: **VISIBLE BY DEFAULT** so no more blank page -->
+  <!-- MENU: visible by default (so no blank page even if JS fails) -->
   <section id="menu">
-    <!-- Hero -->
+    <!-- Hero + Featured -->
     <section class="hero">
       <div class="max-w-5xl mx-auto px-4 pt-10 pb-8">
         <div class="grid md:grid-cols-[1.2fr_.8fr] gap-6 items-start">
@@ -63,32 +72,41 @@
             <p class="mt-2 text-lg" style="color:var(--muted)">
               Targeted practice for P1 courses. Clean UI, dark mode, and a 🔥 streak for sustained accuracy.
             </p>
+            <!-- Resume last quiz (auto-shown by home.js if found) -->
             <div class="mt-4 flex flex-wrap gap-3" id="resume-wrap" style="display:none;">
               <a id="resume-link" class="btn btn-ghost">Resume last quiz</a>
             </div>
           </div>
 
-          <!-- Featured cards (static is fine) -->
+          <!-- Featured cards (static; tweak anytime) -->
           <div class="space-y-4">
             <div class="card p-4 bg-[var(--accent)] text-white">
-              <div class="text-sm opacity-90">Featured cumulative</div>
-              <div class="font-semibold">Cumulative Quiz 1–4</div>
+              <div class="flex items-center gap-2 text-sm opacity-90">
+                <span class="pill pill-featured">FEATURED</span> <span>Featured cumulative</span>
+              </div>
+              <div class="font-semibold mt-1">Cumulative Quiz 1–4</div>
               <div class="mt-2 flex gap-2">
                 <a class="btn btn-blue" href="quiz.html?id=cumulative-quiz1-4&mode=easy&limit=20">Start (Easy)</a>
                 <a class="btn btn-blue" href="quiz.html?id=cumulative-quiz1-4&mode=hard&limit=20">Start (Hard)</a>
               </div>
             </div>
+
             <div class="card p-4 bg-[var(--accent)] text-white">
-              <div class="text-sm opacity-90">Featured</div>
-              <div class="font-semibold">Lab Quiz 5 — Antiarrhythmics</div>
+              <div class="flex items-center gap-2 text-sm opacity-90">
+                <span class="pill pill-new">NEW</span> <span>Latest unit</span>
+              </div>
+              <div class="font-semibold mt-1">Lab Quiz 5 — Antiarrhythmics</div>
               <div class="mt-2 flex gap-2">
                 <a class="btn btn-blue" href="quiz.html?id=lab-quiz5-antiarrhythmics&mode=easy&limit=20">Start (Easy)</a>
                 <a class="btn btn-blue" href="quiz.html?id=lab-quiz5-antiarrhythmics&mode=hard&limit=20">Start (Hard)</a>
               </div>
             </div>
+
             <div class="card p-4 bg-[var(--accent)] text-white">
-              <div class="text-sm opacity-90">Featured exam</div>
-              <div class="font-semibold">Principles of Pharmacy Practice — Practice Exam 1</div>
+              <div class="flex items-center gap-2 text-sm opacity-90">
+                <span class="pill pill-featured">FEATURED</span> <span>Featured exam</span>
+              </div>
+              <div class="font-semibold mt-1">Principles of Pharmacy Practice — Practice Exam 1</div>
               <div class="mt-2 flex gap-2">
                 <a class="btn btn-blue" href="quiz.html?id=popp-practice-exam1&mode=easy&limit=20">Start (Easy)</a>
                 <a class="btn btn-blue" href="quiz.html?id=popp-practice-exam1&mode=hard&limit=20">Start (Hard)</a>
@@ -99,10 +117,11 @@
       </div>
     </section>
 
-    <!-- Classes grid (SINGLE main id="classes") -->
+    <!-- Classes grid -->
     <main id="classes" class="max-w-5xl mx-auto px-4 pb-16">
       <div class="flex items-end justify-between gap-4 mb-4">
         <h2 class="text-xl font-bold">Classes</h2>
+        <!-- Quick filter -->
         <input id="class-filter" class="w-64 rounded-xl border px-3 py-2"
                style="border-color:var(--ring); background:var(--card); color:var(--text)"
                placeholder="Filter: e.g., Anticoagulants, Easy, POPP" />
@@ -118,21 +137,24 @@
           </ul>
         </div>
 
-        <!-- Lab — Unit Quizzes -->
+        <!-- Longitudinal Lab — Unit Quizzes -->
         <div class="card p-4">
           <h3 class="font-semibold">Longitudinal Lab — Unit Quizzes</h3>
           <ul class="mt-2 space-y-1 text-sm">
             <li><a class="quiz-link" href="quiz.html?id=lab-quiz1-antihypertensives&mode=easy&limit=20">Lab Quiz 1 — Antihypertensives (Easy)</a></li>
             <li><a class="quiz-link" href="quiz.html?id=lab-quiz1-antihypertensives&mode=hard&limit=20">Lab Quiz 1 — Antihypertensives (Hard)</a></li>
+
             <li><a class="quiz-link" href="quiz.html?id=lab-quiz2-antihypertensives&mode=easy&limit=20">Lab Quiz 2 — Antihypertensives (Easy)</a></li>
             <li><a class="quiz-link" href="quiz.html?id=lab-quiz2-antihypertensives&mode=hard&limit=20">Lab Quiz 2 — Antihypertensives (Hard)</a></li>
+
             <li><a class="quiz-link" href="quiz.html?id=lab-quiz3-antilipemics&mode=easy&limit=20">Lab Quiz 3 — Antilipemics (Easy)</a></li>
             <li><a class="quiz-link" href="quiz.html?id=lab-quiz3-antilipemics&mode=hard&limit=20">Lab Quiz 3 — Antilipemics (Hard)</a></li>
+
             <li>
               <div class="quiz-card p-3 mt-2 bg-[var(--accent)]/10 border border-[var(--accent)]/30 rounded-xl">
                 <div class="flex items-center justify-between">
                   <span class="font-semibold">Lab Quiz 4 — Anticoagulants</span>
-                  <span class="text-xs opacity-70">Featured</span>
+                  <span class="pill pill-featured">FEATURED</span>
                 </div>
                 <div class="mt-2 flex gap-2">
                   <a class="btn btn-blue" href="quiz.html?id=lab-quiz4-anticoagulants&mode=easy&limit=20">Start (Easy)</a>
@@ -140,11 +162,12 @@
                 </div>
               </div>
             </li>
+
             <li>
               <div class="quiz-card p-3 mt-2 bg-[var(--accent)]/10 border border-[var(--accent)]/30 rounded-xl">
                 <div class="flex items-center justify-between">
                   <span class="font-semibold">Lab Quiz 5 — Antiarrhythmics</span>
-                  <span class="text-xs opacity-70">Featured</span>
+                  <span class="pill pill-new">NEW</span>
                 </div>
                 <div class="mt-2 flex gap-2">
                   <a class="btn btn-blue" href="quiz.html?id=lab-quiz5-antiarrhythmics&mode=easy&limit=20">Start (Easy)</a>
@@ -155,7 +178,7 @@
           </ul>
         </div>
 
-        <!-- Lab — Cumulative -->
+        <!-- Longitudinal Lab — Cumulative Practice -->
         <div class="card p-4">
           <h3 class="font-semibold">Longitudinal Lab — Cumulative Practice</h3>
           <ul class="mt-2 space-y-1 text-sm">
@@ -167,6 +190,7 @@
               <div class="quiz-card p-3 mt-2 bg-[var(--accent)]/10 border border-[var(--accent)]/30 rounded-xl">
                 <div class="flex items-center justify-between">
                   <span class="font-semibold">Cumulative Quiz 1–4</span>
+                  <span class="pill pill-featured">FEATURED</span>
                 </div>
                 <div class="mt-2 flex gap-2">
                   <a class="btn btn-blue" href="quiz.html?id=cumulative-quiz1-4&mode=easy&limit=20">Start (Easy)</a>
@@ -185,6 +209,7 @@
               <div class="quiz-card p-3 mt-1 bg-[var(--accent)]/10 border border-[var(--accent)]/30 rounded-xl">
                 <div class="flex items-center justify-between">
                   <span class="font-semibold">Practice Exam 1</span>
+                  <span class="pill pill-featured">FEATURED</span>
                 </div>
                 <div class="mt-2 flex gap-2">
                   <a class="quiz-link btn btn-blue" href="quiz.html?id=popp-practice-exam1&mode=easy&limit=20">Start (Easy)</a>
@@ -212,19 +237,19 @@
           <ul class="mt-2 space-y-2 text-sm">
             <li class="flex items-center justify-between">
               <a class="quiz-link" href="quiz.html?id=calc-practice-exam1&mode=easy&limit=20">Practice Exam 1 (Easy)</a>
-              <span class="badge">TBD</span>
+              <span class="pill pill-tbd">TBD</span>
             </li>
             <li class="flex items-center justify-between">
               <a class="quiz-link" href="quiz.html?id=calc-practice-exam1&mode=hard&limit=20">Practice Exam 1 (Hard)</a>
-              <span class="badge">TBD</span>
+              <span class="pill pill-tbd">TBD</span>
             </li>
             <li class="flex items-center justify-between">
               <a class="quiz-link" href="quiz.html?id=calc-cumulative-quiz1-2&mode=easy&limit=20">Cumulative Practice 1–2 (Easy)</a>
-              <span class="badge">TBD</span>
+              <span class="pill pill-tbd">TBD</span>
             </li>
             <li class="flex items-center justify-between">
               <a class="quiz-link" href="quiz.html?id=calc-cumulative-quiz1-2&mode=hard&limit=20">Cumulative Practice 1–2 (Hard)</a>
-              <span class="badge">TBD</span>
+              <span class="pill pill-tbd">TBD</span>
             </li>
           </ul>
         </div>
@@ -245,7 +270,14 @@
     </main>
   </section>
 
-  <!-- Single safe script -->
+  <!-- Safe single script (crash-proof) -->
   <script src="assets/js/home.js" defer></script>
+
+  <!-- NoScript hint -->
+  <noscript>
+    <div style="max-width:780px;margin:1rem auto;padding:1rem;border:1px solid #ddd;border-radius:12px;">
+      JavaScript is off or failed to load. The menu is visible, but some features may be limited.
+    </div>
+  </noscript>
 </body>
 </html>
