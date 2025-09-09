@@ -209,6 +209,22 @@ function showResults(){
 }
 
 /* ---------- helpers ---------- */
+  } else if (q.type === "short") {
+    els.shortWrap.classList.remove("hidden");
+    els.shortInput.value = q._user || ""; 
+    els.shortInput.disabled = q._answered || state.review;
+  } else {
+    els.options.innerHTML = `<p style="color:var(--muted)">Unsupported question type.</p>`;
+  }
+
+  if (q._answered || state.review) {
+    renderAnswerReveal(q);
+  }
+
+  updateProgressAndFlame();
+}
+
+
 function currentQ(){ return state.questions[state.index]; }
 
 function updateProgressAndFlame(){
