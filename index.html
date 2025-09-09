@@ -17,11 +17,12 @@
       border-radius: 1rem;
       box-shadow: 0 10px 15px -3px rgba(0,0,0,.08), 0 4px 6px -2px rgba(0,0,0,.04);
     }
-    .disabled { opacity:.6; pointer-events:none; }
     .badge { font-size:.75rem; padding:.15rem .5rem; border-radius:.5rem; }
+    .disabled { opacity:.6; pointer-events:none; }
   </style>
 </head>
 <body class="min-h-screen">
+
   <!-- Top bar -->
   <header class="sticky top-0 z-10 backdrop-blur supports-[backdrop-filter]:bg-white/70 dark:supports-[backdrop-filter]:bg-black/40 border-b border-[var(--ring)]">
     <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -33,144 +34,200 @@
     </div>
   </header>
 
-  <!-- Hero -->
-  <section class="hero">
-    <div class="max-w-5xl mx-auto px-4 pt-10 pb-8">
-      <div class="grid md:grid-cols-[1.2fr_.8fr] gap-6 items-center">
-        <div>
-          <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">Your P1 Fall study home.</h1>
-          <p class="mt-2 text-[var(--muted)] text-lg">
-            Practice quizzes with a clean UI, dark mode, and a 🔥 streak when you stay ≥80% during play.
-          </p>
-          <div class="mt-4 flex flex-wrap gap-3">
-            <a href="#classes" class="btn btn-blue">Start learning</a>
-            <a href="quiz.html?id=lab-week2-antihypertensives&mode=easy" class="btn btn-ghost">Jump to Week 2</a>
-          </div>
-        </div>
+  <!-- Welcome (first visit only) -->
+  <section id="welcome" class="min-h-[60vh] flex items-center justify-center px-4" style="display:none;">
+    <div class="card max-w-xl w-full p-6">
+      <h1 class="text-2xl font-bold">Welcome to Pharm-let 👋</h1>
+      <p class="mt-2" style="color:var(--muted)">
+        Quick practice for quizzes & exams. Dark mode, 🔥 streak, and clean UI.
+      </p>
 
-        <!-- Featured quiz -->
-        <div class="card p-5">
-          <div class="flex items-center justify-between">
-            <div>
-              <div class="text-sm" style="color:var(--muted)">Featured quiz</div>
-              <div class="font-semibold">Lab Week 2 — Antihypertensives</div>
-            </div>
-            <div class="text-3xl">🔥</div>
-          </div>
-          <div class="mt-4">
-            <div class="progress-bar-container">
-              <div class="progress-bar" style="width: 65%;"></div>
-            </div>
-            <p class="text-sm" style="color:var(--muted)">Keep ≥80% accuracy to light the flame.</p>
-          </div>
-          <div class="mt-4 flex gap-2">
-            <a class="btn btn-blue flex-1 text-center" href="quiz.html?id=lab-week2-antihypertensives&mode=easy">Start (Easy)</a>
-            <a class="btn btn-gray flex-1 text-center" href="quiz.html?id=lab-week2-antihypertensives&mode=hard">Hard</a>
-          </div>
-        </div>
+      <div class="mt-4">
+        <label class="block text-sm mb-1" for="your-name" style="color:var(--muted)">Your name (optional)</label>
+        <input id="your-name" class="w-full rounded-lg border px-3 py-2"
+               style="border-color:var(--ring); background:var(--card); color:var(--text)"
+               placeholder="e.g., Luis" />
       </div>
+
+      <div class="mt-4 flex gap-3">
+        <button id="start-now" class="btn btn-blue">Let’s go</button>
+        <button id="skip" class="btn btn-ghost">Skip</button>
+      </div>
+
+      <p class="mt-3 text-sm" style="color:var(--muted)">You can toggle themes anytime with the button above.</p>
     </div>
   </section>
 
-  <!-- Classes -->
-  <main id="classes" class="max-w-5xl mx-auto px-4 pb-16">
-    <h2 class="text-2xl font-bold mt-8 mb-4">Classes</h2>
-
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-      <!-- PHPR 71101 Longitudinal Lab I (LIVE) -->
-      <section class="card p-5 flex flex-col">
-        <div class="flex items-start justify-between">
+  <!-- Main menu (hero + classes) -->
+  <section id="menu" style="display:none;">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="max-w-5xl mx-auto px-4 pt-10 pb-8">
+        <div class="grid md:grid-cols-[1.2fr_.8fr] gap-6 items-center">
           <div>
-            <h3 class="font-semibold text-lg">PHPR 71101 Longitudinal Lab I</h3>
-            <p class="text-sm" style="color:var(--muted)">Brand/generic, classes, MOA</p>
+            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">
+              Your P1 Fall study home.
+            </h1>
+            <p class="mt-2 text-lg" style="color:var(--muted)">
+              Practice with a clean UI, dark mode, and a 🔥 streak when you stay ≥80% during play.
+            </p>
+            <div class="mt-4 flex flex-wrap gap-3">
+              <a href="#classes" class="btn btn-blue">Start learning</a>
+              <a href="quiz.html?id=lab-week2-antihypertensives&mode=easy" class="btn btn-ghost">Jump to Week 2</a>
+            </div>
           </div>
-          <span class="badge bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300">LIVE</span>
+
+          <!-- Featured quiz card -->
+          <div class="card p-5">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-sm" style="color:var(--muted)">Featured quiz</div>
+                <div class="font-semibold">Lab Week 2 — Antihypertensives</div>
+              </div>
+              <div class="text-3xl">🔥</div>
+            </div>
+            <div class="mt-4">
+              <div class="progress-bar-container">
+                <div class="progress-bar" style="width: 65%;"></div>
+              </div>
+              <p class="text-sm" style="color:var(--muted)">Keep ≥80% accuracy to light the flame.</p>
+            </div>
+            <div class="mt-4 flex gap-2">
+              <a class="btn btn-blue flex-1 text-center" href="quiz.html?id=lab-week2-antihypertensives&mode=easy">Start (Easy)</a>
+              <a class="btn btn-gray flex-1 text-center" href="quiz.html?id=lab-week2-antihypertensives&mode=hard">Hard</a>
+            </div>
+          </div>
         </div>
-        <ul class="mt-4 space-y-2">
-          <!-- Working quizzes -->
-          <li><a class="quiz-link" href="quiz.html?id=lab-week2-antihypertensives&mode=easy">Quiz 2 — Week 2 Drugs (Easy)</a></li>
-          <li><a class="quiz-link" href="quiz.html?id=lab-week2-antihypertensives&mode=hard">Quiz 2 — Week 2 Drugs (Hard)</a></li>
-          <!-- Your planned sets (placeholders from your file) -->
-          <li><span class="disabled quiz-link">quiz1_week1 — Coming soon</span></li>
-          <li><span class="disabled quiz-link">quiz2_week4 — Coming soon</span></li>
-          <li><span class="disabled quiz-link">quiz3_weeks1_4 — Coming soon</span></li>
-          <li><span class="disabled quiz-link">quiz4_week5 — Coming soon</span></li>
-        </ul>
-        <div class="mt-4 text-sm" style="color:var(--muted)">Add any of these by dropping a matching JSON into <code>/quizzes</code> and linking it.</div>
-      </section>
+      </div>
+    </section>
 
-      <!-- PSCI 71103 Basis for Drug Therapy I -->
-      <section class="card p-5 opacity-90">
-        <h3 class="font-semibold text-lg">PSCI 71103 Basis for Drug Therapy I</h3>
-        <p class="text-sm" style="color:var(--muted)">Physiology & targets</p>
-        <div class="mt-4"><span class="badge bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">Coming soon</span></div>
-      </section>
+    <!-- Classes -->
+    <main id="classes" class="max-w-5xl mx-auto px-4 pb-16">
+      <h2 class="text-2xl font-bold mt-8 mb-4">Classes</h2>
 
-      <!-- PSCI 71303 Pharmaceutics I -->
-<!-- PSCI 71303 Pharmaceutics I -->
-<section class="card p-5">
-  <div class="flex items-start justify-between">
-    <div>
-      <h3 class="font-semibold text-lg">PSCI 71303 Pharmaceutics I</h3>
-      <p class="text-sm" style="color:var(--muted)">Foundations, ADME, dosage forms</p>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+
+        <!-- PHPR 71101 Longitudinal Lab I (LIVE) -->
+        <section class="card p-5 flex flex-col">
+          <div class="flex items-start justify-between">
+            <div>
+              <h3 class="font-semibold text-lg">PHPR 71101 Longitudinal Lab I</h3>
+              <p class="text-sm" style="color:var(--muted)">Brand/generic, classes, MOA</p>
+            </div>
+            <span class="badge bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300">LIVE</span>
+          </div>
+          <ul class="mt-4 space-y-2">
+            <li><a class="quiz-link" href="quiz.html?id=lab-week2-antihypertensives&mode=easy">Quiz 2 — Week 2 Drugs (Easy)</a></li>
+            <li><a class="quiz-link" href="quiz.html?id=lab-week2-antihypertensives&mode=hard">Quiz 2 — Week 2 Drugs (Hard)</a></li>
+            <!-- planned sets (placeholders you can light up later) -->
+            <li><span class="disabled quiz-link">quiz1_week1 — Coming soon</span></li>
+            <li><span class="disabled quiz-link">quiz2_week4 — Coming soon</span></li>
+            <li><span class="disabled quiz-link">quiz3_weeks1_4 — Coming soon</span></li>
+            <li><span class="disabled quiz-link">quiz4_week5 — Coming soon</span></li>
+          </ul>
+        </section>
+
+        <!-- PSCI 71303 Pharmaceutics I (LIVE: your Ceutics Practice 1) -->
+        <section class="card p-5 flex flex-col">
+          <div class="flex items-start justify-between">
+            <div>
+              <h3 class="font-semibold text-lg">PSCI 71303 Pharmaceutics I</h3>
+              <p class="text-sm" style="color:var(--muted)">Foundations, ADME, dosage forms</p>
+            </div>
+            <span class="badge bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300">LIVE</span>
+          </div>
+          <ul class="mt-4 space-y-2">
+            <li>
+              <a class="quiz-link" href="quiz.html?id=ceutics-practice-1&mode=easy">
+                Pharmaceutics Practice 1 — Easy
+              </a>
+            </li>
+            <li>
+              <a class="quiz-link" href="quiz.html?id=ceutics-practice-1&mode=hard">
+                Pharmaceutics Practice 1 — Hard
+              </a>
+            </li>
+          </ul>
+        </section>
+
+        <!-- PSCI 71103 Basis for Drug Therapy I -->
+        <section class="card p-5 opacity-90">
+          <h3 class="font-semibold text-lg">PSCI 71103 Basis for Drug Therapy I</h3>
+          <p class="text-sm" style="color:var(--muted)">Physiology & targets</p>
+          <div class="mt-4"><span class="badge bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">Coming soon</span></div>
+        </section>
+
+        <!-- PHPR 71143 Social & Admin Sciences I -->
+        <section class="card p-5 opacity-90">
+          <h3 class="font-semibold text-lg">PHPR 71143 Social & Admin Sciences I</h3>
+          <p class="text-sm" style="color:var(--muted)">Systems & policy</p>
+          <div class="mt-4"><span class="badge bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">Coming soon</span></div>
+        </section>
+
+        <!-- PHPR 71133 Principles of Pharmacy Practice I -->
+        <section class="card p-5 opacity-90">
+          <h3 class="font-semibold text-lg">PHPR 71133 Principles of Pharmacy Practice I</h3>
+          <p class="text-sm" style="color:var(--muted)">Counseling & dispensing</p>
+          <div class="mt-4"><span class="badge bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">Coming soon</span></div>
+        </section>
+
+        <!-- PHPR 71002 Pharmaceutical Calculations -->
+        <section class="card p-5 opacity-90">
+          <h3 class="font-semibold text-lg">PHPR 71002 Pharmaceutical Calculations</h3>
+          <p class="text-sm" style="color:var(--muted)">Math you’ll actually use</p>
+          <div class="mt-4"><span class="badge bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">Coming soon</span></div>
+        </section>
+
+      </div>
+    </main>
+
+    <!-- Footer (clean) -->
+    <div class="mt-6 pb-10 text-center text-sm" style="color:var(--muted)">
+      Pharm-let © 2025 — Study smarter, not harder ✨
     </div>
-    <span class="badge bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300">LIVE</span>
-  </div>
-  <ul class="mt-4 space-y-2">
-    <li>
-      <a class="quiz-link" href="quiz.html?id=ceutics-practice-1&mode=easy">
-        Pharmaceutics Practice 1 — Easy
-      </a>
-    </li>
-    <li>
-      <a class="quiz-link" href="quiz.html?id=ceutics-practice-1&mode=hard">
-        Pharmaceutics Practice 1 — Hard
-      </a>
-    </li>
-  </ul>
-</section>
+  </section>
 
-
-      <!-- PHPR 71143 Social & Admin Sciences I -->
-      <section class="card p-5 opacity-90">
-        <h3 class="font-semibold text-lg">PHPR 71143 Social & Admin Sciences I</h3>
-        <p class="text-sm" style="color:var(--muted)">Systems & policy</p>
-        <div class="mt-4"><span class="badge bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">Coming soon</span></div>
-      </section>
-
-      <!-- PHPR 71133 Principles of Pharmacy Practice I -->
-      <section class="card p-5 opacity-90">
-        <h3 class="font-semibold text-lg">PHPR 71133 Principles of Pharmacy Practice I</h3>
-        <p class="text-sm" style="color:var(--muted)">Counseling & dispensing</p>
-        <div class="mt-4"><span class="badge bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">Coming soon</span></div>
-      </section>
-
-      <!-- PHPR 71002 Pharmaceutical Calculations -->
-      <section class="card p-5 opacity-90">
-        <h3 class="font-semibold text-lg">PHPR 71002 Pharmaceutical Calculations</h3>
-        <p class="text-sm" style="color:var(--muted)">Math you’ll actually use</p>
-        <div class="mt-4"><span class="badge bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">Coming soon</span></div>
-      </section>
-    </div>
-
-    <div class="mt-10 text-center text-sm" style="color:var(--muted)">
-      Theme saves across pages • Add quizzes by dropping JSON into <code>/quizzes</code>
-    </div>
-  </main>
-
-  <!-- theme script -->
+  <!-- Theme + welcome logic -->
   <script>
-    const THEME_KEY="quiz-theme";
+    const THEME_KEY = "quiz-theme";
     function applyTheme(mode){
       document.documentElement.classList.toggle("dark", mode==="dark");
-      const btn=document.getElementById("theme-toggle");
-      if(btn) btn.textContent = mode==="dark" ? "☀️ Light" : "🌙 Dark";
+      const btn = document.getElementById("theme-toggle");
+      if (btn) btn.textContent = mode==="dark" ? "☀️ Light" : "🌙 Dark";
     }
-    applyTheme(localStorage.getItem(THEME_KEY)||"light");
+    applyTheme(localStorage.getItem(THEME_KEY) || "light");
     document.getElementById("theme-toggle")?.addEventListener("click",()=>{
-      const next=document.documentElement.classList.contains("dark")?"light":"dark";
+      const next = document.documentElement.classList.contains("dark") ? "light" : "dark";
       applyTheme(next); localStorage.setItem(THEME_KEY,next);
     });
+
+    // welcome/menu toggle
+    const KEY = 'pharmlet.welcomeDone';
+    const welcome = document.getElementById('welcome');
+    const menu = document.getElementById('menu');
+    function show(el, on=true){ el.style.display = on ? '' : 'none'; }
+    const done = localStorage.getItem(KEY) === '1';
+    show(welcome, !done);
+    show(menu, done);
+
+    document.getElementById('start-now')?.addEventListener('click', () => {
+      const name = document.getElementById('your-name')?.value?.trim();
+      if (name) localStorage.setItem('pharmlet.userName', name);
+      localStorage.setItem(KEY, '1');
+      show(welcome,false); show(menu,true);
+      injectName();
+    });
+    document.getElementById('skip')?.addEventListener('click', () => {
+      localStorage.setItem(KEY, '1');
+      show(welcome,false); show(menu,true);
+    });
+
+    function injectName(){
+      const name = localStorage.getItem('pharmlet.userName');
+      const hero = document.querySelector('.hero h1');
+      if (name && hero) hero.innerHTML = `Welcome back, <span class="font-extrabold">${name}</span>. Ready to study?`;
+    }
+    injectName();
   </script>
 </body>
 </html>
