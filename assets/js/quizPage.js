@@ -1,49 +1,53 @@
 // assets/js/quizPage.js
 (function () {
-  // --- Build hard links for the segmented control (5 / 10 / 20 / All) ---
+  /* ---------- Segmented "Questions" control ---------- */
   const group = document.getElementById('qcount-group');
   if (group) {
-    const current = new URL(location.href).searchParams.get('limit') || '';
+    const url = new URL(location.href);
+    const current = url.searchParams.get('limit') || ''; // '' means All
 
-    const hrefFor = (limit) => {
-      const u = new URL(location.href);
-      if (limit) u.searchParams.set('limit', String(limit));
-      else u.searchParams.delete('limit'); // All
-      return u.toString();
-    };
+    // mark active
+    group.querySelectorAll('.seg-link').forEach(link => {
+      const val = link.getAttribute('data-limit') ?? '';
+      link.classList.toggle('active', val === current);
 
-    group.innerHTML = [
-      { label: '5',  val: '5'  },
-      { label: '10', val: '10' },
-      { label: '20', val: '20' },
-      { label: 'All',val: ''   }
-    ].map(opt => {
-      const active = (opt.val === current) ? 'active' : '';
-      return `<a class="seg-link ${active}" href="${hrefFor(opt.val)}" data-limit="${opt.val}">${opt.label}</a>`;
-    }).join('');
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const u = new URL(location.href);
+        const next = link.getAttribute('data-limit') ?? '';
+        if (next) u.searchParams.set('limit', next);
+        else u.searchParams.delete('limit');  // All
+        // keep id/mode/seed as-is
+        location.href = u.toString();
+      });
+    });
   }
 
-  // --- Share link ---
+  /* ---------- Share button ---------- */
   document.getElementById('share')?.addEventListener('click', async () => {
-    try { await navigator.clipboard.writeText(location.href); alert('Link copied!'); }
-    catch { alert('Copy failed. You can manually copy the URL.'); }
+    try {
+      await navigator.clipboard.writeText(location.href);
+      alert('Link copied!');
+    } catch {
+      alert('Copy failed. You can manually copy the URL.');
+    }
   });
 
-  // --- Theme button (persist + label) ---
+  /* ---------- Theme toggle (persist + label) ---------- */
   const THEME_KEY = "quiz-theme";
-  const t = document.getElementById("theme-toggle");
-  if (t) {
+  const btn = document.getElementById('theme-toggle');
+  if (btn) {
     const saved = localStorage.getItem(THEME_KEY);
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const startMode = saved || (prefersDark ? 'dark' : 'light');
-    document.documentElement.classList.toggle('dark', startMode === 'dark');
-    t.textContent = document.documentElement.classList.contains("dark") ? "☀️ Light" : "🌙 Dark";
+    const start = saved || (prefersDark ? 'dark' : 'light');
+    document.documentElement.classList.toggle('dark', start === 'dark');
+    btn.textContent = start === 'dark' ? '☀️ Light' : '🌙 Dark';
 
-    t.addEventListener("click", () => {
-      const next = document.documentElement.classList.contains("dark") ? "light" : "dark";
-      document.documentElement.classList.toggle("dark", next === "dark");
+    btn.addEventListener('click', () => {
+      const next = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+      document.documentElement.classList.toggle('dark', next === 'dark');
       localStorage.setItem(THEME_KEY, next);
-      t.textContent = next === "dark" ? "☀️ Light" : "🌙 Dark";
+      btn.textContent = next === 'dark' ? '☀️ Light' : '🌙 Dark';
     });
   }
 })();
