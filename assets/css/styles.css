@@ -1,10 +1,26 @@
 :root{
-  --bg:#f3f4f6; --card:#fff; --text:#111827; --muted:#6b7280;
-  --accent:#3b82f6; --good:#10b981; --bad:#ef4444; --ring:#e5e7eb;
+  /* UAMS-like maroon theme */
+  --bg:#f6f5f5;
+  --card:#ffffff;
+  --text:#1f2937;
+  --muted:#6b7280;
+  --accent:#8b1e3f;      /* primary maroon */
+  --accent-600:#731933;  /* darker maroon for hover/active */
+  --good:#10b981;
+  --bad:#ef4444;
+  --ring:#e5e7eb;
 }
-.dark{ --bg:#0f172a; --card:#1f2937; --text:#e5e7eb; --muted:#9ca3af; --accent:#60a5fa; --good:#34d399; --bad:#f87171; --ring:#374151; }
-html,body{ background:var(--bg); color:var(--text); }
-
+.dark{
+  --bg:#0f172a;
+  --card:#1f2937;
+  --text:#e5e7eb;
+  --muted:#9ca3af;
+  --accent:#b3274f;      /* slightly brighter maroon in dark */
+  --accent-600:#8b1e3f;
+  --good:#34d399;
+  --bad:#f87171;
+  --ring:#374151;
+}
 .quiz-card{ background:var(--card); border-radius:1rem; box-shadow:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -2px rgba(0,0,0,.05); padding:1rem 1.25rem; border:1px solid var(--ring); }
 .explain{ display:none; margin-top:.75rem; font-size:.95rem; color:var(--muted); }
 .explain.show{ display:block; }
