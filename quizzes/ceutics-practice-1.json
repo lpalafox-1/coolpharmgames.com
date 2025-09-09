@@ -1,6 +1,6 @@
 {
-  "title": "Pharmaceutics Practice 1",
-  "subtitle": "PSCI 71303 — Quiz 1 Practice (Easy/Hard pools)",
+  "title": "PSCI 71303 Pharmaceutics",
+  "subtitle": "Practice Quiz 1 (Easy/Hard pools)",
   "pools": {
     "easy": [
       { "type": "mcq", "prompt": "What is the primary purpose of the active pharmaceutical ingredient (API) in a drug?", "choices": ["To act as a filler","The primary component responsible for the intended therapeutic effect","To make the drug taste better","To bind the tablet together"], "answer": "The primary component responsible for the intended therapeutic effect" },
