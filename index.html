@@ -25,11 +25,13 @@
 
   <!-- Subtle hero background -->
   <style>
-    .hero {
+    .hero{
       background:
         radial-gradient(1200px 600px at 10% -20%, rgba(139,30,63,.18), transparent 40%),
         radial-gradient(800px 400px at 100% 0%, rgba(139,30,63,.10), transparent 45%);
     }
+    .badge{font-size:.72rem; border-radius:.5rem; padding:.15rem .4rem; border:1px solid var(--ring); color:var(--muted)}
+    .badge-new{color:#fff; background:var(--accent); border-color:transparent}
   </style>
 </head>
 
@@ -64,41 +66,38 @@
       <div class="max-w-5xl mx-auto px-4 pt-10 pb-8">
         <div class="grid md:grid-cols-[1.2fr_.8fr] gap-6 items-center">
           <div>
-            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">
-              P1 Fall 2025 — Practice Hub
-            </h1>
+            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">P1 Fall 2025 — Practice Hub</h1>
             <p class="mt-2 text-lg" style="color:var(--muted)">
               Targeted practice across your courses. Clean UI, dark mode, and a 🔥 streak for sustained accuracy.
             </p>
 
-            <!-- Resume last quiz (auto-shows if found) -->
+            <!-- Resume last quiz (auto-shows if found by home.js) -->
             <div class="mt-4 flex flex-wrap gap-3" id="resume-wrap" style="display:none;">
               <a id="resume-link" class="btn btn-ghost">Resume last quiz</a>
             </div>
           </div>
 
-          <!-- Featured: adjust anytime -->
+          <!-- Featured (change anytime) -->
           <div class="card p-4">
             <div class="text-sm" style="color:var(--muted)">Featured</div>
-            <div class="font-semibold">Lab Quiz 3 — Antilipemics</div>
+            <div class="font-semibold">Lab Quiz 4 — Anticoagulants <span class="badge badge-new">NEW</span></div>
             <div class="mt-2 flex gap-2">
-              <a class="btn btn-blue" href="quiz.html?id=lab-quiz3-antilipemics&mode=easy">Start (Easy)</a>
-              <a class="btn btn-blue" href="quiz.html?id=lab-quiz3-antilipemics&mode=hard">Start (Hard)</a>
+              <a class="btn btn-blue" href="quiz.html?id=lab-quiz4-anticoagulants&mode=easy">Start (Easy)</a>
+              <a class="btn btn-blue" href="quiz.html?id=lab-quiz4-anticoagulants&mode=hard">Start (Hard)</a>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Classes grid + filter -->
+    <!-- Classes + filter -->
     <main id="classes" class="max-w-5xl mx-auto px-4 pb-16">
       <div class="flex items-end justify-between gap-4 mb-4">
         <h2 class="text-xl font-bold">Classes</h2>
-        <!-- Quick filter (filters all links below) -->
         <input id="class-filter"
                class="w-64 rounded-xl border px-3 py-2"
                style="border-color:var(--ring); background:var(--card); color:var(--text)"
-               placeholder="Filter: e.g., Quiz 2, Antilipemics, Easy" />
+               placeholder="Filter: e.g., Quiz 4, Anticoagulants, Easy" />
       </div>
 
       <div class="grid md:grid-cols-2 gap-4">
@@ -106,7 +105,7 @@
         <div class="card p-4">
           <h3 class="font-semibold">Longitudinal Lab</h3>
           <div class="mt-2 text-sm" style="color:var(--muted)">
-            Unit quizzes (match course numbering) + cumulative practice sets.
+            Unit quizzes (match course numbering) + cumulative sets.
           </div>
           <ul class="mt-2 space-y-1 text-sm">
             <!-- Unit quizzes -->
@@ -118,6 +117,12 @@
 
             <li><a class="quiz-link" href="quiz.html?id=lab-quiz3-antilipemics&mode=easy">Lab Quiz 3 — Antilipemics (Easy)</a></li>
             <li><a class="quiz-link" href="quiz.html?id=lab-quiz3-antilipemics&mode=hard">Lab Quiz 3 — Antilipemics (Hard)</a></li>
+
+            <li><a class="quiz-link" href="quiz.html?id=lab-quiz4-anticoagulants&mode=easy">Lab Quiz 4 — Anticoagulants (Easy)</a> <span class="badge badge-new">NEW</span></li>
+            <li><a class="quiz-link" href="quiz.html?id=lab-quiz4-anticoagulants&mode=hard">Lab Quiz 4 — Anticoagulants (Hard)</a> <span class="badge badge-new">NEW</span></li>
+
+            <li><a class="quiz-link" href="quiz.html?id=lab-quiz5-antiarrhythmics&mode=easy">Lab Quiz 5 — Antiarrhythmics (Easy)</a></li>
+            <li><a class="quiz-link" href="quiz.html?id=lab-quiz5-antiarrhythmics&mode=hard">Lab Quiz 5 — Antiarrhythmics (Hard)</a></li>
 
             <!-- Cumulative -->
             <li class="mt-3"><strong>Cumulative Practice</strong></li>
@@ -150,9 +155,7 @@
         <!-- Principles of Pharmacy Practice I -->
         <div class="card p-4">
           <h3 class="font-semibold">Principles of Pharmacy Practice I</h3>
-          <div class="mt-2 text-sm" style="color:var(--muted)">
-            Foundations, law focus, workflows.
-          </div>
+          <div class="mt-2 text-sm" style="color:var(--muted)">Foundations, law focus, workflows.</div>
           <ul class="mt-2 space-y-1 text-sm">
             <li><a class="quiz-link" href="quiz.html?id=popp-practice-law&mode=easy">Practice Quiz — Pharmacy Law (Easy)</a></li>
             <li><a class="quiz-link" href="quiz.html?id=popp-practice-law&mode=hard">Practice Quiz — Pharmacy Law (Hard)</a></li>
@@ -166,9 +169,7 @@
         <!-- Basis for Drug Therapy I -->
         <div class="card p-4">
           <h3 class="font-semibold">Basis for Drug Therapy I</h3>
-          <div class="mt-2 text-sm" style="color:var(--muted)">
-            Basic pharmacology, PK/PD foundations.
-          </div>
+          <div class="mt-2 text-sm" style="color:var(--muted)">Basic pharmacology, PK/PD foundations.</div>
           <ul class="mt-2 space-y-1 text-sm">
             <li><a class="quiz-link" href="quiz.html?id=bdt1-practice-quiz1&mode=easy">Practice Quiz 1 (Easy)</a></li>
             <li><a class="quiz-link" href="quiz.html?id=bdt1-practice-quiz1&mode=hard">Practice Quiz 1 (Hard)</a></li>
@@ -185,21 +186,20 @@
         <!-- Pharmaceutical Calculations -->
         <div class="card p-4">
           <h3 class="font-semibold">Pharmaceutical Calculations</h3>
-          <div class="mt-2 text-sm" style="color:var(--muted)">
-            Dosage, conversions, compounding math.
-          </div>
+          <div class="mt-2 text-sm" style="color:var(--muted)">Dosage, conversions, compounding math.</div>
           <ul class="mt-2 space-y-1 text-sm">
-            <li><a class="quiz-link" href="quiz.html?id=calc-practice-exam1&mode=easy">Practice Exam 1 (Easy)</a></li>
-            <li><a class="quiz-link" href="quiz.html?id=calc-practice-exam1&mode=hard">Practice Exam 1 (Hard)</a></li>
+            <li><a class="quiz-link" href="quiz.html?id=calc-supplemental-exam2024&mode=easy">2024 Supplemental Exam (Easy)</a> <span class="badge">legacy</span></li>
+            <li><a class="quiz-link" href="quiz.html?id=calc-supplemental-exam2024&mode=hard">2024 Supplemental Exam (Hard)</a> <span class="badge">legacy</span></li>
+
+            <li><a class="quiz-link" href="quiz.html?id=calc-practice-exam2&mode=easy">Practice Exam 2 (Easy)</a></li>
+            <li><a class="quiz-link" href="quiz.html?id=calc-practice-exam2&mode=hard">Practice Exam 2 (Hard)</a></li>
           </ul>
         </div>
 
         <!-- SAS 1 -->
         <div class="card p-4">
           <h3 class="font-semibold">SAS 1</h3>
-          <div class="mt-2 text-sm" style="color:var(--muted)">
-            Study & Academic Success — strategies and skills.
-          </div>
+          <div class="mt-2 text-sm" style="color:var(--muted)">Study & Academic Success — strategies and skills.</div>
           <ul class="mt-2 space-y-1 text-sm">
             <li><a class="quiz-link" href="quiz.html?id=sas1-practice-exam1&mode=easy">Practice Exam 1 (Easy)</a></li>
             <li><a class="quiz-link" href="quiz.html?id=sas1-practice-exam1&mode=hard">Practice Exam 1 (Hard)</a></li>
