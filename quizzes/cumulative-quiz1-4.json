@@ -1,1 +1,375 @@
-
+{
+  "id": "lab-cumulative-quiz1-4",
+  "title": "Cumulative Quiz 1–4 — Antihypertensives + Antilipemics + Anticoagulants",
+  "pools": {
+    "easy": [
+      {
+        "type": "mcq",
+        "prompt": "Lisinopril belongs to which class?",
+        "choices": [
+          "ACE inhibitor",
+          "ARB",
+          "Thiazide",
+          "Loop diuretic"
+        ],
+        "answer": "ACE inhibitor"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Losartan is a(n):",
+        "choices": [
+          "ACE inhibitor",
+          "ARB",
+          "Beta blocker",
+          "Diuretic"
+        ],
+        "answer": "ARB"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Amlodipine is a:",
+        "choices": [
+          "DHP CCB",
+          "Non‑DHP CCB",
+          "ACE inhibitor",
+          "ARB"
+        ],
+        "answer": "DHP CCB"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Hydrochlorothiazide is a:",
+        "choices": [
+          "Thiazide diuretic",
+          "Loop diuretic",
+          "Aldosterone antagonist",
+          "ACE inhibitor"
+        ],
+        "answer": "Thiazide diuretic"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Spironolactone is a(n):",
+        "choices": [
+          "Aldosterone antagonist",
+          "ARB",
+          "ACE inhibitor",
+          "Thiazide"
+        ],
+        "answer": "Aldosterone antagonist"
+      },
+      {
+        "type": "tf",
+        "prompt": "ACE inhibitors can cause cough due to bradykinin.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Atorvastatin belongs to which class?",
+        "choices": [
+          "Statin",
+          "Fibrate",
+          "Bile acid sequestrant",
+          "Niacin"
+        ],
+        "answer": "Statin"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Ezetimibe is a:",
+        "choices": [
+          "Cholesterol absorption inhibitor",
+          "PCSK9 inhibitor",
+          "Fibrate",
+          "Omega‑3"
+        ],
+        "answer": "Cholesterol absorption inhibitor"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Fenofibrate is a:",
+        "choices": [
+          "Fibrate",
+          "Statin",
+          "Ezetimibe",
+          "BAS"
+        ],
+        "answer": "Fibrate"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Alirocumab is a:",
+        "choices": [
+          "PCSK9 monoclonal antibody",
+          "Omega‑3",
+          "Niacin",
+          "BAS"
+        ],
+        "answer": "PCSK9 monoclonal antibody"
+      },
+      {
+        "type": "tf",
+        "prompt": "Niacin commonly causes flushing.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Warfarin is a:",
+        "choices": [
+          "Vitamin K antagonist",
+          "Factor Xa inhibitor",
+          "Direct thrombin inhibitor",
+          "LMWH"
+        ],
+        "answer": "Vitamin K antagonist"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Apixaban is a:",
+        "choices": [
+          "Factor Xa inhibitor",
+          "Direct thrombin inhibitor",
+          "LMWH",
+          "UFH"
+        ],
+        "answer": "Factor Xa inhibitor"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Enoxaparin is:",
+        "choices": [
+          "LMWH",
+          "UFH",
+          "DOAC—Xa inhibitor",
+          "VKA"
+        ],
+        "answer": "LMWH"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which lab is used to manage warfarin dosing?",
+        "choices": [
+          "INR",
+          "aPTT",
+          "Anti‑Xa",
+          "Platelets"
+        ],
+        "answer": "INR"
+      },
+      {
+        "type": "tf",
+        "prompt": "Protamine reverses UFH most completely.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Crestor is the brand of:",
+        "choices": [
+          "Rosuvastatin",
+          "Atorvastatin",
+          "Simvastatin",
+          "Pravastatin"
+        ],
+        "answer": "Rosuvastatin"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Eliquis is the brand of:",
+        "choices": [
+          "Apixaban",
+          "Rivaroxaban",
+          "Warfarin",
+          "Enoxaparin"
+        ],
+        "answer": "Apixaban"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Xarelto is the brand of:",
+        "choices": [
+          "Rivaroxaban",
+          "Apixaban",
+          "Warfarin",
+          "Heparin"
+        ],
+        "answer": "Rivaroxaban"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Lovenox is the brand of:",
+        "choices": [
+          "Enoxaparin",
+          "Heparin",
+          "Warfarin",
+          "Dabigatran"
+        ],
+        "answer": "Enoxaparin"
+      }
+    ],
+    "hard": [
+      {
+        "type": "mcq",
+        "prompt": "Which combo most increases hyperkalemia risk?",
+        "choices": [
+          "Lisinopril + eplerenone",
+          "Amlodipine + HCTZ",
+          "Furosemide + hydralazine",
+          "Atenolol + chlorthalidone"
+        ],
+        "answer": "Lisinopril + eplerenone"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Non‑DHP CCBs can cause:",
+        "choices": [
+          "Bradycardia/AV block",
+          "Hypokalemia",
+          "Hyperuricemia",
+          "Dry cough"
+        ],
+        "answer": "Bradycardia/AV block"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Thiazides characteristically:",
+        "choices": [
+          "↑ Calcium",
+          "↓ Uric acid",
+          "↑ Potassium",
+          "↑ Magnesium"
+        ],
+        "answer": "↑ Calcium"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Statins inhibit:",
+        "choices": [
+          "HMG‑CoA reductase",
+          "ATP‑citrate lyase",
+          "NPC1L1",
+          "CETP"
+        ],
+        "answer": "HMG‑CoA reductase"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Bempedoic acid acts primarily in:",
+        "choices": [
+          "Hepatocytes",
+          "Skeletal muscle",
+          "Intestinal mucosa",
+          "Adipose"
+        ],
+        "answer": "Hepatocytes"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which combo is most prone to myopathy?",
+        "choices": [
+          "Gemfibrozil + statin",
+          "Ezetimibe + BAS",
+          "Niacin + BAS",
+          "Fenofibrate + omega‑3"
+        ],
+        "answer": "Gemfibrozil + statin"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Target INR for most AF patients on warfarin is:",
+        "choices": [
+          "2.0–3.0",
+          "1.0–1.5",
+          "3.5–4.5",
+          ">4.5"
+        ],
+        "answer": "2.0–3.0"
+      },
+      {
+        "type": "mcq",
+        "prompt": "UFH infusion is commonly monitored with:",
+        "choices": [
+          "aPTT (or anti‑Xa)",
+          "INR",
+          "PTT‑INR combo",
+          "Platelets only"
+        ],
+        "answer": "aPTT (or anti‑Xa)"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Apixaban/rivaroxaban elimination is:",
+        "choices": [
+          "Mixed hepatic & renal",
+          "Pure renal",
+          "Pure hepatic",
+          "Pulmonary"
+        ],
+        "answer": "Mixed hepatic & renal"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which agent has neuraxial hematoma risk warning?",
+        "choices": [
+          "Enoxaparin",
+          "Warfarin",
+          "Aspirin",
+          "Clopidogrel"
+        ],
+        "answer": "Enoxaparin"
+      },
+      {
+        "type": "short",
+        "prompt": "Name one PCSK9 monoclonal antibody.",
+        "answerText": [
+          "alirocumab",
+          "evolocumab"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Name the lab used to titrate warfarin dosing.",
+        "answerText": [
+          "inr",
+          "international normalized ratio",
+          "pt",
+          "prothrombin time"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Name one β1‑selective blocker.",
+        "answerText": [
+          "metoprolol",
+          "atenolol",
+          "bisoprolol",
+          "nebivolol"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Name one bile acid sequestrant.",
+        "answerText": [
+          "cholestyramine",
+          "colestipol",
+          "colesevelam"
+        ]
+      },
+      {
+        "type": "tf",
+        "prompt": "Ezetimibe inhibits HMG‑CoA reductase.",
+        "answer": "False"
+      },
+      {
+        "type": "tf",
+        "prompt": "Protamine fully reverses LMWH.",
+        "answer": "False",
+        "explain": "It fully reverses UFH; LMWH reversal is partial."
+      },
+      {
+        "type": "tf",
+        "prompt": "ACE inhibitors typically increase serum potassium.",
+        "answer": "True"
+      }
+    ]
+  }
+}
