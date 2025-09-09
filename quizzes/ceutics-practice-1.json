@@ -1,0 +1,49 @@
+{
+  "title": "Pharmaceutics Practice 1",
+  "subtitle": "PSCI 71303 — Quiz 1 Practice (Easy/Hard pools)",
+  "pools": {
+    "easy": [
+      { "type": "mcq", "prompt": "What is the primary purpose of the active pharmaceutical ingredient (API) in a drug?", "choices": ["To act as a filler","The primary component responsible for the intended therapeutic effect","To make the drug taste better","To bind the tablet together"], "answer": "The primary component responsible for the intended therapeutic effect" },
+      { "type": "tf", "prompt": "True or False: One quality of an ideal dosage form is being comfortable and palatable to the patient.", "answerText": "True" },
+      { "type": "short", "prompt": "What is the term for any component of a medicinal product other than the active substance(s)?", "answerText": "Excipient" },
+      { "type": "mcq", "prompt": "What is a key reason a manufacturer might prepare a drug in more than one dosage form?", "choices": ["To reduce manufacturing costs","To extend the drug's shelf life","To allow for different routes of administration","To comply with FDA labeling regulations"], "answer": "To allow for different routes of administration" },
+      { "type": "mcq", "prompt": "Excipients are not the API. Which is a specific function an excipient can perform?", "choices": ["To provide the therapeutic effect","To improve the drug's stability","To determine the drug's half-life","To act as the drug's primary container"], "answer": "To improve the drug's stability" },
+      { "type": "mcq", "prompt": "According to the FD&C Act of 1938, which of the following is NOT a defined use for a drug?", "choices": ["Diagnosis","Nutrition","Treatment","Prevention"], "answer": "Nutrition" },
+      { "type": "short", "prompt": "What is the term for a drug product in a specific form and strength intended for administration?", "answerText": "Dosage form" },
+      { "type": "tf", "prompt": "True or False: The API is an inactive substance.", "answerText": "False" },
+      { "type": "mcq", "prompt": "What is the main purpose of a drug dosage form?", "choices": ["To administer an effective and safe drug dose to a patient.","To make the drug more soluble in water.","To prevent the drug from being absorbed too quickly.","To standardize the color and shape of the medication."], "answer": "To administer an effective and safe drug dose to a patient." },
+      { "type": "short", "prompt": "What is the acronym for the act that defines a drug?", "answerText": "FD&C Act" },
+      { "type": "mcq", "prompt": "According to ideal dosage form design, which quality is a primary concern when a medication tastes unpleasant?", "choices": ["Drug stability","Patient palatability","Drug release rate","Manufacturing cost"], "answer": "Palatability" },
+      { "type": "mcq", "prompt": "Which factor ensures a drug remains effective over its shelf life?", "choices": ["Stability","Patient compliance","Route of administration","Bioavailability"], "answer": "Stability" },
+      { "type": "short", "prompt": "Acronym for Absorption, Distribution, Metabolism, Excretion?", "answerText": "ADME" },
+      { "type": "mcq", "prompt": "What does T(max) represent on a plasma drug concentration–time curve?", "choices": ["The time the drug was administered","The time it takes for the drug to be eliminated from the body","The time it takes to reach maximum drug concentration in the plasma","The time it takes to reach steady state"], "answer": "The time it takes to reach maximum drug concentration in the plasma" },
+      { "type": "mcq", "prompt": "Which of the following is an example of a systemic effect?", "choices": ["An antifungal cream applied to the skin","A medicated eye drop","An oral tablet for a headache","A nasal spray for local congestion"], "answer": "An oral tablet for a headache" },
+      { "type": "mcq", "prompt": "What does AUC stand for in pharmacokinetics?", "choices": ["Active Unit Count","Area Under the Curve","Absorption Uniformity Constant","Average User Concentration"], "answer": "Area Under the Curve" },
+      { "type": "mcq", "prompt": "Which of the following best describes extemporaneous compounding?", "choices": ["Mass-producing a standardized drug","Creating a customized medication for an individual patient","The process of drug metabolism in the liver","Designing the drug’s primary container"], "answer": "Creating a customized medication for an individual patient" },
+      { "type": "short", "prompt": "Term for a medication absorbed into the bloodstream and transported to a distant site of action:", "answerText": "Systemic" },
+      { "type": "mcq", "prompt": "Which of the following is an enteral route of drug administration?", "choices": ["Subcutaneous injection","Oral tablet","Inhaler","Transdermal patch"], "answer": "Oral tablet" },
+      { "type": "tf", "prompt": "True or False: The goal of biopharmaceutics is to control the drug’s properties for consistent delivery and performance.", "answerText": "True" },
+      { "type": "short", "prompt": "Study of the fate of a drug in the body (ADME)?", "answerText": "Pharmacokinetics" }
+    ],
+    "hard": [
+      { "type": "mcq", "prompt": "In the \"speed trap\" analogy, the speed trap represents:", "choices": ["Drug elimination","The first-pass effect","Drug distribution","Drug absorption"], "answer": "The first-pass effect" },
+      { "type": "mcq", "prompt": "Average time for new medicine development and approval:", "choices": ["2–3 years","5–8 years","10–15 years","20–25 years"], "answer": "10–15 years" },
+      { "type": "mcq", "prompt": "Water cooler analogy: why does flow rate decrease over time (spigot size normal)?", "choices": ["Too little water","Pressure driving the flow decreases as water level drops","Flow rate is constant","Water gets colder"], "answer": "Pressure driving the flow decreases as water level drops" },
+      { "type": "mcq", "prompt": "In dosing curves, AUC physically represents:", "choices": ["Time of Cmax","Maximum peak concentration","Rate and extent of absorption","Total drug exposure over time"], "answer": "Total drug exposure over time" },
+      { "type": "short", "prompt": "ADME stage responsible for elimination via kidneys, lungs, or bile:", "answerText": "Excretion" },
+      { "type": "short", "prompt": "ADME stage primarily responsible for processing in the liver:", "answerText": "Metabolism" },
+      { "type": "mcq", "prompt": "Why can an excipient NOT perform metabolism?", "choices": ["Excipients are only in solids","Metabolism is a physiological process performed by the body, not an ingredient","FDA prohibits any active function","Excipients are eliminated before reaching the liver"], "answer": "Metabolism is a physiological process performed by the body, not an ingredient" },
+      { "type": "mcq", "prompt": "Physical meaning of C(max):", "choices": ["Drug completely eliminated","Time to reach half of maximum","Maximum (peak) plasma concentration after administration","Total amount of drug administered"], "answer": "Maximum (peak) plasma concentration after administration" },
+      { "type": "mcq", "prompt": "An IV dose bypasses:", "choices": ["Absorption and metabolism","Metabolism and excretion","Distribution and absorption","Absorption and first-pass metabolism"], "answer": "Absorption and first-pass metabolism" },
+      { "type": "mcq", "prompt": "Why is IV bioavailability ~100%?", "choices": ["Most stable form","Bypasses digestive system and enters bloodstream directly","Easier to manufacture","Highest concentration"], "answer": "Bypasses digestive system and enters bloodstream directly" },
+      { "type": "mcq", "prompt": "Key difference between bioavailability and bioequivalence:", "choices": ["BA: rate/extent at site of action; BE: compare BA between formulations","BA: safety; BE: efficacy","BA: drug; BE: dosage form","BA: body effect; BE: plasma effect"], "answer": "BA: rate/extent at site of action; BE: compare BA between formulations" },
+      { "type": "mcq", "prompt": "NOT a pre-marketing clinical phase:", "choices": ["Phase I","Phase II","Phase III","Phase IV"], "answer": "Phase IV" },
+      { "type": "short", "prompt": "Drug movement from administration site into bloodstream:", "answerText": "Absorption" },
+      { "type": "mcq", "prompt": "Lower Cmax and delayed Tmax for oral vs IV is primarily due to:", "choices": ["Elimination","Metabolism","Absorption","Distribution"], "answer": "Absorption" },
+      { "type": "mcq", "prompt": "Solid drug becomes suspended/dissolved in liquid—this is:", "choices": ["Metabolism","Excretion","Dissolution","Distribution"], "answer": "Dissolution" },
+      { "type": "tf", "prompt": "True or False: Dissolution rate is directly proportional to surface area.", "answerText": "True" },
+      { "type": "mcq", "prompt": "Drug that demonstrates bioequivalence to RLD and same therapeutic effect & safety:", "choices": ["Brand-name drug","Biosimilar","Generic drug","OTC drug"], "answer": "Generic drug" }
+    ],
+    "expert": []
+  }
+}
