@@ -5,161 +5,256 @@
     "easy": [
       {
         "type": "mcq",
-        "prompt": "Lisinopril belongs to which class?",
+        "prompt": "What medication class is amlodipine?",
         "choices": [
+          "DHP calcium channel blocker",
+          "Non‑DHP calcium channel blocker",
           "ACE inhibitor",
-          "ARB",
-          "Thiazide",
-          "Loop diuretic"
+          "ARB"
         ],
-        "answer": "ACE inhibitor"
+        "answer": "DHP calcium channel blocker"
       },
       {
         "type": "mcq",
-        "prompt": "Losartan is a(n):",
+        "prompt": "What medication category is amlodipine?",
+        "choices": [
+          "Antihypertensive",
+          "Antilipemic",
+          "Anticoagulant",
+          "Antidiabetic"
+        ],
+        "answer": "Antihypertensive"
+      },
+      {
+        "type": "mcq",
+        "prompt": "What medication class is losartan?",
         "choices": [
           "ACE inhibitor",
           "ARB",
-          "Beta blocker",
-          "Diuretic"
+          "Thiazide diuretic",
+          "Beta blocker"
         ],
         "answer": "ARB"
       },
       {
         "type": "mcq",
-        "prompt": "Amlodipine is a:",
+        "prompt": "What medication category is losartan?",
         "choices": [
-          "DHP CCB",
-          "Non‑DHP CCB",
-          "ACE inhibitor",
-          "ARB"
+          "Antihypertensive",
+          "Antilipemic",
+          "Anticoagulant",
+          "Analgesic"
         ],
-        "answer": "DHP CCB"
+        "answer": "Antihypertensive"
       },
       {
         "type": "mcq",
-        "prompt": "Hydrochlorothiazide is a:",
+        "prompt": "What medication class is hydrochlorothiazide?",
         "choices": [
           "Thiazide diuretic",
           "Loop diuretic",
           "Aldosterone antagonist",
-          "ACE inhibitor"
+          "Non‑DHP CCB"
         ],
         "answer": "Thiazide diuretic"
       },
       {
         "type": "mcq",
-        "prompt": "Spironolactone is a(n):",
+        "prompt": "What medication category is hydrochlorothiazide?",
         "choices": [
-          "Aldosterone antagonist",
-          "ARB",
+          "Antihypertensive",
+          "Antilipemic",
+          "Anticoagulant",
+          "Antiplatelet"
+        ],
+        "answer": "Antihypertensive"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Metoprolol belongs to what medication class?",
+        "choices": [
+          "β1‑selective beta blocker",
+          "Non‑selective beta blocker",
+          "Alpha‑1 blocker",
+          "Central α2 agonist"
+        ],
+        "answer": "β1‑selective beta blocker"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Metoprolol falls under what medication category?",
+        "choices": [
+          "Antihypertensive",
+          "Antilipemic",
+          "Anticoagulant",
+          "Anticonvulsant"
+        ],
+        "answer": "Antihypertensive"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Diltiazem belongs to what medication class?",
+        "choices": [
+          "Non‑DHP calcium channel blocker",
+          "DHP calcium channel blocker",
           "ACE inhibitor",
-          "Thiazide"
+          "ARB"
         ],
-        "answer": "Aldosterone antagonist"
-      },
-      {
-        "type": "tf",
-        "prompt": "ACE inhibitors can cause cough due to bradykinin.",
-        "answer": "True"
+        "answer": "Non‑DHP calcium channel blocker"
       },
       {
         "type": "mcq",
-        "prompt": "Atorvastatin belongs to which class?",
+        "prompt": "Diltiazem belongs to what medication category?",
         "choices": [
-          "Statin",
-          "Fibrate",
-          "Bile acid sequestrant",
-          "Niacin"
+          "Antihypertensive",
+          "Antilipemic",
+          "Anticoagulant",
+          "Bronchodilator"
         ],
-        "answer": "Statin"
+        "answer": "Antihypertensive"
       },
       {
         "type": "mcq",
-        "prompt": "Ezetimibe is a:",
+        "prompt": "What medication class is atorvastatin?",
+        "choices": [
+          "HMG‑CoA reductase inhibitor (statin)",
+          "Fibrate",
+          "PCSK9 inhibitor",
+          "Bile acid sequestrant"
+        ],
+        "answer": "HMG‑CoA reductase inhibitor (statin)"
+      },
+      {
+        "type": "mcq",
+        "prompt": "What medication category is atorvastatin?",
+        "choices": [
+          "Antilipemic",
+          "Antihypertensive",
+          "Anticoagulant",
+          "Antidiabetic"
+        ],
+        "answer": "Antilipemic"
+      },
+      {
+        "type": "mcq",
+        "prompt": "What medication class is ezetimibe?",
         "choices": [
           "Cholesterol absorption inhibitor",
-          "PCSK9 inhibitor",
           "Fibrate",
-          "Omega‑3"
+          "Statin",
+          "PCSK9 inhibitor"
         ],
         "answer": "Cholesterol absorption inhibitor"
       },
       {
         "type": "mcq",
-        "prompt": "Fenofibrate is a:",
+        "prompt": "What medication category is ezetimibe?",
+        "choices": [
+          "Antilipemic",
+          "Antihypertensive",
+          "Anticoagulant",
+          "Antiplatelet"
+        ],
+        "answer": "Antilipemic"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Rosuvastatin belongs to what medication class?",
+        "choices": [
+          "Statin",
+          "Fibrate",
+          "PCSK9 inhibitor",
+          "Bile acid sequestrant"
+        ],
+        "answer": "Statin"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Fenofibrate belongs to what medication class?",
         "choices": [
           "Fibrate",
           "Statin",
-          "Ezetimibe",
-          "BAS"
+          "PCSK9 inhibitor",
+          "Omega‑3 fatty acid"
         ],
         "answer": "Fibrate"
       },
       {
         "type": "mcq",
-        "prompt": "Alirocumab is a:",
+        "prompt": "Alirocumab belongs to what medication class?",
         "choices": [
           "PCSK9 monoclonal antibody",
-          "Omega‑3",
-          "Niacin",
-          "BAS"
+          "Statin",
+          "Fibrate",
+          "Cholesterol absorption inhibitor"
         ],
         "answer": "PCSK9 monoclonal antibody"
       },
       {
-        "type": "tf",
-        "prompt": "Niacin commonly causes flushing.",
-        "answer": "True"
+        "type": "mcq",
+        "prompt": "Alirocumab belongs to what medication category?",
+        "choices": [
+          "Antilipemic",
+          "Antihypertensive",
+          "Anticoagulant",
+          "Antiplatelet"
+        ],
+        "answer": "Antilipemic"
       },
       {
         "type": "mcq",
-        "prompt": "Warfarin is a:",
+        "prompt": "What medication class is apixaban?",
+        "choices": [
+          "Direct Factor Xa inhibitor",
+          "Direct thrombin inhibitor",
+          "Vitamin K antagonist",
+          "LMWH"
+        ],
+        "answer": "Direct Factor Xa inhibitor"
+      },
+      {
+        "type": "mcq",
+        "prompt": "What medication category is apixaban?",
+        "choices": [
+          "Anticoagulant",
+          "Antiplatelet",
+          "Antilipemic",
+          "Antihypertensive"
+        ],
+        "answer": "Anticoagulant"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Warfarin belongs to what medication class?",
         "choices": [
           "Vitamin K antagonist",
-          "Factor Xa inhibitor",
           "Direct thrombin inhibitor",
+          "Factor Xa inhibitor",
           "LMWH"
         ],
         "answer": "Vitamin K antagonist"
       },
       {
         "type": "mcq",
-        "prompt": "Apixaban is a:",
-        "choices": [
-          "Factor Xa inhibitor",
-          "Direct thrombin inhibitor",
-          "LMWH",
-          "UFH"
-        ],
-        "answer": "Factor Xa inhibitor"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Enoxaparin is:",
+        "prompt": "Enoxaparin belongs to what medication class?",
         "choices": [
           "LMWH",
           "UFH",
-          "DOAC—Xa inhibitor",
-          "VKA"
+          "DOAC (Xa)",
+          "Vitamin K antagonist"
         ],
         "answer": "LMWH"
       },
       {
         "type": "mcq",
-        "prompt": "Which lab is used to manage warfarin dosing?",
+        "prompt": "What medication category is warfarin?",
         "choices": [
-          "INR",
-          "aPTT",
-          "Anti‑Xa",
-          "Platelets"
+          "Anticoagulant",
+          "Antiplatelet",
+          "Antilipemic",
+          "Antihypertensive"
         ],
-        "answer": "INR"
-      },
-      {
-        "type": "tf",
-        "prompt": "Protamine reverses UFH most completely.",
-        "answer": "True"
+        "answer": "Anticoagulant"
       },
       {
         "type": "mcq",
@@ -196,34 +291,67 @@
       },
       {
         "type": "mcq",
-        "prompt": "Lovenox is the brand of:",
+        "prompt": "Lopid is the brand of:",
         "choices": [
-          "Enoxaparin",
-          "Heparin",
-          "Warfarin",
-          "Dabigatran"
+          "Gemfibrozil",
+          "Fenofibrate",
+          "Ezetimibe",
+          "Pravastatin"
         ],
-        "answer": "Enoxaparin"
+        "answer": "Gemfibrozil"
       }
     ],
     "hard": [
       {
-        "type": "mcq",
-        "prompt": "Which combo most increases hyperkalemia risk?",
-        "choices": [
-          "Lisinopril + eplerenone",
-          "Amlodipine + HCTZ",
-          "Furosemide + hydralazine",
-          "Atenolol + chlorthalidone"
-        ],
-        "answer": "Lisinopril + eplerenone"
+        "type": "short",
+        "prompt": "What medication class is atenolol? (answer as class)",
+        "answerText": [
+          "beta blocker",
+          "β blocker",
+          "β1‑selective beta blocker",
+          "beta-1 selective blocker",
+          "b1 selective beta blocker"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "What medication category is atenolol? (answer as category)",
+        "answerText": [
+          "antihypertensive"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "What medication class is valsartan?",
+        "answerText": [
+          "arb",
+          "angiotensin receptor blocker"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "What medication category is valsartan?",
+        "answerText": [
+          "antihypertensive"
+        ]
       },
       {
         "type": "mcq",
-        "prompt": "Non‑DHP CCBs can cause:",
+        "prompt": "Which best describes the MOA of ARBs like losartan?",
+        "choices": [
+          "Block angiotensin II at the AT1 receptor",
+          "Inhibit ACE and increase bradykinin",
+          "Block L‑type calcium channels in vessels",
+          "Increase sodium excretion at distal tubule"
+        ],
+        "answer": "Block angiotensin II at the AT1 receptor"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Non‑DHP CCBs (e.g., verapamil/diltiazem) can cause which effect?",
         "choices": [
           "Bradycardia/AV block",
-          "Hypokalemia",
+          "Hyperkalemia",
           "Hyperuricemia",
           "Dry cough"
         ],
@@ -231,18 +359,18 @@
       },
       {
         "type": "mcq",
-        "prompt": "Thiazides characteristically:",
+        "prompt": "Thiazides typically cause which lab change?",
         "choices": [
           "↑ Calcium",
-          "↓ Uric acid",
+          "↓ Calcium",
           "↑ Potassium",
-          "↑ Magnesium"
+          "↓ Uric acid"
         ],
         "answer": "↑ Calcium"
       },
       {
         "type": "mcq",
-        "prompt": "Statins inhibit:",
+        "prompt": "Statins lower LDL primarily by inhibiting which enzyme?",
         "choices": [
           "HMG‑CoA reductase",
           "ATP‑citrate lyase",
@@ -253,18 +381,7 @@
       },
       {
         "type": "mcq",
-        "prompt": "Bempedoic acid acts primarily in:",
-        "choices": [
-          "Hepatocytes",
-          "Skeletal muscle",
-          "Intestinal mucosa",
-          "Adipose"
-        ],
-        "answer": "Hepatocytes"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which combo is most prone to myopathy?",
+        "prompt": "Which combo most increases myopathy risk?",
         "choices": [
           "Gemfibrozil + statin",
           "Ezetimibe + BAS",
@@ -274,15 +391,41 @@
         "answer": "Gemfibrozil + statin"
       },
       {
+        "type": "short",
+        "prompt": "What medication class is ezetimibe? (answer as class)",
+        "answerText": [
+          "cholesterol absorption inhibitor"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "What medication category is ezetimibe? (answer as category)",
+        "answerText": [
+          "antilipemic",
+          "antihyperlipidemic"
+        ]
+      },
+      {
         "type": "mcq",
-        "prompt": "Target INR for most AF patients on warfarin is:",
+        "prompt": "PCSK9 inhibitors like alirocumab primarily:",
         "choices": [
-          "2.0–3.0",
-          "1.0–1.5",
-          "3.5–4.5",
-          ">4.5"
+          "Increase LDL receptor recycling",
+          "Block cholesterol absorption",
+          "Reduce hepatic VLDL synthesis",
+          "Inhibit CETP"
         ],
-        "answer": "2.0–3.0"
+        "answer": "Increase LDL receptor recycling"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Warfarin requires routine monitoring of which lab?",
+        "choices": [
+          "INR",
+          "aPTT",
+          "Anti‑Xa",
+          "Platelets"
+        ],
+        "answer": "INR"
       },
       {
         "type": "mcq",
@@ -297,78 +440,84 @@
       },
       {
         "type": "mcq",
-        "prompt": "Apixaban/rivaroxaban elimination is:",
+        "prompt": "Which is the best reversal for UFH?",
         "choices": [
-          "Mixed hepatic & renal",
-          "Pure renal",
-          "Pure hepatic",
-          "Pulmonary"
+          "Protamine sulfate",
+          "Vitamin K",
+          "Idarucizumab",
+          "Andexanet alfa"
         ],
-        "answer": "Mixed hepatic & renal"
+        "answer": "Protamine sulfate"
       },
       {
         "type": "mcq",
-        "prompt": "Which agent has neuraxial hematoma risk warning?",
+        "prompt": "Apixaban belongs to what medication class?",
         "choices": [
-          "Enoxaparin",
-          "Warfarin",
-          "Aspirin",
-          "Clopidogrel"
+          "Direct Factor Xa inhibitor",
+          "Vitamin K antagonist",
+          "Direct thrombin inhibitor",
+          "LMWH"
         ],
-        "answer": "Enoxaparin"
+        "answer": "Direct Factor Xa inhibitor"
       },
       {
         "type": "short",
-        "prompt": "Name one PCSK9 monoclonal antibody.",
+        "prompt": "What medication category is apixaban? (one word)",
         "answerText": [
-          "alirocumab",
-          "evolocumab"
+          "anticoagulant"
         ]
       },
       {
         "type": "short",
-        "prompt": "Name the lab used to titrate warfarin dosing.",
+        "prompt": "What medication class is enoxaparin? (answer as class)",
         "answerText": [
-          "inr",
-          "international normalized ratio",
-          "pt",
-          "prothrombin time"
+          "lmwh",
+          "low molecular weight heparin"
         ]
       },
       {
         "type": "short",
-        "prompt": "Name one β1‑selective blocker.",
+        "prompt": "What medication category is enoxaparin? (one word)",
         "answerText": [
-          "metoprolol",
-          "atenolol",
-          "bisoprolol",
-          "nebivolol"
+          "anticoagulant"
+        ]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Crestor is associated with which adverse effect warning?",
+        "choices": [
+          "Myopathy/rhabdomyolysis risk",
+          "Thyroid dysfunction",
+          "Cough/angioedema",
+          "Blue‑gray skin discoloration"
+        ],
+        "answer": "Myopathy/rhabdomyolysis risk"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Eliquis and Xarelto belong to which medication category?",
+        "choices": [
+          "Anticoagulant",
+          "Antiplatelet",
+          "Antihypertensive",
+          "Antilipemic"
+        ],
+        "answer": "Anticoagulant"
+      },
+      {
+        "type": "short",
+        "prompt": "State the medication class for hydrochlorothiazide. (one phrase)",
+        "answerText": [
+          "thiazide diuretic",
+          "thiazide"
         ]
       },
       {
         "type": "short",
-        "prompt": "Name one bile acid sequestrant.",
+        "prompt": "State the medication category for hydrochlorothiazide. (one word)",
         "answerText": [
-          "cholestyramine",
-          "colestipol",
-          "colesevelam"
+          "antihypertensive"
         ]
-      },
-      {
-        "type": "tf",
-        "prompt": "Ezetimibe inhibits HMG‑CoA reductase.",
-        "answer": "False"
-      },
-      {
-        "type": "tf",
-        "prompt": "Protamine fully reverses LMWH.",
-        "answer": "False",
-        "explain": "It fully reverses UFH; LMWH reversal is partial."
-      },
-      {
-        "type": "tf",
-        "prompt": "ACE inhibitors typically increase serum potassium.",
-        "answer": "True"
       }
     ]
   }
