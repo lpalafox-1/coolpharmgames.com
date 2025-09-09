@@ -71,6 +71,13 @@ async function main() {
 
   const limit = Number.isFinite(limitParam) && limitParam > 0 ? limitParam : null;
   const pool = limit ? poolCopy.slice(0, Math.min(limit, poolCopy.length)) : poolCopy;
+console.log(
+  "[engine] quizId:", quizId,
+  "mode:", mode,
+  "limitParam:", limitParam,
+  "total available:", poolCopy.length,
+  "→ using:", pool.length
+);
 
   state.title = data.title || "Quiz";
   state.questions = pool.map(q => ({
