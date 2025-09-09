@@ -22,3 +22,9 @@ const done = localStorage.getItem(KEY) === '1';
 show(welcome, !done); show(menu, done);
 document.getElementById('start-now')?.addEventListener('click', () => { localStorage.setItem(KEY, '1'); show(welcome,false); show(menu,true); });
 document.getElementById('skip')?.addEventListener('click',   () => { localStorage.setItem(KEY, '1'); show(welcome,false); show(menu,true); });
+
+<noscript>
+  <div class="quiz-card max-w-md mx-auto mt-8">
+    Please enable JavaScript to use Pharm-let.
+  </div>
+</noscript>
