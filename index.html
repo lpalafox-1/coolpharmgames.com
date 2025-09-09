@@ -3,182 +3,106 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Pharm-let — Study Hub</title>
-  <meta name="description" content="P1 study quizzes with dark mode, flame streak, and a clean UI." />
-  <meta property="og:title" content="Pharm-let — Study Hub" />
+  <title>Pharm-let — P1 Fall 2025 Hub</title>
+  <meta name="description" content="P1 Fall 2025 study quizzes with dark mode, flame streak, and a clean UI." />
+  <meta property="og:title" content="Pharm-let — P1 Fall 2025 Hub" />
   <meta property="og:description" content="Practice quizzes for pharmacy classes. Dark mode. 🔥 streak." />
   <meta property="og:image" content="assets/og.png" />
-  <meta name="theme-color" content="#3b82f6" />
+  <meta name="theme-color" content="#8b1e3f" />
   <link rel="icon" href="assets/icon.png" />
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; script-src 'self' https://cdn.tailwindcss.com;">
+    content="default-src 'self'; img-src 'self' data:;
+             style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com;
+             script-src 'self' https://cdn.tailwindcss.com;">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="assets/css/styles.css" />
   <style>
     .hero {
-      background: radial-gradient(1200px 600px at 10% -20%, rgba(96,165,250,.25), transparent 40%),
-                  radial-gradient(800px 400px at 100% 0%, rgba(16,185,129,.15), transparent 45%);
+      background:
+        radial-gradient(1200px 600px at 10% -20%, rgba(139,30,63,.18), transparent 40%),
+        radial-gradient(800px 400px at 100% 0%, rgba(139,30,63,.10), transparent 45%);
     }
-    .card {
-      background: var(--card);
-      border: 1px solid var(--ring);
-      border-radius: 1rem;
-      box-shadow: 0 10px 15px -3px rgba(0,0,0,.08), 0 4px 6px -2px rgba(0,0,0,.04);
-    }
-    .badge { font-size:.75rem; padding:.15rem .5rem; border-radius:.5rem; }
-    .disabled { opacity:.6; pointer-events:none; }
   </style>
 </head>
-<body class="min-h-screen">
-
-  <!-- Top bar -->
-  <header class="sticky top-0 z-10 backdrop-blur supports-[backdrop-filter]:bg-white/70 dark:supports-[backdrop-filter]:bg-black/40 border-b border-[var(--ring)]">
-    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <span class="text-2xl">🧪</span>
-        <span class="font-bold text-lg">Pharm-let</span>
-      </div>
-      <button id="theme-toggle" class="btn btn-ghost">🌙 Dark</button>
-    </div>
+<body class="bg-[var(--bg)] text-[var(--text)]">
+  <!-- Header -->
+  <header class="flex justify-between items-center px-4 py-3 border-b border-[var(--ring)]">
+    <h1 class="font-bold text-lg">Pharm-let</h1>
+    <button id="theme-toggle" class="btn btn-ghost" type="button">🌙 Dark</button>
   </header>
 
-  <!-- Welcome (first visit only) -->
-  <section id="welcome" class="min-h-[60vh] flex items-center justify-center px-4"">
+  <!-- Welcome screen -->
+  <section id="welcome" class="min-h-[60vh] flex items-center justify-center px-4" style="display:none;">
     <div class="card max-w-xl w-full p-6">
       <h1 class="text-2xl font-bold">Welcome to Pharm-let 👋</h1>
       <p class="mt-2" style="color:var(--muted)">
-        Quick practice for quizzes & exams. Dark mode, 🔥 streak, and clean UI.
+        Your P1 Fall 2025 resource for focused quiz practice. Clean UI, dark mode, and 🔥 streaks when you stay sharp.
       </p>
       <div class="mt-4 flex gap-3">
         <button id="start-now" class="btn btn-blue">Let’s go</button>
         <button id="skip" class="btn btn-ghost">Skip</button>
       </div>
       <p class="mt-3 text-sm" style="color:var(--muted)">
-        You can toggle themes anytime with the button above.
+        Toggle dark/light themes anytime with the button above.
       </p>
     </div>
   </section>
 
-  <!-- Main menu (hero + classes) -->
-  <section id="menu"">
+  <!-- Main menu -->
+  <section id="menu" style="display:none;">
     <!-- Hero -->
     <section class="hero">
       <div class="max-w-5xl mx-auto px-4 pt-10 pb-8">
         <div class="grid md:grid-cols-[1.2fr_.8fr] gap-6 items-center">
           <div>
             <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">
-              Your P1 Fall study home.
+              P1 Fall 2025 — Practice Hub
             </h1>
             <p class="mt-2 text-lg" style="color:var(--muted)">
-              Practice with a clean UI, dark mode, and a 🔥 streak when you stay ≥80% during play.
+              Targeted practice for P1 courses. Clean UI, dark mode, and a 🔥 streak for sustained accuracy.
             </p>
-            <div class="mt-4 flex flex-wrap gap-3">
-              <a href="#classes" class="btn btn-blue">Start learning</a>
-              <a href="quiz.html?id=lab-week2-antihypertensives&mode=easy" class="btn btn-ghost">Jump to Week 2</a>
-            </div>
           </div>
-
-          <!-- Featured quiz card -->
-          <div class="card p-5">
-            <div class="flex items-center justify-between">
-              <div>
-                <div class="text-sm" style="color:var(--muted)">Featured quiz</div>
-                <div class="font-semibold">Lab Week 2 — Antihypertensives</div>
-              </div>
-              <div class="text-3xl">🔥</div>
-            </div>
-            <div class="mt-4">
-              <div class="progress-bar-container">
-                <div class="progress-bar" style="width: 65%;"></div>
-              </div>
-              <p class="text-sm" style="color:var(--muted)">Keep ≥80% accuracy to light the flame.</p>
-            </div>
-            <div class="mt-4 flex gap-2">
-              <a class="btn btn-blue flex-1 text-center" href="quiz.html?id=lab-week2-antihypertensives&mode=easy">Start (Easy)</a>
-              <a class="btn btn-gray flex-1 text-center" href="quiz.html?id=lab-week2-antihypertensives&mode=hard">Hard</a>
+          <div class="card p-4">
+            <div class="text-sm" style="color:var(--muted)">Featured set</div>
+            <div class="font-semibold">Lab Week 2 — Antihypertensives</div>
+            <div class="mt-2 flex gap-2">
+              <a class="btn btn-blue" href="quiz.html?id=lab-week2-antihypertensives&mode=easy&limit=20">Start (Easy)</a>
+              <a class="btn btn-blue" href="quiz.html?id=lab-week2-antihypertensives&mode=hard&limit=20">Start (Hard)</a>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Classes -->
+    <!-- Classes grid -->
     <main id="classes" class="max-w-5xl mx-auto px-4 pb-16">
-      <h2 class="text-2xl font-bold mt-8 mb-4">Classes</h2>
-      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-
-        <!-- PHPR 71101 Longitudinal Lab I (LIVE) -->
-        <section class="card p-5 flex flex-col">
-          <div class="flex items-start justify-between">
-            <div>
-              <h3 class="font-semibold text-lg">PHPR 71101 Longitudinal Lab I</h3>
-              <p class="text-sm" style="color:var(--muted)">Brand/generic, classes, MOA</p>
-            </div>
-            <span class="badge bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300">LIVE</span>
-          </div>
-          <ul class="mt-4 space-y-2">
-            <li><a class="quiz-link" href="quiz.html?id=lab-week2-antihypertensives&mode=easy">Quiz 2 — Week 2 Drugs (Easy)</a></li>
-            <li><a class="quiz-link" href="quiz.html?id=lab-week2-antihypertensives&mode=hard">Quiz 2 — Week 2 Drugs (Hard)</a></li>
-            <!-- placeholders -->
-            <li><span class="disabled quiz-link">quiz1_week1 — Coming soon</span></li>
-            <li><span class="disabled quiz-link">quiz2_week4 — Coming soon</span></li>
-            <li><span class="disabled quiz-link">quiz3_weeks1_4 — Coming soon</span></li>
-            <li><span class="disabled quiz-link">quiz4_week5 — Coming soon</span></li>
+      <h2 class="text-xl font-bold mb-4">Classes</h2>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="card p-4">
+          <h3 class="font-semibold">Pharmaceutics</h3>
+          <ul class="mt-2 space-y-1 text-sm">
+            <li><a class="quiz-link" href="quiz.html?id=ceutics-practice-1&mode=easy&limit=20">Practice 1 — Easy</a></li>
+            <li><a class="quiz-link" href="quiz.html?id=ceutics-practice-1&mode=hard&limit=20">Practice 1 — Hard</a></li>
           </ul>
-        </section>
+        </div>
 
-        <!-- PSCI 71303 Pharmaceutics I (LIVE: Ceutics Practice 1) -->
-        <section class="card p-5 flex flex-col">
-          <div class="flex items-start justify-between">
-            <div>
-              <h3 class="font-semibold text-lg">PSCI 71303 Pharmaceutics I</h3>
-              <p class="text-sm" style="color:var(--muted)">Foundations, ADME, dosage forms</p>
-            </div>
-            <span class="badge bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300">LIVE</span>
-          </div>
-          <ul class="mt-4 space-y-2">
-            <li><a class="quiz-link" href="quiz.html?id=ceutics-practice-1&mode=easy">Pharmaceutics Practice 1 — Easy</a></li>
-            <li><a class="quiz-link" href="quiz.html?id=ceutics-practice-1&mode=hard">Pharmaceutics Practice 1 — Hard</a></li>
+        <div class="card p-4">
+          <h3 class="font-semibold">Longitudinal Lab</h3>
+          <ul class="mt-2 space-y-1 text-sm">
+            <li><a class="quiz-link" href="quiz.html?id=lab-week2-antihypertensives&mode=easy&limit=20">Week 2 Quiz 2 — Easy</a></li>
+            <li><a class="quiz-link" href="quiz.html?id=lab-week2-antihypertensives&mode=hard&limit=20">Week 2 Quiz 2 — Hard</a></li>
           </ul>
-        </section>
-
-        <!-- Other classes (placeholders) -->
-        <section class="card p-5 opacity-90">
-          <h3 class="font-semibold text-lg">PSCI 71103 Basis for Drug Therapy I</h3>
-          <p class="text-sm" style="color:var(--muted)">Physiology & targets</p>
-          <div class="mt-4"><span class="badge bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">Coming soon</span></div>
-        </section>
-
-        <section class="card p-5 opacity-90">
-          <h3 class="font-semibold text-lg">PHPR 71143 Social & Admin Sciences I</h3>
-          <p class="text-sm" style="color:var(--muted)">Systems & policy</p>
-          <div class="mt-4"><span class="badge bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">Coming soon</span></div>
-        </section>
-
-        <section class="card p-5 opacity-90">
-          <h3 class="font-semibold text-lg">PHPR 71133 Principles of Pharmacy Practice I</h3>
-          <p class="text-sm" style="color:var(--muted)">Counseling & dispensing</p>
-          <div class="mt-4"><span class="badge bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">Coming soon</span></div>
-        </section>
-
-        <section class="card p-5 opacity-90">
-          <h3 class="font-semibold text-lg">PHPR 71002 Pharmaceutical Calculations</h3>
-          <p class="text-sm" style="color:var(--muted)">Math you’ll actually use</p>
-          <div class="mt-4"><span class="badge bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">Coming soon</span></div>
-        </section>
-
+        </div>
       </div>
     </main>
-
-    <div class="mt-6 pb-10 text-center text-sm" style="color:var(--muted)">
-      Pharm-let © 2025 — Study smarter, not harder ✨
-    </div>
   </section>
 
-  <!-- Theme + welcome logic -->
-  <script>
-    <script src="assets/js/home.js"></script>
+  <!-- Footer -->
+  <footer class="text-center text-sm py-6" style="color:var(--muted)">
+    Pharm-let © 2025 — Study smarter, not harder ✨
+  </footer>
 
-  </script>
+  <!-- Scripts -->
+  <script src="assets/js/home.js"></script>
 </body>
 </html>
