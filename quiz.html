@@ -4,34 +4,69 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Quiz</title>
+
+  <!-- Meta / theme -->
+  <meta name="description" content="Pharm-let quiz runner with dark mode and streak flame." />
+  <meta name="theme-color" content="#8b1e3f" />
+  <link rel="icon" href="assets/icon.png" />
+
+  <!-- CSP (no inline scripts) -->
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self';
+             img-src 'self' data:;
+             style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com;
+             script-src 'self' https://cdn.tailwindcss.com;">
+
+  <!-- CSS / Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="assets/css/styles.css" />
+  <style>
+    /* segmented control styling to match your maroon theme */
+    .segmented {
+      display:inline-flex; border:1px solid var(--ring); border-radius:.75rem;
+      background:var(--card); overflow:hidden;
+    }
+    .segmented button {
+      padding:.45rem .7rem; font-weight:600; min-height:44px;
+      border:none; background:transparent; color:var(--text);
+    }
+    .segmented button + button { border-left:1px solid var(--ring); }
+    .segmented button.active { background:var(--accent); color:#fff; }
+    .segmented button:focus-visible { outline:3px solid var(--accent); outline-offset:2px; }
+  </style>
 </head>
-<body>
+
+<body class="bg-[var(--bg)] text-[var(--text)]">
   <main class="max-w-3xl mx-auto p-6" id="app">
+    <!-- Header -->
     <header class="mb-4">
       <div class="flex items-center justify-between gap-3">
         <a href="index.html" class="quiz-link">← Back to Library</a>
         <div class="flex items-center gap-3">
           <button id="share" class="btn btn-ghost" type="button">Share</button>
+
+          <!-- Segmented question-count control -->
           <div class="flex items-center gap-2">
-            <label for="qcount" class="text-sm" style="color:var(--muted)">Questions:</label>
-            <select id="qcount" class="btn btn-ghost">
-              <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="20">20</option>
-              <option value="">All</option>
-            </select>
+            <span class="text-sm" style="color:var(--muted)">Questions:</span>
+            <div id="qcount-group" class="segmented">
+              <button type="button" data-limit="5">5</button>
+              <button type="button" data-limit="10">10</button>
+              <button type="button" data-limit="20">20</button>
+              <button type="button" data-limit="">All</button>
+            </div>
           </div>
+
           <button id="theme-toggle" class="btn btn-ghost" type="button">🌙 Dark</button>
         </div>
       </div>
 
       <h1 id="quiz-title" class="text-2xl font-bold mt-2">Loading…</h1>
+
       <div class="flex justify-between items-center mt-2 text-sm" style="color: var(--muted);">
         <div>Question <span id="qnum">0</span>/<span id="qtotal">0</span></div>
         <div>Score: <span id="score">0</span></div>
       </div>
+
       <div class="progress-bar-container">
         <div id="progress-bar" class="progress-bar" style="width:0%;">
           <span id="fire-flame" class="fire-flame hidden">🔥</span>
@@ -39,23 +74,31 @@
       </div>
     </header>
 
+    <!-- Question card -->
     <section id="question-card" class="quiz-card">
       <h2 id="prompt" class="font-semibold" aria-live="polite">Loading question…</h2>
+
       <div id="options" class="mt-3 space-y-2"></div>
+
       <div id="short-wrap" class="mt-3 hidden">
-        <input id="short-input" class="w-full rounded-xl border border-slate-300 px-3 py-2" placeholder="Type your answer…" />
+        <input id="short-input"
+               class="w-full rounded-xl border border-slate-300 px-3 py-2"
+               placeholder="Type your answer…" />
       </div>
+
       <div id="explain" class="explain"></div>
       <div id="live" aria-live="polite" class="sr-only"></div>
     </section>
 
+    <!-- Footer controls -->
     <footer class="mt-6 flex flex-wrap gap-3">
-      <button id="prev" class="btn btn-gray" type="button">Previous (P)</button>
+      <button id="prev" class="btn btn-gray"  type="button">Previous (P)</button>
       <button id="check" class="btn btn-blue" type="button">Check (C)</button>
       <button id="next" class="btn btn-green hidden" type="button">Next (N)</button>
       <button id="restart" class="btn btn-ghost ml-auto" type="button">Restart</button>
     </footer>
 
+    <!-- Results -->
     <section id="results" class="hidden text-center mt-8">
       <h2 class="text-3xl font-bold mb-2">Quiz Complete!</h2>
       <p>Your final score is: <span id="final-score" class="font-bold" style="color:var(--accent)"></span></p>
@@ -63,9 +106,8 @@
     </section>
   </main>
 
+  <!-- Scripts (no inline JS; CSP-safe) -->
   <script type="module" src="assets/js/quizEngine.js"></script>
-  <script>
-    <script src="assets/js/quizPage.js"></script>
-  </script>
+  <script src="assets/js/quizPage.js"></script>
 </body>
 </html>
