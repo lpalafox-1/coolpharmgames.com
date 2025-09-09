@@ -1,19 +1,14 @@
-// Reusable quiz engine with flame, limit, seeded shuffle, keyboard shortcuts,
-// review mode, resume state, shuffled answers, a11y announcements, and friendly errors.
-// Includes explicit "Correct answer:" reveal.  (bullet-proofed)
+// assets/js/quizEngine.js
+// Clean quiz runner with: seeded/random order, limit, review mode,
+// explicit answer reveal, keyboard shortcuts, progress mini-map,
+// mark-for-review, session timer, streak meter, a11y niceties.
 
-// ---- Params ----
-const params     = new URLSearchParams(location.search);
-const quizId     = params.get("id");
-const mode       = (params.get("mode") || "easy").toLowerCase();
-const limitParam = parseInt(params.get("limit") || "", 10);   // e.g., 5,10,20, NaN => All
-const seedParam  = parseInt(params.get("seed")  || "", 10);   // optional repeatable shuffle
+const params = new URLSearchParams(location.search);
+const quizId = params.get("id");
+const mode   = (params.get("mode") || "easy").toLowerCase();
+const limitParam = parseInt(params.get("limit") || "", 10);
+const seedParam  = parseInt(params.get("seed")  || "", 10);
 
-// ---- Debug toggle (set true if you want logs) ----
-const DEBUG = false;
-const dbg = (...a)=>{ if (DEBUG) console.log(...a); };
-
-// ---- Elements ----
 const els = {
   title: document.getElementById("quiz-title"),
   qnum: document.getElementById("qnum"),
@@ -34,11 +29,15 @@ const els = {
   card: document.getElementById("question-card"),
   progressBar: document.getElementById("progress-bar"),
   fire: document.getElementById("fire-flame"),
+  fireCount: document.getElementById("fire-count"),
   live: document.getElementById("live"),
   themeToggle: document.getElementById("theme-toggle"),
+  navMap: document.getElementById("nav-map"),
+  mark: document.getElementById("mark"),
+  timerToggle: document.getElementById("timer-toggle"),
+  timerReadout: document.getElementById("timer-readout"),
 };
 
-// ---- Theme (same behavior, just centralized) ----
 const THEME_KEY = "quiz-theme";
 applyTheme(localStorage.getItem(THEME_KEY) || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
 els.themeToggle?.addEventListener("click", () => {
@@ -50,99 +49,76 @@ function applyTheme(mode){
   if (els.themeToggle) els.themeToggle.textContent = mode === "dark" ? "☀️ Light" : "🌙 Dark";
 }
 
-// ---- State ----
-const state = { title: "", questions: [], index: 0, score: 0, review:false };
-
-// Storage key includes quiz, mode, **limit** and **seed** so sessions never collide
-const STORAGE_KEY = () => {
-  const L = Number.isFinite(limitParam) && limitParam > 0 ? `L${limitParam}` : "Lall";
-  const S = Number.isFinite(seedParam) ? `S${seedParam}` : "Sr";
-  return `pharmlet.${quizId}.${mode}.${L}.${S}`;
+const state = {
+  title: "",
+  questions: [],
+  index: 0,
+  score: 0,
+  review: false,
+  currentStreak: 0,
+  bestStreak: 0,
+  marked: new Set(),
+  // timer
+  timerEnabled: false,
+  timerSeconds: 0,
+  timerHandle: null,
 };
 
-// ---- Main ----
+const STORAGE_KEY = () => `pharmlet.${quizId}.${mode}`;
+
 main().catch(err => {
   console.error(err);
   if (els.title) els.title.textContent = 'Quiz not found';
-  if (els.card)  els.card.innerHTML = `<p style="color:var(--muted)">Could not load <code>quizzes/${quizId}.json</code>. Check the file name and path.</p>`;
+  if (els.card) els.card.innerHTML = `<p style="color:var(--muted)">Could not load <code>quizzes/${sanitize(quizId)}.json</code>. Check the file name and path.</p>`;
 });
 
 async function main() {
   if (!quizId) throw new Error("Missing ?id=…");
 
-  let data;
-  try {
-    const res = await fetch(`quizzes/${quizId}.json`, { cache: "no-store" });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    data = await res.json();
-  } catch (e) {
-    throw e;
-  }
+  const res = await fetch(`quizzes/${quizId}.json`, { cache: "no-store" });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const data = await res.json();
 
-  const allPool  = (data.pools && data.pools[mode]) || data.questions || [];
+  const allPool = (data.pools && data.pools[mode]) || data.questions || [];
   const poolCopy = [...allPool];
-
-  // shuffle (seeded or random)
   if (Number.isFinite(seedParam)) seededShuffle(poolCopy, seedParam);
   else shuffleInPlace(poolCopy);
 
-  // Apply limit (clamped to available)
-  const limit = Number.isFinite(limitParam) && limitParam > 0 ? Math.max(1, Math.min(limitParam, poolCopy.length)) : null;
-  const pool  = limit ? poolCopy.slice(0, limit) : poolCopy;
+  const limit = Number.isFinite(limitParam) && limitParam > 0 ? limitParam : null;
+  const pool = limit ? poolCopy.slice(0, Math.min(limit, poolCopy.length)) : poolCopy;
 
-  // Title shows limit if set
   state.title = data.title || "Quiz";
-  if (els.title) els.title.textContent = `${state.title} — ${capitalize(mode)}${limit ? ` · ${limit} Q` : ''}`;
-
-  // Build questions
-  state.questions = pool.map(q => ({
+  state.questions = pool.map((q, i) => ({
     ...q,
     _answered:false, _correct:false, _user:null,
-    _choices: Array.isArray(q.choices) ? shuffledCopy(q.choices) : (q.type === "tf" ? ["True","False"] : null)
+    _choices: Array.isArray(q.choices) ? shuffledCopy(q.choices) : (q.type === "tf" ? ["True","False"] : null),
+    _id: i
   }));
 
-  // Try restore (only if it exactly matches same id/mode/limit/seed and length)
+  // restore saved session if present (and same length)
   try {
-    const savedRaw = localStorage.getItem(STORAGE_KEY());
-    if (savedRaw) {
-      const saved = JSON.parse(savedRaw);
-      const ok =
-        saved &&
-        saved.meta &&
-        saved.meta.quizId === quizId &&
-        saved.meta.mode   === mode &&
-        (saved.meta.limit ?? null) === (limit ?? null) &&
-        (saved.meta.seed  ?? null) === (Number.isFinite(seedParam) ? seedParam : null) &&
-        Array.isArray(saved.questions) &&
-        saved.questions.length === state.questions.length;
-
-      if (ok) {
-        Object.assign(state, saved, { review:false }); // never resume directly into review
-        dbg("[restore] resumed session", saved.meta);
-      } else {
-        dbg("[restore] ignored stale session (mismatch)");
-      }
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY()) || "null");
+    if (saved && Array.isArray(saved.questions) && saved.questions.length === state.questions.length) {
+      Object.assign(state, saved, { review:false, timerHandle:null }); // never resume in review; no running timer
+      state.marked = new Set(saved.marked || []);
     }
-  } catch (e) { dbg("[restore] failed", e); }
+  } catch {}
 
+  if (els.title) els.title.textContent = `${state.title} — ${capitalize(mode)}`;
   if (els.qtotal) els.qtotal.textContent = state.questions.length;
 
   wireEvents();
   render();
-
-  dbg("[engine] id:", quizId, "mode:", mode,
-      "limitParam:", limitParam, "available:", poolCopy.length,
-      "→ using:", state.questions.length, "seed:", Number.isFinite(seedParam) ? seedParam : "random");
 }
 
 /* ---------- events ---------- */
 function wireEvents(){
-  els.prev.addEventListener("click", () => { if (state.index>0) state.index--; render(); save(); });
-  els.next.addEventListener("click", () => {
+  els.prev?.addEventListener("click", () => { if (state.index>0) { state.index--; render(); save(); } });
+  els.next?.addEventListener("click", () => {
     if (state.index < state.questions.length - 1) { state.index++; render(); save(); }
     else { showResults(); }
   });
-  els.check.addEventListener("click", () => {
+  els.check?.addEventListener("click", () => {
     const q = currentQ();
     if (!q) return;
     if (q.type === "mcq" || q.type === "tf") {
@@ -153,14 +129,41 @@ function wireEvents(){
       scoreCurrent(els.shortInput.value);
     }
   });
-  els.restart.addEventListener("click", restart);
+  els.restart?.addEventListener("click", restart);
+
+  // Mark for review ⭐
+  els.mark?.addEventListener("click", () => {
+    const idx = state.index;
+    if (state.marked.has(idx)) state.marked.delete(idx);
+    else state.marked.add(idx);
+    renderNavMap();
+    updateMarkButton();
+    save();
+  });
+
+  // Timer ⏱
+  els.timerToggle?.addEventListener("click", toggleTimer);
 
   // Keyboard shortcuts
   window.addEventListener('keydown', (e)=>{
-    const k = e.key.toLowerCase();
-    if (k === 'n' && !els.next.classList.contains('hidden')) els.next.click();
-    if (k === 'p') els.prev.click();
-    if (k === 'c' && !els.check.classList.contains('hidden')) els.check.click();
+    // don't intercept while typing short answers
+    if (document.activeElement === els.shortInput) return;
+
+    const key = e.key;
+    if (key === 'ArrowRight') { e.preventDefault(); if (!els.next.classList.contains('hidden')) els.next.click(); }
+    if (key === 'ArrowLeft')  { e.preventDefault(); els.prev.click(); }
+    if (key === 'Enter')      { e.preventDefault(); if (!els.check.classList.contains('hidden')) els.check.click(); else if (!els.next.classList.contains('hidden')) els.next.click(); }
+
+    // number keys 1..9 select that choice
+    const num = Number(key);
+    if (num >= 1 && num <= 9) {
+      const radios = els.options.querySelectorAll("input[type='radio']");
+      const choice = radios[num-1];
+      if (choice && !choice.disabled) {
+        choice.checked = true;
+        enableCheckIfChoiceSelected();
+      }
+    }
   });
 }
 
@@ -188,30 +191,64 @@ function render(){
     choices.forEach((choice, idx) => {
       const id = `${group}c${idx}`;
       const wrap = document.createElement("label");
-      wrap.className = "flex items-center gap-2"; wrap.setAttribute("for", id);
+      wrap.className = "flex items-center gap-2";
+      wrap.setAttribute("for", id);
+      wrap.setAttribute("role", "radio");
+      wrap.setAttribute("aria-checked", "false");
       wrap.innerHTML = `<input id="${id}" type="radio" name="${group}" value="${choice}"><span>${sanitize(choice)}</span>`;
+      const input = wrap.querySelector("input");
+      input.addEventListener('change', enableCheckIfChoiceSelected);
+
       if (q._answered || state.review) {
-        wrap.querySelector("input").disabled = true;
+        input.disabled = true;
         const ok = isCorrectChoice(q, choice);
         if (ok) wrap.classList.add("correct");
         if (q._user && equalFold(q._user, choice) && !q._correct) wrap.classList.add("wrong");
+        // answer fade: dim wrong options
+        if (!ok) wrap.style.opacity = ".65";
+        wrap.setAttribute("aria-checked", equalFold(q._user, choice) ? "true" : "false");
+        wrap.setAttribute("aria-disabled", "true");
       }
       els.options.appendChild(wrap);
     });
   } else if (q.type === "short") {
     els.shortWrap.classList.remove("hidden");
-    els.shortInput.value = q._user || ""; 
+    els.shortInput.value = q._user || "";
     els.shortInput.disabled = q._answered || state.review;
+    // enable/disable Check based on presence
+    els.check.disabled = !q._answered && !(els.shortInput.value.trim().length > 0);
+    els.shortInput.oninput = () => {
+      if (state.review || q._answered) return;
+      els.check.disabled = els.shortInput.value.trim().length === 0;
+    };
   } else {
     els.options.innerHTML = `<p style="color:var(--muted)">Unsupported question type.</p>`;
   }
 
-  // explicit answer reveal on answered or in review mode
+  // ensure "Check" disabled until a selection is present
+  if (q.type === "mcq" || q.type === "tf") {
+    const anyChecked = !!els.options.querySelector("input[type='radio']:checked");
+    els.check.disabled = !anyChecked;
+  }
+
+  // explicit answer reveal when answered or in review
   if (q._answered || state.review) {
     renderAnswerReveal(q);
   }
 
+  // mark button
+  updateMarkButton();
+
+  // progress
+  renderNavMap();
   updateProgressAndFlame();
+
+  save();
+}
+
+function enableCheckIfChoiceSelected() {
+  const sel = els.options.querySelector("input[type='radio']:checked");
+  els.check.disabled = !sel;
 }
 
 function scoreCurrent(userValRaw){
@@ -220,15 +257,14 @@ function scoreCurrent(userValRaw){
   if (q.type === "mcq" || q.type === "tf") {
     correct = isCorrectChoice(q, userVal);
   } else if (q.type === "short") {
-    const answers = Array.isArray(q.answerText) ? q.answerText : [q.answerText];
-    correct = answers.filter(Boolean).some(a => equalFold(a, userVal));
+    correct = shortAnswerMatches(q, userVal);
   }
   if (!q._answered) {
     q._answered = true; q._correct = !!correct; q._user = userVal;
-    if (correct) state.score += 1;
+    if (correct) { state.score += 1; state.currentStreak += 1; state.bestStreak = Math.max(state.bestStreak, state.currentStreak); }
+    else { state.currentStreak = 0; }
   }
 
-  // Show "Correct answer:" line + explanation (if any)
   renderAnswerReveal(q);
 
   els.card.classList.toggle("correct", correct);
@@ -237,17 +273,31 @@ function scoreCurrent(userValRaw){
   els.check.classList.add("hidden"); els.next.classList.remove("hidden");
 
   announce(`Question ${state.index+1} ${correct ? 'correct' : 'wrong'}. Score ${state.score} of ${state.questions.length}.`);
-  render(); save();
+  render(); // re-render to apply dimming, button states, streak, etc.
 }
 
 function showResults(){
   els.card.classList.add("hidden");
   els.results.classList.remove("hidden");
   els.final.textContent = `${state.score} / ${state.questions.length}`;
+
+  // Add compact breakdown
+  const made = state.questions.filter(q=>q._answered).length;
+  const wrong = made - state.score;
+  const summaryId = "res-summary";
+  let sum = document.getElementById(summaryId);
+  if (!sum) {
+    sum = document.createElement("div");
+    sum.id = summaryId;
+    sum.className = "mt-3 text-sm";
+    els.results.appendChild(sum);
+  }
+  sum.innerHTML = `✅ Correct: <strong>${state.score}</strong> &nbsp; • &nbsp; ❌ Wrong: <strong>${wrong}</strong> &nbsp; • &nbsp; 🔥 Best streak: <strong>${state.bestStreak}</strong>${state.timerSeconds>0 ? ` &nbsp; • &nbsp; ⏱ Time: <strong>${formatTime(state.timerSeconds)}</strong>` : ""}`;
+
   const pct = state.score / state.questions.length;
   els.celebrate.classList.toggle("hidden", !(pct === 1 || pct >= 0.9));
 
-  // Add Review button
+  // Review button
   let btn = els.results.querySelector('#review-btn');
   if (!btn) {
     btn = document.createElement('button');
@@ -258,22 +308,52 @@ function showResults(){
     els.results.appendChild(btn);
   }
 
-  // Clear ONLY this session key to avoid stale resumes with different limits later
+  stopTimer();
   try { localStorage.removeItem(STORAGE_KEY()); } catch {}
 }
 
 function restart(){
   state.index = 0; state.score = 0; state.review = false;
+  state.currentStreak = 0; state.bestStreak = 0;
+  state.marked = new Set();
   state.questions.forEach(q => Object.assign(q, {_answered:false,_correct:false,_user:null}));
   els.results.classList.add("hidden");
   els.card.classList.remove("hidden");
   els.check.classList.remove("hidden");
   els.next.classList.add("hidden");
-  render(); save();
+  // reset timer readout but keep setting off
+  state.timerSeconds = 0; stopTimer(); updateTimerReadout();
+  render();
 }
 
 /* ---------- helpers ---------- */
 function currentQ(){ return state.questions[state.index]; }
+
+function renderNavMap(){
+  if (!els.navMap) return;
+  els.navMap.innerHTML = "";
+  state.questions.forEach((q, i) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = String(i+1);
+    b.className = "btn btn-ghost";
+    b.setAttribute("aria-label", `Go to question ${i+1}`);
+    // styling states
+    if (i === state.index) b.style.outline = `2px solid var(--accent)`;
+    if (state.marked.has(i)) b.textContent += "⭐";
+    if (q._answered) b.style.opacity = ".9";
+    if (q._answered && !q._correct) b.style.borderColor = "var(--bad)";
+    b.addEventListener("click", () => { state.index = i; render(); save(); });
+    els.navMap.appendChild(b);
+  });
+}
+
+function updateMarkButton(){
+  if (!els.mark) return;
+  const marked = state.marked.has(state.index);
+  els.mark.textContent = marked ? "⭐ Unmark" : "⭐ Mark";
+  els.mark.setAttribute("aria-pressed", marked ? "true" : "false");
+}
 
 function updateProgressAndFlame(){
   const answered = state.questions.filter(q=>q._answered).length;
@@ -281,14 +361,21 @@ function updateProgressAndFlame(){
   const correct  = state.questions.filter(q=>q._answered && q._correct).length;
   if (els.progressBar) els.progressBar.style.width = `${Math.min(100,(answered/total)*100)}%`;
   const acc = answered ? (correct/answered) : 0;
+
   const hot = answered >= 5 && acc >= 0.80;
   if (!els.fire) return;
   if (hot){
     els.fire.classList.remove("hidden");
+    if (els.fireCount) {
+      const streak = Math.max(0, state.currentStreak);
+      els.fireCount.textContent = `×${streak}`;
+      els.fireCount.classList.toggle("hidden", streak < 2);
+    }
     const extra = Math.max(0, acc - 0.80); const scale = 1 + extra * 2.5;
     els.fire.style.setProperty("--flame-scale", scale.toFixed(2));
   } else {
     els.fire.classList.add("hidden");
+    els.fireCount?.classList.add("hidden");
   }
 }
 
@@ -302,7 +389,32 @@ function isCorrectChoice(q, choice){
   return false;
 }
 
-// --- Correct-answer reveal helpers ---
+// short answer matching with light normalization
+function shortAnswerMatches(q, userVal) {
+  const answers = Array.isArray(q.answerText) ? q.answerText : [q.answerText];
+  const normUser = norm(userVal);
+  return answers.filter(Boolean).some(a => {
+    const na = norm(a);
+    return na === normUser || softEq(na, normUser);
+  });
+}
+function norm(s=""){
+  return String(s)
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .replace(/[’'`]/g, "'")
+    .replace(/[\.\,\;\:\-$begin:math:text$$end:math:text$$begin:math:display$$end:math:display$\{\}]/g, "")
+    .trim();
+}
+// allow plural/singular and minor variants: "beta blocker" == "beta blockers"
+function softEq(a, b){
+  if (a === b) return true;
+  const ap = a.endsWith("s") ? a.slice(0,-1) : a + "s";
+  const bp = b.endsWith("s") ? b.slice(0,-1) : b + "s";
+  return ap === b || bp === a || ap === bp;
+}
+
+// answer reveal helpers
 function getCorrectAnswers(q){
   if (Array.isArray(q.answer)) return q.answer.map(String);
   if (Array.isArray(q.answerText)) return q.answerText.map(String);
@@ -313,26 +425,42 @@ function getCorrectAnswers(q){
   if (typeof q.answerText === "string") return [ q.answerText ];
   return [];
 }
-
 function renderAnswerReveal(q){
   const answers = getCorrectAnswers(q);
-  const answerLine =
-    answers.length
-      ? `<div><strong>Correct answer:</strong> ${answers.map(sanitize).join(" • ")}</div>`
-      : "";
-
+  const answerLine = answers.length
+    ? `<div><strong>Correct answer:</strong> ${answers.map(sanitize).join(" • ")}</div>`
+    : "";
   const explainLine = q.explain ? `<div class="mt-1">${sanitize(q.explain)}</div>` : "";
   const html = `${answerLine}${explainLine}`;
-
-  if (html) {
-    els.explain.innerHTML = html;
-    els.explain.classList.add("show");
-  } else {
-    els.explain.innerHTML = `<div style="color:var(--muted)">No explanation provided.</div>`;
-    els.explain.classList.add("show");
-  }
+  els.explain.innerHTML = html || `<div style="color:var(--muted)">No explanation provided.</div>`;
+  els.explain.classList.add("show");
 }
 
+function toggleTimer(){
+  state.timerEnabled = !state.timerEnabled;
+  els.timerToggle?.setAttribute("aria-pressed", state.timerEnabled ? "true" : "false");
+  els.timerToggle.textContent = state.timerEnabled ? "⏸ Pause Timer" : "⏱ Start Timer";
+  if (state.timerEnabled) startTimer(); else stopTimer();
+}
+function startTimer(){
+  if (state.timerHandle) return;
+  state.timerHandle = setInterval(() => {
+    state.timerSeconds += 1;
+    updateTimerReadout();
+  }, 1000);
+}
+function stopTimer(){
+  if (state.timerHandle) { clearInterval(state.timerHandle); state.timerHandle = null; }
+}
+function updateTimerReadout(){
+  if (els.timerReadout) els.timerReadout.textContent = formatTime(state.timerSeconds);
+}
+function formatTime(sec){
+  const m = Math.floor(sec/60); const s = sec%60;
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+/* ---------- utils ---------- */
 function sanitize(s=""){ return s.replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function equalFold(a,b){ return String(a).trim().toLowerCase() === String(b).trim().toLowerCase(); }
 function shuffleInPlace(a){ for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } }
@@ -340,19 +468,10 @@ function shuffledCopy(a){ const b=[...a]; shuffleInPlace(b); return b; }
 function seededShuffle(arr, seed=1){ let s=seed; const rand=()=> (s=(s*9301+49297)%233280)/233280;
   for(let i=arr.length-1;i>0;i--){ const j=Math.floor(rand()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } }
 function capitalize(s){ return s ? s[0].toUpperCase()+s.slice(1) : s; }
-
-// Persist with meta so we can validate on restore
 function save(){
   try {
-    const meta = {
-      quizId, mode,
-      limit: Number.isFinite(limitParam) && limitParam > 0 ? limitParam : null,
-      seed:  Number.isFinite(seedParam)  ? seedParam  : null,
-      count: state.questions.length,
-      ver: 1
-    };
-    localStorage.setItem(STORAGE_KEY(), JSON.stringify({ ...state, meta }));
+    const toSave = {...state, marked:[...state.marked]};
+    localStorage.setItem(STORAGE_KEY(), JSON.stringify(toSave));
   } catch {}
 }
-
 function announce(msg){ if (els.live) els.live.textContent = msg; }
