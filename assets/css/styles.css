@@ -40,6 +40,9 @@
 .fire-flame{ position:absolute; right:0; top:50%; transform:translateY(-50%) translateX(100%); font-size:1.5rem; animation:pulse-fire 1s infinite alternate; z-index:2; }
 .hidden{ display:none; }
 @keyframes pulse-fire{ from{ transform:translateY(-50%) translateX(100%) scale(var(--flame-scale,1)); } to{ transform:translateY(-50%) translateX(100%) scale(calc(var(--flame-scale,1)+.1)); } }
+.btn-blue{ background:var(--accent); color:#fff; }
+.btn-blue:hover{ background:var(--accent-600); }
+.progress-bar{ background-color:var(--accent); }
 
 /* Accessibility niceties */
 .btn:focus-visible, .quiz-link:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
