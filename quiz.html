@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Quiz</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <main class="max-w-3xl mx-auto p-6" id="app">
+    <header class="mb-4">
+      <div class="flex items-center justify-between gap-3">
+        <a href="index.html" class="quiz-link">← Back to Library</a>
+        <button id="theme-toggle" class="btn btn-ghost">🌙 Dark</button>
+      </div>
+      <h1 id="quiz-title" class="text-2xl font-bold mt-2">Loading…</h1>
+      <div class="flex justify-between items-center mt-2 text-sm" style="color: var(--muted);">
+        <div>Question <span id="qnum">0</span>/<span id="qtotal">0</span></div>
+        <div>Score: <span id="score">0</span></div>
+      </div>
+      <div class="progress-bar-container">
+        <div id="progress-bar" class="progress-bar" style="width:0%;">
+          <span id="fire-flame" class="fire-flame hidden">🔥</span>
+        </div>
+      </div>
+    </header>
+
+    <section id="question-card" class="quiz-card">
+      <h2 id="prompt" class="font-semibold">Loading question…</h2>
+      <div id="options" class="mt-3 space-y-2"></div>
+      <div id="short-wrap" class="mt-3 hidden">
+        <input id="short-input" class="w-full rounded-xl border border-slate-300 px-3 py-2" placeholder="Type your answer…" />
+      </div>
+      <div id="explain" class="explain"></div>
+    </section>
+
+    <footer class="mt-6 flex flex-wrap gap-3">
+      <button id="prev" class="btn btn-gray">Previous</button>
+      <button id="check" class="btn btn-blue">Check</button>
+      <button id="next" class="btn btn-green hidden">Next</button>
+      <button id="restart" class="btn btn-ghost ml-auto">Restart</button>
+    </footer>
+
+    <section id="results" class="hidden text-center mt-8">
+      <h2 class="text-3xl font-bold mb-2">Quiz Complete!</h2>
+      <p>Your final score is: <span id="final-score" class="font-bold" style="color:var(--accent)"></span></p>
+      <div id="celebrate" class="text-4xl mt-4 hidden">🔥🔥</div>
+    </section>
+  </main>
+  <script type="module" src="assets/js/quizEngine.js"></script>
+</body>
+</html>
