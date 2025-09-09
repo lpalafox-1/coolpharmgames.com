@@ -6,7 +6,7 @@
   <title>Quiz</title>
 
   <!-- Meta / theme -->
-  <meta name="description" content="Pharm-let quiz runner with dark mode and streak flame." />
+  <meta name="description" content="Pharm-let quiz runner with dark mode, streak flame, timer, and keyboard shortcuts." />
   <meta name="theme-color" content="#8b1e3f" />
   <link rel="icon" href="assets/icon.png" />
 
@@ -15,94 +15,114 @@
     content="default-src 'self';
              img-src 'self' data:;
              style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com;
-             script-src 'self' https://cdn.tailwindcss.com;">
+             script-src 'self' https://cdn.tailwindcss.com;
+             connect-src 'self';">
 
   <!-- CSS / Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="assets/css/styles.css" />
   <style>
-    /* segmented control styling to match your maroon theme */
-    .segmented {
-      display:inline-flex; border:1px solid var(--ring); border-radius:.75rem;
-      background:var(--card); overflow:hidden;
+    /* Small helper for visually-hidden live region */
+    .sr-only {
+      position: absolute; width: 1px; height: 1px;
+      padding: 0; margin: -1px; overflow: hidden;
+      clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
     }
-    .segmented button {
-      padding:.45rem .7rem; font-weight:600; min-height:44px;
-      border:none; background:transparent; color:var(--text);
-    }
-    .segmented button + button { border-left:1px solid var(--ring); }
-    .segmented button.active { background:var(--accent); color:#fff; }
-    .segmented button:focus-visible { outline:3px solid var(--accent); outline-offset:2px; }
+    .sticky-head { position:sticky; top:0; z-index:50; backdrop-filter:saturate(1.2) blur(6px); background:color-mix(in oklab, var(--bg) 80%, transparent); }
+    .mini-hint { font-size:.8rem; color:var(--muted); }
   </style>
 </head>
 
 <body class="bg-[var(--bg)] text-[var(--text)]">
-  <main class="max-w-3xl mx-auto p-6" id="app">
-    <!-- Header -->
-    <header class="mb-4">
-      <div class="flex items-center justify-between gap-3">
-        <a href="index.html" class="quiz-link">← Back to Library</a>
-        <div class="flex items-center gap-3">
-          <button id="share" class="btn btn-ghost" type="button">Share</button>
+  <header class="sticky-head border-b border-[var(--ring)]">
+    <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+      <a href="index.html" class="quiz-link">← Back to Library</a>
+      <div class="flex items-center gap-3">
+        <button id="share" class="btn btn-ghost" type="button" aria-label="Copy quiz link">Share</button>
 
-          <!-- Segmented question-count control -->
-          <div class="flex items-center gap-2">
-            <span class="text-sm" style="color:var(--muted)">Questions:</span>
-            <div id="qcount-group" class="segmented">
-              <button type="button" data-limit="5">5</button>
-              <button type="button" data-limit="10">10</button>
-              <button type="button" data-limit="20">20</button>
-              <button type="button" data-limit="">All</button>
-            </div>
+        <!-- Question count segmented control (implemented in quizPage.js) -->
+        <div class="flex items-center gap-2">
+          <span class="text-sm" style="color:var(--muted)">Questions:</span>
+          <div id="qcount-group" class="segmented" role="group" aria-label="Question count">
+            <a class="seg-link" data-limit="5"  href="#">5</a>
+            <a class="seg-link" data-limit="10" href="#">10</a>
+            <a class="seg-link" data-limit="20" href="#">20</a>
+            <a class="seg-link" data-limit=""  href="#">All</a>
           </div>
-
-          <button id="theme-toggle" class="btn btn-ghost" type="button">🌙 Dark</button>
         </div>
-      </div>
 
-      <h1 id="quiz-title" class="text-2xl font-bold mt-2">Loading…</h1>
+        <button id="theme-toggle" class="btn btn-ghost" type="button" aria-label="Toggle theme">🌙 Dark</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto p-6" id="app">
+    <!-- Title + counters -->
+    <header class="mb-4">
+      <h1 id="quiz-title" class="text-2xl font-bold">Loading…</h1>
 
       <div class="flex justify-between items-center mt-2 text-sm" style="color: var(--muted);">
         <div>Question <span id="qnum">0</span>/<span id="qtotal">0</span></div>
         <div>Score: <span id="score">0</span></div>
       </div>
 
-      <div class="progress-bar-container">
+      <!-- Progress bar + flame + streak -->
+      <div class="progress-bar-container" aria-label="Progress">
         <div id="progress-bar" class="progress-bar" style="width:0%;">
-          <span id="fire-flame" class="fire-flame hidden">🔥</span>
+          <span id="fire-flame" class="fire-flame hidden" aria-hidden="true">🔥</span>
+          <span id="fire-count" class="hidden" aria-label="Current streak">×0</span>
         </div>
       </div>
+
+      <!-- Progress mini-map (click to jump) -->
+      <div id="nav-map" class="mt-2 flex flex-wrap gap-2 text-sm" aria-label="Question navigator"></div>
     </header>
 
     <!-- Question card -->
-    <section id="question-card" class="quiz-card">
-      <h2 id="prompt" class="font-semibold" aria-live="polite">Loading question…</h2>
+    <section id="question-card" class="quiz-card" aria-live="polite">
+      <h2 id="prompt" class="font-semibold">Loading question…</h2>
 
-      <div id="options" class="mt-3 space-y-2"></div>
+      <!-- Multiple choice / TF container -->
+      <div id="options" class="mt-3 space-y-2" role="radiogroup" aria-label="Answer choices"></div>
 
+      <!-- Short answer -->
       <div id="short-wrap" class="mt-3 hidden">
+        <label for="short-input" class="mini-hint">Short answer (not case sensitive)</label>
         <input id="short-input"
                class="w-full rounded-xl border border-slate-300 px-3 py-2"
                placeholder="Type your answer…" />
       </div>
 
-      <div id="explain" class="explain"></div>
+      <!-- Explicit reveal + explanation (if present in JSON) -->
+      <div id="explain" class="explain" aria-live="polite"></div>
       <div id="live" aria-live="polite" class="sr-only"></div>
     </section>
 
     <!-- Footer controls -->
-    <footer class="mt-6 flex flex-wrap gap-3">
-      <button id="prev" class="btn btn-gray"  type="button">Previous (P)</button>
-      <button id="check" class="btn btn-blue" type="button">Check (C)</button>
-      <button id="next" class="btn btn-green hidden" type="button">Next (N)</button>
-      <button id="restart" class="btn btn-ghost ml-auto" type="button">Restart</button>
+    <footer class="mt-6 flex flex-wrap items-center gap-3">
+      <button id="prev" class="btn btn-gray"  type="button" aria-label="Previous question">Previous (← / P)</button>
+      <button id="check" class="btn btn-blue" type="button" aria-label="Check answer">Check (Enter / C)</button>
+      <button id="next" class="btn btn-green hidden" type="button" aria-label="Next question">Next (→ / N)</button>
+
+      <span class="mini-hint ml-2">Tip: use number keys 1–9 to pick an option</span>
+
+      <div class="ml-auto flex items-center gap-3">
+        <button id="mark" class="btn btn-ghost" type="button" aria-pressed="false" aria-label="Mark for review">⭐ Mark</button>
+
+        <!-- Timer controls (not graded) -->
+        <button id="timer-toggle" class="btn btn-ghost" type="button" aria-pressed="false" aria-label="Toggle timer">⏱ Start Timer</button>
+        <span id="timer-readout" class="text-sm" style="color:var(--muted)">00:00</span>
+
+        <button id="restart" class="btn btn-ghost" type="button" aria-label="Restart quiz">Restart</button>
+      </div>
     </footer>
 
     <!-- Results -->
-    <section id="results" class="hidden text-center mt-8">
+    <section id="results" class="hidden text-center mt-8" aria-live="polite">
       <h2 class="text-3xl font-bold mb-2">Quiz Complete!</h2>
       <p>Your final score is: <span id="final-score" class="font-bold" style="color:var(--accent)"></span></p>
-      <div id="celebrate" class="text-4xl mt-4 hidden">🔥🔥</div>
+      <div id="celebrate" class="text-4xl mt-4 hidden" aria-hidden="true">🔥🔥</div>
+      <!-- summary + review button are injected by JS -->
     </section>
   </main>
 
