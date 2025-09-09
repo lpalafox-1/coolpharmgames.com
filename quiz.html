@@ -60,5 +60,26 @@
     </section>
   </main>
   <script type="module" src="assets/js/quizEngine.js"></script>
+<script>
+  // reflect current ?limit in the dropdown
+  (function () {
+    const sel = document.getElementById('qcount');
+    if (!sel) return;
+    const url = new URL(location.href);
+    const current = url.searchParams.get('limit') || '';
+    sel.value = current;
+
+    sel.addEventListener('change', () => {
+      const next = sel.value;
+      const u = new URL(location.href);
+      if (next) u.searchParams.set('limit', next);
+      else u.searchParams.delete('limit');
+      // keep id & mode as-is, just tweak limit
+      location.href = u.toString();
+    });
+  })();
+</script>
+
+
 </body>
 </html>
