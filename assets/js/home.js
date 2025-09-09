@@ -1,15 +1,31 @@
 // assets/js/home.js
-(() => {
-  'use strict';
-  const $ = s => document.querySelector(s);
+document.addEventListener("DOMContentLoaded", () => {
+  const $  = s => document.querySelector(s);
   const $$ = s => Array.from(document.querySelectorAll(s));
 
-  /* ---------- Theme ---------- */
+  // --- safeShow helpers ---
+  function show(el){ if (el) el.style.display = ""; }
+  function hide(el){ if (el) el.style.display = "none"; }
+
+  // If anything fails, we still want *something* visible
+  function showFallback() {
+    try {
+      const welcome = $("#welcome");
+      const menu = $("#menu");
+      if (welcome) hide(welcome);
+      if (menu) show(menu);
+    } catch {}
+  }
+
+  /* ========== THEME ========== */
   try {
     const THEME_KEY = "quiz-theme";
     const btn = $("#theme-toggle");
-    const start = localStorage.getItem(THEME_KEY) ||
-      (window.matchMedia?.("(prefers-color-scheme: dark)")?.matches ? "dark" : "light");
+    const prefersDark = (() => {
+      try { return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches; }
+      catch { return false; }
+    })();
+    const start = localStorage.getItem(THEME_KEY) || (prefersDark ? "dark" : "light");
     document.documentElement.classList.toggle("dark", start === "dark");
     if (btn) btn.textContent = document.documentElement.classList.contains("dark") ? "☀️ Light" : "🌙 Dark";
     btn?.addEventListener("click", () => {
@@ -18,42 +34,50 @@
       localStorage.setItem(THEME_KEY, next);
       if (btn) btn.textContent = next === "dark" ? "☀️ Light" : "🌙 Dark";
     });
-  } catch (e) { console.error("Theme init failed:", e); }
+  } catch (e) { console.error("Theme init:", e); }
 
-  /* ---------- Welcome vs Menu ---------- */
+  /* ========== WELCOME vs MENU ========== */
   try {
-    const WELCOME_KEY = "pharmlet.welcome.seen";
     const welcome = $("#welcome");
     const menu = $("#menu");
-    const seen = localStorage.getItem(WELCOME_KEY);
-    if (welcome && menu) {
-      if (seen) { welcome.style.display = "none"; menu.style.display = ""; }
-      else { welcome.style.display = ""; menu.style.display = "none"; }
-    }
-    $("#start-now")?.addEventListener("click", () => { localStorage.setItem(WELCOME_KEY, "1"); if (welcome) welcome.style.display="none"; if (menu) menu.style.display=""; });
-    $("#skip")?.addEventListener("click", () => { localStorage.setItem(WELCOME_KEY, "1"); if (welcome) welcome.style.display="none"; if (menu) menu.style.display=""; });
-  } catch (e) { console.error("Welcome/menu failed:", e); }
+    if (!welcome || !menu) { showFallback(); return; }
 
-  /* ---------- Resume last quiz (best-effort) ---------- */
+    const WELCOME_KEY = "pharmlet.welcome.seen";
+    const seen = (() => { try { return localStorage.getItem(WELCOME_KEY); } catch { return null; } })();
+
+    if (seen) { hide(welcome); show(menu); }
+    else      { show(welcome); hide(menu); }
+
+    $("#start-now")?.addEventListener("click", () => {
+      try { localStorage.setItem(WELCOME_KEY, "1"); } catch {}
+      hide(welcome); show(menu);
+    });
+    $("#skip")?.addEventListener("click", () => {
+      try { localStorage.setItem(WELCOME_KEY, "1"); } catch {}
+      hide(welcome); show(menu);
+    });
+  } catch (e) { console.error("Welcome/Menu:", e); showFallback(); }
+
+  /* ========== RESUME LAST QUIZ ========== */
   try {
-    const keys = Object.keys(localStorage).filter(k => k.startsWith("pharmlet."));
-    if (keys.length) {
-      const lastKey = keys[keys.length - 1];
-      const parts = lastKey.split(".");
-      if (parts.length >= 3) {
-        const id = parts[1];
-        const mode = parts[2];
-        const wrap = $("#resume-wrap");
-        const link = $("#resume-link");
-        if (wrap && link && id && mode) {
-          link.href = `quiz.html?id=${encodeURIComponent(id)}&mode=${encodeURIComponent(mode)}`;
-          wrap.style.display = "";
+    const wrap = $("#resume-wrap"), link = $("#resume-link");
+    if (wrap && link) {
+      const keys = Object.keys(localStorage).filter(k => k.startsWith("pharmlet."));
+      if (keys.length) {
+        const lastKey = keys[keys.length - 1]; // crude but fine
+        const parts = lastKey.split(".");
+        if (parts.length >= 3) {
+          const id = parts[1], mode = parts[2];
+          if (id && mode) {
+            link.href = `quiz.html?id=${encodeURIComponent(id)}&mode=${encodeURIComponent(mode)}`;
+            show(wrap);
+          }
         }
       }
     }
-  } catch (e) { console.error("Resume failed:", e); }
+  } catch (e) { console.error("Resume:", e); }
 
-  /* ---------- Class filter ---------- */
+  /* ========== CLASS FILTER ========== */
   try {
     const filter = $("#class-filter");
     filter?.addEventListener("input", () => {
@@ -63,60 +87,51 @@
         card.style.display = !q || txt.includes(q) ? "" : "none";
       });
     });
-  } catch (e) { console.error("Filter failed:", e); }
+  } catch (e) { console.error("Filter:", e); }
 
-  /* ---------- Badges: New / Featured with multiple ways to expire ---------- */
+  /* ========== BADGES (New/Featured) ========== */
   try {
     const todayStr = new Date().toISOString().slice(0,10); // yyyy-mm-dd
-    const today = new Date(todayStr + "T00:00:00Z").getTime();
+    const today = Date.parse(`${todayStr}T00:00:00Z`);
 
-    function shouldShowNew(a) {
-      // 1) explicit on/off
+    function isNew(a){
+      // explicit "new"
       if (a.hasAttribute("data-new")) return true;
-
-      // 2) until date: data-new-until="2025-10-20"
+      // until date
       const until = a.getAttribute("data-new-until");
-      if (until) {
-        const t = Date.parse(until + "T23:59:59Z");
-        if (!Number.isNaN(t)) return today <= t;
+      if (until && !Number.isNaN(Date.parse(`${until}T23:59:59Z`))) {
+        return today <= Date.parse(`${until}T23:59:59Z`);
       }
-
-      // 3) days-based freshness: data-new-days="21" + data-added="2025-09-05"
+      // days freshness
       const days = parseInt(a.getAttribute("data-new-days") || "", 10);
       const added = a.getAttribute("data-added");
       if (Number.isFinite(days) && added) {
-        const start = Date.parse(added + "T00:00:00Z");
+        const start = Date.parse(`${added}T00:00:00Z`);
         if (!Number.isNaN(start)) {
-          const diffDays = Math.floor((today - start) / 86400000);
-          return diffDays <= days;
+          const diff = Math.floor((today - start) / 86400000);
+          return diff <= days;
         }
       }
       return false;
     }
-
-    function shouldShowFeatured(a) {
+    function isFeatured(a){
       if (a.hasAttribute("data-featured")) return true;
       const until = a.getAttribute("data-featured-until");
-      if (until) {
-        const t = Date.parse(until + "T23:59:59Z");
-        if (!Number.isNaN(t)) return today <= t;
-      }
-      return false;
+      return !!(until && today <= Date.parse(`${until}T23:59:59Z`));
     }
 
-    // Add pill tags next to qualifying links
     const recent = [];
-    $$("#menu a[href*='quiz.html']").forEach(a => {
-      // cleanup old pills
+    document.querySelectorAll("#menu a[href*='quiz.html']").forEach(a => {
+      // Clear existing pills near this link
       a.parentElement?.querySelectorAll(".pill").forEach(p => p.remove());
 
-      if (shouldShowFeatured(a)) {
+      if (isFeatured(a)) {
         const pill = document.createElement("span");
         pill.className = "pill pill-featured";
         pill.textContent = "Featured";
         a.insertAdjacentElement("afterend", pill);
       }
-      if (shouldShowNew(a)) {
+      if (isNew(a)) {
         const pill = document.createElement("span");
         pill.className = "pill pill-new";
         pill.textContent = "New";
@@ -125,16 +140,11 @@
       }
     });
 
-    // Simple “Recently added” strip in hero if anything new
-    const heroContainer = document.querySelector(".hero .max-w-5xl");
-    if (heroContainer) {
-      let strip = heroContainer.querySelector("#recent-strip");
-      if (!strip) {
-        strip = document.createElement("div");
-        strip.id = "recent-strip";
-        strip.style.marginTop = "0.5rem";
-        heroContainer.appendChild(strip);
-      }
+    // Recently added strip (non-breaking if none)
+    const hero = document.querySelector(".hero .max-w-5xl");
+    if (hero) {
+      let strip = hero.querySelector("#recent-strip");
+      if (!strip) { strip = document.createElement("div"); strip.id = "recent-strip"; hero.appendChild(strip); }
       strip.innerHTML = recent.length
         ? `<div class="text-sm" style="color:var(--muted)">
              Recently added: ${recent.slice(0,4).map(a => {
@@ -145,5 +155,5 @@
            </div>`
         : "";
     }
-  } catch (e) { console.error("Badges failed:", e); }
-})();
+  } catch (e) { console.error("Badges:", e); }
+});
