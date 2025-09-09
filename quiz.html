@@ -12,18 +12,19 @@
     <header class="mb-4">
       <div class="flex items-center justify-between gap-3">
         <a href="index.html" class="quiz-link">← Back to Library</a>
-        <button id="theme-toggle" class="btn btn-ghost">🌙 Dark</button>
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2">
+            <label for="qcount" class="text-sm" style="color:var(--muted)">Questions:</label>
+            <select id="qcount" class="btn btn-ghost">
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="">All</option>
+            </select>
+          </div>
+          <button id="theme-toggle" class="btn btn-ghost">🌙 Dark</button>
+        </div>
       </div>
-<div class="flex items-center gap-2">
-  <label for="qcount" class="text-sm" style="color:var(--muted)">Questions:</label>
-  <select id="qcount" class="btn btn-ghost">
-    <option value="5">5</option>
-    <option value="10">10</option>
-    <option value="20">20</option>
-    <option value="">All</option>
-  </select>
-</div>
-
 
       <h1 id="quiz-title" class="text-2xl font-bold mt-2">Loading…</h1>
       <div class="flex justify-between items-center mt-2 text-sm" style="color: var(--muted);">
@@ -38,19 +39,21 @@
     </header>
 
     <section id="question-card" class="quiz-card">
-      <h2 id="prompt" class="font-semibold">Loading question…</h2>
+      <h2 id="prompt" class="font-semibold" aria-live="polite">Loading question…</h2>
       <div id="options" class="mt-3 space-y-2"></div>
       <div id="short-wrap" class="mt-3 hidden">
-        <input id="short-input" class="w-full rounded-xl border border-slate-300 px-3 py-2" placeholder="Type your answer…" />
+        <input id="short-input"
+               class="w-full rounded-xl border border-slate-300 px-3 py-2"
+               placeholder="Type your answer…" />
       </div>
       <div id="explain" class="explain"></div>
     </section>
 
     <footer class="mt-6 flex flex-wrap gap-3">
-      <button id="prev" class="btn btn-gray">Previous</button>
-      <button id="check" class="btn btn-blue">Check</button>
-      <button id="next" class="btn btn-green hidden">Next</button>
-      <button id="restart" class="btn btn-ghost ml-auto">Restart</button>
+      <button id="prev" class="btn btn-gray" type="button">Previous</button>
+      <button id="check" class="btn btn-blue" type="button">Check</button>
+      <button id="next" class="btn btn-green hidden" type="button">Next</button>
+      <button id="restart" class="btn btn-ghost ml-auto" type="button">Restart</button>
     </footer>
 
     <section id="results" class="hidden text-center mt-8">
@@ -59,27 +62,26 @@
       <div id="celebrate" class="text-4xl mt-4 hidden">🔥🔥</div>
     </section>
   </main>
+
   <script type="module" src="assets/js/quizEngine.js"></script>
-<script>
-  // reflect current ?limit in the dropdown
-  (function () {
-    const sel = document.getElementById('qcount');
-    if (!sel) return;
-    const url = new URL(location.href);
-    const current = url.searchParams.get('limit') || '';
-    sel.value = current;
+  <script>
+    // Reflect current ?limit in the dropdown
+    (function () {
+      const sel = document.getElementById('qcount');
+      if (!sel) return;
+      const url = new URL(location.href);
+      const current = url.searchParams.get('limit') || '';
+      sel.value = current;
 
-    sel.addEventListener('change', () => {
-      const next = sel.value;
-      const u = new URL(location.href);
-      if (next) u.searchParams.set('limit', next);
-      else u.searchParams.delete('limit');
-      // keep id & mode as-is, just tweak limit
-      location.href = u.toString();
-    });
-  })();
-</script>
-
-
+      sel.addEventListener('change', () => {
+        const next = sel.value;
+        const u = new URL(location.href);
+        if (next) u.searchParams.set('limit', next);
+        else u.searchParams.delete('limit');
+        // reload with updated query
+        location.href = u.toString();
+      });
+    })();
+  </script>
 </body>
 </html>
