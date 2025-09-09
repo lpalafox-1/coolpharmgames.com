@@ -19,7 +19,35 @@
   --shadow: 0 10px 15px -3px rgba(0,0,0,.45), 0 4px 6px -2px rgba(0,0,0,.35);
   --shadow-lg: 0 20px 25px -5px rgba(0,0,0,.55), 0 10px 10px -5px rgba(0,0,0,.45);
 }
+/* Badge styles */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  margin-left: 0.4rem;
+}
 
+/* Variants */
+.badge-new {
+  background: #10b981; /* Tailwind emerald-500 */
+  color: white;
+  box-shadow: 0 0 6px rgba(16,185,129,0.6);
+}
+
+.badge-featured {
+  background: #3b82f6; /* Tailwind blue-500 */
+  color: white;
+  box-shadow: 0 0 6px rgba(59,130,246,0.6);
+}
+
+.badge-tbd {
+  background: #f59e0b; /* Tailwind amber-500 */
+  color: white;
+  box-shadow: 0 0 6px rgba(245,158,11,0.6);
+}
 /* ===== Base ===== */
 *{box-sizing:border-box}
 html,body{background:var(--bg);color:var(--text);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial}
