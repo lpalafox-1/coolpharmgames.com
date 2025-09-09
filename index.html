@@ -21,7 +21,22 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="assets/css/styles.css" />
+<!-- Welcome: hidden by default -->
+<section id="welcome" class="min-h-[60vh] flex items-center justify-center px-4" style="display:none;">
+  ...
+</section>
 
+<!-- Menu: VISIBLE by default -->
+<section id="menu">
+  ...
+</section>
+
+<!-- Bonus: show a helpful message if JS is disabled -->
+<noscript>
+  <div style="max-width:780px;margin:1rem auto;padding:1rem;border:1px solid #ddd;border-radius:12px;">
+    JavaScript is off or failed to load. The menu is still visible, but some features may be limited.
+  </div>
+</noscript>
   <style>
     /* soft maroon glow */
     .hero {
