@@ -47,8 +47,23 @@ main().catch(err => {
 
 async function main() {
   if (!quizId) throw new Error("Missing ?id=…");
-  const data = await fetch(`quizzes/${quizId}.json`, { cache: "no-store" }).then(r => r.json());
-  const pool = (data.pools && data.pools[mode]) || data.questions || [];
+   // Choose pool by mode
+  const allPool =
+    (data.pools && data.pools[mode]) ||
+    data.questions ||
+    [];
+
+  // Optional limit via URL: ?limit=5|10|20 (after shuffling)
+  const limitParam = parseInt(new URLSearchParams(location.search).get("limit") || "", 10);
+  const limit = Number.isFinite(limitParam) && limitParam > 0 ? limitParam : null;
+
+  // Copy + shuffle so we don't mutate the original
+  const poolCopy = [...allPool];
+  shuffleInPlace(poolCopy);
+
+  // Apply limit (if any)
+  const pool = limit ? poolCopy.slice(0, Math.min(limit, poolCopy.length)) : poolCopy;
+
   state.title = data.title || "Quiz";
   state.questions = pool.map(q => ({ ...q, _answered:false, _correct:false, _user:null }));
   shuffleInPlace(state.questions);
