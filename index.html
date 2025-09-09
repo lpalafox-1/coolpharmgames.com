@@ -4,20 +4,24 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Pharm-let — P1 Fall 2025 Hub</title>
+
   <meta name="description" content="P1 Fall 2025 study quizzes with dark mode, flame streak, and a clean UI." />
   <meta property="og:title" content="Pharm-let — P1 Fall 2025 Hub" />
   <meta property="og:description" content="Practice quizzes for pharmacy classes. Dark mode. 🔥 streak." />
   <meta property="og:image" content="assets/og.png" />
   <meta name="theme-color" content="#8b1e3f" />
   <link rel="icon" href="assets/icon.png" />
+
   <!-- CSP (no inline JS) -->
   <meta http-equiv="Content-Security-Policy"
     content="default-src 'self';
              img-src 'self' data:;
              style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com;
              script-src 'self' https://cdn.tailwindcss.com;">
+
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="assets/css/styles.css" />
+
   <style>
     .hero {
       background:
@@ -63,60 +67,60 @@
             <p class="mt-2 text-lg" style="color:var(--muted)">
               Targeted practice for P1 courses. Clean UI, dark mode, and a 🔥 streak for sustained accuracy.
             </p>
+
+            <!-- Resume last quiz (auto-shows if we find one) -->
             <div class="mt-4 flex flex-wrap gap-3" id="resume-wrap" style="display:none;">
               <a id="resume-link" class="btn btn-ghost">Resume last quiz</a>
             </div>
           </div>
+
+          <!-- Featured card -->
           <div class="card p-4">
             <div class="text-sm" style="color:var(--muted)">Featured set</div>
             <div class="font-semibold">Lab Week 2 — Antihypertensives</div>
             <div class="mt-2 flex gap-2">
-              <a class="btn btn-blue" href="quiz.html?id=lab-week2-antihypertensives&mode=easy&limit=20">Start (Easy)</a>
-              <a class="btn btn-blue" href="quiz.html?id=lab-week2-antihypertensives&mode=hard&limit=20">Start (Hard)</a>
+              <a class="btn btn-blue" href="quiz.html?id=lab-week2-antihypertensives&mode=easy">Start (Easy)</a>
+              <a class="btn btn-blue" href="quiz.html?id=lab-week2-antihypertensives&mode=hard">Start (Hard)</a>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Classes grid -->
+    <!-- Classes grid + filter -->
     <main id="classes" class="max-w-5xl mx-auto px-4 pb-16">
-      <h2 class="text-xl font-bold mb-4">Classes</h2>
+      <div class="flex items-end justify-between gap-4 mb-4">
+        <h2 class="text-xl font-bold">Classes</h2>
+        <!-- Quick filter -->
+        <input id="class-filter"
+               class="w-64 rounded-xl border px-3 py-2"
+               style="border-color:var(--ring); background:var(--card); color:var(--text)"
+               placeholder="Filter: e.g., Week 2, Easy, Pharmaceutics" />
+      </div>
+
       <div class="grid md:grid-cols-2 gap-4">
         <div class="card p-4">
           <h3 class="font-semibold">Pharmaceutics</h3>
           <ul class="mt-2 space-y-1 text-sm">
-            <li><a class="quiz-link" href="quiz.html?id=ceutics-practice-1&mode=easy&limit=20">Practice 1 — Easy</a></li>
-            <li><a class="quiz-link" href="quiz.html?id=ceutics-practice-1&mode=hard&limit=20">Practice 1 — Hard</a></li>
+            <li><a class="quiz-link" href="quiz.html?id=ceutics-practice-1&mode=easy">Practice 1 — Easy</a></li>
+            <li><a class="quiz-link" href="quiz.html?id=ceutics-practice-1&mode=hard">Practice 1 — Hard</a></li>
           </ul>
         </div>
+
         <div class="card p-4">
           <h3 class="font-semibold">Longitudinal Lab</h3>
           <ul class="mt-2 space-y-1 text-sm">
-            <li><a class="quiz-link" href="quiz.html?id=lab-week2-antihypertensives&mode=easy&limit=20">Week 2 Quiz 2 — Easy</a></li>
-            <li><a class="quiz-link" href="quiz.html?id=lab-week2-antihypertensives&mode=hard&limit=20">Week 2 Quiz 2 — Hard</a></li>
+            <li><a class="quiz-link" href="quiz.html?id=lab-week2-antihypertensives&mode=easy">Week 2 Quiz 2 — Easy</a></li>
+            <li><a class="quiz-link" href="quiz.html?id=lab-week2-antihypertensives&mode=hard">Week 2 Quiz 2 — Hard</a></li>
           </ul>
         </div>
       </div>
-<main id="classes" class="max-w-5xl mx-auto px-4 pb-16">
-  <div class="flex items-end justify-between gap-4 mb-4">
-    <h2 class="text-xl font-bold">Classes</h2>
-    <!-- Quick filter -->
-    <input id="class-filter"
-           class="w-64 rounded-xl border px-3 py-2"
-           style="border-color:var(--ring); background:var(--card); color:var(--text)"
-           placeholder="Filter: e.g., Week 2, Easy, Pharmaceutics" />
-  </div>
 
-  <div class="grid md:grid-cols-2 gap-4">
-    <!-- ... your cards/lists ... -->
-  </div>
-
-  <footer class="text-center text-sm py-10 mt-8" style="color:var(--muted)">
-    Pharm-let © 2025 — Study smarter, not harder ✨
-  </footer>
-</main>
-
+      <!-- Footer (inside menu so it's hidden during Welcome) -->
+      <footer class="text-center text-sm py-10 mt-8" style="color:var(--muted)">
+        Pharm-let © 2025 — Study smarter, not harder ✨
+      </footer>
+    </main>
   </section>
 
   <!-- Scripts -->
