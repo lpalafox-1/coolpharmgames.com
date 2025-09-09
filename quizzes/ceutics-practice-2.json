@@ -1,6 +1,7 @@
 {
   "id": "ceutics-practice-2.json",
-  "title": "Pharmaceutics Practice Quiz 2",
+  "title": "PSCI 71303 Pharmaceutics",
+  "subtitle": "Practice Quiz 1 (Easy/Hard pools)",
   "pools": {
     "easy": [
       {
