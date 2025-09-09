@@ -1,5 +1,6 @@
 // Reusable quiz engine with flame, limit, seeded shuffle, keyboard shortcuts,
 // review mode, resume state, shuffled answers, a11y announcements, and friendly errors.
+// Includes explicit "Correct answer:" reveal.
 
 const params = new URLSearchParams(location.search);
 const quizId = params.get("id");
@@ -75,7 +76,7 @@ async function main() {
   state.questions = pool.map(q => ({
     ...q,
     _answered:false, _correct:false, _user:null,
-    _choices: Array.isArray(q.choices) ? shuffledCopy(q.choices) : null // shuffle answer choices
+    _choices: Array.isArray(q.choices) ? shuffledCopy(q.choices) : (q.type === "tf" ? ["True","False"] : null)
   }));
 
   // restore saved session if present (and same length)
@@ -129,7 +130,7 @@ function render(){
   els.qnum.textContent = state.index + 1; els.score.textContent = state.score;
   els.prompt.innerHTML = sanitize(q.prompt || "Question");
   els.options.innerHTML = ""; els.shortWrap.classList.add("hidden");
-  els.explain.textContent = q.explain || ""; els.explain.classList.toggle("show", q._answered || state.review);
+  els.explain.innerHTML = ""; els.explain.classList.remove("show");
   els.card.classList.remove("correct","wrong");
 
   // controls
@@ -140,7 +141,7 @@ function render(){
 
   if (q.type === "mcq" || q.type === "tf") {
     const group = `q${state.index}`;
-    const choices = q._choices || (q.type === "tf" ? ["True","False"] : []);
+    const choices = q._choices || [];
     choices.forEach((choice, idx) => {
       const id = `${group}c${idx}`;
       const wrap = document.createElement("label");
@@ -156,9 +157,15 @@ function render(){
     });
   } else if (q.type === "short") {
     els.shortWrap.classList.remove("hidden");
-    els.shortInput.value = q._user || ""; els.shortInput.disabled = q._answered || state.review;
+    els.shortInput.value = q._user || ""; 
+    els.shortInput.disabled = q._answered || state.review;
   } else {
     els.options.innerHTML = `<p style="color:var(--muted)">Unsupported question type.</p>`;
+  }
+
+  // NEW: explicit answer reveal on answered or in review mode
+  if (q._answered || state.review) {
+    renderAnswerReveal(q);
   }
 
   updateProgressAndFlame();
@@ -177,9 +184,13 @@ function scoreCurrent(userValRaw){
     q._answered = true; q._correct = !!correct; q._user = userVal;
     if (correct) state.score += 1;
   }
-  els.explain.classList.toggle("show", !!q.explain);
+
+  // NEW: show "Correct answer:" line + explanation (if any)
+  renderAnswerReveal(q);
+
   els.card.classList.toggle("correct", correct);
   els.card.classList.toggle("wrong", !correct);
+
   els.check.classList.add("hidden"); els.next.classList.remove("hidden");
 
   announce(`Question ${state.index+1} ${correct ? 'correct' : 'wrong'}. Score ${state.score} of ${state.questions.length}.`);
@@ -208,23 +219,17 @@ function showResults(){
   try { localStorage.removeItem(STORAGE_KEY()); } catch {}
 }
 
-/* ---------- helpers ---------- */
-  } else if (q.type === "short") {
-    els.shortWrap.classList.remove("hidden");
-    els.shortInput.value = q._user || ""; 
-    els.shortInput.disabled = q._answered || state.review;
-  } else {
-    els.options.innerHTML = `<p style="color:var(--muted)">Unsupported question type.</p>`;
-  }
-
-  if (q._answered || state.review) {
-    renderAnswerReveal(q);
-  }
-
-  updateProgressAndFlame();
+function restart(){
+  state.index = 0; state.score = 0; state.review = false;
+  state.questions.forEach(q => Object.assign(q, {_answered:false,_correct:false,_user:null}));
+  els.results.classList.add("hidden");
+  els.card.classList.remove("hidden");
+  els.check.classList.remove("hidden");
+  els.next.classList.add("hidden");
+  render(); save();
 }
 
-
+/* ---------- helpers ---------- */
 function currentQ(){ return state.questions[state.index]; }
 
 function updateProgressAndFlame(){
@@ -248,7 +253,41 @@ function isCorrectChoice(q, choice){
   const ans = q.answer ?? q.answerText ?? q.answerIndex;
   if (Array.isArray(ans)) return ans.some(a => equalFold(a, choice));
   if (typeof ans === "string") return equalFold(ans, choice);
-  return Number(choice) === Number(ans);
+  if (typeof ans === "number") {
+    return Array.isArray(q.choices) && equalFold(String(q.choices[ans]), choice);
+  }
+  return false;
+}
+
+// --- NEW: Correct-answer reveal helpers ---
+function getCorrectAnswers(q){
+  if (Array.isArray(q.answer)) return q.answer.map(String);
+  if (Array.isArray(q.answerText)) return q.answerText.map(String);
+  if (typeof q.answerIndex === "number" && Array.isArray(q.choices)) {
+    return [ String(q.choices[q.answerIndex]) ];
+  }
+  if (typeof q.answer === "string") return [ q.answer ];
+  if (typeof q.answerText === "string") return [ q.answerText ];
+  return [];
+}
+
+function renderAnswerReveal(q){
+  const answers = getCorrectAnswers(q);
+  const answerLine =
+    answers.length
+      ? `<div><strong>Correct answer:</strong> ${answers.map(sanitize).join(" • ")}</div>`
+      : "";
+
+  const explainLine = q.explain ? `<div class="mt-1">${sanitize(q.explain)}</div>` : "";
+  const html = `${answerLine}${explainLine}`;
+
+  if (html) {
+    els.explain.innerHTML = html;
+    els.explain.classList.add("show");
+  } else {
+    els.explain.innerHTML = `<div style="color:var(--muted)">No explanation provided.</div>`;
+    els.explain.classList.add("show");
+  }
 }
 
 function sanitize(s=""){ return s.replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
@@ -257,7 +296,6 @@ function shuffleInPlace(a){ for (let i=a.length-1;i>0;i--){ const j=Math.floor(M
 function shuffledCopy(a){ const b=[...a]; shuffleInPlace(b); return b; }
 function seededShuffle(arr, seed=1){ let s=seed; const rand=()=> (s=(s*9301+49297)%233280)/233280;
   for(let i=arr.length-1;i>0;i--){ const j=Math.floor(rand()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } }
-
 function capitalize(s){ return s ? s[0].toUpperCase()+s.slice(1) : s; }
 function save(){ try { localStorage.setItem(STORAGE_KEY(), JSON.stringify(state)); } catch {} }
 function announce(msg){ if (els.live) els.live.textContent = msg; }
