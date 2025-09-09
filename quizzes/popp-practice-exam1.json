@@ -1,1 +1,186 @@
-yo
+{
+  "id": "popp-practice-exam1",
+  "title": "Pharmacy Law — Practice (PoPP I)",
+  "pools": {
+    "easy": [
+      {
+        "type": "mcq",
+        "prompt": "Which DEA form is used to order Schedule II controlled substances?",
+        "choices": ["Form 222", "Form 41", "Form 106", "Form 224"],
+        "answer": "Form 222"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which DEA form is used to report significant theft or loss of controlled substances?",
+        "choices": ["Form 106", "Form 41", "Form 224", "Form 363"],
+        "answer": "Form 106"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which DEA form is used for destruction/surrender of controlled substances?",
+        "choices": ["Form 41", "Form 106", "Form 222", "Form 224"],
+        "answer": "Form 41"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Initial DEA registration for a retail pharmacy is:",
+        "choices": ["Form 224", "Form 224a", "Form 225", "Form 363"],
+        "answer": "Form 224"
+      },
+      {
+        "type": "tf",
+        "prompt": "Schedule II prescriptions generally may not be refilled.",
+        "answer": "True"
+      },
+      {
+        "type": "tf",
+        "prompt": "Schedule III–V prescriptions may be refilled up to five times within six months if authorized.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which is a Schedule II controlled substance (federal)?",
+        "choices": ["Morphine", "Diazepam", "Pregabalin", "Codeine (alone) ≤ 90 mg/dose"],
+        "answer": "Morphine"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which is Schedule IV (federal)?",
+        "choices": ["Diazepam", "Heroin", "Cocaine", "Methadone"],
+        "answer": "Diazepam"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Federal daily pseudoephedrine sales limit is:",
+        "choices": ["3.6 g/day", "9 g/day", "7.5 g/day", "1.2 g/day"],
+        "answer": "3.6 g/day"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Federal 30-day retail pseudoephedrine limit is:",
+        "choices": ["9 g/30 days", "7.5 g/30 days", "12 g/30 days", "3.6 g/30 days"],
+        "answer": "9 g/30 days"
+      },
+      {
+        "type": "tf",
+        "prompt": "A pharmacist has a corresponding responsibility to ensure a controlled Rx is for a legitimate medical purpose.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which schedules may be phoned in (non-emergency) if permitted by state law?",
+        "choices": ["Schedule III–V", "Schedule II only", "None", "All schedules"],
+        "answer": "Schedule III–V"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Emergency oral C-II prescriptions require follow-up written/e-signed Rx within:",
+        "choices": ["7 days (federal)", "24 hours", "3 days", "14 days"],
+        "answer": "7 days (federal)"
+      },
+      {
+        "type": "tf",
+        "prompt": "Transfers of Schedule III–V prescriptions are allowed once between pharmacies that do not share a real-time database (if permitted).",
+        "answer": "True"
+      },
+      {
+        "type": "short",
+        "prompt": "DEA form for ordering C-II drugs (number only is fine).",
+        "answerText": ["222", "form 222", "dea 222"]
+      },
+      {
+        "type": "short",
+        "prompt": "DEA form for theft/loss reporting (number only is fine).",
+        "answerText": ["106", "form 106", "dea 106"]
+      },
+      {
+        "type": "short",
+        "prompt": "DEA form for destruction/surrender (number only is fine).",
+        "answerText": ["41", "form 41", "dea 41"]
+      },
+      {
+        "type": "short",
+        "prompt": "Max pseudoephedrine grams per day (federal).",
+        "answerText": ["3.6", "3.6 g", "3.6 grams"]
+      },
+      {
+        "type": "short",
+        "prompt": "Max CIII–CV refills (number).",
+        "answerText": ["5", "five"]
+      },
+      {
+        "type": "short",
+        "prompt": "Refill window for CIII–CV (months).",
+        "answerText": ["6", "six"]
+      }
+    ],
+    "hard": [
+      {
+        "type": "mcq",
+        "prompt": "Which items must be on a controlled prescription (federal)?",
+        "choices": ["Patient name & address", "Prescriber name, address, DEA #", "Drug name, strength, dosage form, quantity, directions", "All of the above"],
+        "answer": "All of the above"
+      },
+      {
+        "type": "tf",
+        "prompt": "Electronic prescribing of controlled substances (EPCS) is permitted federally if system requirements are met (state law may vary).",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Controlled substance inventory must occur at least every:",
+        "choices": ["2 years (federal)", "6 months", "Annually (federal)", "3 years"],
+        "answer": "2 years (federal)"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which of the following can generally be transferred more than once if pharmacies share a real-time database and state law permits?",
+        "choices": ["CIII–CV", "CII", "None", "Non-controlled only"],
+        "answer": "CIII–CV"
+      },
+      {
+        "type": "tf",
+        "prompt": "Post-dating a controlled prescription is permitted under federal law.",
+        "answer": "False"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which DEA form is used to renew a pharmacy registration?",
+        "choices": ["224a", "224", "225", "363"],
+        "answer": "224a"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which act primarily regulates pseudoephedrine sales?",
+        "choices": ["Combat Methamphetamine Epidemic Act", "Controlled Substances Act", "Poison Prevention Packaging Act", "Food, Drug, and Cosmetic Act"],
+        "answer": "Combat Methamphetamine Epidemic Act"
+      },
+      {
+        "type": "mcq",
+        "prompt": "For an emergency oral C-II prescription, a pharmacist must:",
+        "choices": ["Limit to amount necessary", "Obtain follow-up within 7 days", "Immediately file DEA Form 41", "Provide partial fill only"],
+        "answer": "Limit to amount necessary"
+      },
+      {
+        "type": "short",
+        "prompt": "DEA form for pharmacy registration (initial).",
+        "answerText": ["224", "form 224", "dea 224"]
+      },
+      {
+        "type": "short",
+        "prompt": "DEA form for pharmacy registration renewal.",
+        "answerText": ["224a", "form 224a", "dea 224a"]
+      },
+      {
+        "type": "short",
+        "prompt": "Minimum years between required federal controlled substance inventories.",
+        "answerText": ["2", "two"]
+      },
+      {
+        "type": "short",
+        "prompt": "Max number of CIII–CV transfers (non-real-time db).",
+        "answerText": ["1", "one"]
+      }
+    ]
+  }
+}
