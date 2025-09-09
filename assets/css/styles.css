@@ -86,17 +86,33 @@ a.quiz-link:hover{ text-decoration:none; }
 }
 .hidden{ display:none; }
 
-/* ===== Segmented control (if you use it) ===== */
-.segmented {
-  display:inline-flex; border:1px solid var(--ring);
-  border-radius:.75rem; background:var(--card); overflow:hidden;
+/* ===== Segmented control ===== */
+.segmented{
+  display:inline-flex;
+  border:1px solid var(--ring);
+  border-radius:.75rem;
+  background:var(--card);
+  overflow:hidden;
 }
-.segmented button{
-  padding:.45rem .7rem; font-weight:600; min-height:44px;
-  border:none; background:transparent; color:var(--text);
+
+/* use <a class="seg-link">5/10/20/All</a> */
+.segmented .seg-link{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:3rem;          /* ensures even width */
+  padding:.45rem .9rem;    /* breathing room */
+  min-height:44px;
+  font-weight:600;
+  font-size:.9rem;
+  text-decoration:none;
+  color:var(--text);
+  background:transparent;
+  transition:background .2s, color .2s;
 }
-.segmented button + button{ border-left:1px solid var(--ring); }
-.segmented button.active{ background:var(--accent); color:#fff; }
+.segmented .seg-link + .seg-link{ border-left:1px solid var(--ring); }
+.segmented .seg-link.active{ background:var(--accent); color:#fff; }
+.segmented .seg-link:hover{ background:var(--accent-600); color:#fff; }
 
 /* ===== Badges (place these near bottom so they win in cascade) ===== */
 .badge{
