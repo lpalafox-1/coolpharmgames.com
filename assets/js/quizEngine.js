@@ -44,7 +44,7 @@ function applyTheme(mode){
 }
 
 const state = { title: "", questions: [], index: 0, score: 0, review:false };
-const STORAGE_KEY = () => `pharmlet.${quizId}.${mode}`;
+const STORAGE_KEY = () => `pharmlet.${quizId}.${mode}.${limitParam || 'all'}`;
 
 main().catch(err => {
   console.error(err);
