@@ -79,7 +79,20 @@ async function main() {
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const data = await res.json();
 
-  const allPool = (data.pools && data.pools[mode]) || data.questions || [];
+  let allPool = [];
+  if (data.pools) {
+    const keys = Object.keys(data.pools || {});
+    if (mode === 'all' || mode === 'mix') {
+      allPool = keys.reduce((acc,k)=> acc.concat(Array.isArray(data.pools[k])?data.pools[k]:[]), []);
+    } else if (data.pools[mode]) {
+      allPool = data.pools[mode] || [];
+    } else {
+      // unknown mode: default to merge
+      allPool = keys.reduce((acc,k)=> acc.concat(Array.isArray(data.pools[k])?data.pools[k]:[]), []);
+    }
+  } else {
+    allPool = data.questions || [];
+  }
   if (!Array.isArray(allPool) || allPool.length === 0) {
     if (els.title) els.title.textContent = data.title || "Quiz";
     if (els.card) {
