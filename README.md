@@ -31,3 +31,11 @@ Quick local test (simple server):
 python3 -m http.server 8000
 # open http://localhost:8000/tools/test-quiz.html
 ```
+
+## Deployment
+
+- **Live site:** https://lpalafox-1.github.io/coolpharmgames.com/
+
+- GitHub Pages is used to publish the site from the repository. To add a custom domain, create a file named `CNAME` at the repository root containing your domain (for example `quiz.example.com`) and then add a DNS `CNAME` record pointing that domain to `lpalafox-1.github.io`.
+
+After updating `CNAME`, push to `main` and the Pages workflow will deploy the site. If you prefer to manage DNS yourself, add the `CNAME` and configure records with your DNS provider.
