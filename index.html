@@ -43,7 +43,7 @@
   <!-- Header -->
   <header class="flex justify-between items-center px-4 py-3 border-b border-[var(--ring)]">
     <h1 class="font-bold text-lg">Pharm-let</h1>
-    <button id="theme-toggle" class="btn btn-ghost" type="button">
+    <button id="theme-toggle" class="btn btn-ghost" type="button" aria-label="Toggle dark/light theme">
       <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.5"/></svg>
       <span id="theme-label">Dark</span>
     </button>
@@ -127,7 +127,8 @@
         <!-- Quick filter -->
         <input id="class-filter" class="w-64 rounded-xl border px-3 py-2"
                style="border-color:var(--ring); background:var(--card); color:var(--text)"
-               placeholder="Filter: e.g., Anticoagulants, Easy, POPP" />
+               placeholder="Filter: e.g., Anticoagulants, Easy, POPP"
+               aria-label="Filter quizzes by name or topic" />
       </div>
 
       <div class="grid md:grid-cols-2 gap-4">
@@ -269,9 +270,11 @@
         <!-- Exam Practice -->
         <div class="card p-4">
           <h3 class="font-semibold">Exam Practice</h3>
+          <p class="text-sm" style="color:var(--muted)">Comprehensive exam prep quizzes have been moved to the <strong>Pharmaceutical Calculations</strong> section below for better organization.</p>
           <ul class="mt-2 space-y-1 text-sm">
-            <li><span style="color:var(--muted)">Practice E1 — Available in Pharmaceutical Calculations section</span></li>
-            <li><span style="color:var(--muted)">Practice E2A — Available in Pharmaceutical Calculations section</span></li>
+            <li>
+              <a class="quiz-link" href="#classes">→ View Practice E1 & E2A in Pharmaceutical Calculations</a>
+            </li>
           </ul>
         </div>
 
