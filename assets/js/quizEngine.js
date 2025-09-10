@@ -46,7 +46,7 @@ els.themeToggle?.addEventListener("click", () => {
 });
 function applyTheme(mode){
   document.documentElement.classList.toggle("dark", mode === "dark");
-  if (els.themeToggle) els.themeToggle.textContent = mode === "dark" ? "☀️ Light" : "🌙 Dark";
+  if (els.themeToggle) els.themeToggle.textContent = mode === "dark" ? "Light" : "Dark";
 }
 
 const state = {
@@ -528,7 +528,7 @@ function toggleRevealSolution(){
 function toggleTimer(){
   state.timerEnabled = !state.timerEnabled;
   els.timerToggle?.setAttribute("aria-pressed", state.timerEnabled ? "true" : "false");
-  els.timerToggle.textContent = state.timerEnabled ? "⏸ Pause Timer" : "⏱ Start Timer";
+  els.timerToggle.textContent = state.timerEnabled ? "Pause Timer" : "Start Timer";
   if (state.timerEnabled) startTimer(); else stopTimer();
 }
 function startTimer(){
