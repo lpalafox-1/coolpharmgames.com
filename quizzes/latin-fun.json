@@ -1,0 +1,10 @@
+{
+  "id": "latin-fun",
+  "title": "Latin Fun",
+  "pools": {
+    "easy": [
+      { "type": "short", "prompt": "Translate: 'Et cetera' (short).", "answerText": "and the rest" }
+    ],
+    "hard": []
+  }
+}

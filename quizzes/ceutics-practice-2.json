@@ -1,7 +1,6 @@
 {
   "id": "ceutics-practice-2",
   "title": "PSCI 71303 Pharmaceutics",
-  "subtitle": "Practice Quiz 1 (Easy/Hard pools)",
   "pools": {
     "easy": [
       {
@@ -17,7 +16,6 @@
         "choices": ["HMG-CoA reductase inhibitors", "Beta blockers", "ACE inhibitors", "Diuretics"],
         "answer": "HMG-CoA reductase inhibitors"
       }
-      // add ~15–20 total
     ],
     "hard": [
       {
@@ -31,7 +29,6 @@
         "prompt": "What is the mechanism of ezetimibe?",
         "answerText": "Inhibits intestinal absorption of cholesterol via NPC1L1 transporter"
       }
-      // add ~15–20 total
     ]
   }
 }

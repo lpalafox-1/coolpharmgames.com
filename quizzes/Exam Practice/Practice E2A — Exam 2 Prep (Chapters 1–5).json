@@ -1,0 +1,23 @@
+{
+  "id": "practice-e2a-exam2-prep-ch1-5",
+  "title": "Practice E2A — Exam 2 Prep (Chapters 1–5)",
+  "description": "Mixed short-answer practice modeled after Exam 2. Includes conversions, SIGs, aliquot parts, % error, and density/SG calculations.",
+  "modes": {
+    "easy": [
+      { "id": 220201, "type": "numeric", "question": "Convert 5 ft 7 in into centimeters. (1 in = 2.54 cm)", "answer": "170 cm", "hints": ["Convert feet→inches, add, then ×2.54."], "solution": "5 ft = 60 in; +7 = 67 in; 67×2.54=170 cm." },
+      { "id": 220202, "type": "numeric", "question": "Balance SR=4 mg. If 50 mg is weighed, what is the maximum % error?", "answer": "8%", "hints": ["% error = (SR × 100) / amount weighed."], "solution": "(4×100)/50=8%." },
+      { "id": 220203, "type": "short-answer", "question": "Interpret SIG: HCTZ tabs 12.5 mg q.d. am", "answer": "Take 12.5 mg every morning", "hints": ["q.d.=every day; am=morning."], "solution": "Take 12.5 mg every morning." },
+      { "id": 220204, "type": "numeric", "question": "Cough syrup: 10 mg/5 mL. How many mg in 120 mL?", "answer": "240 mg", "hints": ["Find mg/mL then multiply."], "solution": "10/5=2 mg/mL; 2×120=240 mg." },
+      { "id": 220205, "type": "numeric", "question": "What is the volume (mL) of 1 lb benzyl benzoate (SG 1.12)?", "answer": "405 mL", "hints": ["Convert lb→g, divide by SG."], "solution": "1 lb=454 g; 454/1.12=405 mL." },
+      { "id": 220206, "type": "short-answer", "question": "Each capsule should weigh 330 mg. Give ±5% acceptable range.", "answer": "313.5-346.5 mg", "hints": ["±0.05×target."], "solution": "330±16.5=313.5-346.5 mg." }
+    ],
+    "hard": [
+      { "id": 220207, "type": "text", "question": "Prescription balance SR=6 mg. How to obtain 50 mg chlorpheniramine maleate with ≤5% error using aliquot?", "answer": "Prepare ≥120 mg mixture (drug+diluent), then aliquot to yield 50 mg drug.", "hints": ["Min weighable=120 mg."], "solution": "Min weighable=(6×100)/5=120 mg. Mix drug with diluent and weigh aliquot." },
+      { "id": 220208, "type": "numeric", "question": "Glycerin suppositories: 50 supps need 91 g glycerin (SG 1.25). How many mL for 96 supps?", "answer": "139.78 mL", "hints": ["Scale mass, then ÷SG."], "solution": "91×(96/50)=174.72 g; 174.72/1.25=139.78 mL." },
+      { "id": 220209, "type": "numeric", "question": "Convert 600 g PEG 400 to mL (SG 1.13).", "answer": "530.97 mL", "hints": ["V=mass/SG."], "solution": "600/1.13=530.97 mL." },
+      { "id": 220210, "type": "numeric", "question": "PEG 400 costs $19.15 per 473 mL. If 2105 mL are required, what is the cost? (SG 1.140).", "answer": "$85.23", "hints": ["Find pints, multiply by cost."], "solution": "2105/473=4.45 pints; 4.45×19.15=$85.23." },
+      { "id": 220211, "type": "numeric", "question": "48 tubes ×100 g cream contain polysorbate 80 at 1% w/w. SG=1.08 g/mL. How many mL needed?", "answer": "44.44 mL", "hints": ["Find total mass of excipient then ÷SG."], "solution": "4800 g total; 1%→48 g; 48/1.08=44.44 mL." },
+      { "id": 220212, "type": "multi-numeric", "question": "24×15 mL phenol solution bottles: each 15 mL contains 1.5 g liquefied phenol + 13.5 g propylene glycol. Total weights needed?", "answers": { "Liquefied phenol": "36 g", "Propylene glycol": "324 g" }, "hints": ["Scale ×24 bottles."], "solution": "Phenol:1.5×24=36 g; PG:13.5×24=324 g." }
+    ]
+  }
+}

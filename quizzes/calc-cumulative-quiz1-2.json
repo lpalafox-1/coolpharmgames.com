@@ -1,0 +1,15 @@
+{
+  "id": "calc-cumulative-quiz1-2",
+  "title": "Pharmaceutical Calculations Cumulative 1–2",
+  "subtitle": "Calculations - Cumulative",
+  "pools": {
+    "easy": [
+      { "type": "short", "prompt": "Convert 500 mg to grams.", "answerText": "0.5" },
+      { "type": "mcq", "prompt": "What is the percent strength of 5 g in 100 mL?", "choices": ["0.5%","5%","50%","0.05%"], "answer": "5%" }
+    ],
+    "hard": [
+      { "type": "short", "prompt": "A 1:200 solution means how many grams per mL? (express as decimal grams/mL)", "answerText": "0.005" },
+      { "type": "mcq", "prompt": "An order is for 450 mg. The stock concentration is 250 mg per tablet. How many tablets should be dispensed?", "choices": ["1","2","2 (with rounding)","3"], "answer": "2" }
+    ]
+  }
+}

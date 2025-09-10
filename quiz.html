@@ -51,7 +51,10 @@
           </div>
         </div>
 
-        <button id="theme-toggle" class="btn btn-ghost" type="button" aria-label="Toggle theme">🌙 Dark</button>
+  <button id="theme-toggle" class="btn btn-ghost" type="button" aria-label="Toggle theme">
+    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.5"/></svg>
+    <span id="theme-label">Dark</span>
+  </button>
       </div>
     </div>
   </header>
@@ -69,7 +72,7 @@
       <!-- Progress bar + flame + streak -->
       <div class="progress-bar-container" aria-label="Progress">
         <div id="progress-bar" class="progress-bar" style="width:0%;">
-          <span id="fire-flame" class="fire-flame hidden" aria-hidden="true">🔥</span>
+          <span id="fire-flame" class="fire-flame hidden" aria-hidden="true"></span>
           <span id="fire-count" class="hidden" aria-label="Current streak">×0</span>
         </div>
       </div>
@@ -107,10 +110,26 @@
       <span class="mini-hint ml-2">Tip: use number keys 1–9 to pick an option</span>
 
       <div class="ml-auto flex items-center gap-3">
-        <button id="mark" class="btn btn-ghost" type="button" aria-pressed="false" aria-label="Mark for review">⭐ Mark</button>
+        <button id="mark" class="btn btn-ghost" type="button" aria-pressed="false" aria-label="Mark for review">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 8l4 4 8-8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span id="mark-label">Mark</span>
+        </button>
+
+        <button id="hint-btn" class="btn btn-ghost" type="button" aria-label="Show hint">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2a7 7 0 0 0-4 12l1 1v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span id="hint-label">Hint</span>
+        </button>
+
+        <button id="reveal-solution" class="btn btn-ghost" type="button" aria-pressed="false" aria-label="Reveal solution">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span id="reveal-label">Show Solution</span>
+        </button>
 
         <!-- Timer controls (not graded) -->
-        <button id="timer-toggle" class="btn btn-ghost" type="button" aria-pressed="false" aria-label="Toggle timer">⏱ Start Timer</button>
+        <button id="timer-toggle" class="btn btn-ghost" type="button" aria-pressed="false" aria-label="Toggle timer">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 8v4l2 2" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+          <span id="timer-label">Start Timer</span>
+        </button>
         <span id="timer-readout" class="text-sm" style="color:var(--muted)">00:00</span>
 
         <button id="restart" class="btn btn-ghost" type="button" aria-label="Restart quiz">Restart</button>
@@ -121,7 +140,7 @@
     <section id="results" class="hidden text-center mt-8" aria-live="polite">
       <h2 class="text-3xl font-bold mb-2">Quiz Complete!</h2>
       <p>Your final score is: <span id="final-score" class="font-bold" style="color:var(--accent)"></span></p>
-      <div id="celebrate" class="text-4xl mt-4 hidden" aria-hidden="true">🔥🔥</div>
+  <div id="celebrate" class="text-4xl mt-4 hidden" aria-hidden="true"></div>
       <!-- summary + review button are injected by JS -->
     </section>
   </main>

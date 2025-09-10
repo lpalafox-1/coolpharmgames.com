@@ -6,7 +6,7 @@
   <title>Pharm-let — P1 Fall 2025 Hub</title>
   <meta name="description" content="P1 Fall 2025 study quizzes with dark mode, flame streak, and a clean UI." />
   <meta property="og:title" content="Pharm-let — P1 Fall 2025 Hub" />
-  <meta property="og:description" content="Practice quizzes for pharmacy classes. Dark mode. 🔥 streak." />
+  <meta property="og:description" content="Practice quizzes for pharmacy classes. Dark mode and streak tracking." />
   <meta property="og:image" content="assets/og.png" />
   <meta name="theme-color" content="#8b1e3f" />
   <link rel="icon" href="assets/icon.png" />
@@ -43,7 +43,10 @@
   <!-- Header -->
   <header class="flex justify-between items-center px-4 py-3 border-b border-[var(--ring)]">
     <h1 class="font-bold text-lg">Pharm-let</h1>
-    <button id="theme-toggle" class="btn btn-ghost" type="button">🌙 Dark</button>
+    <button id="theme-toggle" class="btn btn-ghost" type="button">
+      <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.5"/></svg>
+      <span id="theme-label">Dark</span>
+    </button>
   </header>
 
   <!-- Welcome (hidden by default; home.js will show on first visit) -->
@@ -70,7 +73,7 @@
           <div>
             <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">P1 Fall 2025 — Practice Hub</h1>
             <p class="mt-2 text-lg" style="color:var(--muted)">
-              Targeted practice for P1 courses. Clean UI, dark mode, and a 🔥 streak for sustained accuracy.
+              Targeted practice for P1 courses. Clean UI, dark mode, and streak tracking for sustained accuracy.
             </p>
             <!-- Resume last quiz (auto-shown by home.js if found) -->
             <div class="mt-4 flex flex-wrap gap-3" id="resume-wrap" style="display:none;">
@@ -265,7 +268,7 @@
 
       <!-- Footer -->
       <footer class="text-center text-sm py-10 mt-8" style="color:var(--muted)">
-        Pharm-let © 2025 — Study smarter, not harder ✨
+  Pharm-let © 2025 — Study smarter, not harder
       </footer>
     </main>
   </section>

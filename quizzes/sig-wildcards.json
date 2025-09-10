@@ -1,0 +1,10 @@
+{
+  "id": "sig-wildcards",
+  "title": "SIG Wildcards",
+  "pools": {
+    "easy": [
+      { "type": "mcq", "prompt": "Fun wildcard Q.", "choices": ["Alpha","Beta","Gamma","Delta"], "answer": "Gamma" }
+    ],
+    "hard": []
+  }
+}

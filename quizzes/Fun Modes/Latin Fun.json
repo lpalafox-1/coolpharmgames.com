@@ -1,0 +1,19 @@
+{
+  "id": "latin-fun",
+  "title": "Latin Fun",
+  "description": "Quick-fire SIG mini-translations. Short, fast, and mix of Latin ↔ English.",
+  "modes": {
+    "easy": [
+      { "id": 9101, "type": "short-answer", "question": "Latin → English: p.o. q.d.", "answer": ["by mouth every day","by mouth once daily","orally once daily"], "hints": ["p.o. = by mouth; q.d. = once daily."], "solution": "By mouth once daily." },
+      { "id": 9102, "type": "short-answer", "question": "Latin → English: i–ii tabs p.o. q4–6h p.r.n. pain", "answer": ["take 1 to 2 tablets by mouth every 4 to 6 hours as needed for pain","take 1–2 tablets by mouth every 4–6 hours as needed for pain"], "hints": ["i–ii = 1–2; q4–6h = every 4–6 hours."], "solution": "Take 1–2 tablets by mouth every 4–6 hours as needed for pain." },
+      { "id": 9103, "type": "short-answer", "question": "English → Latin: Inject 40 units under the skin every morning", "answer": ["Inject 40 units subQ q.a.m.","Inject 40 units subcut q.a.m.","Inject 40 units SC q.a.m."], "hints": ["subQ/SC = subcutaneous; q.a.m. = every morning."], "solution": "Inject 40 units subQ q.a.m." },
+      { "id": 9104, "type": "short-answer", "question": "Latin → English: gtt ii o.u. b.i.d.", "answer": ["instill 2 drops in each eye twice daily","place 2 drops in each eye twice daily"], "hints": ["gtt = drops; o.u. = both eyes; b.i.d. = twice daily."], "solution": "Instill 2 drops in each eye twice daily." }
+    ],
+    "hard": [
+      { "id": 9111, "type": "short-answer", "question": "English → Latin: Take 1 tablet by mouth at bedtime as needed for sleep", "answer": ["i tab p.o. h.s. p.r.n. sleep","i tab p.o. h.s. p.r.n. somnus"], "hints": ["h.s. = at bedtime; somnus = sleep."], "solution": "i tab p.o. h.s. p.r.n. sleep." },
+      { "id": 9112, "type": "short-answer", "question": "Latin → English: cap ii 1 h prior to departure, then cap i after 12 h", "answer": ["take 2 capsules 1 hour before departure, then 1 capsule after 12 hours","take two capsules one hour before departure, then one capsule after 12 hours"], "hints": ["cap = capsule; ii = 2; i = 1."], "solution": "Take 2 capsules 1 hour before departure, then 1 capsule after 12 hours." },
+      { "id": 9113, "type": "short-answer", "question": "Latin → English: 1 tab qAM HBP", "answer": ["take 1 tablet every morning for high blood pressure","take one tablet every morning for hypertension"], "hints": ["qAM = every morning; HBP = high blood pressure."], "solution": "Take 1 tablet every morning for high blood pressure." },
+      { "id": 9114, "type": "short-answer", "question": "English → Latin: Instill 1 drop in both eyes every 2 hours as needed", "answer": ["gtt i o.u. q2h p.r.n.","i gtt o.u. q2h p.r.n."], "hints": ["gtt i = 1 drop; q2h = every 2 hours."], "solution": "gtt i o.u. q2h p.r.n." }
+    ]
+  }
+}

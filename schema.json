@@ -4,11 +4,13 @@
   "properties": {
     "id": { "type": "string" },
     "title": { "type": "string", "minLength": 1 },
+    "subtitle": { "type": "string" },
     "pools": {
       "type": "object",
       "properties": {
         "easy": { "$ref": "#/$defs/itemsArray" },
-        "hard": { "$ref": "#/$defs/itemsArray" }
+        "hard": { "$ref": "#/$defs/itemsArray" },
+        "expert": { "$ref": "#/$defs/itemsArray" }
       },
       "additionalProperties": false
     },
@@ -53,13 +55,20 @@
               }
             ]
           },
-          "explain": { "type": "string" }
+          "explain": { "type": "string" },
+            "solution": { "type": "string" },
+            "hints": {
+              "oneOf": [
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string" } }
+              ]
+            },
+            "tolerance": { "type": "number", "minimum": 0 }
         },
         "allOf": [
           {
             "if": { "properties": { "type": { "const": "mcq" } }, "required": ["type"] },
             "then": {
-              "required": [],
               "anyOf": [
                 { "required": ["answer"] },
                 { "required": ["answerIndex"] }

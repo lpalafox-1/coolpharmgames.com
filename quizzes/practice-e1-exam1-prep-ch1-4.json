@@ -1,0 +1,10 @@
+{
+  "id": "practice-e1-exam1-prep-ch1-4",
+  "title": "Practice E1 — Exam 1 Prep (Chapters 1–4)",
+  "pools": {
+    "easy": [
+      { "type": "mcq", "prompt": "Sample E1 Q: topic from Ch.1-4?", "choices": ["A","B","C","D"], "answer": "C" }
+    ],
+    "hard": []
+  }
+}

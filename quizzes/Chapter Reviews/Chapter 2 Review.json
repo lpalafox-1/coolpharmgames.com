@@ -1,0 +1,10 @@
+{
+  "id": "chapter2-review",
+  "title": "Chapter 2 Review",
+  "pools": {
+    "easy": [
+      { "type": "short", "prompt": "Sample Q: Define a key term from Chapter 2.", "answerText": "definition" }
+    ],
+    "hard": []
+  }
+}

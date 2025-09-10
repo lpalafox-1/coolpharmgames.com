@@ -1,3 +1,30 @@
+name: Validate quizzes
+
+on:
+  push:
+    paths:
+      - 'quizzes/**'
+      - 'schema.json'
+      - 'tools/**'
+  pull_request:
+    paths:
+      - 'quizzes/**'
+      - 'schema.json'
+      - 'tools/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install deps (none required)
+        run: echo "No extra deps"
+      - name: Run quiz validator
+        run: node tools/validate-quizzes.mjs
 name: Validate Quizzes
 on:
   push:

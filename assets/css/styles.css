@@ -10,6 +10,7 @@
   --bad:#ef4444;         /* red */
   --ring:#e5e7eb;        /* border */
   --blue:#3b82f6;        /* featured */
+  --blue-600:#2563eb;    /* featured (hover) */
   --amber:#f59e0b;       /* tbd */
 }
 .dark{
@@ -23,6 +24,7 @@
   --bad:#f87171;
   --ring:#374151;
   --blue:#60a5fa;
+  --blue-600:#3b82f6;
   --amber:#fbbf24;
 }
 
@@ -46,9 +48,15 @@ a.quiz-link:hover{ text-decoration:none; }
 
 /* ===== Buttons ===== */
 .btn{ border-radius:.75rem; padding:.6rem 1rem; font-weight:600; min-height:44px; }
+.btn .btn-icon{ width:1rem; height:1rem; display:inline-block; margin-right:.5rem; vertical-align:middle; }
 .btn-ghost{ background:transparent; border:1px solid var(--ring); }
-.btn-blue{ background:var(--accent); color:#fff; }
-.btn-blue:hover{ background:var(--accent-600); }
+.btn-blue{
+  background:transparent; color:var(--accent); border:1px solid var(--accent);
+}
+.btn-blue:hover{
+  background:linear-gradient(180deg, rgba(139,30,63,0.08), rgba(139,30,63,0.06));
+  color:#fff; border-color:var(--accent-600);
+}
 .btn-green{ background:#16a34a; color:#fff; }
 .btn-gray{ background:#e5e7eb; } .dark .btn-gray{ background:#374151; color:#e5e7eb; }
 

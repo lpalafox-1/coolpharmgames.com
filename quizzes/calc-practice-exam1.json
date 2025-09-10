@@ -1,0 +1,15 @@
+{
+  "id": "calc-practice-exam1",
+  "title": "Pharmaceutical Calculations Practice Exam 1",
+  "subtitle": "Calculations - Practice",
+  "pools": {
+    "easy": [
+      { "type": "short", "prompt": "A 250 mg tablet contains 250 mg of drug. How many tablets are needed for a 1 g dose?", "answerText": "4" },
+      { "type": "mcq", "prompt": "If a solution is 2% w/v, how many grams of solute per 100 mL?", "choices": ["0.2 g","2 g","20 g","200 g"], "answer": "2 g" }
+    ],
+    "hard": [
+      { "type": "short", "prompt": "You need to prepare 500 mL of a 0.9% NaCl solution. How many grams of NaCl are required?", "answerText": "4.5" },
+      { "type": "mcq", "prompt": "Calculate the mEq of K+ in 20 mL of KCl 2 mEq/mL.", "choices": ["20 mEq","40 mEq","2 mEq","10 mEq"], "answer": "40 mEq" }
+    ]
+  }
+}

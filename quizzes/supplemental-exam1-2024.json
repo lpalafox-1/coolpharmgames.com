@@ -1,0 +1,10 @@
+{
+  "id": "supplemental-exam1-2024",
+  "title": "Supplemental Exam 1 2024",
+  "pools": {
+    "easy": [
+      { "type": "mcq", "prompt": "Sample supplemental Q.", "choices": ["Yes","No","Maybe","N/A"], "answer": "Yes" }
+    ],
+    "hard": []
+  }
+}

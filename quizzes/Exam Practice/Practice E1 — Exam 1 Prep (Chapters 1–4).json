@@ -1,0 +1,23 @@
+{
+  "id": "practice-e1-exam1-prep-ch1-4",
+  "title": "Practice E1 — Exam 1 Prep (Chapters 1–4)",
+  "description": "Practice set aligned to Exam 1 style. Covers SIGs, conversions, dosage problems, and percentage error from Chapters 1–4.",
+  "modes": {
+    "easy": [
+      { "id": 210101, "type": "multi-numeric", "question": "Each tablet of TYLENOL WITH CODEINE contains 30 mg codeine and 300 mg acetaminophen. If a patient takes 2 tablets daily for 7 days, how many mg of each drug are taken?", "answers": { "Codeine": "420 mg", "Acetaminophen": "4200 mg" }, "hints": ["Multiply per-tablet dose × tablets/day × 7 days."], "solution": "Codeine: 30×2×7=420 mg; Acetaminophen: 300×2×7=4200 mg." },
+      { "id": 210102, "type": "numeric", "question": "A cough syrup contains 10 mg per 5 mL. How many mg are in 120 mL?", "answer": "240 mg", "hints": ["Find mg/mL then multiply by total volume."], "solution": "10/5=2 mg/mL; 2×120=240 mg." },
+      { "id": 210103, "type": "numeric", "question": "An ophthalmic solution has 1 mg/mL. If the eyedropper delivers 20 drops/mL, how many mg are in 2 drops?", "answer": "0.1 mg", "hints": ["2 drops=0.1 mL; multiply by 1 mg/mL."], "solution": "2/20=0.1 mL; 0.1×1=0.1 mg." },
+      { "id": 210104, "type": "numeric", "question": "Add 0.0025 kg, 1750 mg, 2.25 g, and 825,000 μg. Express in grams.", "answer": "7.325 g", "hints": ["Convert all to grams."], "solution": "0.0025 kg=2.5 g; 1750 mg=1.75 g; 2.25 g; 825,000 μg=0.825 g; total=7.325 g." },
+      { "id": 210105, "type": "short-answer", "question": "Interpret SIG: ii gtt. each eye q4h p.r.n. pain.", "answer": "Instill 2 drops in each eye every 4 hours as needed for pain", "hints": ["gtt=drops; q4h=every 4 hours; p.r.n.=as needed."], "solution": "Instill 2 drops in each eye every 4 hours as needed for pain." },
+      { "id": 210106, "type": "numeric", "question": "Balance SR=4 mg. A pharmacist weighs 50 mg of a substance. What is the maximum % error?", "answer": "8%", "hints": ["Formula: (SR×100)/quantity."], "solution": "(4×100)/50=8%." }
+    ],
+    "hard": [
+      { "id": 210107, "type": "numeric", "question": "A pint (473 mL) of acyclovir suspension contains 200 mg/5 mL. How many mg per pint?", "answer": "18920 mg", "hints": ["Convert concentration to mg/mL then ×473."], "solution": "200/5=40 mg/mL; 40×473=18,920 mg." },
+      { "id": 210108, "type": "multi-numeric", "question": "Oral solution: 80 mg lopinavir + 20 mg ritonavir per mL. How many mg of each in 0.4 mL?", "answers": { "Lopinavir": "32 mg", "Ritonavir": "8 mg" }, "hints": ["Multiply each by 0.4 mL."], "solution": "Lopinavir 80×0.4=32 mg; Ritonavir 20×0.4=8 mg." },
+      { "id": 210109, "type": "short-answer", "question": "Interpret: Mesalamine 1.2 g p.o. q.d. c food.", "answer": "Take 1.2 g by mouth once daily with food", "hints": ["q.d.=every day; c=with."], "solution": "Take 1.2 g by mouth once daily with food." },
+      { "id": 210110, "type": "numeric", "question": "10-mL graduate weighs 42.745 g. With 5 mL water, total weight is 47.675 g. True 5 mL water should weigh 5 g. Calculate % error.", "answer": "1.4%", "hints": ["Subtract graduate weight then compare."], "solution": "47.675–42.745=4.93 g; error=(5–4.93)/5=1.4%." },
+      { "id": 210111, "type": "numeric", "question": "Prescription balance SR=6 mg. To weigh 50 mg chlorpheniramine maleate with error ≤5%, explain aliquot method.", "answer": "Weigh ≥120 mg mixture containing 50 mg drug and take proportion.", "hints": ["Min weighable=120 mg."], "solution": "Prepare mixture ≥120 mg with drug+diluent. Then aliquot mixture to obtain 50 mg drug equivalent." },
+      { "id": 210112, "type": "numeric", "question": "Patient prescription: Day 1 q.i.d. (4 tabs); Day 2 t.i.d. (3 tabs); Days 3–7 b.i.d. (10 tabs); Days 8–30 q.d. (23 tabs). Total?", "answer": "40 tablets", "hints": ["Add all doses."], "solution": "4+3+10+23=40 tablets." }
+    ]
+  }
+}

@@ -1,6 +1,5 @@
 {
   "title": "Lab Quiz 2 — Antihypertensives",
-  "subtitle": "PHPR 71101 Longitudinal Lab I — Quiz 2",
   "pools": {
     "easy": [
       { "type": "mcq", "prompt": "What is the brand name of Hydralazine?", "choices": ["Diovan","Vasotec","Apresoline","Catapres"], "answer": "Apresoline" },

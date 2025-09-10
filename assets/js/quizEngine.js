@@ -144,6 +144,12 @@ function wireEvents(){
   // Timer ⏱
   els.timerToggle?.addEventListener("click", toggleTimer);
 
+  // hint and reveal wiring
+  const hintBtn = document.getElementById('hint-btn');
+  const revealBtn = document.getElementById('reveal-solution');
+  hintBtn?.addEventListener('click', () => { showHintFor(currentQ()); });
+  revealBtn?.addEventListener('click', () => { toggleRevealSolution(); });
+
   // Keyboard shortcuts
   window.addEventListener('keydown', (e)=>{
     // don't intercept while typing short answers
@@ -239,6 +245,12 @@ function render(){
   // mark button
   updateMarkButton();
 
+  // hint / reveal availability
+  const hintBtn = document.getElementById('hint-btn');
+  const revealBtn = document.getElementById('reveal-solution');
+  if (hintBtn) hintBtn.disabled = !(q && (q.hints || q.hint));
+  if (revealBtn) revealBtn.disabled = !(q && (q.solution || q.explain));
+
   // progress
   renderNavMap();
   updateProgressAndFlame();
@@ -292,7 +304,7 @@ function showResults(){
     sum.className = "mt-3 text-sm";
     els.results.appendChild(sum);
   }
-  sum.innerHTML = `✅ Correct: <strong>${state.score}</strong> &nbsp; • &nbsp; ❌ Wrong: <strong>${wrong}</strong> &nbsp; • &nbsp; 🔥 Best streak: <strong>${state.bestStreak}</strong>${state.timerSeconds>0 ? ` &nbsp; • &nbsp; ⏱ Time: <strong>${formatTime(state.timerSeconds)}</strong>` : ""}`;
+  sum.innerHTML = `Correct: <strong>${state.score}</strong> &nbsp; • &nbsp; Wrong: <strong>${wrong}</strong> &nbsp; • &nbsp; Best streak: <strong>${state.bestStreak}</strong>${state.timerSeconds>0 ? ` &nbsp; • &nbsp; Time: <strong>${formatTime(state.timerSeconds)}</strong>` : ""}`;
 
   const pct = state.score / state.questions.length;
   els.celebrate.classList.toggle("hidden", !(pct === 1 || pct >= 0.9));
@@ -340,7 +352,7 @@ function renderNavMap(){
     b.setAttribute("aria-label", `Go to question ${i+1}`);
     // styling states
     if (i === state.index) b.style.outline = `2px solid var(--accent)`;
-    if (state.marked.has(i)) b.textContent += "⭐";
+    if (state.marked.has(i)) b.textContent += "*";
     if (q._answered) b.style.opacity = ".9";
     if (q._answered && !q._correct) b.style.borderColor = "var(--bad)";
     b.addEventListener("click", () => { state.index = i; render(); save(); });
@@ -351,7 +363,7 @@ function renderNavMap(){
 function updateMarkButton(){
   if (!els.mark) return;
   const marked = state.marked.has(state.index);
-  els.mark.textContent = marked ? "⭐ Unmark" : "⭐ Mark";
+  els.mark.textContent = marked ? "Unmark" : "Mark";
   els.mark.setAttribute("aria-pressed", marked ? "true" : "false");
 }
 
@@ -393,10 +405,57 @@ function isCorrectChoice(q, choice){
 function shortAnswerMatches(q, userVal) {
   const answers = Array.isArray(q.answerText) ? q.answerText : [q.answerText];
   const normUser = norm(userVal);
+  // If user input is numeric, allow numeric tolerance/range matching
+  const userNum = parseNumber(normUser);
+  // if a tolerance is provided explicitly on the question, use that
+  const explicitTol = Number.isFinite(Number(q.tolerance)) ? Number(q.tolerance) : null;
   return answers.filter(Boolean).some(a => {
-    const na = norm(a);
-    return na === normUser || softEq(na, normUser);
+    const na = String(a).trim();
+    const answerNum = parseNumber(na);
+    if (Number.isFinite(answerNum) && Number.isFinite(userNum)) {
+      if (Number.isFinite(explicitTol)) {
+        return Math.abs(answerNum - userNum) <= explicitTol;
+      }
+      // exact numeric comparison
+      if (Number(answerNum) === Number(userNum)) return true;
+    }
+    // support answer specified as range or tolerance: e.g. "4.5-4.6" or "4.5±0.1"
+    const range = parseRange(na);
+    if (range && Number.isFinite(userNum)) {
+      return userNum >= range.min && userNum <= range.max;
+    }
+    // fallback to normalized string compare with soft equality
+    const naNorm = norm(na);
+    return naNorm === normUser || softEq(naNorm, normUser);
   });
+}
+
+// parse a simple numeric string into number, or NaN
+function parseNumber(s){
+  if (s === null || s === undefined) return NaN;
+  const cleaned = String(s).trim();
+  // allow numeric formats and scientific notation; reject if no digit present
+  if (!/[0-9]/.test(cleaned)) return NaN;
+  // strip non-number trailing chars except e/E, +, -, dot, digits
+  const filtered = cleaned.replace(/[^0-9\.\-\+eE]/g,'').trim();
+  const n = Number(filtered);
+  return Number.isFinite(n) ? n : NaN;
+}
+
+// parse range strings like "4.5-4.6" or tolerance like "4.5±0.1" into {min,max}
+function parseRange(s){
+  if (!s) return null;
+  const tolMatch = s.match(/^\s*([+-]?[0-9]*\.?[0-9]+)\s*[±+]\s*([0-9]*\.?[0-9]+)\s*$/);
+  if (tolMatch) {
+    const val = Number(tolMatch[1]); const tol = Number(tolMatch[2]);
+    if (Number.isFinite(val) && Number.isFinite(tol)) return { min: val - tol, max: val + tol };
+  }
+  const dashMatch = s.match(/^\s*([+-]?[0-9]*\.?[0-9]+)\s*-\s*([+-]?[0-9]*\.?[0-9]+)\s*$/);
+  if (dashMatch) {
+    const a = Number(dashMatch[1]); const b = Number(dashMatch[2]);
+    if (Number.isFinite(a) && Number.isFinite(b)) return { min: Math.min(a,b), max: Math.max(a,b) };
+  }
+  return null;
 }
 function norm(s=""){
   return String(s)
@@ -431,9 +490,39 @@ function renderAnswerReveal(q){
     ? `<div><strong>Correct answer:</strong> ${answers.map(sanitize).join(" • ")}</div>`
     : "";
   const explainLine = q.explain ? `<div class="mt-1">${sanitize(q.explain)}</div>` : "";
+  const solutionLine = q.solution ? `<div class="mt-1"><strong>Solution:</strong> ${sanitize(q.solution)}</div>` : "";
   const html = `${answerLine}${explainLine}`;
   els.explain.innerHTML = html || `<div style="color:var(--muted)">No explanation provided.</div>`;
   els.explain.classList.add("show");
+}
+
+function showHintFor(q){
+  if (!q) return;
+  const hints = q.hints || q.hint;
+  if (!hints) return;
+  const arr = Array.isArray(hints) ? hints : [hints];
+  // show first hint inline in explain area (non-destructive)
+  const existing = els.explain.innerHTML || "";
+  const hintHtml = `<div class="mt-1 mini-hint"><strong>Hint:</strong> ${sanitize(arr[0])}</div>`;
+  els.explain.innerHTML = existing + hintHtml;
+  els.explain.classList.add('show');
+}
+
+function toggleRevealSolution(){
+  const q = currentQ(); if (!q) return;
+  const btn = document.getElementById('reveal-solution');
+  const revealed = btn && btn.getAttribute('aria-pressed') === 'true';
+  if (btn) btn.setAttribute('aria-pressed', revealed ? 'false' : 'true');
+  if (!revealed) {
+    // append solution/explain
+    const sol = q.solution ? `<div class="mt-2"><strong>Solution:</strong> ${sanitize(q.solution)}</div>` : '';
+    const expl = q.explain ? `<div class="mt-1">${sanitize(q.explain)}</div>` : '';
+    els.explain.innerHTML = (els.explain.innerHTML || '') + sol + expl;
+    els.explain.classList.add('show');
+  } else {
+    // hide solution: re-render to clear explain area (render() will restore reveal if answered)
+    render();
+  }
 }
 
 function toggleTimer(){

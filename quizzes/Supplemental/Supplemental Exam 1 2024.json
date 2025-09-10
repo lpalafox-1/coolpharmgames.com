@@ -1,0 +1,23 @@
+{
+  "id": "supplemental-exam1-2024",
+  "title": "Supplemental Exam 1 2024",
+  "description": "Mock exam aligned to Unit 1 style: SIG translations (Latin ↔ English), core conversions, and calculation items from Chapters 1–4. Short-answer with hints and stepwise solutions.",
+  "modes": {
+    "easy": [
+      { "id": 6001, "type": "short-answer", "question": "Latin → English: p.o. q.d.", "answer": ["by mouth once daily", "by mouth every day", "orally once daily"], "hints": ["p.o. = by mouth; q.d. = once daily."], "solution": "By mouth once daily." },
+      { "id": 6002, "type": "short-answer", "question": "English → Latin: Take 1 tablet by mouth twice daily as needed for pain.", "answer": ["i tab p.o. b.i.d. p.r.n. pain", "one tablet p.o. b.i.d. p.r.n. pain"], "hints": ["i = one; b.i.d. = twice daily; p.r.n. = as needed."], "solution": "i tab p.o. b.i.d. p.r.n. pain." },
+      { "id": 6003, "type": "numeric", "question": "Convert 4 gallons to liters. (1 gal = 3.785 L)", "answer": "15.14 L", "hints": ["Multiply gallons by 3.785."], "solution": "4 × 3.785 = 15.14 L." },
+      { "id": 6004, "type": "numeric", "question": "Convert 5 ft 7 in to centimeters. (1 in = 2.54 cm)", "answer": "170 cm", "hints": ["5 ft = 60 in; +7 = 67 in; multiply by 2.54."], "solution": "67 × 2.54 = 170 cm." },
+      { "id": 6005, "type": "multi-numeric", "question": "TYLENOL WITH CODEINE: 30 mg codeine + 300 mg acetaminophen per tablet. If 2 tablets are taken daily for 7 days, how many mg of each are taken?", "answers": { "Codeine": "420 mg", "Acetaminophen": "4200 mg" }, "hints": ["Per tablet × tablets/day × 7 days."], "solution": "Codeine: 30×2×7 = 420 mg; Acetaminophen: 300×2×7 = 4200 mg." },
+      { "id": 6006, "type": "multi-numeric", "question": "A 15‑mL nasal spray delivers 20 sprays per mL and 1.5 mg per spray. (a) Total sprays per bottle? (b) Total mg per bottle?", "answers": { "a": "300 sprays", "b": "450 mg" }, "hints": ["(a) 15×20 = 300 sprays; (b) 300×1.5 mg = 450 mg."], "solution": "(a) 15×20 = 300 sprays; (b) 300×1.5 = 450 mg." }
+    ],
+    "hard": [
+      { "id": 6011, "type": "multi-numeric", "question": "An oral solution contains per mL: 80 mg lopinavir and 20 mg ritonavir. How many mg of each are in 0.4 mL?", "answers": { "Lopinavir": "32 mg", "Ritonavir": "8 mg" }, "hints": ["Multiply each concentration by 0.4 mL."], "solution": "Lopinavir: 80×0.4 = 32 mg; Ritonavir: 20×0.4 = 8 mg." },
+      { "id": 6012, "type": "numeric", "question": "Acyclovir suspension contains 200 mg/5 mL. How many mg are in a pint (473 mL) bottle?", "answer": "18920 mg", "hints": ["Convert to mg/mL, then multiply by 473 mL."], "solution": "200/5 = 40 mg/mL; 40×473 = 18,920 mg." },
+      { "id": 6013, "type": "numeric", "question": "A pharmacist weighed 50 mg of a substance on a balance with SR = 4 mg. What is the maximum potential % error?", "answer": "8%", "hints": ["% error = (SR × 100)/quantity weighed."], "solution": "(4×100)/50 = 8%." },
+      { "id": 6014, "type": "numeric", "question": "10‑mL graduate weighs 42.745 g. With 5 mL of water, total is 47.675 g. True 5 mL water should weigh 5 g. Calculate % error.", "answer": "1.4%", "hints": ["Subtract graduate weight; compare measured water vs. 5 g."], "solution": "Measured water = 47.675 − 42.745 = 4.93 g. Error = (5 − 4.93)/5 × 100 = 1.4%." },
+      { "id": 6015, "type": "short-answer", "question": "Translate to English: i–ii tabs p.o. q4–6h p.r.n. pain", "answer": ["take 1–2 tablets by mouth every 4–6 hours as needed for pain", "take 1 to 2 tablets by mouth every 4 to 6 hours as needed for pain"], "hints": ["i–ii = 1–2; q4–6h = every 4–6 hours."], "solution": "Take 1–2 tablets by mouth every 4–6 hours as needed for pain." },
+      { "id": 6016, "type": "numeric", "question": "A 30‑day prescription: Day 1 q.i.d. (4 tabs), Day 2 t.i.d. (3 tabs), Days 3–7 b.i.d. (10 tabs), Days 8–30 q.d. (23 tabs). Total tablets to dispense?", "answer": "40 tablets", "hints": ["Sum each phase across 30 days."], "solution": "Total = 4 + 3 + 10 + 23 = 40 tablets." }
+    ]
+  }
+}

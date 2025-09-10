@@ -3,7 +3,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "validate": "node tools/validate-quizzes.mjs"
+    "validate": "node tools/validate-quizzes.mjs",
+    "validate:quizzes": "node tools/validate-quizzes.mjs"
   },
   "devDependencies": {
     "ajv": "^8.17.1"

@@ -1,0 +1,10 @@
+{
+  "id": "practice-e2a-exam2-prep-ch1-5",
+  "title": "Practice E2A — Exam 2 Prep (Chapters 1–5)",
+  "pools": {
+    "easy": [
+      { "type": "short", "prompt": "Sample E2A Q: short calculation.", "answerText": "42" }
+    ],
+    "hard": []
+  }
+}

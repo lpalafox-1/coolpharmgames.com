@@ -1,0 +1,10 @@
+{
+  "id": "chapter4-review",
+  "title": "Chapter 4 Review",
+  "pools": {
+    "easy": [
+      { "type": "tf", "prompt": "Sample Q: True or False from Chapter 4?", "answer": "True" }
+    ],
+    "hard": []
+  }
+}

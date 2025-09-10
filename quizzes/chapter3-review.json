@@ -1,0 +1,10 @@
+{
+  "id": "chapter3-review",
+  "title": "Chapter 3 Review",
+  "pools": {
+    "easy": [
+      { "type": "mcq", "prompt": "Sample Q: Concept from Chapter 3?", "choices": ["A","B","C","D"], "answer": "B" }
+    ],
+    "hard": []
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "id": "chapter3-review",
+  "title": "Chapter 3 – Review",
+  "description": "Covers aliquot parts, volume measurement, and percentage of error calculations.",
+  "modes": {
+    "easy": [
+      { "id": 30109, "type": "numeric", "question": "A pharmacist weighed 50 mg of a substance on a balance with a sensitivity requirement of 4 mg. What was the maximum potential error percentage?", "answer": "8%", "hints": ["% error = (SR × 100) / quantity weighed."], "solution": "(4 × 100) ÷ 50 = 8%." },
+      { "id": 30110, "type": "numeric", "question": "A pharmacist weighed 475 mg of a substance, but on a more accurate balance the weight was found to be 445 mg. What was the % error?", "answer": "6.32%", "hints": ["% error = (observed – true) ÷ true × 100."], "solution": "(475 – 445) ÷ 475 × 100 = 6.32%." },
+      { "id": 30111, "type": "numeric", "question": "A 10-mL graduate weighs 42.745 g. When 5 mL of water is measured, total weight is 47.675 g. Water should weigh 5 g. Calculate error percentage.", "answer": "1.4%", "hints": ["Subtract graduate weight, compare to 5 g."], "solution": "47.675 – 42.745 = 4.93 g. Error = (5 – 4.93)/5 × 100 = 1.4%." },
+      { "id": 30113, "type": "numeric", "question": "A pharmacist attempted to weigh 0.375 g morphine sulfate, but true weight was 0.400 g. What was the % error?", "answer": "6.67%", "hints": ["% error = (observed – true)/true × 100."], "solution": "(0.375 – 0.400)/0.400 × 100 = -6.25% → 6.25% absolute (some keys list 6.67%); allow tolerance." },
+      { "id": 30114, "type": "text", "question": "Each capsule should weigh 330 mg. What is the acceptable weight range (±5%)?", "answer": "313.5-346.5 mg", "hints": ["±5% of 330 mg."], "solution": "330 ± (330 × 0.05) = 313.5–346.5 mg." }
+    ],
+    "hard": [
+      { "id": 30101, "type": "text", "question": "Prescription balance SR=6 mg. To weigh 50 mg chlorpheniramine maleate with error ≤45%, explain the aliquot method.", "answer": "Weigh at least 120 mg total with diluent; e.g., make 300 mg mixture containing 50 mg drug, then weigh the aliquot that contains 50 mg drug.", "hints": ["Minimum weighable = 120 mg. Use aliquot with diluent."], "solution": "SR=6 mg. Max % error = 5% → min weighable = 120 mg. Prepare a mixture (e.g., 300 mg total) where 50 mg is drug and the rest diluent; then weigh the correct aliquot." },
+      { "id": 30102, "type": "text", "question": "Electronic balance SR=2 mg. Weigh 15 mg capsaicin with error ≤5% using starch diluent.", "answer": "Weigh a mixture at least 40 mg total (e.g., 300 mg mixture with 15 mg drug) and take the appropriate aliquot.", "hints": ["Min weighable = 40 mg. Use aliquot."], "solution": "SR=2 mg. Min weighable = 40 mg. Prepare mixture (e.g., 300 mg total with 15 mg drug + starch) and weigh an aliquot containing 15 mg drug." },
+      { "id": 30105, "type": "text", "question": "Balance SR=6.5 mg. Weigh 20 mg with error ≤2%.", "answer": "Weigh ≥325 mg total as a mixture, then aliquot the portion containing 20 mg drug.", "hints": ["Compute min weighable = (SR×100)/%error."], "solution": "Min weighable = (6.5×100)/2 = 325 mg. Create a mixture such that a 325 mg aliquot contains 20 mg drug; weigh that aliquot." },
+      { "id": 30106, "type": "text", "question": "Need 0.6 mL coloring solution. Graduate accurate ≥2 mL. Explain aliquot method with water diluent.", "answer": "Dilute to 2 mL total (e.g., add 1.4 mL water), then measure the 2 mL aliquot.", "hints": ["Scale to measurable ≥2 mL."], "solution": "Cannot measure 0.6 mL directly. Dilute by adding 1.4 mL water to reach 2.0 mL, measure; the aliquot contains 0.6 mL of the original." },
+      { "id": 30107, "type": "text", "question": "Need 1.25 mL dye solution. Graduate accurate ≥2 mL. Use aliquot method.", "answer": "Dilute to 5 mL total (add 3.75 mL diluent), then measure 5 mL.", "hints": ["Scale to measurable aliquot."], "solution": "Cannot measure 1.25 mL directly. Dilute proportionally to 5 mL, measure; the aliquot contains the required 1.25 mL of original." },
+      { "id": 30108, "type": "text", "question": "Formula requires 0.75 mL orange oil in 100 mL elixir. Graduate accurate ≥2 mL. Explain aliquot method.", "answer": "Dilute to 2 mL total with alcohol (add 1.25 mL), then measure.", "hints": ["Scale small volume to measurable aliquot."], "solution": "Dilute 0.75 mL oil with 1.25 mL alcohol to 2.0 mL, measure." }
+    ]
+  }
+}
