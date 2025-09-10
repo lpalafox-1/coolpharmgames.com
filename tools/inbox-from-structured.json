@@ -1,0 +1,236 @@
+{
+  "items": [
+    {
+      "targetId": "chapter1-review",
+      "difficulty": "easy",
+      "type": "short",
+      "prompt": "A solution contains 25 mg drug per 5 mL. How many mg are in 12 mL?",
+      "answerText": [
+        "60 mg"
+      ],
+      "hints": "Find mg/mL, then multiply by 12 mL.",
+      "solution": "25/5=5 mg/mL; 5×12=60 mg."
+    },
+    {
+      "targetId": "chapter1-review",
+      "difficulty": "easy",
+      "type": "short",
+      "prompt": "A dropper delivers 20 drops/mL. How many drops are in 2.5 mL?",
+      "answerText": [
+        "50 drops"
+      ],
+      "hints": "drops = volume × drops/mL.",
+      "solution": "2.5×20=50 drops."
+    },
+    {
+      "targetId": "chapter1-review",
+      "difficulty": "easy",
+      "type": "short",
+      "prompt": "An elixir has 8 mg per teaspoonful (5 mL). How many mg in 1 tablespoonful?",
+      "answerText": [
+        "24 mg"
+      ],
+      "hints": "1 tbsp = 15 mL = 3 tsp.",
+      "solution": "8×3=24 mg."
+    },
+    {
+      "targetId": "chapter1-review",
+      "difficulty": "hard",
+      "type": "short",
+      "prompt": "An inhaler contains 18 mg drug and delivers 200 actuations. How many micrograms per actuation?",
+      "answerText": [
+        "90 mcg"
+      ],
+      "hints": "Convert mg→mcg and divide by 200.",
+      "solution": "18 mg=18000 mcg; 18000/200=90 mcg."
+    },
+    {
+      "targetId": "chapter1-review",
+      "difficulty": "hard",
+      "type": "short",
+      "prompt": "A syrup contains 120 mg per 10 mL. If a patient takes 7.5 mL, how many mg are taken?",
+      "answerText": [
+        "90 mg"
+      ],
+      "hints": "Find mg/mL then ×7.5 mL.",
+      "solution": "120/10=12 mg/mL; 12×7.5=90 mg."
+    },
+    {
+      "targetId": "chapter2-review",
+      "difficulty": "easy",
+      "type": "short",
+      "prompt": "Convert 0.45 L to mL.",
+      "answerText": [
+        "450 mL"
+      ],
+      "hints": "Multiply by 1000.",
+      "solution": "0.45×1000=450 mL."
+    },
+    {
+      "targetId": "chapter2-review",
+      "difficulty": "easy",
+      "type": "short",
+      "prompt": "Convert 7500 mg to g.",
+      "answerText": [
+        "7.5 g"
+      ],
+      "hints": "Divide by 1000.",
+      "solution": "7500/1000=7.5 g."
+    },
+    {
+      "targetId": "chapter2-review",
+      "difficulty": "hard",
+      "type": "short",
+      "prompt": "A solution labeled 25 mg/mL: How many mL are needed for 180 mg?",
+      "answerText": [
+        "7.2 mL"
+      ],
+      "hints": "V = dose / conc.",
+      "solution": "180/25=7.2 mL."
+    },
+    {
+      "targetId": "chapter2-review",
+      "difficulty": "hard",
+      "type": "short",
+      "prompt": "Medication provides 150 mcg per spray; 120-spray canister. Total mg of drug?",
+      "answerText": [
+        "18 mg"
+      ],
+      "hints": "Convert mcg→mg after multiplying by sprays.",
+      "solution": "150×120=18000 mcg=18 mg."
+    },
+    {
+      "targetId": "chapter3-review",
+      "difficulty": "easy",
+      "type": "short",
+      "prompt": "Balance SR=5 mg. If 100 mg is weighed, max % error?",
+      "answerText": [
+        "5%"
+      ],
+      "hints": "(SR×100)/quantity.",
+      "solution": "(5×100)/100=5%."
+    },
+    {
+      "targetId": "chapter3-review",
+      "difficulty": "hard",
+      "type": "short",
+      "prompt": "You need 12 mg of a potent drug. Balance SR=6 mg, max error 5%. Outline an aliquot plan with lactose as diluent.",
+      "answerText": [
+        "Prepare at least 120 mg mixture so a measurable aliquot contains 12 mg; e.g., 12 mg drug + 108 mg lactose to make 120 mg mixture; weigh entire 120 mg aliquot."
+      ],
+      "hints": "Minimum weighable = 120 mg.",
+      "solution": "Min weighable=(6×100)/5=120 mg. Make a 120 mg mixture with 12 mg active + 108 mg lactose. Weigh 120 mg aliquot to deliver 12 mg drug."
+    },
+    {
+      "targetId": "chapter4-review",
+      "difficulty": "easy",
+      "type": "short",
+      "prompt": "Interpret: 1 tbsp p.o. q6h",
+      "answerText": [
+        "Take 1 tablespoonful by mouth every 6 hours"
+      ],
+      "hints": "1 tbsp=15 mL; q6h=every 6 hours.",
+      "solution": "Take 1 tablespoonful by mouth every 6 hours."
+    },
+    {
+      "targetId": "chapter4-review",
+      "difficulty": "hard",
+      "type": "short",
+      "prompt": "Interpret: Admin. prochlorperazine 10 mg IM q3h p.r.n. N&V",
+      "answerText": [
+        "Administer 10 mg intramuscularly every 3 hours as needed for nausea and vomiting"
+      ],
+      "hints": "IM=intramuscular; q3h=every 3 hours.",
+      "solution": "Administer 10 mg intramuscularly every 3 hours as needed for nausea and vomiting."
+    },
+    {
+      "targetId": "chapter5-review",
+      "difficulty": "easy",
+      "type": "short",
+      "prompt": "What volume (mL) do 75 g of castor oil (SG 0.96) occupy?",
+      "answerText": [
+        "78.13 mL"
+      ],
+      "hints": "V=mass/SG.",
+      "solution": "75/0.96=78.13 mL."
+    },
+    {
+      "targetId": "chapter5-review",
+      "difficulty": "hard",
+      "type": "short",
+      "prompt": "A lotion requires 2.5% w/w propylene glycol in 2.0 kg. SG PG=1.04. How many mL PG?",
+      "answerText": [
+        "48.08 mL"
+      ],
+      "hints": "Mass PG=0.025×2000 g; then ÷1.04.",
+      "solution": "Mass=50 g; volume=50/1.04=48.08 mL."
+    },
+    {
+      "targetId": "practice-e1-exam1-prep-ch1-4",
+      "difficulty": "easy",
+      "type": "short",
+      "prompt": "Interpret: ii gtt o.u. q.i.d.",
+      "answerText": [
+        "Instill 2 drops in both eyes four times daily"
+      ],
+      "hints": "o.u.=both eyes; q.i.d.=four times daily.",
+      "solution": "Instill 2 drops in both eyes four times daily."
+    },
+    {
+      "targetId": "practice-e1-exam1-prep-ch1-4",
+      "difficulty": "hard",
+      "type": "short",
+      "prompt": "A 5 mL ampule contains 100 mg drug. How many mg in 2.2 mL?",
+      "answerText": [
+        "44 mg"
+      ],
+      "hints": "Find mg/mL then ×2.2 mL.",
+      "solution": "100/5=20 mg/mL; 20×2.2=44 mg."
+    },
+    {
+      "targetId": "practice-e2a-exam2-prep-ch1-5",
+      "difficulty": "easy",
+      "type": "short",
+      "prompt": "Convert 2 gallons to liters (1 gal=3.785 L).",
+      "answerText": [
+        "7.57 L"
+      ],
+      "hints": "Multiply by 3.785.",
+      "solution": "2×3.785=7.57 L."
+    },
+    {
+      "targetId": "practice-e2a-exam2-prep-ch1-5",
+      "difficulty": "hard",
+      "type": "short",
+      "prompt": "A cream batch is 12 kg; contains 0.75% w/w fragrance (SG 0.90). How many mL fragrance?",
+      "answerText": [
+        "100.0 mL"
+      ],
+      "hints": "Find grams then ÷SG.",
+      "solution": "Mass=0.0075×12000=90 g; volume=90/0.90=100.0 mL."
+    },
+    {
+      "targetId": "supplemental-exam1-2024",
+      "difficulty": "easy",
+      "type": "short",
+      "prompt": "Latin → English: gtt i o.u. q2h p.r.n.",
+      "answerText": [
+        "instill 1 drop in both eyes every 2 hours as needed",
+        "place 1 drop in both eyes every 2 hours as needed"
+      ],
+      "hints": "gtt i = 1 drop; o.u. = both eyes; q2h = every 2 hours.",
+      "solution": "Instill 1 drop in both eyes every 2 hours as needed."
+    },
+    {
+      "targetId": "supplemental-exam1-2024",
+      "difficulty": "hard",
+      "type": "short",
+      "prompt": "A 250‑mL bottle labeled 80 mg/5 mL: total mg?",
+      "answerText": [
+        "4000 mg"
+      ],
+      "hints": "Find mg/mL then multiply by 250 mL.",
+      "solution": "80/5=16 mg/mL; 16×250=4000 mg."
+    }
+  ]
+}
