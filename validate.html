@@ -1,39 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Pharm-let — Quiz Validator</title>
-  <meta name="robots" content="noindex" />
-  <link rel="stylesheet" href="assets/css/styles.css" />
-  <style>
-    body{max-width:1000px;margin:2rem auto;padding:0 1rem;}
-    .okay{ color:#065f46; }
-    .warn{ color:#92400e; }
-    .err{  color:#991b1b; }
-    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-    .row{ background:var(--card); border:1px solid var(--ring); border-radius:.75rem; padding:1rem; margin:.75rem 0; }
-    .pill{ display:inline-block; padding:.2rem .5rem; border-radius:9999px; background:var(--ring); font-size:.75rem; margin-right:.25rem; }
-    details > summary { cursor: pointer; }
-  </style>
-</head>
-<body class="bg-[var(--bg)] text-[var(--text)]">
-  <h1 class="text-2xl font-bold">Quiz Validator</h1>
-  <p class="mt-2" style="color:var(--muted)">
-    This checks every quiz linked from <code class="mono">index.html</code> and reports JSON/schema issues.
-  </p>
+// tools/validate-quizzes.mjs
+import { readFileSync, readdirSync } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import Ajv from 'ajv';
 
-  <div id="out" class="mt-6"></div>
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-  <!-- Option A: your module is self-executing -->
-  <script type="module" src="assets/js/validate-quizzes.mjs"></script>
+// Resolve files relative to the repository root (one level up from tools/)
+const repoRoot = path.resolve(__dirname, '..');
+const schemaPath = path.join(repoRoot, 'schema.json');
+const quizzesDir = path.join(repoRoot, 'quizzes');
 
-  <!-- Option B: if your module exports a function (e.g., runValidator), comment out the line above and use this: -->
-  <!--
-  <script type="module">
-    import { runValidator } from './assets/js/validate-quizzes.mjs';
-    runValidator?.();
-  </script>
-  -->
-</body>
-</html>
+const ajv = new Ajv({ allErrors: true, allowUnionTypes: true });
+const schema = JSON.parse(readFileSync(schemaPath, 'utf8'));
+const validate = ajv.compile(schema);
+
+const files = readdirSync(quizzesDir).filter(f => f.endsWith('.json'));
+let ok = true;
+
+for (const f of files) {
+  try {
+    const raw = readFileSync(path.join(quizzesDir, f), 'utf8');
+    const data = JSON.parse(raw);
+    const valid = validate(data);
+    if (!valid) {
+      ok = false;
+      console.error(`❌ ${f}`);
+      console.error(validate.errors);
+    } else {
+      console.log(`✅ ${f}`);
+    }
+  } catch (e) {
+    ok = false;
+    console.error(`💥 ${f}: ${e.message}`);
+  }
+}
+
+if (!ok) process.exit(1);
