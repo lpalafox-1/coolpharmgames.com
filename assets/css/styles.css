@@ -42,8 +42,8 @@ a.quiz-link:hover{ text-decoration:none; }
 }
 .hero {
   background:
-    radial-gradient(1200px 600px at 10% -20%, rgba(139,30,63,.18), transparent 40%),
-    radial-gradient(800px 400px at 100% 0%, rgba(139,30,63,.10), transparent 45%);
+    radial-gradient(1200px 600px at 10% -20%, rgba(139,30,63,.28), transparent 40%),
+    radial-gradient(800px 400px at 100% 0%, rgba(139,30,63,.18), transparent 45%);
 }
 
 /* ===== Buttons ===== */
@@ -51,11 +51,10 @@ a.quiz-link:hover{ text-decoration:none; }
 .btn .btn-icon{ width:1rem; height:1rem; display:inline-block; margin-right:.5rem; vertical-align:middle; }
 .btn-ghost{ background:transparent; border:1px solid var(--ring); }
 .btn-blue{
-  background:transparent; color:var(--accent); border:1px solid var(--accent);
+  background:var(--accent); color:#fff; border:1px solid var(--accent);
 }
 .btn-blue:hover{
-  background:linear-gradient(180deg, rgba(139,30,63,0.08), rgba(139,30,63,0.06));
-  color:#fff; border-color:var(--accent-600);
+  background:var(--accent-600); color:#fff; border-color:var(--accent-600);
 }
 .btn-green{ background:#16a34a; color:#fff; }
 .btn-gray{ background:#e5e7eb; } .dark .btn-gray{ background:#374151; color:#e5e7eb; }
