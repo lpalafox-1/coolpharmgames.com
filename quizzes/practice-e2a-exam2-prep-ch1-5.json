@@ -3,8 +3,216 @@
   "title": "Practice E2A — Exam 2 Prep (Chapters 1–5)",
   "pools": {
     "easy": [
-      { "type": "short", "prompt": "Sample E2A Q: short calculation.", "answerText": "42" }
+      {
+        "id": 12001,
+        "type": "short",
+        "prompt": "Convert 4 gallons to liters. (1 gal = 3.785 L)",
+        "answerText": ["15.14 L"],
+        "hints": "Multiply gallons by 3.785.",
+        "solution": "4×3.785=15.14 L."
+      },
+      {
+        "id": 12002,
+        "type": "short",
+        "prompt": "What volume (mL) do 100 g of peanut oil (SG 0.915) occupy?",
+        "answerText": ["109.3 mL"],
+        "hints": "V = mass/SG.",
+        "solution": "100/0.915=109.29 ≈ 109.3 mL."
+      },
+      {
+        "id": 12003,
+        "type": "short",
+        "prompt": "What volume (mL) do 100 g of phosphoric acid (SG 1.70) occupy?",
+        "answerText": ["58.8 mL"],
+        "hints": "V = mass/SG.",
+        "solution": "100/1.70=58.82 ≈ 58.8 mL."
+      },
+      {
+        "id": 12004,
+        "type": "short",
+        "prompt": "Volume (mL) of 1 lb benzyl benzoate (SG 1.12)? (1 lb = 454 g)",
+        "answerText": ["405 mL"],
+        "hints": "Convert lb→g, then ÷SG.",
+        "solution": "454/1.12=405 mL."
+      },
+      {
+        "id": 12005,
+        "type": "short",
+        "prompt": "How many grams are in 250 mL of glycerin (SG 1.25)?",
+        "answerText": ["312.5 g"],
+        "hints": "mass = SG×volume.",
+        "solution": "1.25×250=312.5 g."
+      },
+      {
+        "id": 12006,
+        "type": "short",
+        "prompt": "24×15 mL phenol solution bottles contain per 15 mL: liquefied phenol 1.5 g and propylene glycol 13.5 g. Totals needed?",
+        "answerText": ["Liquefied phenol: 36 g, Propylene glycol: 324 g"],
+        "hints": "Scale per-bottle amounts ×24.",
+        "solution": "Phenol 1.5×24=36 g; PG 13.5×24=324 g."
+      },
+      {
+        "id": 12007,
+        "type": "short",
+        "prompt": "Convert 0.45 L to mL.",
+        "answerText": ["450 mL"],
+        "hints": "×1000.",
+        "solution": "0.45×1000=450 mL."
+      },
+      {
+        "id": 12008,
+        "type": "short",
+        "prompt": "An elixir has 8 mg per teaspoonful (5 mL). How many mg in 1 tablespoonful?",
+        "answerText": ["24 mg"],
+        "hints": "1 tbsp = 15 mL = 3 tsp.",
+        "solution": "8 mg per 5 mL → 8×3 = 24 mg."
+      },
+      {
+        "id": 12009,
+        "type": "short",
+        "prompt": "How many μg are in 7.5 mg?",
+        "answerText": ["7500 mcg", "7500 μg"],
+        "hints": "1 mg = 1000 μg.",
+        "solution": "7.5×1000=7500 mcg."
+      },
+      {
+        "id": 12010,
+        "type": "short",
+        "prompt": "Solution 25 mg/5 mL. What volume provides 75 mg?",
+        "answerText": ["15 mL"],
+        "hints": "Find mg/mL then divide.",
+        "solution": "25/5=5 mg/mL; 75/5=15 mL."
+      },
+      {
+        "id": 12011,
+        "type": "short",
+        "prompt": "Interpret: Mesalamine 1.2 g p.o. q.d. c food",
+        "answerText": ["Take 1.2 g by mouth once daily with food"],
+        "hints": "q.d. = every day; c = with.",
+        "solution": "Take 1.2 g by mouth once daily with food."
+      },
+      {
+        "id": 12012,
+        "type": "short",
+        "prompt": "Interpret: HCTZ tabs 12.5 mg q.d. am",
+        "answerText": ["Take 12.5 mg every morning"],
+        "hints": "q.d. am = every morning.",
+        "solution": "Take 12.5 mg every morning."
+      },
+      {
+        "id": 12013,
+        "type": "short",
+        "prompt": "Convert 2 gallons to liters (1 gal=3.785 L).",
+        "answerText": ["7.57 L"],
+        "hints": "×3.785.",
+        "solution": "2×3.785=7.57 L."
+      }
     ],
-    "hard": []
+    "hard": [
+      {
+        "id": 12101,
+        "type": "short",
+        "prompt": "Polyethylene glycol ointment: 600 g PEG 400 per 1000 g. For 4000 g, how many mL PEG 400? (SG 1.140)",
+        "answerText": ["2105 mL"],
+        "hints": "Scale mass then ÷SG.",
+        "solution": "600×(4000/1000)=2400 g; 2400/1.14=2105 mL."
+      },
+      {
+        "id": 12102,
+        "type": "short",
+        "prompt": "PEG 400 costs $19.15 per 473 mL. What is the cost for 2105 mL?",
+        "answerText": ["$85.23"],
+        "hints": "mL ÷ 473 × $19.15.",
+        "solution": "2105/473=4.45; ×19.15=$85.23."
+      },
+      {
+        "id": 12103,
+        "type": "short",
+        "prompt": "50 glycerin suppositories need 91 g glycerin (SG 1.25). How many mL for 96 suppositories?",
+        "answerText": ["139.78 mL"],
+        "hints": "Scale mass then ÷SG.",
+        "solution": "91×(96/50)=174.72 g; ÷1.25=139.78 mL."
+      },
+      {
+        "id": 12104,
+        "type": "short",
+        "prompt": "What volume of polysorbate 80 (SG 1.08) supplies 60 g?",
+        "answerText": ["55.56 mL"],
+        "hints": "V = m/SG.",
+        "solution": "60/1.08=55.56 mL."
+      },
+      {
+        "id": 12105,
+        "type": "short",
+        "prompt": "Lotion 2.0 kg contains 2.5% w/w propylene glycol (SG 1.04). How many mL PG?",
+        "answerText": ["48.08 mL"],
+        "hints": "Mass PG = 0.025×2000 g.",
+        "solution": "Mass=50 g; volume=50/1.04=48.08 mL."
+      },
+      {
+        "id": 12106,
+        "type": "short",
+        "prompt": "Balance SR = 6.5 mg. Minimum weighable for ≤2% error?",
+        "answerText": ["325 mg"],
+        "hints": "(SR×100)/%error.",
+        "solution": "(6.5×100)/2=325 mg."
+      },
+      {
+        "id": 12107,
+        "type": "short",
+        "prompt": "Need 0.75 mL orange oil; graduate accurate ≥2 mL; alcohol diluent. Describe aliquot method.",
+        "answerText": ["Dilute to 2.00 mL total with alcohol, then measure the 2.00 mL aliquot."],
+        "hints": "Scale to measurable aliquot.",
+        "solution": "Add 1.25 mL alcohol to 0.75 mL oil to make 2.00 mL; measure the 2.00 mL aliquot."
+      },
+      {
+        "id": 12108,
+        "type": "short",
+        "prompt": "10‑mL graduate calibration: expected 10 mL water = 10 g; measured = 9.87 g. % error?",
+        "answerText": ["1.3%"],
+        "hints": "% error = (true − measured)/true × 100.",
+        "solution": "(10.00−9.87)/10×100 = 1.3%."
+      },
+      {
+        "id": 12109,
+        "type": "short",
+        "prompt": "A 5‑mL ampule contains 100 mg. Volume for 35 mg?",
+        "answerText": ["1.75 mL"],
+        "hints": "V = dose/conc.",
+        "solution": "100/5=20 mg/mL; 35/20=1.75 mL."
+      },
+      {
+        "id": 12110,
+        "type": "short",
+        "prompt": "A vial 0.1 mg/mL. Volume for 90 μg?",
+        "answerText": ["0.9 mL"],
+        "hints": "Convert μg→mg, divide by conc.",
+        "solution": "90 μg=0.09 mg; 0.09/0.1=0.9 mL."
+      },
+      {
+        "id": 12111,
+        "type": "short",
+        "prompt": "TRIVORA-28 totals: Levonorgestrel and ethinyl estradiol over the 28 days?",
+        "answerText": ["Levonorgestrel 0.68 mg; Ethinyl estradiol 0.58 mg"],
+        "hints": "Sum per phase.",
+        "solution": "L: 6×0.05 + 5×0.075 + 10×0.125 = 0.68 mg. EE: 6×0.03 + 5×0.04 + 10×0.03 = 0.58 mg."
+      },
+      {
+        "id": 12112,
+        "type": "short",
+        "prompt": "Total course dose: 50 μg/day ×2 days; 150 μg/day ×3; 250 μg/day ×3; 350 μg ×1. Answer in mg.",
+        "answerText": ["1.65 mg"],
+        "hints": "Total μg then ÷1000.",
+        "solution": "100 + 450 + 750 + 350 = 1650 μg = 1.65 mg."
+      },
+      {
+        "id": 12113,
+        "type": "short",
+        "prompt": "ROXANOL: 0.6 g/30 mL. (a) mg/mL? (b) mg in 0.6 mL?",
+        "answerText": ["(a) 20 mg/mL (b) 12 mg"],
+        "hints": "Convert g→mg.",
+        "solution": "600 mg/30 mL = 20 mg/mL; ×0.6 mL = 12 mg."
+      }
+    ]
   }
 }
