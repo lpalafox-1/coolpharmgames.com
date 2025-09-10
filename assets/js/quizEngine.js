@@ -80,6 +80,15 @@ async function main() {
   const data = await res.json();
 
   const allPool = (data.pools && data.pools[mode]) || data.questions || [];
+  if (!Array.isArray(allPool) || allPool.length === 0) {
+    if (els.title) els.title.textContent = data.title || "Quiz";
+    if (els.card) {
+      els.card.innerHTML = `<div class="p-4"><p style="color:var(--muted)">No questions found for mode "${sanitize(mode)}". Try switching to another mode (easy/hard) or check back later.</p></div>`;
+      els.results?.classList.add("hidden");
+      els.card.classList.remove("hidden");
+    }
+    return;
+  }
   const poolCopy = [...allPool];
   if (Number.isFinite(seedParam)) seededShuffle(poolCopy, seedParam);
   else shuffleInPlace(poolCopy);
@@ -462,7 +471,7 @@ function norm(s=""){
     .toLowerCase()
     .replace(/\s+/g, " ")
     .replace(/[’'`]/g, "'")
-    .replace(/[\.\,\;\:\-$begin:math:text$$end:math:text$$begin:math:display$$end:math:display$\{\}]/g, "")
+    .replace(/[\.,;:\-\{\}]/g, "")
     .trim();
 }
 // allow plural/singular and minor variants: "beta blocker" == "beta blockers"
