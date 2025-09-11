@@ -7,12 +7,26 @@
         "type": "mcq",
         "prompt": "Which amino acid is achiral?",
         "choices": ["Alanine", "Glycine", "Proline", "Valine"],
-        "answer": "Glycine"
+        "answer": "Glycine",
+        "hint": "Think: the simplest AA, with just a hydrogen side chain."
+      },
+      {
+        "type": "mcq",
+        "prompt": "Proline is unique because:",
+        "choices": ["It is achiral", "It forms a rigid cyclic structure", "It contains sulfur", "It is aromatic"],
+        "answer": "It forms a rigid cyclic structure",
+        "hint": "This AA often breaks α-helices."
       },
       {
         "type": "short",
         "prompt": "What type of bond links amino acids in the primary structure of proteins?",
         "answers": ["peptide bond", "amide bond", "peptide bond (amide bond)"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which level of protein structure involves α-helices and β-sheets?",
+        "choices": ["Primary", "Secondary", "Tertiary", "Quaternary"],
+        "answer": "Secondary"
       },
       {
         "type": "mcq",
@@ -22,9 +36,26 @@
       },
       {
         "type": "mcq",
+        "prompt": "Which of the following proteins is fibrous?",
+        "choices": ["Myoglobin", "Hemoglobin", "Collagen", "Catalase"],
+        "answer": "Collagen"
+      },
+      {
+        "type": "mcq",
         "prompt": "Which enzyme model describes flexibility and conformational change on substrate binding?",
         "choices": ["Lock and Key", "Induced Fit", "Zymogen", "Allosteric"],
         "answer": "Induced Fit"
+      },
+      {
+        "type": "short",
+        "prompt": "What is the general suffix for enzyme names?",
+        "answers": ["ase", "-ase"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which class of enzymes catalyzes oxidation-reduction reactions?",
+        "choices": ["Hydrolases", "Ligases", "Oxidoreductases", "Transferases"],
+        "answer": "Oxidoreductases"
       },
       {
         "type": "short",
@@ -33,9 +64,61 @@
       },
       {
         "type": "mcq",
+        "prompt": "Cellulose has which type of glycosidic linkage?",
+        "choices": ["α-1,4", "α-1,6", "β-1,4", "β-1,6"],
+        "answer": "β-1,4"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which polysaccharide is highly branched with α-1,6 linkages every ~10 residues?",
+        "choices": ["Cellulose", "Amylose", "Amylopectin", "Glycogen"],
+        "answer": "Glycogen"
+      },
+      {
+        "type": "mcq",
         "prompt": "In DNA, adenine pairs with ______ by how many hydrogen bonds?",
         "choices": ["Cytosine, 3 bonds", "Thymine, 2 bonds", "Uracil, 3 bonds", "Thymine, 3 bonds"],
         "answer": "Thymine, 2 bonds"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which base is unique to RNA?",
+        "choices": ["Cytosine", "Uracil", "Thymine", "Adenine"],
+        "answer": "Uracil"
+      },
+      {
+        "type": "short",
+        "prompt": "Which enzyme unwinds DNA during replication?",
+        "answers": ["helicase"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which RNA carries amino acids during translation?",
+        "choices": ["mRNA", "rRNA", "tRNA", "snRNA"],
+        "answer": "tRNA"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which carbohydrate is found in plant cell walls?",
+        "choices": ["Glycogen", "Cellulose", "Starch", "Amylopectin"],
+        "answer": "Cellulose"
+      },
+      {
+        "type": "mcq",
+        "prompt": "What is the start codon in translation?",
+        "choices": ["UAA", "UGA", "AUG", "UAG"],
+        "answer": "AUG"
+      },
+      {
+        "type": "short",
+        "prompt": "Which amino acid can form disulfide bonds?",
+        "answers": ["cysteine"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which post-translational modification is most common in enzyme regulation?",
+        "choices": ["Hydroxylation", "Phosphorylation", "Glycosylation", "Nitration"],
+        "answer": "Phosphorylation"
       }
     ],
     "hard": [
@@ -51,6 +134,11 @@
         "answers": ["point mutation in β-globin: glutamate → valine at position 6", "glutamate to valine substitution at position 6 in beta-globin", "glu to val substitution at position 6"]
       },
       {
+        "type": "short",
+        "prompt": "Explain the Bohr Effect in hemoglobin.",
+        "answers": ["at lower ph/higher co₂, hemoglobin decreases its affinity for o₂, promoting oxygen release in tissues", "lower ph decreases oxygen affinity, promoting release to tissues"]
+      },
+      {
         "type": "mcq",
         "prompt": "Competitive inhibition changes enzyme kinetics in which way?",
         "choices": [
@@ -60,6 +148,17 @@
           "Increases Km, decreases Vmax"
         ],
         "answer": "Increases Km, no change in Vmax"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Noncompetitive inhibition changes enzyme kinetics in which way?",
+        "choices": [
+          "Vmax decreases, Km unchanged",
+          "Km decreases, Vmax unchanged",
+          "Both Km and Vmax decrease",
+          "Km increases, Vmax unchanged"
+        ],
+        "answer": "Vmax decreases, Km unchanged"
       },
       {
         "type": "short",
@@ -75,9 +174,9 @@
       },
       {
         "type": "mcq",
-        "prompt": "Which enzyme is responsible for proof-reading during DNA replication?",
-        "choices": ["Helicase", "DNA Polymerase I", "DNA Polymerase III", "Ligase"],
-        "answer": "DNA Polymerase I"
+        "prompt": "Which DNA polymerase proofreads new DNA strands in prokaryotes?",
+        "choices": ["DNA Pol I", "DNA Pol II", "DNA Pol III", "Ligase"],
+        "answer": "DNA Pol I"
       },
       {
         "type": "short",
@@ -87,6 +186,69 @@
           "hba1c is glycated hemoglobin, hba is normal adult hemoglobin",
           "hba1c has glucose attached, hba is normal hemoglobin"
         ]
+      },
+      {
+        "type": "short",
+        "prompt": "What is the key repeating sequence in collagen's α-chain?",
+        "answers": ["gly-x-y, where x is often proline and y is often hydroxyproline", "glycine-x-y triplet"]
+      },
+      {
+        "type": "short",
+        "prompt": "Why is hydroxyproline important in collagen?",
+        "answers": ["it stabilizes the triple helix by maximizing hydrogen bonding between chains", "stabilizes triple helix through hydrogen bonding"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which enzyme catalyzes the joining of Okazaki fragments?",
+        "choices": ["DNA Polymerase I", "DNA Polymerase III", "Ligase", "Topoisomerase"],
+        "answer": "Ligase"
+      },
+      {
+        "type": "short",
+        "prompt": "Name two enzymes that relieve supercoiling during DNA replication.",
+        "answers": ["topoisomerase and gyrase", "gyrase and topoisomerase"]
+      },
+      {
+        "type": "short",
+        "prompt": "What causes Osteogenesis Imperfecta at the molecular level?",
+        "answers": ["replacement of glycine with bulky residues in collagen, preventing triple helix formation", "glycine substitution disrupts collagen triple helix"]
+      },
+      {
+        "type": "short",
+        "prompt": "Name the three stop codons.",
+        "answers": ["uaa, uga, uag", "uaa uga uag"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which enzyme catalyzes phosphorylation of glucose to glucose-6-phosphate?",
+        "choices": ["Glucokinase", "Hexokinase", "Both", "Neither"],
+        "answer": "Both"
+      },
+      {
+        "type": "short",
+        "prompt": "What's the difference between amylose and amylopectin?",
+        "answers": ["amylose is unbranched with α-1,4 linkages; amylopectin is branched with α-1,4 and α-1,6 linkages", "amylose unbranched, amylopectin branched"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which unusual amino acid is considered the '21st amino acid'?",
+        "choices": ["Selenocysteine", "Pyrrolysine", "Desmosine", "Hydroxylysine"],
+        "answer": "Selenocysteine"
+      },
+      {
+        "type": "short",
+        "prompt": "What enzyme is targeted by penicillin?",
+        "answers": ["bacterial transpeptidase", "transpeptidase", "cell wall synthesis enzyme"]
+      },
+      {
+        "type": "short",
+        "prompt": "What enzyme is inhibited by NSAIDs?",
+        "answers": ["cyclooxygenase", "cox", "cyclooxygenase (cox)"]
+      },
+      {
+        "type": "short",
+        "prompt": "What enzyme is inhibited by ACE inhibitors?",
+        "answers": ["angiotensin-converting enzyme", "ace", "angiotensin-converting enzyme (ace)"]
       }
     ]
   }
