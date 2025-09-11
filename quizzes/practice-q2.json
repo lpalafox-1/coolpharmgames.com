@@ -250,6 +250,118 @@
         "prompt": "What enzyme is inhibited by ACE inhibitors?",
         "answers": ["angiotensin-converting enzyme", "ace", "angiotensin-converting enzyme (ace)"]
       }
+    ],
+    "expert": [
+      {
+        "type": "short",
+        "prompt": "Which genetic disorder results from deficiency in α-L-iduronidase and leads to accumulation of dermatan and heparan sulfate?",
+        "answers": ["hurler syndrome", "mucopolysaccharidosis type i", "mps i"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "In the context of drug metabolism, which CYP450 enzyme is responsible for ~50% of drug oxidations and is highly polymorphic?",
+        "choices": ["CYP1A2", "CYP2D6", "CYP2C19", "CYP3A4"],
+        "answer": "CYP2D6"
+      },
+      {
+        "type": "short",
+        "prompt": "What is the biochemical basis for the efficacy of 5-fluorouracil as a chemotherapy agent?",
+        "answers": ["inhibits thymidylate synthase, blocking dttp synthesis and dna replication", "thymidylate synthase inhibition prevents dna synthesis"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which amino acid substitution in β-thalassemia causes the most severe clinical phenotype due to unstable β-globin chains?",
+        "choices": ["Glu6Val", "Lys8Asn", "Glu26Lys", "Pro5Arg"],
+        "answer": "Pro5Arg"
+      },
+      {
+        "type": "short",
+        "prompt": "Explain the molecular mechanism by which warfarin exerts its anticoagulant effect.",
+        "answers": ["inhibits vitamin k epoxide reductase, preventing regeneration of vitamin k cofactor needed for gamma-carboxylation of clotting factors ii, vii, ix, x", "blocks vitamin k recycling, preventing carboxylation of clotting factors"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which post-translational modification is essential for proper collagen cross-linking and is deficient in scurvy?",
+        "choices": ["Hydroxylation of proline", "Hydroxylation of lysine", "Both hydroxylation of proline and lysine", "Glycosylation of hydroxylysine"],
+        "answer": "Both hydroxylation of proline and lysine"
+      },
+      {
+        "type": "short",
+        "prompt": "What is the molecular defect in Gaucher disease and which enzyme is used therapeutically?",
+        "answers": ["deficiency in beta-glucocerebrosidase; treated with recombinant glucocerebrosidase (imiglucerase)", "glucocerebrosidase deficiency; treated with enzyme replacement therapy"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which allosteric enzyme is the rate-limiting step in cholesterol biosynthesis and is the target of statins?",
+        "choices": ["Acetyl-CoA carboxylase", "HMG-CoA reductase", "HMG-CoA synthase", "Mevalonate kinase"],
+        "answer": "HMG-CoA reductase"
+      },
+      {
+        "type": "short",
+        "prompt": "Describe the 'zipper' mechanism of myosin-actin interaction in muscle contraction.",
+        "answers": ["myosin heads bind actin in staggered fashion, power stroke pulls actin filaments past myosin, creating sliding filament contraction", "staggered myosin binding creates sliding filament mechanism"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which glycosaminoglycan when sulfated becomes the active form of the anticoagulant heparin?",
+        "choices": ["Chondroitin", "Dermatan", "Heparan", "Hyaluronic acid"],
+        "answer": "Heparan"
+      },
+      {
+        "type": "short",
+        "prompt": "What is the biochemical mechanism of action of metformin in diabetes treatment?",
+        "answers": ["activates amp kinase, leading to decreased gluconeogenesis and increased glucose uptake", "ampk activation reduces glucose production and increases uptake"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which DNA repair mechanism is defective in xeroderma pigmentosum?",
+        "choices": ["Base excision repair", "Nucleotide excision repair", "Mismatch repair", "Homologous recombination"],
+        "answer": "Nucleotide excision repair"
+      },
+      {
+        "type": "short",
+        "prompt": "Explain the molecular basis for the selectivity of penicillin for bacterial cells over human cells.",
+        "answers": ["penicillin targets bacterial transpeptidase involved in peptidoglycan synthesis; human cells lack cell walls and this enzyme", "targets bacterial cell wall synthesis enzyme absent in humans"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which enzyme deficiency causes phenylketonuria (PKU)?",
+        "choices": ["Tyrosine hydroxylase", "Phenylalanine hydroxylase", "Tryptophan hydroxylase", "Histidine decarboxylase"],
+        "answer": "Phenylalanine hydroxylase"
+      },
+      {
+        "type": "short",
+        "prompt": "What is the molecular mechanism by which aspirin irreversibly inhibits COX enzymes?",
+        "answers": ["covalent acetylation of serine 530 in cox-1 and serine 516 in cox-2 active site", "irreversible acetylation of active site serine residue"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "In sickle cell disease, which amino acid interaction promotes polymerization of HbS?",
+        "choices": ["Hydrophobic interaction between Val6 and Phe85", "Hydrogen bonding between Val6 and Lys16", "Electrostatic interaction between Val6 and Asp73", "Van der Waals forces between Val6 and Leu88"],
+        "answer": "Hydrophobic interaction between Val6 and Phe85"
+      },
+      {
+        "type": "short",
+        "prompt": "Which oncogene encodes a mutated growth factor receptor that is targeted by trastuzumab (Herceptin)?",
+        "answers": ["her2", "erbb2", "her2/neu"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which amino acid is incorporated at amber stop codons (UAG) in the presence of special suppressor tRNAs?",
+        "choices": ["Selenocysteine", "Pyrrolysine", "N-formylmethionine", "Both selenocysteine and pyrrolysine"],
+        "answer": "Pyrrolysine"
+      },
+      {
+        "type": "short",
+        "prompt": "What is the molecular defect in Marfan syndrome and which protein is affected?",
+        "answers": ["mutation in fibrillin-1 gene affects elastic fiber formation in connective tissues", "fibrillin-1 defect causing connective tissue abnormalities"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which enzyme is deficient in Tay-Sachs disease, leading to GM2 ganglioside accumulation?",
+        "choices": ["α-galactosidase A", "β-hexosaminidase A", "β-glucocerebrosidase", "α-L-iduronidase"],
+        "answer": "β-hexosaminidase A"
+      }
     ]
   }
 }
