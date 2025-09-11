@@ -1,185 +1,239 @@
 {
   "id": "popp-practice-exam1",
-  "title": "Pharmacy Law — Practice (PoPP I)",
+  "title": "Pharmacy Principles Practice Exam 1",
   "pools": {
     "easy": [
       {
         "type": "mcq",
-        "prompt": "Which DEA form is used to order Schedule II controlled substances?",
-        "choices": ["Form 222", "Form 41", "Form 106", "Form 224"],
-        "answer": "Form 222"
+        "prompt": "Which of the following best defines patient safety?",
+        "choices": ["Preventing errors and harm", "Correctly billing insurance", "Limiting patient counseling", "Documenting refills only"],
+        "answer": "Preventing errors and harm"
       },
       {
         "type": "mcq",
-        "prompt": "Which DEA form is used to report significant theft or loss of controlled substances?",
-        "choices": ["Form 106", "Form 41", "Form 224", "Form 363"],
-        "answer": "Form 106"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which DEA form is used for destruction/surrender of controlled substances?",
-        "choices": ["Form 41", "Form 106", "Form 222", "Form 224"],
-        "answer": "Form 41"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Initial DEA registration for a retail pharmacy is:",
-        "choices": ["Form 224", "Form 224a", "Form 225", "Form 363"],
-        "answer": "Form 224"
+        "prompt": "Which federal law requires valid prescriptions and proper labeling?",
+        "choices": ["FD&C Act", "CSA", "OBRA 90", "HIPAA"],
+        "answer": "FD&C Act"
       },
       {
         "type": "tf",
-        "prompt": "Schedule II prescriptions generally may not be refilled.",
-        "answer": "True"
-      },
-      {
-        "type": "tf",
-        "prompt": "Schedule III–V prescriptions may be refilled up to five times within six months if authorized.",
+        "prompt": "A valid prescription must include prescriber signature.",
         "answer": "True"
       },
       {
         "type": "mcq",
-        "prompt": "Which is a Schedule II controlled substance (federal)?",
-        "choices": ["Morphine", "Diazepam", "Pregabalin", "Codeine (alone) ≤ 90 mg/dose"],
-        "answer": "Morphine"
+        "prompt": "Which of the following is a look-alike/sound-alike (SALAD) drug pair?",
+        "choices": ["Atorvastatin / Acetaminophen", "Hydralazine / Hydroxyzine", "Amoxicillin / Ibuprofen", "Metformin / Omeprazole"],
+        "answer": "Hydralazine / Hydroxyzine"
       },
       {
         "type": "mcq",
-        "prompt": "Which is Schedule IV (federal)?",
-        "choices": ["Diazepam", "Heroin", "Cocaine", "Methadone"],
-        "answer": "Diazepam"
+        "prompt": "DAW means:",
+        "choices": ["Dispense As Written", "Deliver All Weekly", "Drug Authorized Withdrawal", "Dispense All Whole"],
+        "answer": "Dispense As Written"
       },
       {
         "type": "mcq",
-        "prompt": "Federal daily pseudoephedrine sales limit is:",
-        "choices": ["3.6 g/day", "9 g/day", "7.5 g/day", "1.2 g/day"],
-        "answer": "3.6 g/day"
+        "prompt": "Which is primary literature?",
+        "choices": ["Cochrane Review", "Randomized controlled trial in NEJM", "Micromedex database", "Lexi-Drug monograph"],
+        "answer": "Randomized controlled trial in NEJM"
       },
       {
         "type": "mcq",
-        "prompt": "Federal 30-day retail pseudoephedrine limit is:",
-        "choices": ["9 g/30 days", "7.5 g/30 days", "12 g/30 days", "3.6 g/30 days"],
-        "answer": "9 g/30 days"
+        "prompt": "Which of the following is secondary literature?",
+        "choices": ["PubMed", "DailyMed", "JAMA", "Lexi-Drug"],
+        "answer": "PubMed"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which is a tertiary resource?",
+        "choices": ["Clinical trial abstract", "Lexi-Drug", "PubMed search", "Systematic review"],
+        "answer": "Lexi-Drug"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which agency enforces the Controlled Substances Act?",
+        "choices": ["FDA", "DEA", "CDC", "ISMP"],
+        "answer": "DEA"
       },
       {
         "type": "tf",
-        "prompt": "A pharmacist has a corresponding responsibility to ensure a controlled Rx is for a legitimate medical purpose.",
+        "prompt": "Schedule II prescriptions can never be refilled.",
         "answer": "True"
       },
       {
         "type": "mcq",
-        "prompt": "Which schedules may be phoned in (non-emergency) if permitted by state law?",
-        "choices": ["Schedule III–V", "Schedule II only", "None", "All schedules"],
-        "answer": "Schedule III–V"
+        "prompt": "Which category of medication error is giving the wrong drug to the correct patient?",
+        "choices": ["Omission", "Commission", "Sentinel event", "Adverse drug event"],
+        "answer": "Commission"
       },
       {
         "type": "mcq",
-        "prompt": "Emergency oral C-II prescriptions require follow-up written/e-signed Rx within:",
-        "choices": ["7 days (federal)", "24 hours", "3 days", "14 days"],
-        "answer": "7 days (federal)"
+        "prompt": "Which law limits pseudoephedrine sales?",
+        "choices": ["CSA", "Combat Methamphetamine Epidemic Act", "DSCSA", "OBRA 90"],
+        "answer": "Combat Methamphetamine Epidemic Act"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which organization manages the MERP program?",
+        "choices": ["DEA", "FDA", "ISMP", "CDC"],
+        "answer": "ISMP"
       },
       {
         "type": "tf",
-        "prompt": "Transfers of Schedule III–V prescriptions are allowed once between pharmacies that do not share a real-time database (if permitted).",
+        "prompt": "DailyMed provides official FDA package insert information.",
         "answer": "True"
       },
       {
-        "type": "short",
-        "prompt": "DEA form for ordering C-II drugs (number only is fine).",
-        "answerText": ["222", "form 222", "dea 222"]
+        "type": "mcq",
+        "prompt": "Which \"Right\" is violated if the correct drug is dispensed but to the wrong patient?",
+        "choices": ["Right dose", "Right drug", "Right patient", "Right route"],
+        "answer": "Right patient"
       },
       {
-        "type": "short",
-        "prompt": "DEA form for theft/loss reporting (number only is fine).",
-        "answerText": ["106", "form 106", "dea 106"]
+        "type": "mcq",
+        "prompt": "Which is required on an Arkansas prescription label?",
+        "choices": ["Patient's name", "Prescriber's DEA number", "Patient's weight", "Pharmacist initials"],
+        "answer": "Patient's name"
       },
       {
-        "type": "short",
-        "prompt": "DEA form for destruction/surrender (number only is fine).",
-        "answerText": ["41", "form 41", "dea 41"]
+        "type": "tf",
+        "prompt": "FMEA is a proactive method to identify failures before errors occur.",
+        "answer": "True"
       },
       {
-        "type": "short",
-        "prompt": "Max pseudoephedrine grams per day (federal).",
-        "answerText": ["3.6", "3.6 g", "3.6 grams"]
+        "type": "mcq",
+        "prompt": "The Orange Book provides:",
+        "choices": ["Controlled substance schedules", "Therapeutic equivalence codes", "Patient safety alerts", "Drug interaction databases"],
+        "answer": "Therapeutic equivalence codes"
       },
       {
-        "type": "short",
-        "prompt": "Max CIII–CV refills (number).",
-        "answerText": ["5", "five"]
+        "type": "tf",
+        "prompt": "Pharmacy technicians can transfer controlled prescriptions.",
+        "answer": "False"
       },
       {
-        "type": "short",
-        "prompt": "Refill window for CIII–CV (months).",
-        "answerText": ["6", "six"]
+        "type": "mcq",
+        "prompt": "Which safety principle focuses on analyzing events after they occur?",
+        "choices": ["FMEA", "RCA", "PDMP", "MERP"],
+        "answer": "RCA"
       }
     ],
     "hard": [
       {
         "type": "mcq",
-        "prompt": "Which items must be on a controlled prescription (federal)?",
-        "choices": ["Patient name & address", "Prescriber name, address, DEA #", "Drug name, strength, dosage form, quantity, directions", "All of the above"],
-        "answer": "All of the above"
+        "prompt": "A bottle of oxycodone 500-count is inventoried. Which rule applies?",
+        "choices": ["Estimate allowed", "Exact count required", "Estimate if <1000", "DEA approval required"],
+        "answer": "Exact count required"
       },
       {
         "type": "tf",
-        "prompt": "Electronic prescribing of controlled substances (EPCS) is permitted federally if system requirements are met (state law may vary).",
+        "prompt": "All controlled substance records must be kept for at least 2 years.",
         "answer": "True"
       },
       {
         "type": "mcq",
-        "prompt": "Controlled substance inventory must occur at least every:",
-        "choices": ["2 years (federal)", "6 months", "Annually (federal)", "3 years"],
-        "answer": "2 years (federal)"
+        "prompt": "A prescriber calls in an emergency 72-hour supply of Adderall. What follow-up is required?",
+        "choices": ["Signed Rx within 7 days", "DEA approval by phone", "Report only to state board", "No follow-up needed"],
+        "answer": "Signed Rx within 7 days"
       },
       {
         "type": "mcq",
-        "prompt": "Which of the following can generally be transferred more than once if pharmacies share a real-time database and state law permits?",
-        "choices": ["CIII–CV", "CII", "None", "Non-controlled only"],
-        "answer": "CIII–CV"
+        "prompt": "Which is a sentinel event?",
+        "choices": ["Wrong drug → patient death", "Mild nausea from chemotherapy", "Delayed refill request", "Missed counseling session"],
+        "answer": "Wrong drug → patient death"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which analysis method identifies workflow risks before errors occur?",
+        "choices": ["RCA", "Sentinel review", "FMEA", "MERP"],
+        "answer": "FMEA"
       },
       {
         "type": "tf",
-        "prompt": "Post-dating a controlled prescription is permitted under federal law.",
+        "prompt": "The Purple Book lists interchangeable biologics.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which Orange Book code indicates drugs are therapeutically equivalent?",
+        "choices": ["AB", "BX", "B", "C-II"],
+        "answer": "AB"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which is NOT required on an Arkansas prescription label?",
+        "choices": ["Patient's name", "Prescriber's name", "Manufacturer (if generic)", "Prescriber's DEA number"],
+        "answer": "Prescriber's DEA number"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which schedule allows estimation of counts for bottles ≤1000 units?",
+        "choices": ["C-II", "C-III to V", "C-I", "OTC"],
+        "answer": "C-III to V"
+      },
+      {
+        "type": "tf",
+        "prompt": "ISMP is a government agency under the FDA.",
         "answer": "False"
       },
       {
         "type": "mcq",
-        "prompt": "Which DEA form is used to renew a pharmacy registration?",
-        "choices": ["224a", "224", "225", "363"],
-        "answer": "224a"
+        "prompt": "A patient brings in another person's lisinopril bottle by mistake. Which \"Right\" failed?",
+        "choices": ["Right dose", "Right time", "Right patient", "Right route"],
+        "answer": "Right patient"
       },
       {
         "type": "mcq",
-        "prompt": "Which act primarily regulates pseudoephedrine sales?",
-        "choices": ["Combat Methamphetamine Epidemic Act", "Controlled Substances Act", "Poison Prevention Packaging Act", "Food, Drug, and Cosmetic Act"],
-        "answer": "Combat Methamphetamine Epidemic Act"
+        "prompt": "Which is an error of omission?",
+        "choices": ["Wrong strength dispensed", "Missed allergy check", "Wrong patient counseling sheet given", "Wrong drug given"],
+        "answer": "Missed allergy check"
+      },
+      {
+        "type": "tf",
+        "prompt": "The CSA requires inventories at least biennially.",
+        "answer": "True"
       },
       {
         "type": "mcq",
-        "prompt": "For an emergency oral C-II prescription, a pharmacist must:",
-        "choices": ["Limit to amount necessary", "Obtain follow-up within 7 days", "Immediately file DEA Form 41", "Provide partial fill only"],
-        "answer": "Limit to amount necessary"
+        "prompt": "A pharmacist substitutes an AB1-rated generic for an AB2-rated brand. Is this allowed?",
+        "choices": ["Yes", "No"],
+        "answer": "No"
       },
       {
-        "type": "short",
-        "prompt": "DEA form for pharmacy registration (initial).",
-        "answerText": ["224", "form 224", "dea 224"]
+        "type": "mcq",
+        "prompt": "Which type of literature includes systematic reviews and meta-analyses?",
+        "choices": ["Primary", "Secondary", "Tertiary", "Package insert"],
+        "answer": "Secondary"
       },
       {
-        "type": "short",
-        "prompt": "DEA form for pharmacy registration renewal.",
-        "answerText": ["224a", "form 224a", "dea 224a"]
+        "type": "mcq",
+        "prompt": "Which factor determines drug scheduling under the CSA?",
+        "choices": ["Price", "Potential for abuse and dependence", "Manufacturer", "Dosage form"],
+        "answer": "Potential for abuse and dependence"
       },
       {
-        "type": "short",
-        "prompt": "Minimum years between required federal controlled substance inventories.",
-        "answerText": ["2", "two"]
+        "type": "mcq",
+        "prompt": "Which law requires pharmacists to counsel Medicaid patients?",
+        "choices": ["CSA", "OBRA 90", "FD&C Act", "DSCSA"],
+        "answer": "OBRA 90"
       },
       {
-        "type": "short",
-        "prompt": "Max number of CIII–CV transfers (non-real-time db).",
-        "answerText": ["1", "one"]
+        "type": "tf",
+        "prompt": "Natural Medicines Database is considered a primary source.",
+        "answer": "False"
+      },
+      {
+        "type": "mcq",
+        "prompt": "A pharmacy's last controlled substance inventory was done in 2024. When is the next due?",
+        "choices": ["2025", "2026", "2027", "2029"],
+        "answer": "2026"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which is an adverse drug reaction (ADR), not an ADE?",
+        "choices": ["Allergic reaction to Bactrim at normal dose", "Overdose due to miscalculated BSA", "Wrong drug dispensed at checkout", "Patient non-adherence"],
+        "answer": "Allergic reaction to Bactrim at normal dose"
       }
     ]
   }

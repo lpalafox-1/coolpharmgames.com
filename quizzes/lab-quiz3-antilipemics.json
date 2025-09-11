@@ -1,276 +1,277 @@
 {
   "id": "lab-quiz3-antilipemics",
-  "title": "Lab Quiz 3 — Antilipemics",
+  "title": "Lab Quiz 3 — Anticoagulants",
   "pools": {
     "easy": [
       {
         "type": "mcq",
-        "prompt": "What is the brand name for Simvastatin?",
-        "choices": ["Zocor", "Lipitor", "Crestor", "Pravachol"],
-        "answer": "Zocor"
+        "prompt": "What is the brand name of Warfarin?",
+        "choices": ["Coumadin", "Xarelto", "Eliquis", "Lovenox"],
+        "answer": "Coumadin"
       },
       {
         "type": "short",
-        "prompt": "Generic name of Lipitor?",
-        "answerText": "Atorvastatin"
+        "prompt": "Generic name of Xarelto?",
+        "answerText": ["Rivaroxaban"]
       },
       {
         "type": "tf",
-        "prompt": "Rosuvastatin is a statin.",
+        "prompt": "Apixaban is classified as an anticoagulant.",
         "answer": "True"
       },
       {
         "type": "mcq",
-        "prompt": "Fenofibrate belongs to what class?",
-        "choices": ["Statin", "Fibric Acid Derivative", "Omega-3", "Nicotinic Acid"],
-        "answer": "Fibric Acid Derivative"
+        "prompt": "Which drug is a Vitamin K antagonist?",
+        "choices": ["Warfarin", "Rivaroxaban", "Apixaban", "Heparin"],
+        "answer": "Warfarin"
       },
       {
         "type": "short",
-        "prompt": "Brand name of Pravastatin?",
-        "answerText": "Pravachol"
-      },
-      {
-        "type": "short",
-        "prompt": "Drug category of Zetia?",
-        "answerText": "Antilipemic"
+        "prompt": "Brand name of Apixaban?",
+        "answerText": ["Eliquis"]
       },
       {
         "type": "tf",
-        "prompt": "Niacin is a Nicotinic Acid.",
+        "prompt": "Heparin enhances the activity of antithrombin III.",
         "answer": "True"
       },
       {
         "type": "mcq",
-        "prompt": "Lovaza is which type of drug?",
-        "choices": ["Statin", "Omega-3 Fatty Acid", "Fibrate", "PCSK9 Inhibitor"],
-        "answer": "Omega-3 Fatty Acid"
+        "prompt": "Which drug is available as Lovenox?",
+        "choices": ["Enoxaparin", "Heparin", "Warfarin", "Apixaban"],
+        "answer": "Enoxaparin"
       },
       {
         "type": "short",
-        "prompt": "Brand name of Rosuvastatin?",
-        "answerText": "Crestor"
+        "prompt": "Generic name of Coumadin?",
+        "answerText": ["Warfarin"]
       },
       {
         "type": "mcq",
-        "prompt": "Which drug blocks cholesterol absorption?",
-        "choices": ["Ezetimibe", "Fenofibrate", "Niacin", "Lovaza"],
-        "answer": "Ezetimibe"
+        "prompt": "Which drug class is Xarelto?",
+        "choices": ["Direct Factor Xa Inhibitor", "Vitamin K Antagonist", "LMWH", "Heparin"],
+        "answer": "Direct Factor Xa Inhibitor"
+      },
+      {
+        "type": "short",
+        "prompt": "Drug category of Eliquis?",
+        "answerText": ["Anticoagulant"]
       },
       {
         "type": "tf",
-        "prompt": "Evolocumab is a PCSK9 inhibitor.",
+        "prompt": "Warfarin requires monitoring with INR.",
         "answer": "True"
       },
       {
         "type": "short",
-        "prompt": "Brand name of Alirocumab?",
-        "answerText": "Praluent"
+        "prompt": "Brand name of Enoxaparin?",
+        "answerText": ["Lovenox"]
       },
       {
         "type": "mcq",
-        "prompt": "Which drug is a Statin?",
-        "choices": ["Niacin", "Fenofibrate", "Simvastatin", "Ezetimibe"],
-        "answer": "Simvastatin"
-      },
-      {
-        "type": "short",
-        "prompt": "Generic name of Zocor?",
-        "answerText": "Simvastatin"
+        "prompt": "Which drug enhances antithrombin III?",
+        "choices": ["Heparin", "Apixaban", "Rivaroxaban", "Warfarin"],
+        "answer": "Heparin"
       },
       {
         "type": "tf",
-        "prompt": "All statins are antilipemics.",
+        "prompt": "Both Rivaroxaban and Apixaban inhibit Factor Xa.",
+        "answer": "True"
+      },
+      {
+        "type": "short",
+        "prompt": "Drug class of Lovenox?",
+        "answerText": ["Low Molecular Weight Heparin", "LMWH"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drug prevents the synthesis of clotting factors II, VII, IX, X?",
+        "choices": ["Warfarin", "Enoxaparin", "Rivaroxaban", "Heparin"],
+        "answer": "Warfarin"
+      },
+      {
+        "type": "short",
+        "prompt": "Brand name of Heparin?",
+        "answerText": ["Hep-Lock"]
+      },
+      {
+        "type": "tf",
+        "prompt": "Direct oral anticoagulants (DOACs) include Apixaban and Rivaroxaban.",
+        "answer": "True"
+      },
+      {
+        "type": "short",
+        "prompt": "Generic name of Jantoven?",
+        "answerText": ["Warfarin"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which is a Low Molecular Weight Heparin (LMWH)?",
+        "choices": ["Enoxaparin", "Warfarin", "Rivaroxaban", "Apixaban"],
+        "answer": "Enoxaparin"
+      },
+      {
+        "type": "short",
+        "prompt": "Drug class of Warfarin?",
+        "answerText": ["Vitamin K Antagonist"]
+      },
+      {
+        "type": "tf",
+        "prompt": "Heparin is considered an anticoagulant.",
         "answer": "True"
       },
       {
         "type": "mcq",
-        "prompt": "Which drug is classified as Nicotinic Acid?",
-        "choices": ["Niacin", "Rosuvastatin", "Fenofibrate", "Ezetimibe"],
-        "answer": "Niacin"
+        "prompt": "Which anticoagulant is commonly used in pregnancy (preferred over warfarin)?",
+        "choices": ["Heparin", "Warfarin", "Rivaroxaban", "Apixaban"],
+        "answer": "Heparin"
       },
       {
         "type": "short",
-        "prompt": "Drug class of Zetia?",
-        "answerText": "Cholesterol Absorption Inhibitor"
-      },
-      {
-        "type": "short",
-        "prompt": "Generic name of Lovaza?",
-        "answerText": ["Omega-3-acid ethyl esters", "Omega-3"]
+        "prompt": "Drug category of Rivaroxaban?",
+        "answerText": ["Anticoagulant"]
       },
       {
         "type": "mcq",
-        "prompt": "Which statin has the brand name Crestor?",
-        "choices": ["Rosuvastatin", "Atorvastatin", "Simvastatin", "Pravastatin"],
-        "answer": "Rosuvastatin"
-      },
-      {
-        "type": "tf",
-        "prompt": "Tricor is a Fibric Acid Derivative.",
-        "answer": "True"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which drug is an siRNA therapy?",
-        "choices": ["Inclisiran", "Ezetimibe", "Fenofibrate", "Niacin"],
-        "answer": "Inclisiran"
-      },
-      {
-        "type": "short",
-        "prompt": "Generic name of Pravachol?",
-        "answerText": "Pravastatin"
-      },
-      {
-        "type": "short",
-        "prompt": "Brand name of Atorvastatin?",
-        "answerText": "Lipitor"
-      },
-      {
-        "type": "tf",
-        "prompt": "Inclisiran is a PCSK9 monoclonal antibody.",
-        "answer": "False"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which drug is an Omega-3 fatty acid?",
-        "choices": ["Lovaza", "Zetia", "Tricor", "Praluent"],
-        "answer": "Lovaza"
+        "prompt": "Which drug has the brand name Eliquis?",
+        "choices": ["Apixaban", "Rivaroxaban", "Warfarin", "Enoxaparin"],
+        "answer": "Apixaban"
       }
     ],
     "hard": [
       {
         "type": "mcq",
-        "prompt": "Statins work by inhibiting which enzyme?",
-        "choices": ["HMG-CoA Reductase", "PPAR-α", "PCSK9", "Lipase"],
-        "answer": "HMG-CoA Reductase"
+        "prompt": "Which anticoagulant requires INR monitoring?",
+        "choices": ["Warfarin", "Apixaban", "Rivaroxaban", "Enoxaparin"],
+        "answer": "Warfarin"
       },
       {
         "type": "tf",
-        "prompt": "Ezetimibe reduces cholesterol absorption in the intestine.",
-        "answer": "True"
-      },
-      {
-        "type": "short",
-        "prompt": "Fenofibrate activates which receptor?",
-        "answerText": ["PPAR-α", "Peroxisome proliferator-activated receptor alpha"]
-      },
-      {
-        "type": "mcq",
-        "prompt": "Niacin reduces production of which lipoprotein?",
-        "choices": ["VLDL", "HDL", "LDL receptor", "PCSK9"],
-        "answer": "VLDL"
-      },
-      {
-        "type": "short",
-        "prompt": "Mechanism of PCSK9 inhibitors?",
-        "answerText": ["Prevent LDL receptor degradation", "Increase LDL receptors"]
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which drug increases lipoprotein lipase activity?",
-        "choices": ["Omega-3 acid ethyl esters", "Ezetimibe", "Niacin", "Pravastatin"],
-        "answer": "Omega-3 acid ethyl esters"
-      },
-      {
-        "type": "short",
-        "prompt": "Generic name of Repatha?",
-        "answerText": "Evolocumab"
-      },
-      {
-        "type": "short",
-        "prompt": "Generic name of Praluent?",
-        "answerText": "Alirocumab"
-      },
-      {
-        "type": "tf",
-        "prompt": "Inclisiran is given as an injection.",
-        "answer": "True"
-      },
-      {
-        "type": "short",
-        "prompt": "Brand name of Ezetimibe?",
-        "answerText": "Zetia"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which drug is a Cholesterol Absorption Inhibitor?",
-        "choices": ["Ezetimibe", "Niacin", "Fenofibrate", "Omega-3"],
-        "answer": "Ezetimibe"
-      },
-      {
-        "type": "short",
-        "prompt": "Drug class of Leqvio?",
-        "answerText": "siRNA Agent"
-      },
-      {
-        "type": "tf",
-        "prompt": "Alirocumab is a PCSK9 inhibitor.",
-        "answer": "True"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which of the following are statins?",
-        "choices": ["Simvastatin and Atorvastatin", "Ezetimibe and Niacin", "Lovaza and Zetia", "Inclisiran and Evolocumab"],
-        "answer": "Simvastatin and Atorvastatin"
-      },
-      {
-        "type": "short",
-        "prompt": "Brand name of Rosuvastatin?",
-        "answerText": "Crestor"
-      },
-      {
-        "type": "short",
-        "prompt": "Brand name of Pravastatin?",
-        "answerText": "Pravachol"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which drugs are PCSK9 inhibitors?",
-        "choices": ["Evolocumab and Alirocumab", "Niacin and Fenofibrate", "Ezetimibe and Lovaza", "Simvastatin and Rosuvastatin"],
-        "answer": "Evolocumab and Alirocumab"
-      },
-      {
-        "type": "tf",
-        "prompt": "Niacin is sometimes called Vitamin B3.",
-        "answer": "True"
-      },
-      {
-        "type": "short",
-        "prompt": "Brand name of Simvastatin?",
-        "answerText": "Zocor"
-      },
-      {
-        "type": "short",
-        "prompt": "Brand name of Atorvastatin?",
-        "answerText": "Lipitor"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which drug reduces LDL cholesterol the most?",
-        "choices": ["Statins", "Niacin", "Omega-3", "Fibrates"],
-        "answer": "Statins"
-      },
-      {
-        "type": "tf",
-        "prompt": "Ezetimibe is a statin.",
+        "prompt": "Rivaroxaban directly inhibits thrombin (Factor IIa).",
         "answer": "False"
       },
       {
         "type": "short",
-        "prompt": "Generic name of Tricor?",
-        "answerText": "Fenofibrate"
-      },
-      {
-        "type": "short",
-        "prompt": "Generic name of Lovaza?",
-        "answerText": ["Omega-3-acid ethyl esters", "Omega-3"]
+        "prompt": "Which clotting factors does Warfarin inhibit?",
+        "answerText": ["II, VII, IX, X", "2, 7, 9, 10"]
       },
       {
         "type": "mcq",
-        "prompt": "Which drug lowers cholesterol absorption but does NOT inhibit HMG-CoA reductase?",
-        "choices": ["Ezetimibe", "Niacin", "Fenofibrate", "Omega-3"],
-        "answer": "Ezetimibe"
+        "prompt": "Enoxaparin works by enhancing activity of?",
+        "choices": ["Antithrombin III", "Vitamin K", "Factor Xa", "Thrombin"],
+        "answer": "Antithrombin III"
+      },
+      {
+        "type": "short",
+        "prompt": "Generic name of Lovenox?",
+        "answerText": ["Enoxaparin"]
+      },
+      {
+        "type": "tf",
+        "prompt": "Apixaban is a direct Factor Xa inhibitor.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drug is classified as LMWH?",
+        "choices": ["Enoxaparin", "Heparin", "Rivaroxaban", "Warfarin"],
+        "answer": "Enoxaparin"
+      },
+      {
+        "type": "short",
+        "prompt": "Brand name of Rivaroxaban?",
+        "answerText": ["Xarelto"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which anticoagulants are DOACs (Direct Oral Anticoagulants)?",
+        "choices": ["Apixaban and Rivaroxaban", "Warfarin and Heparin", "Enoxaparin and Warfarin", "All of the above"],
+        "answer": "Apixaban and Rivaroxaban"
+      },
+      {
+        "type": "tf",
+        "prompt": "Heparin directly inhibits Factor Xa without antithrombin.",
+        "answer": "False"
+      },
+      {
+        "type": "short",
+        "prompt": "Generic name of Hep-Lock?",
+        "answerText": ["Heparin"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which anticoagulant is safest to use in pregnancy?",
+        "choices": ["Heparin", "Rivaroxaban", "Apixaban", "Warfarin"],
+        "answer": "Heparin"
+      },
+      {
+        "type": "short",
+        "prompt": "Drug class of Eliquis?",
+        "answerText": ["Direct Factor Xa Inhibitor"]
+      },
+      {
+        "type": "tf",
+        "prompt": "Vitamin K is the antidote for Warfarin toxicity.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which anticoagulant is most associated with HIT (Heparin-Induced Thrombocytopenia)?",
+        "choices": ["Heparin", "Enoxaparin", "Warfarin", "Apixaban"],
+        "answer": "Heparin"
+      },
+      {
+        "type": "short",
+        "prompt": "Brand name of Warfarin?",
+        "answerText": ["Coumadin", "Jantoven"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which anticoagulant prevents conversion of prothrombin to thrombin?",
+        "choices": ["Rivaroxaban", "Apixaban", "Heparin", "All of the above"],
+        "answer": "All of the above"
+      },
+      {
+        "type": "short",
+        "prompt": "Brand name of Enoxaparin?",
+        "answerText": ["Lovenox"]
+      },
+      {
+        "type": "tf",
+        "prompt": "Warfarin has a delayed onset of action compared to DOACs.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which anticoagulant is reversed with protamine sulfate?",
+        "choices": ["Heparin", "Enoxaparin", "Both Heparin and Enoxaparin", "Warfarin"],
+        "answer": "Both Heparin and Enoxaparin"
+      },
+      {
+        "type": "short",
+        "prompt": "Generic name of Eliquis?",
+        "answerText": ["Apixaban"]
+      },
+      {
+        "type": "short",
+        "prompt": "Drug class of Lovenox?",
+        "answerText": ["Low Molecular Weight Heparin", "LMWH"]
+      },
+      {
+        "type": "tf",
+        "prompt": "Rivaroxaban requires routine INR monitoring.",
+        "answer": "False"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drug is a Vitamin K antagonist?",
+        "choices": ["Warfarin", "Apixaban", "Enoxaparin", "Rivaroxaban"],
+        "answer": "Warfarin"
+      },
+      {
+        "type": "short",
+        "prompt": "Which anticoagulant enhances antithrombin III?",
+        "answerText": ["Heparin", "Enoxaparin"]
       }
     ]
   }
