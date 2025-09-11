@@ -11,299 +11,357 @@
       },
       {
         "type": "mcq",
-        "prompt": "Proline is unique because:",
-        "choices": ["It is achiral", "It forms a rigid cyclic structure", "It contains sulfur", "It is aromatic"],
-        "answer": "It forms a rigid cyclic structure"
+        "prompt": "Which amino acid has a side chain that forms a ring with its own amino group?",
+        "choices": ["Proline", "Histidine", "Serine", "Cysteine"],
+        "answer": "Proline"
       },
       {
         "type": "short",
-        "prompt": "What type of bond links amino acids in the primary structure of proteins?",
-        "answer": "Peptide bond (amide bond)",
-        "answerText": ["peptide bond", "amide bond", "peptide (amide) bond", "peptide linkage", "amide linkage"]
+        "prompt": "What is the term for the pH at which an amino acid has no net charge?",
+        "answer": "Isoelectric point (pI)",
+        "answerText": ["isoelectric point", "pi"]
       },
       {
         "type": "mcq",
-        "prompt": "Which level of protein structure involves α-helices and β-sheets?",
+        "prompt": "Which amino acid can absorb UV light strongly at 280 nm?",
+        "choices": ["Alanine", "Histidine", "Tryptophan", "Cysteine"],
+        "answer": "Tryptophan"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which amino acid can form disulfide bonds?",
+        "choices": ["Serine", "Cysteine", "Threonine", "Glutamine"],
+        "answer": "Cysteine"
+      },
+      {
+        "type": "short",
+        "prompt": "What type of bond links amino acids in proteins?",
+        "answer": "Peptide bond",
+        "answerText": ["peptide bond", "amide bond", "peptide linkage"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which protein level of structure involves α-helices and β-sheets?",
         "choices": ["Primary", "Secondary", "Tertiary", "Quaternary"],
         "answer": "Secondary"
       },
       {
         "type": "mcq",
+        "prompt": "Which protein is fibrous?",
+        "choices": ["Hemoglobin", "Keratin", "Myoglobin", "Albumin"],
+        "answer": "Keratin"
+      },
+      {
+        "type": "mcq",
         "prompt": "Which of the following is a globular protein?",
-        "choices": ["Collagen", "Hemoglobin", "Keratin", "Elastin"],
+        "choices": ["Collagen", "Elastin", "Hemoglobin", "Keratin"],
         "answer": "Hemoglobin"
       },
       {
-        "type": "mcq",
-        "prompt": "Which of the following proteins is fibrous?",
-        "choices": ["Myoglobin", "Hemoglobin", "Collagen", "Catalase"],
-        "answer": "Collagen"
+        "type": "short",
+        "prompt": "The repeating sequence in collagen is ______.",
+        "answer": "Gly–X–Y",
+        "answerText": ["gly-x-y", "glycine proline hydroxyproline", "gly-pro-hyp"]
       },
       {
         "type": "mcq",
-        "prompt": "Which enzyme model describes flexibility and conformational change on substrate binding?",
-        "choices": ["Lock and Key", "Induced Fit", "Zymogen", "Allosteric"],
+        "prompt": "Which protein stores oxygen in muscle?",
+        "choices": ["Hemoglobin", "Myoglobin", "Collagen", "Albumin"],
+        "answer": "Myoglobin"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which effect describes Hb releasing more O₂ in tissues with low pH?",
+        "choices": ["Hill effect", "Bohr effect", "Pasteur effect", "Warburg effect"],
+        "answer": "Bohr effect"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which molecule stabilizes the T-state of Hb?",
+        "choices": ["2,3-BPG", "ATP", "NADH", "CO₂"],
+        "answer": "2,3-BPG"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which enzyme model allows for conformational change?",
+        "choices": ["Lock & Key", "Induced Fit", "Allosteric", "Isoenzyme"],
         "answer": "Induced Fit"
       },
       {
-        "type": "short",
-        "prompt": "What is the general suffix for enzyme names?",
-        "answer": "ase",
-        "answerText": ["ase"]
-      },
-      {
         "type": "mcq",
-        "prompt": "Which class of enzymes catalyzes oxidation-reduction reactions?",
+        "prompt": "Which class of enzymes catalyzes oxidation-reduction?",
         "choices": ["Hydrolases", "Ligases", "Oxidoreductases", "Transferases"],
         "answer": "Oxidoreductases"
       },
       {
         "type": "short",
-        "prompt": "Name the disaccharide composed of glucose + galactose.",
-        "answer": "Lactose",
-        "answerText": ["lactose"]
+        "prompt": "What suffix do most enzyme names end in?",
+        "answer": "ase",
+        "answerText": ["ase"]
       },
       {
         "type": "mcq",
-        "prompt": "Cellulose has which type of glycosidic linkage?",
-        "choices": ["α-1,4", "α-1,6", "β-1,4", "β-1,6"],
-        "answer": "β-1,4"
+        "prompt": "Which enzyme is required to unwind DNA strands?",
+        "choices": ["Ligase", "Topoisomerase", "Helicase", "Polymerase"],
+        "answer": "Helicase"
       },
       {
         "type": "mcq",
-        "prompt": "Which polysaccharide is highly branched with α-1,6 linkages every ~10 residues?",
-        "choices": ["Cellulose", "Amylose", "Amylopectin", "Glycogen"],
-        "answer": "Glycogen"
+        "prompt": "Which enzyme joins Okazaki fragments?",
+        "choices": ["DNA Polymerase I", "DNA Polymerase III", "Ligase", "Primase"],
+        "answer": "Ligase"
       },
       {
         "type": "mcq",
-        "prompt": "In DNA, adenine pairs with ______ by how many hydrogen bonds?",
-        "choices": ["Cytosine, 3 bonds", "Thymine, 2 bonds", "Uracil, 3 bonds", "Thymine, 3 bonds"],
-        "answer": "Thymine, 2 bonds"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which base is unique to RNA?",
-        "choices": ["Cytosine", "Uracil", "Thymine", "Adenine"],
-        "answer": "Uracil"
-      },
-      {
-        "type": "short",
-        "prompt": "Which enzyme unwinds DNA during replication?",
-        "answer": "Helicase",
-        "answerText": ["helicase", "dna helicase"]
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which RNA carries amino acids during translation?",
+        "prompt": "Which RNA brings amino acids to ribosomes?",
         "choices": ["mRNA", "rRNA", "tRNA", "snRNA"],
         "answer": "tRNA"
       },
       {
+        "type": "short",
+        "prompt": "What is the start codon for translation?",
+        "answer": "AUG",
+        "answerText": ["aug", "start codon aug", "methionine"]
+      },
+      {
+        "type": "short",
+        "prompt": "Name one stop codon.",
+        "answer": "UAA",
+        "answerText": ["uaa", "uag", "uga", "stop codon"]
+      },
+      {
         "type": "mcq",
-        "prompt": "Which carbohydrate is found in plant cell walls?",
-        "choices": ["Glycogen", "Cellulose", "Starch", "Amylopectin"],
+        "prompt": "Which base is unique to RNA?",
+        "choices": ["Uracil", "Thymine", "Cytosine", "Adenine"],
+        "answer": "Uracil"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which sugar is found in RNA?",
+        "choices": ["Deoxyribose", "Ribose", "Glucose", "Fructose"],
+        "answer": "Ribose"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which polysaccharide has β-1,4 linkages and is indigestible to humans?",
+        "choices": ["Starch", "Amylopectin", "Glycogen", "Cellulose"],
         "answer": "Cellulose"
       },
       {
         "type": "mcq",
-        "prompt": "What is the start codon in translation?",
-        "choices": ["UAA", "UGA", "AUG", "UAG"],
-        "answer": "AUG"
+        "prompt": "Which disaccharide is composed of glucose + galactose?",
+        "choices": ["Sucrose", "Lactose", "Maltose", "Cellobiose"],
+        "answer": "Lactose"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which polysaccharide is the major storage form of glucose in animals?",
+        "choices": ["Cellulose", "Glycogen", "Starch", "Amylose"],
+        "answer": "Glycogen"
       },
       {
         "type": "short",
-        "prompt": "Which amino acid can form disulfide bonds?",
-        "answer": "Cysteine",
-        "answerText": ["cysteine", "cys"]
+        "prompt": "Name one glycosaminoglycan (GAG).",
+        "answer": "Hyaluronan",
+        "answerText": ["hyaluronan", "hyaluronic acid", "chondroitin", "heparin", "dermatan", "keratan"]
       },
       {
         "type": "mcq",
-        "prompt": "Which post-translational modification is most common in enzyme regulation?",
-        "choices": ["Hydroxylation", "Phosphorylation", "Glycosylation", "Nitration"],
-        "answer": "Phosphorylation"
-      }
-    ],
-    "hard": [
-      {
-        "type": "mcq",
-        "prompt": "Which amino acid is commonly found in collagen and allows tight packing of the triple helix?",
-        "choices": ["Proline", "Glycine", "Cysteine", "Lysine"],
-        "answer": "Glycine"
-      },
-      {
-        "type": "short",
-        "prompt": "What type of mutation causes Sickle Cell Disease? Be specific about the amino acid substitution.",
-        "answer": "Point mutation in β-globin: Glutamate → Valine at position 6",
-        "answerText": [
-          "glu to val at beta 6",
-          "glutamate to valine at position 6",
-          "e6v in beta globin",
-          "point mutation glu→val (β6)",
-          "glu->val beta 6"
-        ]
-      },
-      {
-        "type": "short",
-        "prompt": "Explain the Bohr Effect in hemoglobin.",
-        "answer": "↓pH/↑CO₂ decreases Hb O₂ affinity (promotes O₂ release)",
-        "answerText": [
-          "low ph and high co2 decrease hemoglobin oxygen affinity",
-          "↓ph/↑co2 → ↓o2 affinity",
-          "bohr effect: acid and co2 shift curve right",
-          "right shift with ↑co2/↓ph"
-        ]
+        "prompt": "Which viral protein binds sialic acid on host cells?",
+        "choices": ["Hemagglutinin", "Neuraminidase", "Polymerase", "Integrase"],
+        "answer": "Hemagglutinin"
       },
       {
         "type": "mcq",
-        "prompt": "Competitive inhibition changes enzyme kinetics in which way?",
-        "choices": [
-          "Increases Km, no change in Vmax",
-          "Decreases Km, decreases Vmax",
-          "No change in Km, decreases Vmax",
-          "Increases Km, decreases Vmax"
-        ],
-        "answer": "Increases Km, no change in Vmax"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Noncompetitive inhibition changes enzyme kinetics in which way?",
-        "choices": [
-          "Vmax decreases, Km unchanged",
-          "Km decreases, Vmax unchanged",
-          "Both Km and Vmax decrease",
-          "Km increases, Vmax unchanged"
-        ],
-        "answer": "Vmax decreases, Km unchanged"
-      },
-      {
-        "type": "short",
-        "prompt": "Name one glycosaminoglycan and its function.",
-        "answer": "Hyaluronan—joint lubrication; Chondroitin—cartilage strength; Heparin—anticoagulant",
-        "answerText": [
-          "hyaluronan",
-          "hyaluronic acid",
-          "chondroitin sulfate",
-          "heparin",
-          "dermatan sulfate",
-          "keratan sulfate"
-        ]
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which DNA polymerase proofreads new DNA strands in prokaryotes?",
+        "prompt": "Which enzyme removes primers in DNA replication?",
         "choices": ["DNA Pol I", "DNA Pol II", "DNA Pol III", "Ligase"],
         "answer": "DNA Pol I"
       },
       {
-        "type": "short",
-        "prompt": "What is the difference between HbA1c and HbA?",
-        "answer": "HbA1c is glycosylated hemoglobin; HbA is normal adult hemoglobin (α2β2).",
-        "answerText": [
-          "hba1c is glycated hemoglobin",
-          "hba1c = glycosylated hemoglobin",
-          "hba is adult hemoglobin a (alpha2 beta2)"
-        ]
-      },
-      {
-        "type": "short",
-        "prompt": "What is the key repeating sequence in collagen's α-chain?",
-        "answer": "Gly–X–Y (X = Pro, Y = Hyp)",
-        "answerText": [
-          "gly x y",
-          "gly–x–y",
-          "gly pro hyp",
-          "glycine proline hydroxyproline",
-          "gly-x-y (x=pro, y=hyp)"
-        ]
-      },
-      {
-        "type": "short",
-        "prompt": "Why is hydroxyproline important in collagen?",
-        "answer": "Stabilizes triple helix via hydrogen bonding",
-        "answerText": [
-          "stabilizes collagen triple helix",
-          "enhances hydrogen bonding in collagen",
-          "triple helix stability"
-        ]
+        "type": "mcq",
+        "prompt": "Which nucleic acid base pairs with guanine?",
+        "choices": ["Adenine", "Cytosine", "Thymine", "Uracil"],
+        "answer": "Cytosine"
       },
       {
         "type": "mcq",
-        "prompt": "Which enzyme catalyzes the joining of Okazaki fragments?",
-        "choices": ["DNA Polymerase I", "DNA Polymerase III", "Ligase", "Topoisomerase"],
-        "answer": "Ligase"
+        "prompt": "How many hydrogen bonds form between G and C?",
+        "choices": ["2", "3", "4", "1"],
+        "answer": "3"
       },
       {
         "type": "short",
-        "prompt": "Name two enzymes that relieve supercoiling during DNA replication.",
-        "answer": "Topoisomerase and DNA gyrase",
-        "answerText": [
-          "topoisomerase and gyrase",
-          "dna gyrase and topoisomerase",
-          "topoisomerase i and topoisomerase ii",
-          "gyrase"
-        ]
-      },
-      {
-        "type": "short",
-        "prompt": "What causes Osteogenesis Imperfecta at the molecular level?",
-        "answer": "Glycine substitutions in collagen prevent proper triple-helix formation",
-        "answerText": [
-          "glycine substitution in collagen",
-          "mutation replacing glycine in collagen",
-          "collagen triple helix disruption by gly substitution"
-        ]
-      },
-      {
-        "type": "short",
-        "prompt": "Name the three stop codons.",
-        "answer": "UAA, UGA, UAG",
-        "answerText": ["uaa uga uag", "uag uaa uga", "uga uaa uag", "u a a, u g a, u a g"]
+        "prompt": "What enzyme proofreads newly synthesized DNA?",
+        "answer": "DNA Polymerase I",
+        "answerText": ["dna polymerase i", "pol i"]
       },
       {
         "type": "mcq",
-        "prompt": "Which enzyme catalyzes phosphorylation of glucose to glucose-6-phosphate?",
-        "choices": ["Glucokinase", "Hexokinase", "Both", "Neither"],
-        "answer": "Both"
-      },
+        "prompt": "Which RNA type forms the ribosome?",
+        "choices": ["mRNA", "rRNA", "tRNA", "siRNA"],
+        "answer": "rRNA"
+      }
+    ],
+    "hard": [
       {
         "type": "short",
-        "prompt": "What's the difference between amylose and amylopectin?",
-        "answer": "Amylose: α-1,4 linear; Amylopectin: α-1,4 with α-1,6 branches",
-        "answerText": [
-          "amylose is linear α-1,4",
-          "amylopectin is branched α-1,4 and α-1,6",
-          "amylose linear; amylopectin branched"
-        ]
+        "prompt": "What is the amino acid substitution in Sickle Cell Disease?",
+        "answer": "Glu → Val at β6",
+        "answerText": ["glu to val beta 6", "glutamate to valine at position 6", "e6v mutation"]
       },
       {
         "type": "mcq",
-        "prompt": "Which unusual amino acid is considered the '21st amino acid'?",
-        "choices": ["Selenocysteine", "Pyrrolysine", "Desmosine", "Hydroxylysine"],
-        "answer": "Selenocysteine"
+        "prompt": "Which amino acid has an imidazole side chain and buffers near pH 7?",
+        "choices": ["Histidine", "Arginine", "Lysine", "Cysteine"],
+        "answer": "Histidine"
       },
       {
         "type": "short",
-        "prompt": "What enzyme is targeted by penicillin?",
-        "answer": "Bacterial transpeptidase (peptidoglycan cross-linking enzyme)",
-        "answerText": [
-          "transpeptidase",
-          "penicillin binding protein",
-          "pbp",
-          "cell wall transpeptidase"
-        ]
+        "prompt": "What repeating sequence is found in collagen?",
+        "answer": "Gly–X–Y",
+        "answerText": ["gly-x-y", "gly pro hyp", "glycine proline hydroxyproline"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Vitamin C deficiency weakens which structural protein?",
+        "choices": ["Hemoglobin", "Collagen", "Elastin", "Myoglobin"],
+        "answer": "Collagen"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which protein is mutated in Marfan syndrome?",
+        "choices": ["Collagen", "Elastin", "Fibrillin", "Keratin"],
+        "answer": "Fibrillin"
+      },
+      {
+        "type": "short",
+        "prompt": "Which molecule stabilizes the T-state of hemoglobin?",
+        "answer": "2,3-BPG",
+        "answerText": ["2,3-bpg", "bpg", "bisphosphoglycerate"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Competitive inhibition results in:",
+        "choices": [
+          "↑ Km, Vmax unchanged",
+          "↓ Km, ↓ Vmax",
+          "Km unchanged, Vmax ↓",
+          "↑ Km, Vmax ↓"
+        ],
+        "answer": "↑ Km, Vmax unchanged"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Noncompetitive inhibition results in:",
+        "choices": [
+          "Vmax ↓, Km unchanged",
+          "Km ↓, Vmax unchanged",
+          "Km ↑, Vmax unchanged",
+          "Km ↓, Vmax ↓"
+        ],
+        "answer": "Vmax ↓, Km unchanged"
       },
       {
         "type": "short",
         "prompt": "What enzyme is inhibited by NSAIDs?",
         "answer": "Cyclooxygenase (COX)",
-        "answerText": ["cyclooxygenase", "cox", "cox-1", "cox-2"]
+        "answerText": ["cox", "cyclooxygenase", "cox-1", "cox-2"]
       },
       {
         "type": "short",
         "prompt": "What enzyme is inhibited by ACE inhibitors?",
         "answer": "Angiotensin-converting enzyme (ACE)",
-        "answerText": ["angiotensin converting enzyme", "ace"]
+        "answerText": ["ace", "angiotensin converting enzyme"]
+      },
+      {
+        "type": "short",
+        "prompt": "What bacterial enzyme is blocked by penicillin?",
+        "answer": "Transpeptidase",
+        "answerText": ["transpeptidase", "penicillin binding protein", "pbp"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which linkage makes glycogen branched?",
+        "choices": ["α-1,4", "α-1,6", "β-1,4", "β-1,6"],
+        "answer": "α-1,6"
+      },
+      {
+        "type": "short",
+        "prompt": "What linkage is found in cellulose?",
+        "answer": "β-1,4",
+        "answerText": ["beta-1,4", "β 1→4"]
+      },
+      {
+        "type": "short",
+        "prompt": "What linkage is found in amylose?",
+        "answer": "α-1,4",
+        "answerText": ["alpha-1,4", "α 1→4"]
+      },
+      {
+        "type": "short",
+        "prompt": "Name one glycosaminoglycan used in joints.",
+        "answer": "Hyaluronan",
+        "answerText": ["hyaluronan", "hyaluronic acid"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which viral protein allows influenza entry by binding sialic acid?",
+        "choices": ["Hemagglutinin", "Neuraminidase", "Integrase", "Polymerase"],
+        "answer": "Hemagglutinin"
+      },
+      {
+        "type": "short",
+        "prompt": "Which enzyme removes primers in DNA replication?",
+        "answer": "DNA Polymerase I",
+        "answerText": ["dna pol i", "pol i", "polymerase i"]
+      },
+      {
+        "type": "short",
+        "prompt": "Which enzyme elongates the leading strand?",
+        "answer": "DNA Polymerase III",
+        "answerText": ["dna pol iii", "pol iii"]
+      },
+      {
+        "type": "short",
+        "prompt": "Which enzyme relieves supercoiling during DNA replication?",
+        "answer": "Topoisomerase",
+        "answerText": ["topoisomerase", "dna gyrase", "gyrase"]
+      },
+      {
+        "type": "short",
+        "prompt": "Which enzyme joins Okazaki fragments?",
+        "answer": "Ligase",
+        "answerText": ["ligase", "dna ligase"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which base pairs with guanine?",
+        "choices": ["Adenine", "Cytosine", "Thymine", "Uracil"],
+        "answer": "Cytosine"
+      },
+      {
+        "type": "short",
+        "prompt": "How many hydrogen bonds form between A and T?",
+        "answer": "2",
+        "answerText": ["2", "two"]
+      },
+      {
+        "type": "short",
+        "prompt": "How many hydrogen bonds form between G and C?",
+        "answer": "3",
+        "answerText": ["3", "three"]
+      },
+      {
+        "type": "short",
+        "prompt": "What is the start codon for translation?",
+        "answer": "AUG",
+        "answerText": ["aug", "methionine", "start codon"]
+      },
+      {
+        "type": "short",
+        "prompt": "Name all three stop codons.",
+        "answer": "UAA, UAG, UGA",
+        "answerText": ["uaa, uag, uga", "uag, uga, uaa", "stop codons"]
       }
     ]
   }
