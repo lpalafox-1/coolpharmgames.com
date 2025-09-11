@@ -382,7 +382,18 @@ function restart(){
   state.index = 0; state.score = 0; state.review = false;
   state.currentStreak = 0; state.bestStreak = 0;
   state.marked = new Set();
-  state.questions.forEach(q => Object.assign(q, {_answered:false,_correct:false,_user:null}));
+  
+  // Randomize question order on restart
+  shuffleInPlace(state.questions);
+  
+  // Re-shuffle multiple choice answers for each question
+  state.questions.forEach(q => {
+    Object.assign(q, {_answered:false,_correct:false,_user:null});
+    if (Array.isArray(q.choices)) {
+      q._choices = shuffledCopy(q.choices);
+    }
+  });
+  
   els.results.classList.add("hidden");
   els.card.classList.remove("hidden");
   els.check.classList.remove("hidden");
