@@ -1,428 +1,60 @@
 {
- "id": "lab-quiz5-anticoagulants",
-  "title": "Lab Quiz 5 Antiarrhythmics",
+  "id": "lab-quiz5-antiarrhythmics",
+  "title": "Lab Quiz 5 - Antiarrhythmics (Balanced P1)",
   "pools": {
     "easy": [
-      {
-        "type": "mcq",
-        "prompt": "What is the brand name of amiodarone?",
-        "choices": [
-          "Cordarone",
-          "Tambocor",
-          "Betapace",
-          "Rythmol"
-        ],
-        "answer": "Cordarone"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Flecainide belongs to which antiarrhythmic class?",
-        "choices": [
-          "Class I",
-          "Class II",
-          "Class III",
-          "Class IV"
-        ],
-        "answer": "Class I "
-      },
-      {
-        "type": "mcq",
-        "prompt": "What is the generic name of Tikosyn?",
-        "choices": [
-          "Dofetilide",
-          "Sotalol",
-          "Propafenone",
-          "Amiodarone"
-        ],
-        "answer": "Dofetilide"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which antiarrhythmic is also a non-selective beta-blocker?",
-        "choices": [
-          "Sotalol",
-          "Dofetilide",
-          "Amiodarone",
-          "Procainamide"
-        ],
-        "answer": "Sotalol"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Propafenone belongs to which antiarrhythmic class?",
-        "choices": [
-          "Class I",
-          "Class II",
-          "Class III",
-          "Class IV"
-        ],
-        "answer": "Class I"
-      },
-      {
-        "type": "mcq",
-        "prompt": "What is the brand name of flecainide?",
-        "choices": [
-          "Tambocor",
-          "Cordarone",
-          "Rythmol",
-          "Tikosyn"
-        ],
-        "answer": "Tambocor"
-      },
-      {
-        "type": "mcq",
-        "prompt": "What is the brand name of propafenone?",
-        "choices": [
-          "Tikosyn",
-          "Rythmol",
-          "Cordarone",
-          "Betapace"
-        ],
-        "answer": "Rythmol"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which class does dofetilide belong to?",
-        "choices": [
-          "Class I",
-          "Class II",
-          "Class III",
-          "Class IV"
-        ],
-        "answer": "Class III"
-      },
-      {
-        "type": "mcq",
-        "prompt": "What is the generic name of Betapace?",
-        "choices": [
-          "Amiodarone",
-          "Sotalol",
-          "Flecainide",
-          "Dofetilide"
-        ],
-        "answer": "Sotalol"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which of these is a potassium channel blocker?",
-        "choices": [
-          "Amiodarone",
-          "Flecainide",
-          "Propafenone",
-          "Lidocaine"
-        ],
-        "answer": "Amiodarone"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Amiodarone is which Vaughan Williams class?",
-        "choices": [
-          "Class I",
-          "Class II",
-          "Class III",
-          "Class IV"
-        ],
-        "answer": "Class III"
-      },
-      {
-        "type": "mcq",
-        "prompt": "What is the primary indication for antiarrhythmic drugs?",
-        "choices": [
-          "Hypertension",
-          "Arrhythmias",
-          "Diabetes",
-          "Angina"
-        ],
-        "answer": "Arrhythmias"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which drug is most associated with QT prolongation?",
-        "choices": [
-          "Dofetilide",
-          "Amiodarone",
-          "Sotalol",
-          "Propafenone"
-        ],
-        "answer": "Dofetilide"
-      },
-      {
-        "type": "mcq",
-        "prompt": "What is the brand name of dofetilide?",
-        "choices": [
-          "Tikosyn",
-          "Cordarone",
-          "Tambocor",
-          "Betapace"
-        ],
-        "answer": "Tikosyn"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which antiarrhythmic has both beta-blocking and Class III properties?",
-        "choices": [
-          "Sotalol",
-          "Amiodarone",
-          "Propafenone",
-          "Flecainide"
-        ],
-        "answer": "Sotalol"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which antiarrhythmic is a Class Ic agent?",
-        "choices": [
-          "Flecainide",
-          "Amiodarone",
-          "Dofetilide",
-          "Sotalol"
-        ],
-        "answer": "Flecainide"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which drug is available as an oral capsule called Rythmol SR?",
-        "choices": [
-          "Propafenone",
-          "Flecainide",
-          "Sotalol",
-          "Amiodarone"
-        ],
-        "answer": "Propafenone"
-      },
-      {
-        "type": "mcq",
-        "prompt": "What is the therapeutic class of flecainide?",
-        "choices": [
-          "Antiarrhythmic",
-          "Antihypertensive",
-          "Antilipemic",
-          "Anticoagulant"
-        ],
-        "answer": "Antiarrhythmic"
-      },
-      {
-        "type": "mcq",
-        "prompt": "What is the therapeutic class of sotalol?",
-        "choices": [
-          "Beta-blocker",
-          "Antiarrhythmic",
-          "Both",
-          "Neither"
-        ],
-        "answer": "Both"
-      }
+      { "type": "mcq", "prompt": "Amiodarone belongs to which Vaughan Williams class?", "choices": ["Class I", "Class II", "Class III", "Class IV"], "answer": "Class III" },
+      { "type": "short", "prompt": "Brand name(s) of amiodarone tablets?", "answerText": ["Pacerone", "Cordarone"] },
+      { "type": "short", "prompt": "Brand name of IV amiodarone (premix)?", "answerText": ["Nexterone"] },
+      { "type": "mcq", "prompt": "Sotalol (Betapace) is primarily classified as:", "choices": ["Class II β-blocker", "Class III antiarrhythmic", "Class Ib", "Class IV"], "answer": "Class III antiarrhythmic" },
+      { "type": "tf", "prompt": "Sotalol has both nonselective beta-blocking and Class III (K+ block) properties.", "answer": "True" },
+      { "type": "short", "prompt": "Generic name of Betapace?", "answerText": ["Sotalol"] },
+      { "type": "mcq", "prompt": "Dofetilide belongs to which class?", "choices": ["Class Ia", "Class Ib", "Class Ic", "Class III"], "answer": "Class III" },
+      { "type": "short", "prompt": "Brand name of dofetilide?", "answerText": ["Tikosyn"] },
+      { "type": "tf", "prompt": "Dofetilide and amiodarone both block cardiac potassium channels.", "answer": "True" },
+      { "type": "mcq", "prompt": "Lidocaine's antiarrhythmic class is:", "choices": ["Class Ib", "Class Ia", "Class Ic", "Class III"], "answer": "Class Ib" },
+      { "type": "short", "prompt": "Common brand for lidocaine injection?", "answerText": ["Xylocaine"] },
+      { "type": "tf", "prompt": "Lidocaine inhibits fast sodium channels.", "answer": "True" },
+      { "type": "mcq", "prompt": "Digoxin is best described as:", "choices": ["Cardiac glycoside", "Class III antiarrhythmic", "Class IV CCB", "ACE inhibitor"], "answer": "Cardiac glycoside" },
+      { "type": "tf", "prompt": "Digoxin slows AV node conduction.", "answer": "True" },
+      { "type": "short", "prompt": "Brand name of digoxin?", "answerText": ["Lanoxin"] },
+      { "type": "mcq", "prompt": "Which drug is an antiarrhythmic AND a local anesthetic?", "choices": ["Lidocaine", "Digoxin", "Sotalol", "Dofetilide"], "answer": "Lidocaine" },
+      { "type": "tf", "prompt": "All five drugs listed (amiodarone, sotalol, lidocaine, digoxin, dofetilide) are used as antiarrhythmics.", "answer": "True" },
+      { "type": "short", "prompt": "Drug category of Tikosyn?", "answerText": ["Antiarrhythmic"] },
+      { "type": "mcq", "prompt": "Which blocks cholesterol absorption at the brush border?", "choices": ["Ezetimibe", "Amiodarone", "Sotalol", "Dofetilide"], "answer": "Ezetimibe" },
+      { "type": "tf", "prompt": "Amiodarone prolongs the cardiac action potential and refractory period.", "answer": "True" },
+      { "type": "mcq", "prompt": "Which agent can also be described as a nonselective beta-blocker?", "choices": ["Sotalol", "Dofetilide", "Digoxin", "Lidocaine"], "answer": "Sotalol" },
+      { "type": "short", "prompt": "Vaughan Williams class of dofetilide?", "answerText": ["Class III", "III"] },
+      { "type": "short", "prompt": "Amiodarone primarily blocks which ion channel for antiarrhythmic effect?", "answerText": ["Potassium", "K+", "Potassium channels"] },
+      { "type": "mcq", "prompt": "Which drug is most associated with AV nodal slowing via parasympathetic effects?", "choices": ["Digoxin", "Lidocaine", "Sotalol", "Dofetilide"], "answer": "Digoxin" },
+      { "type": "short", "prompt": "Therapeutic class of all five focus drugs?", "answerText": ["Antiarrhythmic", "Antiarrhythmics"] }
     ],
     "hard": [
-      {
-        "type": "mcq",
-        "prompt": "Which antiarrhythmic blocks multiple ion channels (K+, Na+, Ca2+) and has alpha- and beta-blocking activity?",
-        "choices": [
-          "Amiodarone",
-          "Flecainide",
-          "Sotalol",
-          "Dofetilide"
-        ],
-        "answer": "Amiodarone"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which drug carries a black box warning for torsades de pointes due to QT prolongation?",
-        "choices": [
-          "Dofetilide",
-          "Amiodarone",
-          "Flecainide",
-          "Propafenone"
-        ],
-        "answer": "Dofetilide"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which antiarrhythmic has thyroid toxicity due to iodine content?",
-        "choices": [
-          "Amiodarone",
-          "Sotalol",
-          "Flecainide",
-          "Propafenone"
-        ],
-        "answer": "Amiodarone"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which antiarrhythmic is contraindicated in structural heart disease?",
-        "choices": [
-          "Flecainide",
-          "Amiodarone",
-          "Sotalol",
-          "Dofetilide"
-        ],
-        "answer": "Flecainide"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which antiarrhythmic has nonlinear pharmacokinetics and significant drug\u2013drug interactions (CYP2D6)?",
-        "choices": [
-          "Propafenone",
-          "Dofetilide",
-          "Sotalol",
-          "Flecainide"
-        ],
-        "answer": "Propafenone"
-      },
-      {
-        "type": "mcq",
-        "prompt": "What pulmonary adverse effect is associated with amiodarone?",
-        "choices": [
-          "Interstitial pneumonitis",
-          "Asthma exacerbation",
-          "COPD flare",
-          "Pulmonary embolism"
-        ],
-        "answer": "Interstitial pneumonitis"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which antiarrhythmic is renally eliminated and requires dose adjustment?",
-        "choices": [
-          "Dofetilide",
-          "Sotalol",
-          "Both",
-          "Neither"
-        ],
-        "answer": "Both"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which antiarrhythmic can cause metallic taste disturbances?",
-        "choices": [
-          "Propafenone",
-          "Flecainide",
-          "Amiodarone",
-          "Sotalol"
-        ],
-        "answer": "Propafenone"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which antiarrhythmic is known for photosensitivity and blue-gray skin discoloration?",
-        "choices": [
-          "Amiodarone",
-          "Sotalol",
-          "Dofetilide",
-          "Flecainide"
-        ],
-        "answer": "Amiodarone"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which antiarrhythmic should be initiated in a hospital with continuous ECG monitoring?",
-        "choices": [
-          "Dofetilide",
-          "Amiodarone",
-          "Flecainide",
-          "Propafenone"
-        ],
-        "answer": "Dofetilide"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which drug blocks sodium channels strongly (Class Ic) and slows conduction velocity?",
-        "choices": [
-          "Flecainide",
-          "Sotalol",
-          "Amiodarone",
-          "Dofetilide"
-        ],
-        "answer": "Flecainide"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which drug prolongs the action potential duration by blocking delayed rectifier potassium channels?",
-        "choices": [
-          "Sotalol",
-          "Flecainide",
-          "Propafenone",
-          "Amiodarone"
-        ],
-        "answer": "Sotalol"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which antiarrhythmic increases digoxin levels via P-glycoprotein inhibition?",
-        "choices": [
-          "Amiodarone",
-          "Sotalol",
-          "Flecainide",
-          "Dofetilide"
-        ],
-        "answer": "Amiodarone"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which antiarrhythmic has both membrane-stabilizing (Na+ channel) and beta-blocking effects?",
-        "choices": [
-          "Propafenone",
-          "Amiodarone",
-          "Flecainide",
-          "Sotalol"
-        ],
-        "answer": "Propafenone"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which drug is contraindicated with verapamil or cimetidine due to risk of increased levels and torsades?",
-        "choices": [
-          "Dofetilide",
-          "Sotalol",
-          "Propafenone",
-          "Amiodarone"
-        ],
-        "answer": "Dofetilide"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which antiarrhythmic requires thyroid function monitoring?",
-        "choices": [
-          "Amiodarone",
-          "Sotalol",
-          "Flecainide",
-          "Propafenone"
-        ],
-        "answer": "Amiodarone"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which antiarrhythmic may worsen asthma due to beta-blocking properties?",
-        "choices": [
-          "Sotalol",
-          "Amiodarone",
-          "Flecainide",
-          "Dofetilide"
-        ],
-        "answer": "Sotalol"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which antiarrhythmic has the longest half-life (weeks)?",
-        "choices": [
-          "Amiodarone",
-          "Sotalol",
-          "Flecainide",
-          "Propafenone"
-        ],
-        "answer": "Amiodarone"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which antiarrhythmic is structurally similar to thyroxine (iodine-containing)?",
-        "choices": [
-          "Amiodarone",
-          "Flecainide",
-          "Sotalol",
-          "Propafenone"
-        ],
-        "answer": "Amiodarone"
-      }
+      { "type": "tf", "prompt": "Dofetilide initiation should occur in a hospital with continuous ECG monitoring.", "answer": "True" },
+      { "type": "mcq", "prompt": "Which pair has the highest torsades de pointes risk due to QT prolongation?", "choices": ["Dofetilide and sotalol", "Digoxin and lidocaine", "Amiodarone and lidocaine", "Digoxin and sotalol"], "answer": "Dofetilide and sotalol" },
+      { "type": "tf", "prompt": "Compared to other Class III agents, amiodarone has a lower risk of torsades but many non-cardiac toxicities.", "answer": "True" },
+      { "type": "short", "prompt": "Two organ systems you must monitor with chronic amiodarone (any two)?", "answerText": ["Thyroid", "Liver", "Pulmonary", "Eyes", "Skin"] },
+      { "type": "mcq", "prompt": "Which drug is renally cleared and requires dose adjustment based on kidney function?", "choices": ["Dofetilide", "Sotalol", "Both", "Neither"], "answer": "Both" },
+      { "type": "tf", "prompt": "Amiodarone can increase digoxin concentrations (P-gp interaction).", "answer": "True" },
+      { "type": "short", "prompt": "Primary clinical use of IV lidocaine in arrhythmia management (one phrase)?", "answerText": ["Ventricular arrhythmias", "Ventricular tachycardia", "VT", "V arrhythmias"] },
+      { "type": "mcq", "prompt": "Which class best describes digoxin's role in atrial fibrillation?", "choices": ["Rate control via AV nodal slowing", "Rhythm conversion to sinus", "Sodium channel blockade", "Beta-1 selective blockade"], "answer": "Rate control via AV nodal slowing" },
+      { "type": "tf", "prompt": "Sotalol should be avoided or used cautiously in asthma due to beta-blockade.", "answer": "True" },
+      { "type": "mcq", "prompt": "Which adverse effect is classically associated with amiodarone skin toxicity?", "choices": ["Blue-gray discoloration", "Urticaria", "Alopecia", "Acneiform rash"], "answer": "Blue-gray discoloration" },
+      { "type": "short", "prompt": "Amiodarone half-life is best described as:", "answerText": ["Weeks", "Several weeks", "Very long"] },
+      { "type": "tf", "prompt": "Dofetilide is a selective delayed rectifier potassium (IKr) channel blocker.", "answer": "True" },
+      { "type": "mcq", "prompt": "Which monitoring is most appropriate during tikosyn initiation?", "choices": ["QTc interval and renal function", "AST/ALT only", "CBC only", "Blood pressure only"], "answer": "QTc interval and renal function" },
+      { "type": "short", "prompt": "Mechanism keyword for sotalol's antiarrhythmic effect (besides beta-blockade)?", "answerText": ["Potassium block", "K+ block", "IKr block"] },
+      { "type": "tf", "prompt": "Digoxin toxicity risk increases with hypokalemia.", "answer": "True" },
+      { "type": "mcq", "prompt": "Which agent is most associated with corneal microdeposits and photosensitivity?", "choices": ["Amiodarone", "Sotalol", "Lidocaine", "Dofetilide"], "answer": "Amiodarone" },
+      { "type": "short", "prompt": "Lidocaine antiarrhythmic subclass (letters)?", "answerText": ["Class Ib", "Ib"] },
+      { "type": "tf", "prompt": "Digoxin is primarily eliminated renally.", "answer": "True" },
+      { "type": "mcq", "prompt": "Which drug commonly requires dose/interval adjustment when CrCl is reduced?", "choices": ["Sotalol", "Dofetilide", "Both", "Neither"], "answer": "Both" },
+      { "type": "short", "prompt": "One classic non-pulmonary amiodarone lab to monitor (single word ok):", "answerText": ["TSH", "Thyroid", "T4", "LFTs", "AST", "ALT"] },
+      { "type": "mcq", "prompt": "Which is LEAST likely to cause torsades among Class III options listed?", "choices": ["Amiodarone", "Dofetilide", "Sotalol", "All equal"], "answer": "Amiodarone" },
+      { "type": "tf", "prompt": "Sotalol is given orally and can also be given IV in some settings.", "answer": "True" },
+      { "type": "short", "prompt": "Digoxin therapeutic use keyword in AF (one or two words):", "answerText": ["Rate control", "AV nodal slowing"] },
+      { "type": "mcq", "prompt": "Which drug is most appropriate as a ventricular antiarrhythmic post-MI (acute setting)?", "choices": ["Lidocaine", "Dofetilide", "Digoxin", "Sotalol"], "answer": "Lidocaine" },
+      { "type": "tf", "prompt": "A baseline ECG is appropriate before starting amiodarone or dofetilide.", "answer": "True" }
     ]
   }
 }
