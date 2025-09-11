@@ -1,10 +1,6 @@
 {
   "id": "popp-practice-law-community-v2",
   "title": "Pharmacy Law — Community Pharmacy Practice (Unit 1, Dr. O'Brien)",
-  "settings": {
-    "shuffleQuestions": true,
-    "shuffleChoices": true
-  },
   "pools": {
     "easy": [
       {
