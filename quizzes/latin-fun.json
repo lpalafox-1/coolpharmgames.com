@@ -1,96 +1,123 @@
 {
   "id": "latin-fun",
-  "title": "Latin Fun",
+  "title": "Latin Fun — English to Latin Practice",
   "pools": {
     "easy": [
       {
         "type": "short",
-        "prompt": "Latin → English: p.o. q.d.",
-        "solution": "'p.o.' means by mouth; 'q.d.' means once daily.",
-        "answerText": [
-          "by mouth every day",
-          "by mouth once daily",
-          "orally once daily"
-        ]
+        "prompt": "Translate to Latin: by mouth",
+        "solution": "'per os' means by mouth.",
+        "answers": ["per os"]
       },
       {
         "type": "short",
-        "prompt": "Latin → English: b.i.d.",
-        "solution": "'b.i.d.' stands for bis in die, meaning twice daily.",
-        "answerText": [
-          "twice daily",
-          "two times a day",
-          "twice a day"
-        ]
+        "prompt": "Translate to Latin: at bedtime",
+        "solution": "'hora somni' means at bedtime.",
+        "answers": ["hora somni"]
       },
       {
         "type": "short",
-        "prompt": "Latin → English: t.i.d.",
-        "solution": "'t.i.d.' stands for ter in die, meaning three times daily.",
-        "answerText": [
-          "three times daily",
-          "three times a day"
-        ]
+        "prompt": "Translate to Latin: as needed",
+        "solution": "'pro re nata' means as needed.",
+        "answers": ["pro re nata"]
       },
       {
         "type": "short",
-        "prompt": "Latin → English: q.i.d.",
-        "solution": "'q.i.d.' stands for quater in die, meaning four times daily.",
-        "answerText": [
-          "four times daily",
-          "four times a day"
-        ]
+        "prompt": "Translate to Latin: with food",
+        "solution": "'cum cibos' means with food.",
+        "answers": ["cum cibos"]
       },
       {
         "type": "short",
-        "prompt": "Latin → English: q.h.s.",
-        "solution": "'q.h.s.' stands for quaque hora somni, meaning at bedtime.",
-        "answerText": [
-          "at bedtime",
-          "every night at bedtime"
-        ]
+        "prompt": "Translate to Latin: every morning",
+        "solution": "'quaque mane' or 'q.a.m.' means every morning.",
+        "answers": ["quaque mane","q.a.m."]
+      },
+      {
+        "type": "short",
+        "prompt": "Translate to Latin: every other day",
+        "solution": "'quaque altera die' or 'q.o.d.' means every other day.",
+        "answers": ["quaque altera die","q.o.d."]
+      },
+      {
+        "type": "short",
+        "prompt": "Translate to Latin: immediately",
+        "solution": "'statim' or 'stat' means immediately.",
+        "answers": ["statim","stat"]
+      },
+      {
+        "type": "short",
+        "prompt": "Translate to Latin: by injection",
+        "solution": "'per injectionem' means by injection.",
+        "answers": ["per injectionem"]
       }
     ],
     "hard": [
       {
         "type": "short",
-        "prompt": "English → Latin: Apply to affected area twice daily",
-        "solution": "Twice daily translates to 'b.i.d.' (bis in die).",
-        "answerText": [
-          "Apply to affected area b.i.d."
-        ]
+        "prompt": "Translate to Latin: four times daily",
+        "solution": "'quater in die' or 'q.i.d.' means four times daily.",
+        "answers": ["quater in die","q.i.d."]
       },
       {
         "type": "short",
-        "prompt": "English → Latin: Take one tablet by mouth four times daily",
-        "solution": "By mouth = 'p.o.'; four times daily = 'q.i.d.'",
-        "answerText": [
-          "Take one tablet p.o. q.i.d."
-        ]
+        "prompt": "Translate to Latin: three times daily",
+        "solution": "'ter in die' or 't.i.d.' means three times daily.",
+        "answers": ["ter in die","t.i.d."]
       },
       {
         "type": "short",
-        "prompt": "English → Latin: Instill one drop in each eye at bedtime",
-        "solution": "At bedtime translates to 'q.h.s.' (quaque hora somni).",
-        "answerText": [
-          "Instill one drop in each eye q.h.s."
-        ]
+        "prompt": "Translate to Latin: twice daily",
+        "solution": "'bis in die' or 'b.i.d.' means twice daily.",
+        "answers": ["bis in die","b.i.d."]
       },
       {
         "type": "short",
-        "prompt": "English → Latin: Take two capsules by mouth every morning",
-        "solution": "By mouth = 'p.o.'; every morning = 'q.a.m.' (quaque ante meridiem).",
-        "answerText": [
-          "Take two capsules p.o. q.a.m."
-        ]
+        "prompt": "Translate to Latin: once daily",
+        "solution": "'quaque die' or 'q.d.' means once daily.",
+        "answers": ["quaque die","q.d."]
       },
       {
         "type": "short",
-        "prompt": "English → Latin: Apply as needed for pain",
-        "solution": "As needed = 'p.r.n.' (pro re nata).",
-        "answerText": [
-          "Apply p.r.n. pain"
-        ]
+        "prompt": "Translate to Latin: before meals",
+        "solution": "'ante cibos' or 'a.c.' means before meals.",
+        "answers": ["ante cibos","a.c."]
+      },
+      {
+        "type": "short",
+        "prompt": "Translate to Latin: after meals",
+        "solution": "'post cibos' or 'p.c.' means after meals.",
+        "answers": ["post cibos","p.c."]
+      },
+      {
+        "type": "short",
+        "prompt": "Translate to Latin: left eye",
+        "solution": "'oculus sinister' or 'o.s.' means left eye.",
+        "answers": ["oculus sinister","o.s."]
+      },
+      {
+        "type": "short",
+        "prompt": "Translate to Latin: right eye",
+        "solution": "'oculus dexter' or 'o.d.' means right eye.",
+        "answers": ["oculus dexter","o.d."]
+      },
+      {
+        "type": "short",
+        "prompt": "Translate to Latin: both eyes",
+        "solution": "'oculi uterque' or 'o.u.' means both eyes.",
+        "answers": ["oculi uterque","o.u."]
+      },
+      {
+        "type": "short",
+        "prompt": "Translate to Latin: as directed",
+        "solution": "'ut dictum' means as directed.",
+        "answers": ["ut dictum"]
+      },
+      {
+        "type": "short",
+        "prompt": "Translate to Latin: every 6 hours",
+        "solution": "'quaque sexta hora' or 'q6h' means every 6 hours.",
+        "answers": ["quaque sexta hora","q6h"]
       }
     ]
   }

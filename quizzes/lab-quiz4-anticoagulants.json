@@ -1,410 +1,276 @@
 {
-  "id": "lab-quiz4-anticoagulants",
-  "title": "Lab Quiz 4 — Anticoagulants",
+  "title": "Quiz 4 - Anticoagulants (Polished Practical Prep)",
   "pools": {
     "easy": [
       {
         "type": "mcq",
-        "prompt": "Warfarin belongs to which class?",
-        "choices": [
-          "Vitamin K antagonist",
-          "Direct thrombin inhibitor",
-          "Factor Xa inhibitor",
-          "Antiplatelet"
-        ],
-        "answer": "Vitamin K antagonist",
-        "explain": "Warfarin inhibits vitamin K–dependent clotting factor synthesis (II, VII, IX, X)."
+        "prompt": "What is the brand name of Warfarin?",
+        "choices": ["Coumadin", "Xarelto", "Eliquis", "Lovenox"],
+        "answer": "Coumadin"
       },
       {
-        "type": "mcq",
-        "prompt": "Rivaroxaban belongs to which class?",
-        "choices": [
-          "Direct thrombin inhibitor",
-          "Factor Xa inhibitor",
-          "LMWH",
-          "Vitamin K antagonist"
-        ],
-        "answer": "Factor Xa inhibitor",
-        "explain": "Rivaroxaban is an oral direct Factor Xa inhibitor."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Apixaban is best categorized as:",
-        "choices": [
-          "Factor Xa inhibitor",
-          "Direct thrombin inhibitor",
-          "LMWH",
-          "Heparin"
-        ],
-        "answer": "Factor Xa inhibitor",
-        "explain": "Apixaban is an oral direct Factor Xa inhibitor."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Heparin (UFH) is given primarily by which route in acute care?",
-        "choices": [
-          "Oral",
-          "Subcutaneous only",
-          "Intravenous",
-          "Transdermal"
-        ],
-        "answer": "Intravenous",
-        "explain": "UFH is given IV (or SC) in hospital for rapid anticoagulation."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Enoxaparin is best categorized as:",
-        "choices": [
-          "UFH",
-          "LMWH",
-          "Factor Xa inhibitor (oral)",
-          "Direct thrombin inhibitor"
-        ],
-        "answer": "LMWH",
-        "explain": "Enoxaparin is a low‑molecular‑weight heparin (LMWH)."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which lab is routinely monitored for warfarin?",
-        "choices": [
-          "aPTT",
-          "INR",
-          "Anti‑Xa level",
-          "Platelet function test"
-        ],
-        "answer": "INR",
-        "explain": "Warfarin dosing is guided by the INR."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which food/vitamin can affect warfarin response?",
-        "choices": [
-          "Vitamin C",
-          "Vitamin K",
-          "Vitamin D",
-          "Vitamin B12"
-        ],
-        "answer": "Vitamin K",
-        "explain": "High vitamin K intake can lower INR."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which agent reverses UFH most rapidly?",
-        "choices": [
-          "Vitamin K (phytonadione)",
-          "Protamine sulfate",
-          "Andexanet alfa",
-          "Idarucizumab"
-        ],
-        "answer": "Protamine sulfate",
-        "explain": "Protamine reverses heparin (UFH > LMWH)."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which agent is an LMWH?",
-        "choices": [
-          "Enoxaparin",
-          "Heparin (UFH)",
-          "Rivaroxaban",
-          "Apixaban"
-        ],
-        "answer": "Enoxaparin",
-        "explain": "LMWH example: enoxaparin."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which two are oral Factor Xa inhibitors?",
-        "choices": [
-          "Rivaroxaban & apixaban",
-          "Warfarin & heparin",
-          "Enoxaparin & heparin",
-          "Warfarin & apixaban"
-        ],
-        "answer": "Rivaroxaban & apixaban",
-        "explain": "Both are oral direct Factor Xa inhibitors."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Common bleeding sign to counsel on with anticoagulants:",
-        "choices": [
-          "Constipation",
-          "Bruising, nosebleeds, gum bleeding",
-          "Rash only",
-          "Hypoglycemia"
-        ],
-        "answer": "Bruising, nosebleeds, gum bleeding",
-        "explain": "Easy bleeding is a key counseling point."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Warfarin brand name is:",
-        "choices": [
-          "Eliquis",
-          "Xarelto",
-          "Coumadin",
-          "Lovenox"
-        ],
-        "answer": "Coumadin",
-        "explain": "Coumadin is a common brand of warfarin."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Apixaban brand name is:",
-        "choices": [
-          "Xarelto",
-          "Eliquis",
-          "Coumadin",
-          "Lovenox"
-        ],
-        "answer": "Eliquis",
-        "explain": "Apixaban = Eliquis."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Rivaroxaban brand name is:",
-        "choices": [
-          "Eliquis",
-          "Xarelto",
-          "Coumadin",
-          "Lovenox"
-        ],
-        "answer": "Xarelto",
-        "explain": "Rivaroxaban = Xarelto."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Enoxaparin brand name is:",
-        "choices": [
-          "Lovenox",
-          "Coumadin",
-          "Eliquis",
-          "Xarelto"
-        ],
-        "answer": "Lovenox",
-        "explain": "Enoxaparin = Lovenox."
+        "type": "short",
+        "prompt": "Generic name of Xarelto?",
+        "answers": ["Rivaroxaban"]
       },
       {
         "type": "tf",
-        "prompt": "Heparin and enoxaparin are given parenterally (not orally).",
-        "answer": "True",
-        "explain": "UFH is IV/SC; enoxaparin is SC."
+        "prompt": "Apixaban is classified as an anticoagulant.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drug is a Vitamin K antagonist?",
+        "choices": ["Warfarin", "Rivaroxaban", "Apixaban", "Heparin"],
+        "answer": "Warfarin"
+      },
+      {
+        "type": "short",
+        "prompt": "Brand name of Apixaban?",
+        "answers": ["Eliquis"]
       },
       {
         "type": "tf",
-        "prompt": "Warfarin requires routine INR monitoring.",
-        "answer": "True",
-        "explain": "INR guides dosing and safety."
+        "prompt": "Heparin enhances the activity of antithrombin III.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drug is available as Lovenox?",
+        "choices": ["Enoxaparin", "Heparin", "Warfarin", "Apixaban"],
+        "answer": "Enoxaparin"
+      },
+      {
+        "type": "short",
+        "prompt": "Generic name of Coumadin?",
+        "answers": ["Warfarin"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drug class is Xarelto?",
+        "choices": ["Direct Factor Xa Inhibitor", "Vitamin K Antagonist", "LMWH", "Heparin"],
+        "answer": "Direct Factor Xa Inhibitor"
+      },
+      {
+        "type": "short",
+        "prompt": "Drug category of Eliquis?",
+        "answers": ["Anticoagulant"]
       },
       {
         "type": "tf",
-        "prompt": "Apixaban dosing should be considered with kidney function and age/weight in some indications.",
-        "answer": "True",
-        "explain": "Dose adjustments or criteria apply based on renal function and clinical factors."
+        "prompt": "Warfarin requires INR monitoring.",
+        "answer": "True"
+      },
+      {
+        "type": "short",
+        "prompt": "Brand name of Enoxaparin?",
+        "answers": ["Lovenox"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drug enhances antithrombin III?",
+        "choices": ["Heparin", "Apixaban", "Rivaroxaban", "Warfarin"],
+        "answer": "Heparin"
+      },
+      {
+        "type": "tf",
+        "prompt": "Both Rivaroxaban and Apixaban inhibit Factor Xa.",
+        "answer": "True"
+      },
+      {
+        "type": "short",
+        "prompt": "Drug class of Lovenox?",
+        "answers": ["Low Molecular Weight Heparin", "LMWH"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drug prevents the synthesis of clotting factors II, VII, IX, X?",
+        "choices": ["Warfarin", "Enoxaparin", "Rivaroxaban", "Heparin"],
+        "answer": "Warfarin"
+      },
+      {
+        "type": "short",
+        "prompt": "Brand name of Heparin?",
+        "answers": ["Hep-Lock"]
+      },
+      {
+        "type": "tf",
+        "prompt": "Direct oral anticoagulants (DOACs) include Apixaban and Rivaroxaban.",
+        "answer": "True"
+      },
+      {
+        "type": "short",
+        "prompt": "Generic name of Jantoven?",
+        "answers": ["Warfarin"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which is a Low Molecular Weight Heparin (LMWH)?",
+        "choices": ["Enoxaparin", "Warfarin", "Rivaroxaban", "Apixaban"],
+        "answer": "Enoxaparin"
+      },
+      {
+        "type": "short",
+        "prompt": "Drug class of Warfarin?",
+        "answers": ["Vitamin K Antagonist"]
+      },
+      {
+        "type": "tf",
+        "prompt": "Heparin is considered an anticoagulant.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which anticoagulant is commonly used in pregnancy (preferred over warfarin)?",
+        "choices": ["Heparin", "Warfarin", "Rivaroxaban", "Apixaban"],
+        "answer": "Heparin"
+      },
+      {
+        "type": "short",
+        "prompt": "Drug category of Rivaroxaban?",
+        "answers": ["Anticoagulant"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drug has the brand name Eliquis?",
+        "choices": ["Apixaban", "Rivaroxaban", "Warfarin", "Enoxaparin"],
+        "answer": "Apixaban"
       }
     ],
     "hard": [
       {
         "type": "mcq",
-        "prompt": "Warfarin inhibits the synthesis of which cofactors?",
-        "choices": [
-          "Factors II, VII, IX, X and proteins C/S",
-          "Factors I, II, V",
-          "ADP receptors",
-          "Thromboxane A2"
-        ],
-        "answer": "Factors II, VII, IX, X and proteins C/S",
-        "explain": "Vitamin K–dependent clotting factors and proteins C/S."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which lab best monitors UFH infusion?",
-        "choices": [
-          "INR",
-          "aPTT (or anti‑Xa)",
-          "Platelets only",
-          "LDH"
-        ],
-        "answer": "aPTT (or anti‑Xa)",
-        "explain": "aPTT is commonly used for UFH titration; some use anti‑Xa."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Enoxaparin’s anticoagulant effect is best correlated with:",
-        "choices": [
-          "INR",
-          "aPTT",
-          "Anti‑Xa level",
-          "Bleeding time"
-        ],
-        "answer": "Anti‑Xa level",
-        "explain": "Anti‑Xa assays may be used in special populations."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which agent has a black box warning about spinal/epidural hematomas with neuraxial anesthesia?",
-        "choices": [
-          "Enoxaparin",
-          "Warfarin",
-          "Aspirin",
-          "Clopidogrel"
-        ],
-        "answer": "Enoxaparin",
-        "explain": "Risk heightened around neuraxial procedures."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which best describes heparin‑induced thrombocytopenia (HIT)?",
-        "choices": [
-          "Immune‑mediated platelet destruction → bleeding only",
-          "Immune‑mediated platelet activation → thrombosis risk",
-          "Dose‑dependent benign drop in platelets",
-          "Genetic vitamin K recycling defect"
-        ],
-        "answer": "Immune‑mediated platelet activation → thrombosis risk",
-        "explain": "HIT is prothrombotic despite thrombocytopenia."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which statement about warfarin interactions is MOST accurate?",
-        "choices": [
-          "Few interactions; no dietary effects",
-          "Many CYP and dietary interactions",
-          "Only interacts with dairy products",
-          "Only interacts with PPIs"
-        ],
-        "answer": "Many CYP and dietary interactions",
-        "explain": "Warfarin has numerous drug and diet interactions."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Target INR for most indications of warfarin (e.g., AF) is:",
-        "choices": [
-          "1.0–1.5",
-          "2.0–3.0",
-          "3.0–4.0",
-          ">4.5"
-        ],
-        "answer": "2.0–3.0",
-        "explain": "Common therapeutic range unless otherwise specified (e.g., mechanical valves)."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which reversal is best matched?",
-        "choices": [
-          "Warfarin — idarucizumab",
-          "Apixaban — vitamin K",
-          "UFH — protamine",
-          "Rivaroxaban — phytonadione"
-        ],
-        "answer": "UFH — protamine",
-        "explain": "Protamine reverses UFH (partial for LMWH)."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which statement is TRUE about rivaroxaban/apixaban?",
-        "choices": [
-          "Require routine INR monitoring",
-          "Are oral direct Factor Xa inhibitors",
-          "Are parenteral only",
-          "Reverse fully with protamine"
-        ],
-        "answer": "Are oral direct Factor Xa inhibitors",
-        "explain": "They inhibit Factor Xa directly and are given orally."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Protamine most completely reverses which agent?",
-        "choices": [
-          "Enoxaparin (fully)",
-          "UFH (fully)",
-          "Apixaban",
-          "Rivaroxaban"
-        ],
-        "answer": "UFH (fully)",
-        "explain": "Protamine fully neutralizes UFH; only partially neutralizes LMWH."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which is LEAST likely to require routine lab monitoring for dose titration?",
-        "choices": [
-          "Warfarin",
-          "UFH infusion",
-          "Apixaban",
-          "Heparin (high‑dose SC)"
-        ],
-        "answer": "Apixaban",
-        "explain": "Direct oral Xa inhibitors generally do not require routine lab titration."
-      },
-      {
-        "type": "mcq",
-        "prompt": "In suspected HIT, which is the best immediate action?",
-        "choices": [
-          "Continue UFH; add aspirin",
-          "Stop heparin and start a non‑heparin anticoagulant",
-          "Switch to warfarin immediately at high dose",
-          "Give vitamin K"
-        ],
-        "answer": "Stop heparin and start a non‑heparin anticoagulant",
-        "explain": "Warfarin is avoided initially in HIT; use alternative agents."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which best describes apixaban/rivaroxaban elimination pathways?",
-        "choices": [
-          "Pure hepatic clearance",
-          "Mixed hepatic and renal",
-          "Pure renal clearance",
-          "Pulmonary excretion"
-        ],
-        "answer": "Mixed hepatic and renal",
-        "explain": "Both have mixed pathways; dosing considers renal function."
-      },
-      {
-        "type": "mcq",
-        "prompt": "For planned surgery, how is apixaban commonly handled?",
-        "choices": [
-          "No hold time needed",
-          "Hold 24–48+ hours depending on bleeding risk/renal function",
-          "Bridge with IV UFH for everyone",
-          "Switch to warfarin 1 week prior"
-        ],
-        "answer": "Hold 24–48+ hours depending on bleeding risk/renal function",
-        "explain": "Periprocedural management depends on bleeding risk and renal function."
-      },
-      {
-        "type": "short",
-        "prompt": "Name one oral Factor Xa inhibitor used here.",
-        "answerText": [
-          "rivaroxaban",
-          "apixaban"
-        ],
-        "explain": "Either is correct."
-      },
-      {
-        "type": "short",
-        "prompt": "Name the lab used to manage warfarin dosing.",
-        "answerText": [
-          "inr",
-          "international normalized ratio",
-          "prothrombin time",
-          "pt"
-        ],
-        "explain": "INR/PT."
-      },
-      {
-        "type": "short",
-        "prompt": "Name one reversal option for UFH/LMWH.",
-        "answerText": [
-          "protamine",
-          "protamine sulfate"
-        ],
-        "explain": "Protamine neutralizes heparin (complete for UFH; partial for LMWH)."
+        "prompt": "Which anticoagulant requires INR monitoring?",
+        "choices": ["Warfarin", "Apixaban", "Rivaroxaban", "Enoxaparin"],
+        "answer": "Warfarin"
       },
       {
         "type": "tf",
-        "prompt": "DOACs like apixaban generally have fewer food interactions than warfarin.",
-        "answer": "True",
-        "explain": "They have fewer diet interactions and fewer routine lab requirements."
+        "prompt": "Rivaroxaban directly inhibits thrombin (Factor IIa).",
+        "answer": "False"
+      },
+      {
+        "type": "short",
+        "prompt": "Which clotting factors does Warfarin inhibit?",
+        "answers": ["II, VII, IX, X", "2, 7, 9, 10"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Enoxaparin works by enhancing activity of?",
+        "choices": ["Antithrombin III", "Vitamin K", "Factor Xa", "Thrombin"],
+        "answer": "Antithrombin III"
+      },
+      {
+        "type": "short",
+        "prompt": "Generic name of Lovenox?",
+        "answers": ["Enoxaparin"]
+      },
+      {
+        "type": "tf",
+        "prompt": "Apixaban is a direct Factor Xa inhibitor.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drug is classified as LMWH?",
+        "choices": ["Enoxaparin", "Heparin", "Rivaroxaban", "Warfarin"],
+        "answer": "Enoxaparin"
+      },
+      {
+        "type": "short",
+        "prompt": "Brand name of Rivaroxaban?",
+        "answers": ["Xarelto"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which anticoagulants are DOACs (Direct Oral Anticoagulants)?",
+        "choices": ["Apixaban and Rivaroxaban", "Warfarin and Heparin", "Enoxaparin and Warfarin", "All of the above"],
+        "answer": "Apixaban and Rivaroxaban"
+      },
+      {
+        "type": "tf",
+        "prompt": "Heparin directly inhibits Factor Xa without antithrombin.",
+        "answer": "False"
+      },
+      {
+        "type": "short",
+        "prompt": "Generic name of Hep-Lock?",
+        "answers": ["Heparin"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which anticoagulant is safest to use in pregnancy?",
+        "choices": ["Heparin", "Rivaroxaban", "Apixaban", "Warfarin"],
+        "answer": "Heparin"
+      },
+      {
+        "type": "short",
+        "prompt": "Drug class of Eliquis?",
+        "answers": ["Direct Factor Xa Inhibitor"]
+      },
+      {
+        "type": "tf",
+        "prompt": "Vitamin K is the antidote for Warfarin toxicity.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which anticoagulant is most associated with HIT (Heparin-Induced Thrombocytopenia)?",
+        "choices": ["Heparin", "Enoxaparin", "Warfarin", "Apixaban"],
+        "answer": "Heparin"
+      },
+      {
+        "type": "short",
+        "prompt": "Brand names of Warfarin?",
+        "answers": ["Coumadin", "Jantoven"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which anticoagulant prevents conversion of prothrombin to thrombin?",
+        "choices": ["Rivaroxaban", "Apixaban", "Heparin", "All of the above"],
+        "answer": "All of the above"
+      },
+      {
+        "type": "short",
+        "prompt": "Brand name of Enoxaparin?",
+        "answers": ["Lovenox"]
+      },
+      {
+        "type": "tf",
+        "prompt": "Warfarin has a delayed onset of action compared to DOACs.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which anticoagulant is reversed with protamine sulfate?",
+        "choices": ["Heparin", "Enoxaparin", "Both Heparin and Enoxaparin", "Warfarin"],
+        "answer": "Both Heparin and Enoxaparin"
+      },
+      {
+        "type": "short",
+        "prompt": "Generic name of Eliquis?",
+        "answers": ["Apixaban"]
+      },
+      {
+        "type": "short",
+        "prompt": "Drug class of Lovenox?",
+        "answers": ["Low Molecular Weight Heparin", "LMWH"]
+      },
+      {
+        "type": "tf",
+        "prompt": "Rivaroxaban requires routine INR monitoring.",
+        "answer": "False"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drug is a Vitamin K antagonist?",
+        "choices": ["Warfarin", "Apixaban", "Enoxaparin", "Rivaroxaban"],
+        "answer": "Warfarin"
+      },
+      {
+        "type": "short",
+        "prompt": "Which anticoagulants enhance antithrombin III?",
+        "answers": ["Heparin", "Enoxaparin"]
       }
     ]
   }
