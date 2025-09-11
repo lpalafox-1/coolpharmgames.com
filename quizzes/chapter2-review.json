@@ -3,8 +3,107 @@
   "title": "Chapter 2 Review",
   "pools": {
     "easy": [
-      { "type": "short", "prompt": "Sample Q: Define a key term from Chapter 2.", "answerText": "definition" }
+      {
+        "type": "short",
+        "prompt": "How many milligrams of drug are needed to prepare 100 tablets, each containing 20 µg?",
+        "solution": "20 µg = 0.02 mg. For 100 tablets: 100 × 0.02 mg = 2 mg.",
+        "answerText": [
+          "2 mg"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Add 2.25 L and 875 mL and express the result in liters.",
+        "solution": "875 mL = 0.875 L. 2.25 L + 0.875 L = 3.125 L.",
+        "answerText": [
+          "3.125 L"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Add 0.0025 kg, 1750 mg, 2.25 g, and 825 000 µg and express the answer in grams.",
+        "solution": "0.0025 kg = 2.5 g; 1750 mg = 1.75 g; 825 000 µg = 0.825 g; plus 2.25 g yields 2.5 + 1.75 + 2.25 + 0.825 = 7.325 g.",
+        "answerText": [
+          "7.325 g"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "An inhalation aerosol contains 5.28 mg fluticasone propionate for 120 inhalations. How many micrograms are delivered per inhalation?",
+        "solution": "5.28 mg = 5280 µg. Dividing by 120 inhalations gives 44 µg per inhalation.",
+        "answerText": [
+          "44 µg",
+          "44 mcg",
+          "44 micrograms"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Convert the following laboratory value to µg/mL: folate 18 pg/mL.",
+        "solution": "1 pg = 10^−3 ng = 10^−6 µg. Thus 18 pg/mL = 18 × 10^−6 µg/mL = 0.000018 µg/mL.",
+        "answerText": [
+          "0.000018 µg/mL",
+          "1.8×10^−5 µg/mL"
+        ]
+      },
+      {
+        "type": "mcq",
+        "prompt": "A microgram laboratory value of serum creatinine is reported as 1.0 mg/dL. Convert this to µg/mL.",
+        "choices": [
+          "10 µg/mL",
+          "1 µg/mL",
+          "100 µg/mL",
+          "0.1 µg/mL"
+        ],
+        "answer": "10 µg/mL",
+        "solution": "1 mg/dL = 1 mg/100 mL. Converting to µg/mL: 1 mg = 1000 µg; divide by 100 mL = 10 µg/mL."
+      }
     ],
-    "hard": []
+    "hard": [
+      {
+        "type": "short",
+        "prompt": "Levothyroxine sodium tablets (Synthroid) are available in strengths from 25 µg to 300 µg. Express this range in milligrams.",
+        "solution": "Divide micrograms by 1000: 25 µg = 0.025 mg; 300 µg = 0.3 mg.",
+        "answerText": [
+          "0.025 mg to 0.3 mg"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "How many grams of digoxin would be required to make 25 000 tablets, each containing 250 µg?",
+        "solution": "250 µg = 0.25 mg = 0.00025 g. For 25 000 tablets: 25 000 × 0.00025 g = 6.25 g.",
+        "answerText": [
+          "6.25 g"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Adalimumab injection is supplied as 40 mg in 0.8 mL. Calculate the concentration in mg/mL.",
+        "solution": "40 mg / 0.8 mL = 50 mg/mL.",
+        "answerText": [
+          "50 mg/mL"
+        ]
+      },
+      {
+        "type": "mcq",
+        "prompt": "A patient takes 50 µg/day for 2 days; 150 µg/day on days 3–5; 250 µg/day on days 6–8; and 350 µg on day 9. How many milligrams total are taken?",
+        "choices": [
+          "1.65 mg",
+          "0.75 mg",
+          "0.9 mg",
+          "2.0 mg"
+        ],
+        "answer": "1.65 mg",
+        "solution": "Total µg = (50×2)+(150×3)+(250×3)+350 = 1650 µg = 1.65 mg."
+      },
+      {
+        "type": "short",
+        "prompt": "An IV solution contains 123 mg drug in 250 mL. If administered at 200 µg/min, how many milliliters of solution are delivered per hour?",
+        "solution": "Concentration is 123 mg/250 mL = 0.492 mg/mL = 492 µg/mL. Infusion rate 200 µg/min × 60 min = 12 000 µg/h. Divide by 492 µg/mL to get 24.39 mL/h.",
+        "answerText": [
+          "24.39 mL"
+        ]
+      }
+    ]
   }
 }

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quiz Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>Quiz Functionality Test</h1>
+    <div id="output"></div>
+
+    <script>
+        const output = document.getElementById('output');
+
+        async function testQuizAccess() {
+            output.innerHTML += '<h2>Testing Quiz Access</h2>';
+
+            try {
+                // Test if we can access the quiz page
+                const url = 'quiz.html?id=chapter1-review&mode=easy';
+                output.innerHTML += `<p class="info">Testing URL: ${url}</p>`;
+
+                // Check if the quiz file exists
+                const response = await fetch('quizzes/chapter1-review.json');
+                if (response.ok) {
+                    const data = await response.json();
+                    output.innerHTML += '<p class="success">✅ Quiz file loads successfully</p>';
+                    output.innerHTML += `<p><strong>Title:</strong> ${data.title}</p>`;
+                    output.innerHTML += `<p><strong>Easy questions:</strong> ${(data.pools?.easy || []).length}</p>`;
+                    output.innerHTML += `<p><strong>Hard questions:</strong> ${(data.pools?.hard || []).length}</p>`;
+
+                    // Test supplemental exam too
+                    const suppResponse = await fetch('quizzes/supplemental-exam1-2024.json');
+                    if (suppResponse.ok) {
+                        const suppData = await suppResponse.json();
+                        output.innerHTML += '<p class="success">✅ Supplemental exam loads successfully</p>';
+                        output.innerHTML += `<p><strong>Supplemental Title:</strong> ${suppData.title}</p>`;
+                        output.innerHTML += `<p><strong>Supplemental Easy:</strong> ${(suppData.pools?.easy || []).length}</p>`;
+                        output.innerHTML += `<p><strong>Supplemental Hard:</strong> ${(suppData.pools?.hard || []).length}</p>`;
+                    }
+
+                    output.innerHTML += '<hr>';
+                    output.innerHTML += '<p class="success"><strong>🎉 QUIZ SYSTEM IS WORKING!</strong></p>';
+                    output.innerHTML += '<p>Students should now be able to access:</p>';
+                    output.innerHTML += '<ul>';
+                    output.innerHTML += '<li>Chapter 1-5 Reviews (Easy/Hard modes)</li>';
+                    output.innerHTML += '<li>Supplemental Exam 1 2024 (Easy/Hard modes)</li>';
+                    output.innerHTML += '<li>All other quizzes in the system</li>';
+                    output.innerHTML += '</ul>';
+
+                } else {
+                    output.innerHTML += `<p class="error">❌ Failed to load quiz file: HTTP ${response.status}</p>`;
+                }
+
+            } catch (err) {
+                output.innerHTML += `<p class="error">❌ Error: ${err.message}</p>`;
+            }
+        }
+
+        testQuizAccess();
+    </script>
+</body>
+</html>

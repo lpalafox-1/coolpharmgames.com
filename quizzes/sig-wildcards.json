@@ -3,8 +3,53 @@
   "title": "SIG Wildcards",
   "pools": {
     "easy": [
-      { "type": "mcq", "prompt": "Fun wildcard Q.", "choices": ["Alpha","Beta","Gamma","Delta"], "answer": "Gamma" }
+      {
+        "type": "short",
+        "prompt": "Translate the following to English: 'p.o. q.a.m.'",
+        "solution": "'p.o.' means by mouth; 'q.a.m.' means every morning.",
+        "answerText": [
+          "by mouth every morning",
+          "take by mouth every morning"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Translate the following to English: 'gtt i o.s. b.i.d.'",
+        "solution": "'gtt i' means 1 drop; 'o.s.' denotes the left eye; 'b.i.d.' means twice daily.",
+        "answerText": [
+          "instill 1 drop in the left eye twice daily",
+          "place one drop in the left eye twice a day"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Translate the following to English: 'Inject 30 units subcut q.o.d.'",
+        "solution": "'q.o.d.' stands for every other day; 'subcut' means subcutaneously.",
+        "answerText": [
+          "inject 30 units subcutaneously every other day",
+          "inject 30 units under the skin every other day"
+        ]
+      }
     ],
-    "hard": []
+    "hard": [
+      {
+        "type": "short",
+        "prompt": "English → Latin: Take 2 tablets by mouth 30 minutes before meals.",
+        "solution": "'ii tabs' denotes two tablets; 'p.o.' means by mouth; 'a.c.' means before meals; 30 minutes can be written as '30 min'.",
+        "answerText": [
+          "ii tabs p.o. 30 min a.c.",
+          "two tabs p.o. 30 min a.c."
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "English → Latin: Apply ointment to the affected area twice daily as needed.",
+        "solution": "'ung.' is ointment; 'ad area affecta' means to the affected area; 'b.i.d.' is twice daily; 'p.r.n.' means as needed.",
+        "answerText": [
+          "Apply ung. ad area affecta b.i.d. p.r.n.",
+          "Apply ointment ad area affecta b.i.d. p.r.n."
+        ]
+      }
+    ]
   }
 }

@@ -105,6 +105,21 @@ function runHome() {
     });
   }
 
+  // 5) Auto-hide NEW banners after 7 days
+  try {
+    const newBanners = document.querySelectorAll('.pill-new[data-added]');
+    const now = new Date();
+    newBanners.forEach(banner => {
+      const addedDate = new Date(banner.getAttribute('data-added'));
+      const daysDiff = (now - addedDate) / (1000 * 60 * 60 * 24);
+      if (daysDiff > 7) {
+        banner.style.display = 'none';
+      }
+    });
+  } catch (e) {
+    console.warn('NEW banner expiration failed:', e);
+  }
+
   // Done: ensure menu is visible at end even if something above silently failed
   const isWelcomeOn = welcome && welcome.style.display !== "none";
   if (!isWelcomeOn && menu) menu.style.display = "";

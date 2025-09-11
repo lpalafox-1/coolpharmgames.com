@@ -5,447 +5,272 @@
     "easy": [
       {
         "type": "mcq",
-        "prompt": "Atorvastatin belongs to which class?",
-        "choices": [
-          "Statin (HMG‑CoA reductase inhibitor)",
-          "Fibrate",
-          "Bile acid sequestrant",
-          "Omega‑3 fatty acid"
-        ],
-        "answer": "Statin (HMG‑CoA reductase inhibitor)",
-        "explain": "Atorvastatin is a statin."
+        "prompt": "What is the brand name for Simvastatin?",
+        "choices": ["Zocor", "Lipitor", "Crestor", "Pravachol"],
+        "answer": "Zocor"
       },
       {
-        "type": "mcq",
-        "prompt": "Ezetimibe is best categorized as:",
-        "choices": [
-          "Cholesterol absorption inhibitor",
-          "PCSK9 inhibitor",
-          "Fibrate",
-          "Niacin"
-        ],
-        "answer": "Cholesterol absorption inhibitor",
-        "explain": "Blocks intestinal NPC1L1 transporter."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Fenofibrate belongs to which class?",
-        "choices": [
-          "Fibrate",
-          "Statin",
-          "Bile acid sequestrant",
-          "Ezetimibe"
-        ],
-        "answer": "Fibrate",
-        "explain": "Fenofibrate is a PPAR‑α agonist."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which drug is a PCSK9 monoclonal antibody?",
-        "choices": [
-          "Alirocumab",
-          "Bempedoic acid",
-          "Ezetimibe",
-          "Cholestyramine"
-        ],
-        "answer": "Alirocumab",
-        "explain": "Alirocumab and evolocumab are PCSK9 mAbs."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Icosapent ethyl (Vascepa) is:",
-        "choices": [
-          "EPA omega‑3 fatty acid",
-          "Fibrate",
-          "Statin",
-          "Bile acid sequestrant"
-        ],
-        "answer": "EPA omega‑3 fatty acid",
-        "explain": "Purified EPA used primarily for triglyceride lowering and CV risk reduction in select patients."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Cholestyramine is a:",
-        "choices": [
-          "Bile acid sequestrant",
-          "Statin",
-          "PCSK9 inhibitor",
-          "Fibrate"
-        ],
-        "answer": "Bile acid sequestrant",
-        "explain": "Binds bile acids in the gut to lower LDL."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Bempedoic acid is classified as a(n):",
-        "choices": [
-          "ATP‑citrate lyase inhibitor",
-          "Cholesterol absorption inhibitor",
-          "Fibrate",
-          "Niacin"
-        ],
-        "answer": "ATP‑citrate lyase inhibitor",
-        "explain": "Acts upstream of HMG‑CoA reductase in the liver."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which statin brand/generic pair is correct?",
-        "choices": [
-          "Lipitor — atorvastatin",
-          "Crestor — simvastatin",
-          "Zocor — rosuvastatin",
-          "Pravachol — fluvastatin"
-        ],
-        "answer": "Lipitor — atorvastatin",
-        "explain": "Crestor = rosuvastatin; Zocor = simvastatin; Pravachol = pravastatin."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which is a bile acid sequestrant?",
-        "choices": [
-          "Colesevelam",
-          "Ezetimibe",
-          "Niacin",
-          "Icosapent ethyl"
-        ],
-        "answer": "Colesevelam",
-        "explain": "BAS: cholestyramine, colestipol, colesevelam."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which statin is generally considered more potent per mg?",
-        "choices": [
-          "Rosuvastatin",
-          "Pravastatin",
-          "Fluvastatin",
-          "Lovastatin"
-        ],
-        "answer": "Rosuvastatin",
-        "explain": "Rosuvastatin and atorvastatin are most potent."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Gemfibrozil belongs to which class?",
-        "choices": [
-          "Fibrate",
-          "Niacin",
-          "Omega‑3 fatty acid",
-          "Statin"
-        ],
-        "answer": "Fibrate",
-        "explain": "A fibrate; avoid with many statins due to myopathy risk."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Colestipol is a:",
-        "choices": [
-          "Bile acid sequestrant",
-          "PCSK9 inhibitor",
-          "Statin",
-          "Ezetimibe"
-        ],
-        "answer": "Bile acid sequestrant",
-        "explain": "BAS: cholestyramine, colestipol, colesevelam."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Inclisiran is best described as:",
-        "choices": [
-          "siRNA that lowers hepatic PCSK9",
-          "PCSK9 monoclonal antibody",
-          "Bile acid sequestrant",
-          "Fibrate"
-        ],
-        "answer": "siRNA that lowers hepatic PCSK9",
-        "explain": "Inclisiran reduces PCSK9 synthesis via RNA interference."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which is a high‑intensity statin dose?",
-        "choices": [
-          "Atorvastatin 40–80 mg",
-          "Simvastatin 20 mg",
-          "Pravastatin 40 mg",
-          "Lovastatin 40 mg"
-        ],
-        "answer": "Atorvastatin 40–80 mg",
-        "explain": "High‑intensity: atorvastatin 40–80 mg or rosuvastatin 20–40 mg."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Crestor is the brand name for:",
-        "choices": [
-          "Rosuvastatin",
-          "Simvastatin",
-          "Atorvastatin",
-          "Pitavastatin"
-        ],
-        "answer": "Rosuvastatin",
-        "explain": "Crestor = rosuvastatin."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Zetia is the brand name for:",
-        "choices": [
-          "Ezetimibe",
-          "Bempedoic acid",
-          "Gemfibrozil",
-          "Colesevelam"
-        ],
-        "answer": "Ezetimibe",
-        "explain": "Zetia = ezetimibe."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Repatha is the brand for:",
-        "choices": [
-          "Evolocumab",
-          "Alirocumab",
-          "Inclisiran",
-          "Niacin"
-        ],
-        "answer": "Evolocumab",
-        "explain": "Repatha = evolocumab (PCSK9 mAb)."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Praluent is the brand for:",
-        "choices": [
-          "Alirocumab",
-          "Evolocumab",
-          "Ezetimibe",
-          "Fenofibrate"
-        ],
-        "answer": "Alirocumab",
-        "explain": "Praluent = alirocumab (PCSK9 mAb)."
+        "type": "short",
+        "prompt": "Generic name of Lipitor?",
+        "answerText": "Atorvastatin"
       },
       {
         "type": "tf",
-        "prompt": "Niacin commonly causes flushing.",
-        "answer": "True",
-        "explain": "Flushing is a classic effect of niacin."
+        "prompt": "Rosuvastatin is a statin.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Fenofibrate belongs to what class?",
+        "choices": ["Statin", "Fibric Acid Derivative", "Omega-3", "Nicotinic Acid"],
+        "answer": "Fibric Acid Derivative"
+      },
+      {
+        "type": "short",
+        "prompt": "Brand name of Pravastatin?",
+        "answerText": "Pravachol"
+      },
+      {
+        "type": "short",
+        "prompt": "Drug category of Zetia?",
+        "answerText": "Antilipemic"
       },
       {
         "type": "tf",
-        "prompt": "Bile acid sequestrants often cause constipation or GI upset.",
-        "answer": "True",
-        "explain": "GI issues are common with BAS."
+        "prompt": "Niacin is a Nicotinic Acid.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Lovaza is which type of drug?",
+        "choices": ["Statin", "Omega-3 Fatty Acid", "Fibrate", "PCSK9 Inhibitor"],
+        "answer": "Omega-3 Fatty Acid"
+      },
+      {
+        "type": "short",
+        "prompt": "Brand name of Rosuvastatin?",
+        "answerText": "Crestor"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drug blocks cholesterol absorption?",
+        "choices": ["Ezetimibe", "Fenofibrate", "Niacin", "Lovaza"],
+        "answer": "Ezetimibe"
+      },
+      {
+        "type": "tf",
+        "prompt": "Evolocumab is a PCSK9 inhibitor.",
+        "answer": "True"
+      },
+      {
+        "type": "short",
+        "prompt": "Brand name of Alirocumab?",
+        "answerText": "Praluent"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drug is a Statin?",
+        "choices": ["Niacin", "Fenofibrate", "Simvastatin", "Ezetimibe"],
+        "answer": "Simvastatin"
+      },
+      {
+        "type": "short",
+        "prompt": "Generic name of Zocor?",
+        "answerText": "Simvastatin"
+      },
+      {
+        "type": "tf",
+        "prompt": "All statins are antilipemics.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drug is classified as Nicotinic Acid?",
+        "choices": ["Niacin", "Rosuvastatin", "Fenofibrate", "Ezetimibe"],
+        "answer": "Niacin"
+      },
+      {
+        "type": "short",
+        "prompt": "Drug class of Zetia?",
+        "answerText": "Cholesterol Absorption Inhibitor"
+      },
+      {
+        "type": "short",
+        "prompt": "Generic name of Lovaza?",
+        "answerText": ["Omega-3-acid ethyl esters", "Omega-3"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which statin has the brand name Crestor?",
+        "choices": ["Rosuvastatin", "Atorvastatin", "Simvastatin", "Pravastatin"],
+        "answer": "Rosuvastatin"
+      },
+      {
+        "type": "tf",
+        "prompt": "Tricor is a Fibric Acid Derivative.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drug is an siRNA therapy?",
+        "choices": ["Inclisiran", "Ezetimibe", "Fenofibrate", "Niacin"],
+        "answer": "Inclisiran"
+      },
+      {
+        "type": "short",
+        "prompt": "Generic name of Pravachol?",
+        "answerText": "Pravastatin"
+      },
+      {
+        "type": "short",
+        "prompt": "Brand name of Atorvastatin?",
+        "answerText": "Lipitor"
+      },
+      {
+        "type": "tf",
+        "prompt": "Inclisiran is a PCSK9 monoclonal antibody.",
+        "answer": "False"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drug is an Omega-3 fatty acid?",
+        "choices": ["Lovaza", "Zetia", "Tricor", "Praluent"],
+        "answer": "Lovaza"
       }
     ],
     "hard": [
       {
         "type": "mcq",
-        "prompt": "Statins reduce cholesterol by inhibiting which enzyme?",
-        "choices": [
-          "HMG‑CoA reductase",
-          "Squalene synthase",
-          "ATP‑citrate lyase",
-          "NPC1L1"
-        ],
-        "answer": "HMG‑CoA reductase",
-        "explain": "Rate‑limiting step in cholesterol synthesis."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which pairing is most prone to myopathy risk?",
-        "choices": [
-          "Ezetimibe + BAS",
-          "Gemfibrozil + statin",
-          "Fenofibrate + omega‑3",
-          "Niacin + ezetimibe"
-        ],
-        "answer": "Gemfibrozil + statin",
-        "explain": "Gemfibrozil inhibits statin glucuronidation."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Ezetimibe targets:",
-        "choices": [
-          "NPC1L1 transporter",
-          "PCSK9 protein",
-          "LDL receptor",
-          "CETP"
-        ],
-        "answer": "NPC1L1 transporter",
-        "explain": "Blocks cholesterol absorption at the brush border."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Bempedoic acid primarily acts in which tissue?",
-        "choices": [
-          "Hepatocytes",
-          "Skeletal muscle",
-          "Adipose tissue",
-          "Intestinal mucosa"
-        ],
-        "answer": "Hepatocytes",
-        "explain": "Activated in the liver; minimal muscle exposure."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Inclisiran maintenance dosing after initial 0 and 3‑month injections is:",
-        "choices": [
-          "Every 6 months",
-          "Monthly",
-          "Every 3 months",
-          "Annually"
-        ],
-        "answer": "Every 6 months",
-        "explain": "After day 0 and 3 months, give every 6 months."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which lipid effect profile matches fibrates?",
-        "choices": [
-          "↓TG greatly; ↑HDL modestly; LDL variable",
-          "↓LDL greatly; no HDL change; ↓TG none",
-          "↑HDL greatly; ↑LDL greatly; ↓TG modestly",
-          "↓TG none; ↑HDL greatly; ↓LDL modestly"
-        ],
-        "answer": "↓TG greatly; ↑HDL modestly; LDL variable",
-        "explain": "Signature fibrate profile."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which monitoring is most relevant at statin initiation?",
-        "choices": [
-          "Baseline ALT/AST",
-          "Serum uric acid",
-          "INR",
-          "TSH"
-        ],
-        "answer": "Baseline ALT/AST",
-        "explain": "Baseline hepatic function typically assessed."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which condition is a relative contraindication to bile acid sequestrants?",
-        "choices": [
-          "Severe hypertriglyceridemia",
-          "Hypertension",
-          "Mild CKD",
-          "Hypothyroidism"
-        ],
-        "answer": "Severe hypertriglyceridemia",
-        "explain": "BAS can raise triglycerides."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which statement best describes EPA‑only therapy (icosapent ethyl)?",
-        "choices": [
-          "Shown to reduce CV events in select high‑risk patients on statins",
-          "Always raises LDL significantly",
-          "First‑line LDL‑lowering monotherapy",
-          "Inhibits PCSK9"
-        ],
-        "answer": "Shown to reduce CV events in select high‑risk patients on statins",
-        "explain": "Evidence supports CV risk reduction in specific populations."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which statin is least dependent on CYP3A4 metabolism?",
-        "choices": [
-          "Pravastatin",
-          "Simvastatin",
-          "Lovastatin",
-          "Atorvastatin"
-        ],
-        "answer": "Pravastatin",
-        "explain": "Pravastatin has minimal CYP3A4 metabolism."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which bile acid sequestrant may improve glycemic control in diabetes?",
-        "choices": [
-          "Colesevelam",
-          "Cholestyramine",
-          "Colestipol",
-          "Ezetimibe"
-        ],
-        "answer": "Colesevelam",
-        "explain": "Colesevelam can modestly improve glycemic control."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which adverse effect is most typical with niacin therapy?",
-        "choices": [
-          "Flushing",
-          "Constipation",
-          "Cough",
-          "Pedal edema"
-        ],
-        "answer": "Flushing",
-        "explain": "Prostaglandin‑mediated flushing is characteristic."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which combination increases risk of bradycardia/heart block the least?",
-        "choices": [
-          "Metoprolol + diltiazem",
-          "Statin + gemfibrozil",
-          "Ezetimibe + statin",
-          "Niacin + BAS"
-        ],
-        "answer": "Niacin + BAS",
-        "explain": "The others listed have known interaction risks (notably statin+gemfibrozil)."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which agent most directly increases hepatic LDL receptor availability?",
-        "choices": [
-          "PCSK9 inhibitors",
-          "Niacin",
-          "Omega‑3 fatty acids",
-          "BAS"
-        ],
-        "answer": "PCSK9 inhibitors",
-        "explain": "They prevent LDL receptor degradation."
-      },
-      {
-        "type": "short",
-        "prompt": "Name one PCSK9 monoclonal antibody.",
-        "answerText": [
-          "alirocumab",
-          "evolocumab"
-        ],
-        "explain": "PCSK9 mAbs include alirocumab and evolocumab."
-      },
-      {
-        "type": "short",
-        "prompt": "Name one bile acid sequestrant.",
-        "answerText": [
-          "cholestyramine",
-          "colestipol",
-          "colesevelam"
-        ],
-        "explain": "Any of these BAS is correct."
-      },
-      {
-        "type": "short",
-        "prompt": "Name one high‑intensity statin (drug name only).",
-        "answerText": [
-          "atorvastatin",
-          "rosuvastatin"
-        ],
-        "explain": "Atorvastatin or rosuvastatin qualify at specific doses."
+        "prompt": "Statins work by inhibiting which enzyme?",
+        "choices": ["HMG-CoA Reductase", "PPAR-α", "PCSK9", "Lipase"],
+        "answer": "HMG-CoA Reductase"
       },
       {
         "type": "tf",
-        "prompt": "Ezetimibe inhibits HMG‑CoA reductase.",
-        "answer": "False",
-        "explain": "It blocks NPC1L1; statins inhibit HMG‑CoA reductase."
+        "prompt": "Ezetimibe reduces cholesterol absorption in the intestine.",
+        "answer": "True"
+      },
+      {
+        "type": "short",
+        "prompt": "Fenofibrate activates which receptor?",
+        "answerText": ["PPAR-α", "Peroxisome proliferator-activated receptor alpha"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Niacin reduces production of which lipoprotein?",
+        "choices": ["VLDL", "HDL", "LDL receptor", "PCSK9"],
+        "answer": "VLDL"
+      },
+      {
+        "type": "short",
+        "prompt": "Mechanism of PCSK9 inhibitors?",
+        "answerText": ["Prevent LDL receptor degradation", "Increase LDL receptors"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drug increases lipoprotein lipase activity?",
+        "choices": ["Omega-3 acid ethyl esters", "Ezetimibe", "Niacin", "Pravastatin"],
+        "answer": "Omega-3 acid ethyl esters"
+      },
+      {
+        "type": "short",
+        "prompt": "Generic name of Repatha?",
+        "answerText": "Evolocumab"
+      },
+      {
+        "type": "short",
+        "prompt": "Generic name of Praluent?",
+        "answerText": "Alirocumab"
       },
       {
         "type": "tf",
-        "prompt": "Gemfibrozil is generally preferred over fenofibrate when combined with statins.",
-        "answer": "False",
-        "explain": "Gemfibrozil has higher myopathy risk with statins; fenofibrate is generally preferred if a fibrate must be used."
+        "prompt": "Inclisiran is given as an injection.",
+        "answer": "True"
+      },
+      {
+        "type": "short",
+        "prompt": "Brand name of Ezetimibe?",
+        "answerText": "Zetia"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drug is a Cholesterol Absorption Inhibitor?",
+        "choices": ["Ezetimibe", "Niacin", "Fenofibrate", "Omega-3"],
+        "answer": "Ezetimibe"
+      },
+      {
+        "type": "short",
+        "prompt": "Drug class of Leqvio?",
+        "answerText": "siRNA Agent"
       },
       {
         "type": "tf",
-        "prompt": "Bempedoic acid can increase uric acid and has tendon‑related warnings.",
-        "answer": "True",
-        "explain": "Hyperuricemia and rare tendon issues have been reported."
+        "prompt": "Alirocumab is a PCSK9 inhibitor.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which of the following are statins?",
+        "choices": ["Simvastatin and Atorvastatin", "Ezetimibe and Niacin", "Lovaza and Zetia", "Inclisiran and Evolocumab"],
+        "answer": "Simvastatin and Atorvastatin"
+      },
+      {
+        "type": "short",
+        "prompt": "Brand name of Rosuvastatin?",
+        "answerText": "Crestor"
+      },
+      {
+        "type": "short",
+        "prompt": "Brand name of Pravastatin?",
+        "answerText": "Pravachol"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drugs are PCSK9 inhibitors?",
+        "choices": ["Evolocumab and Alirocumab", "Niacin and Fenofibrate", "Ezetimibe and Lovaza", "Simvastatin and Rosuvastatin"],
+        "answer": "Evolocumab and Alirocumab"
+      },
+      {
+        "type": "tf",
+        "prompt": "Niacin is sometimes called Vitamin B3.",
+        "answer": "True"
+      },
+      {
+        "type": "short",
+        "prompt": "Brand name of Simvastatin?",
+        "answerText": "Zocor"
+      },
+      {
+        "type": "short",
+        "prompt": "Brand name of Atorvastatin?",
+        "answerText": "Lipitor"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drug reduces LDL cholesterol the most?",
+        "choices": ["Statins", "Niacin", "Omega-3", "Fibrates"],
+        "answer": "Statins"
+      },
+      {
+        "type": "tf",
+        "prompt": "Ezetimibe is a statin.",
+        "answer": "False"
+      },
+      {
+        "type": "short",
+        "prompt": "Generic name of Tricor?",
+        "answerText": "Fenofibrate"
+      },
+      {
+        "type": "short",
+        "prompt": "Generic name of Lovaza?",
+        "answerText": ["Omega-3-acid ethyl esters", "Omega-3"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drug lowers cholesterol absorption but does NOT inhibit HMG-CoA reductase?",
+        "choices": ["Ezetimibe", "Niacin", "Fenofibrate", "Omega-3"],
+        "answer": "Ezetimibe"
       }
     ]
   }

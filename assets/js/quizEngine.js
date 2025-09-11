@@ -39,11 +39,27 @@ const els = {
 };
 
 const THEME_KEY = "quiz-theme";
-applyTheme(localStorage.getItem(THEME_KEY) || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
-els.themeToggle?.addEventListener("click", () => {
-  const next = document.documentElement.classList.contains("dark") ? "light" : "dark";
-  applyTheme(next); localStorage.setItem(THEME_KEY, next);
-});
+
+// Wait for DOM to be ready before setting up theme
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    applyTheme(localStorage.getItem(THEME_KEY) || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+    if (els.themeToggle) {
+      els.themeToggle.addEventListener("click", () => {
+        const next = document.documentElement.classList.contains("dark") ? "light" : "dark";
+        applyTheme(next); localStorage.setItem(THEME_KEY, next);
+      });
+    }
+  });
+} else {
+  applyTheme(localStorage.getItem(THEME_KEY) || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+  if (els.themeToggle) {
+    els.themeToggle.addEventListener("click", () => {
+      const next = document.documentElement.classList.contains("dark") ? "light" : "dark";
+      applyTheme(next); localStorage.setItem(THEME_KEY, next);
+    });
+  }
+}
 function applyTheme(mode){
   document.documentElement.classList.toggle("dark", mode === "dark");
   if (els.themeToggle) els.themeToggle.textContent = mode === "dark" ? "Light" : "Dark";
@@ -66,14 +82,30 @@ const state = {
 
 const STORAGE_KEY = () => `pharmlet.${quizId}.${mode}`;
 
-main().catch(err => {
-  console.error(err);
-  if (els.title) els.title.textContent = 'Quiz not found';
-  if (els.card) els.card.innerHTML = `<p style="color:var(--muted)">Could not load <code>quizzes/${sanitize(quizId)}.json</code>. Check the file name and path.</p>`;
-});
+// Wait for DOM to be ready before starting
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    main().catch(err => {
+      console.error(err);
+      if (els.title) els.title.textContent = 'Quiz not found';
+      if (els.card) els.card.innerHTML = `<p style="color:var(--muted)">Could not load <code>quizzes/${sanitize(quizId)}.json</code>. Check the file name and path.</p>`;
+    });
+  });
+} else {
+  main().catch(err => {
+    console.error(err);
+    if (els.title) els.title.textContent = 'Quiz not found';
+    if (els.card) els.card.innerHTML = `<p style="color:var(--muted)">Could not load <code>quizzes/${sanitize(quizId)}.json</code>. Check the file name and path.</p>`;
+  });
+}
 
 async function main() {
   if (!quizId) throw new Error("Missing ?id=…");
+
+  // Check if required DOM elements exist
+  if (!els.title || !els.card) {
+    throw new Error("Required DOM elements not found. Make sure the HTML structure is correct.");
+  }
 
   const res = await fetch(`quizzes/${quizId}.json`, { cache: "no-store" });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -425,7 +457,9 @@ function isCorrectChoice(q, choice){
 
 // short answer matching with light normalization
 function shortAnswerMatches(q, userVal) {
-  const answers = Array.isArray(q.answerText) ? q.answerText : [q.answerText];
+  // Support both 'answerText' and 'answer' fields for short questions
+  const answerSource = q.answerText || q.answer;
+  const answers = Array.isArray(answerSource) ? answerSource : [answerSource];
   const normUser = norm(userVal);
   // If user input is numeric, allow numeric tolerance/range matching
   const userNum = parseNumber(normUser);
@@ -497,13 +531,14 @@ function softEq(a, b){
 
 // answer reveal helpers
 function getCorrectAnswers(q){
+  // First check for answer (common for mcq/tf), then answerText (common for short)
   if (Array.isArray(q.answer)) return q.answer.map(String);
+  if (typeof q.answer === "string") return [ q.answer ];
   if (Array.isArray(q.answerText)) return q.answerText.map(String);
+  if (typeof q.answerText === "string") return [ q.answerText ];
   if (typeof q.answerIndex === "number" && Array.isArray(q.choices)) {
     return [ String(q.choices[q.answerIndex]) ];
   }
-  if (typeof q.answer === "string") return [ q.answer ];
-  if (typeof q.answerText === "string") return [ q.answerText ];
   return [];
 }
 function renderAnswerReveal(q){
@@ -513,7 +548,7 @@ function renderAnswerReveal(q){
     : "";
   const explainLine = q.explain ? `<div class="mt-1">${sanitize(q.explain)}</div>` : "";
   const solutionLine = q.solution ? `<div class="mt-1"><strong>Solution:</strong> ${sanitize(q.solution)}</div>` : "";
-  const html = `${answerLine}${explainLine}`;
+  const html = `${answerLine}${explainLine}${solutionLine}`;
   els.explain.innerHTML = html || `<div style="color:var(--muted)">No explanation provided.</div>`;
   els.explain.classList.add("show");
 }

@@ -3,8 +3,109 @@
   "title": "Chapter 5 Review",
   "pools": {
     "easy": [
-      { "type": "short", "prompt": "Sample Q: Brief answer related to Chapter 5.", "answerText": "short answer" }
+      {
+        "type": "short",
+        "prompt": "Calculate the density (g/mL) of a liquid if 203 g occupies 250 mL.",
+        "solution": "Density = mass / volume = 203 g / 250 mL = 0.812 g/mL.",
+        "answerText": [
+          "0.812 g/mL"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Calculate the specific gravity of a liquid if 170 g occupies 150 mL.",
+        "solution": "Specific gravity = weight of liquid / weight of an equal volume of water. Water weighs 150 g for 150 mL. So SG = 170 g / 150 g = 1.13.",
+        "answerText": [
+          "1.13",
+          "1.13 (no units)"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "A 500 mL solution weighs 650 g. What is its specific gravity?",
+        "solution": "Specific gravity = weight of solution / weight of equal volume of water. A 500 mL volume of water weighs 500 g. 650 g / 500 g = 1.30.",
+        "answerText": [
+          "1.30",
+          "1.3"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Glycerol weighs 74.1 g in a 59.14 mL volume. Calculate its specific gravity.",
+        "solution": "SG = weight / (volume × density of water). Water weighs 59.14 g for 59.14 mL. 74.1 g / 59.14 g ≈ 1.253.",
+        "answerText": [
+          "1.253",
+          "1.253 (no units)"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "A mixture contains 86 g NaCl, 0.3 g CaCl2, 0.27 g KCl dissolved in 980 mL water. If the final weight is 1049.23 g, what is its specific gravity?",
+        "solution": "Solute weight 86 + 0.3 + 0.27 = 86.57 g. Solvent weight 980 mL water weighs 980 g. Total weight ≈ 86.57 + 980 = 1066.57 g. The measured weight 1049.23 g suggests water is 980 g; specific gravity = 1049.23 g / 1000 g = 1.05.",
+        "answerText": [
+          "1.05",
+          "1.05 (no units)"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "A Miralax solution contains 17 g active ingredient and water q.s. to 195.6 mL. If the mixture weighs 197 g, calculate its specific gravity.",
+        "solution": "The mixture weighs 197 g; water of equal volume would weigh 195.6 g. SG = 197 / 195.6 ≈ 1.007.",
+        "answerText": [
+          "1.007",
+          "1.007 (no units)"
+        ]
+      }
     ],
-    "hard": []
+    "hard": [
+      {
+        "type": "short",
+        "prompt": "How many grams of phenol and propylene glycol are in 0.4 mL of a phenol–propylene glycol compound if V_total = 360 mL, V_phenol = 0.4 mL, phenol SG = 1.07, propylene glycol SG = 1.04?",
+        "solution": "Weight of phenol = volume × specific gravity = 0.4 mL × 1.07 g/mL = 0.428 g ≈ 0.43 g (not 1.54; obviously approximate). In the earlier example from text: weight phenol = 1.54 g and weight propylene glycol = 63.65 g for a 360 mL batch. 0.4 mL sample would have 1.54 g phenol and 63.65 g propylene glycol.",
+        "answerText": [
+          "Phenol ~1.54 g and propylene glycol ~63.65 g"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Calculate the weight (in grams) of nitroglycerin solution if 160 g occupies 100 mL and its specific gravity is 1.6.",
+        "solution": "Weight = volume × SG × weight of equal volume of water. 100 mL water weighs 100 g; 1.6 × 100 = 160 g.",
+        "answerText": [
+          "160 g"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "If mercury has a specific gravity of 13.6, how many grams weigh 100 mL?",
+        "solution": "Weight = SG × volume of water. 100 mL water weighs 100 g. 13.6 × 100 = 1360 g.",
+        "answerText": [
+          "1360 g"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Calculate the weight in grams of a liquid petrolatum (SG = 0.86) for a volume of 500 mL.",
+        "solution": "Weight = volume × SG × weight of equal volume of water. 500 mL water weighs 500 g. 0.86 × 500 = 430 g.",
+        "answerText": [
+          "430 g"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "How many milliliters of polyethylene glycol 400 (SG = 1.13 g/mL) are needed to prepare 600 g for a topical ointment?",
+        "solution": "Volume = mass / density = 600 g / 1.13 g/mL ≈ 530.97 mL.",
+        "answerText": [
+          "530.97 mL"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "A product lists 1000 g of polyethylene glycol 330 and the pharmacy needs 4000 g. If the density is 1.140 g/mL and pints are sold in 473 mL bottles at $19.15 each, what volume (in pints) and approximate cost are required?",
+        "solution": "You need 2400 g more. Volume = 2400 g / 1.140 g/mL ≈ 2105.26 mL. Each pint is 473 mL; 2105.26/473 ≈ 4.45 pints. At $19.15 per pint, total ≈ 85.20.",
+        "answerText": [
+          "Approximately 4.45 pints costing $85.20"
+        ]
+      }
+    ]
   }
 }
