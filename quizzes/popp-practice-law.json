@@ -58,15 +58,15 @@
         "answer": "Up to 5 times in 6 months if authorized"
       },
       {
-        "type": "mcq",
-        "prompt": "Which is a Schedule II medication?",
+        "type": "mcq-multiple",
+        "prompt": "Which is a Schedule II medication? (Select all that apply)",
         "choices": [
           "Morphine",
+          "Oxycodone",
           "Diazepam",
-          "Pregabalin",
-          "Dextromethorphan"
+          "Pregabalin"
         ],
-        "answer": "Morphine"
+        "answer": ["Morphine", "Oxycodone"]
       },
       {
         "type": "mcq",

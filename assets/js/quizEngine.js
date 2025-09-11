@@ -179,6 +179,11 @@ function wireEvents(){
       const chosen = els.options.querySelector("input[type='radio']:checked");
       if (!chosen) return;
       scoreCurrent(chosen.value);
+    } else if (q.type === "mcq-multiple") {
+      const checked = Array.from(els.options.querySelectorAll("input[type='checkbox']:checked"));
+      if (checked.length === 0) return;
+      const answers = checked.map(cb => cb.value);
+      scoreCurrent(answers);
     } else if (q.type === "short") {
       scoreCurrent(els.shortInput.value);
     }
@@ -217,11 +222,21 @@ function wireEvents(){
     // number keys 1..9 select that choice
     const num = Number(key);
     if (num >= 1 && num <= 9) {
-      const radios = els.options.querySelectorAll("input[type='radio']");
-      const choice = radios[num-1];
-      if (choice && !choice.disabled) {
-        choice.checked = true;
-        enableCheckIfChoiceSelected();
+      const q = currentQ();
+      if (q && (q.type === "mcq" || q.type === "tf")) {
+        const radios = els.options.querySelectorAll("input[type='radio']");
+        const choice = radios[num-1];
+        if (choice && !choice.disabled) {
+          choice.checked = true;
+          enableCheckIfChoiceSelected();
+        }
+      } else if (q && q.type === "mcq-multiple") {
+        const checkboxes = els.options.querySelectorAll("input[type='checkbox']");
+        const choice = checkboxes[num-1];
+        if (choice && !choice.disabled) {
+          choice.checked = !choice.checked; // Toggle for multiple choice
+          enableCheckIfChoiceSelected();
+        }
       }
     }
   });
@@ -271,6 +286,39 @@ function render(){
       }
       els.options.appendChild(wrap);
     });
+  } else if (q.type === "mcq-multiple") {
+    const group = `q${state.index}`;
+    const choices = q._choices || [];
+    choices.forEach((choice, idx) => {
+      const id = `${group}c${idx}`;
+      const wrap = document.createElement("label");
+      wrap.className = "flex items-center gap-2";
+      wrap.setAttribute("for", id);
+      wrap.setAttribute("role", "checkbox");
+      wrap.setAttribute("aria-checked", "false");
+      wrap.innerHTML = `<input id="${id}" type="checkbox" name="${group}" value="${choice}"><span>${sanitize(choice)}</span>`;
+      const input = wrap.querySelector("input");
+      input.addEventListener('change', enableCheckIfChoiceSelected);
+
+      // Check if this choice is in user's selection
+      if (Array.isArray(q._user) && q._user.includes(choice)) {
+        input.checked = true;
+        wrap.setAttribute("aria-checked", "true");
+      }
+
+      if (q._answered || state.review) {
+        input.disabled = true;
+        const ok = isCorrectChoice(q, choice);
+        const userSelected = Array.isArray(q._user) && q._user.includes(choice);
+        if (ok) wrap.classList.add("correct");
+        if (userSelected && !q._correct) wrap.classList.add("wrong");
+        // answer fade: dim wrong options
+        if (!ok) wrap.style.opacity = ".65";
+        wrap.setAttribute("aria-checked", userSelected ? "true" : "false");
+        wrap.setAttribute("aria-disabled", "true");
+      }
+      els.options.appendChild(wrap);
+    });
   } else if (q.type === "short") {
     els.shortWrap.classList.remove("hidden");
     els.shortInput.value = q._user || "";
@@ -288,6 +336,9 @@ function render(){
   // ensure "Check" disabled until a selection is present
   if (q.type === "mcq" || q.type === "tf") {
     const anyChecked = !!els.options.querySelector("input[type='radio']:checked");
+    els.check.disabled = !anyChecked;
+  } else if (q.type === "mcq-multiple") {
+    const anyChecked = !!els.options.querySelector("input[type='checkbox']:checked");
     els.check.disabled = !anyChecked;
   }
 
@@ -313,18 +364,40 @@ function render(){
 }
 
 function enableCheckIfChoiceSelected() {
-  const sel = els.options.querySelector("input[type='radio']:checked");
-  els.check.disabled = !sel;
+  const q = currentQ();
+  if (!q) return;
+  
+  if (q.type === "mcq" || q.type === "tf") {
+    const sel = els.options.querySelector("input[type='radio']:checked");
+    els.check.disabled = !sel;
+  } else if (q.type === "mcq-multiple") {
+    const checked = els.options.querySelectorAll("input[type='checkbox']:checked");
+    els.check.disabled = checked.length === 0;
+  }
 }
 
 function scoreCurrent(userValRaw){
-  const q = currentQ(); const userVal = (userValRaw ?? "").toString().trim();
+  const q = currentQ(); 
   let correct = false;
+  let userVal = userValRaw;
+  
   if (q.type === "mcq" || q.type === "tf") {
+    userVal = (userValRaw ?? "").toString().trim();
     correct = isCorrectChoice(q, userVal);
+  } else if (q.type === "mcq-multiple") {
+    // userValRaw should be an array of selected choices
+    if (Array.isArray(userValRaw)) {
+      userVal = userValRaw;
+      correct = isCorrectMultipleChoice(q, userVal);
+    } else {
+      userVal = [];
+      correct = false;
+    }
   } else if (q.type === "short") {
+    userVal = (userValRaw ?? "").toString().trim();
     correct = shortAnswerMatches(q, userVal);
   }
+  
   if (!q._answered) {
     q._answered = true; q._correct = !!correct; q._user = userVal;
     if (correct) { state.score += 1; state.currentStreak += 1; state.bestStreak = Math.max(state.bestStreak, state.currentStreak); }
@@ -464,6 +537,19 @@ function isCorrectChoice(q, choice){
     return Array.isArray(q.choices) && equalFold(String(q.choices[ans]), choice);
   }
   return false;
+}
+
+function isCorrectMultipleChoice(q, userChoices) {
+  const ans = q.answer ?? q.answerText ?? q.answerIndex;
+  if (!Array.isArray(ans)) return false;
+  if (!Array.isArray(userChoices)) return false;
+  
+  // Both arrays must have the same length and contain the same elements
+  if (ans.length !== userChoices.length) return false;
+  
+  // Check that every correct answer is selected and no incorrect answers are selected
+  return ans.every(a => userChoices.some(uc => equalFold(a, uc))) &&
+         userChoices.every(uc => ans.some(a => equalFold(a, uc)));
 }
 
 // short answer matching with light normalization
