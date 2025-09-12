@@ -1,0 +1,121 @@
+{
+  "type": "object",
+  "required": ["title"],
+  "properties": {
+    "id": { "type": "string" },
+    "title": { "type": "string", "minLength": 1 },
+    "subtitle": { "type": "string" },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "notes": { "type": "string" },
+        "version": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "pools": {
+      "type": "object",
+      "properties": {
+        "easy": { "$ref": "#/$defs/itemsArray" },
+        "hard": { "$ref": "#/$defs/itemsArray" },
+        "expert": { "$ref": "#/$defs/itemsArray" }
+      },
+      "additionalProperties": false
+    },
+    "questions": { "$ref": "#/$defs/itemsArray" }
+  },
+  "anyOf": [
+    { "required": ["pools"] },
+    { "required": ["questions"] }
+  ],
+  "$defs": {
+    "itemsArray": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "prompt"],
+        "properties": {
+          "type": { "enum": ["mcq", "mcq-multiple", "tf", "short"] },
+          "prompt": { "type": "string", "minLength": 1 },
+          "choices": {
+            "type": "array",
+            "items": { "type": "string" },
+            "minItems": 2
+          },
+          "answer": {
+            "oneOf": [
+              { "type": "string" },
+              {
+                "type": "array",
+                "items": { "type": "string" },
+                "minItems": 1
+              }
+            ]
+          },
+          "answerIndex": { "type": "number" },
+          "answerText": {
+            "oneOf": [
+              { "type": "string" },
+              {
+                "type": "array",
+                "items": { "type": "string" },
+                "minItems": 1
+              }
+            ]
+          },
+          "explain": { "type": "string" },
+            "solution": { "type": "string" },
+            "hints": {
+              "oneOf": [
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string" } }
+              ]
+            },
+            "tolerance": { "type": "number", "minimum": 0 }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "type": { "const": "mcq" } }, "required": ["type"] },
+            "then": {
+              "anyOf": [
+                { "required": ["answer"] },
+                { "required": ["answerIndex"] }
+              ],
+              "required": ["choices"]
+            }
+          },
+          {
+            "if": { "properties": { "type": { "const": "mcq-multiple" } }, "required": ["type"] },
+            "then": {
+              "required": ["answer", "choices"],
+              "properties": {
+                "answer": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "minItems": 1
+                }
+              }
+            }
+          },
+          {
+            "if": { "properties": { "type": { "const": "tf" } }, "required": ["type"] },
+            "then": {
+              "required": ["answer"],
+              "properties": {
+                "answer": {
+                  "type": "string",
+                  "enum": ["True", "False", "true", "false"]
+                }
+              }
+            }
+          },
+          {
+            "if": { "properties": { "type": { "const": "short" } }, "required": ["type"] },
+            "then": { "required": ["answerText"] }
+          }
+        ]
+      }
+    }
+  },
+  "additionalProperties": false
+}

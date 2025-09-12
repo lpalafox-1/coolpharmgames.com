@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Quiz</title>
+
+  <!-- Meta / theme -->
+  <meta name="description" content="Pharm-let quiz runner with dark mode, streak flame, timer, and keyboard shortcuts." />
+  <meta name="theme-color" content="#8b1e3f" />
+  <link rel="icon" href="assets/icon.png" />
+
+  <!-- CSP (no inline scripts) -->
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self';
+             img-src 'self' data:;
+             style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com;
+             script-src 'self' https://cdn.tailwindcss.com;
+             connect-src 'self';">
+
+  <!-- CSS / Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <style>
+    /* Small helper for visually-hidden live region */
+    .sr-only {
+      position: absolute; width: 1px; height: 1px;
+      padding: 0; margin: -1px; overflow: hidden;
+      clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+    }
+    .sticky-head { position:sticky; top:0; z-index:50; backdrop-filter:saturate(1.2) blur(6px); background:color-mix(in oklab, var(--bg) 80%, transparent); }
+    .mini-hint { font-size:.8rem; color:var(--muted); }
+  </style>
+</head>
+
+<body class="bg-[var(--bg)] text-[var(--text)]">
+  <header class="sticky-head border-b border-[var(--ring)]">
+    <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+      <a href="index.html" class="quiz-link">← Back to Library</a>
+      <div class="flex items-center gap-3">
+        <button id="share" class="btn btn-ghost" type="button" aria-label="Copy quiz link">Share</button>
+
+        <!-- Question count segmented control (implemented in quizPage.js) -->
+        <div class="flex items-center gap-2">
+          <span class="text-sm" style="color:var(--muted)">Questions:</span>
+          <div id="qcount-group" class="segmented" role="group" aria-label="Question count">
+            <a class="seg-link" data-limit="5"  href="#">5</a>
+            <a class="seg-link" data-limit="10" href="#">10</a>
+            <a class="seg-link" data-limit="20" href="#">20</a>
+            <a class="seg-link" data-limit=""  href="#">All</a>
+          </div>
+        </div>
+
+  <button id="theme-toggle" class="btn btn-ghost" type="button" aria-label="Toggle theme">
+    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.5"/></svg>
+    <span id="theme-label">Dark</span>
+  </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto p-6" id="app">
+    <!-- Title + counters -->
+    <header class="mb-4">
+      <h1 id="quiz-title" class="text-2xl font-bold">Loading…</h1>
+
+      <div class="flex justify-between items-center mt-2 text-sm" style="color: var(--muted);">
+        <div>Question <span id="qnum">0</span>/<span id="qtotal">0</span></div>
+        <div>Score: <span id="score">0</span></div>
+      </div>
+
+      <!-- Progress bar + flame + streak -->
+      <div class="progress-bar-container" aria-label="Progress">
+        <div id="progress-bar" class="progress-bar" style="width:0%;">
+          <span id="fire-flame" class="fire-flame hidden" aria-hidden="true"></span>
+          <span id="fire-count" class="hidden" aria-label="Current streak">×0</span>
+        </div>
+      </div>
+
+      <!-- Progress mini-map (click to jump) -->
+      <div id="nav-map" class="mt-2 flex flex-wrap gap-2 text-sm" aria-label="Question navigator"></div>
+    </header>
+
+    <!-- Question card -->
+    <section id="question-card" class="quiz-card" aria-live="polite">
+      <h2 id="prompt" class="font-semibold">Loading question…</h2>
+
+      <!-- Multiple choice / TF container -->
+      <div id="options" class="mt-3 space-y-2" role="radiogroup" aria-label="Answer choices"></div>
+
+      <!-- Short answer -->
+      <div id="short-wrap" class="mt-3 hidden">
+        <label for="short-input" class="mini-hint">Short answer (not case sensitive)</label>
+        <input id="short-input"
+               class="w-full rounded-xl border border-slate-300 px-3 py-2"
+               placeholder="Type your answer…" />
+      </div>
+
+      <!-- Explicit reveal + explanation (if present in JSON) -->
+      <div id="explain" class="explain" aria-live="polite"></div>
+      <div id="live" aria-live="polite" class="sr-only"></div>
+    </section>
+
+    <!-- Footer controls -->
+    <footer class="mt-6 flex flex-wrap items-center gap-3">
+      <button id="prev" class="btn btn-gray"  type="button" aria-label="Previous question">Previous (← / P)</button>
+      <button id="check" class="btn btn-blue" type="button" aria-label="Check answer">Check (Enter / C)</button>
+      <button id="next" class="btn btn-green hidden" type="button" aria-label="Next question">Next (→ / N)</button>
+
+      <span class="mini-hint ml-2">Tip: use number keys 1–9 to pick an option</span>
+
+      <div class="ml-auto flex items-center gap-3">
+        <button id="mark" class="btn btn-ghost" type="button" aria-pressed="false" aria-label="Mark for review">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 8l4 4 8-8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span id="mark-label">Mark</span>
+        </button>
+
+        <button id="hint-btn" class="btn btn-ghost" type="button" aria-label="Show hint">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M9 21h6M12 3c2.5 0 5 2.5 5 5.5 0 2.5-1.5 4.5-2 5.5h-6c-.5-1-2-3-2-5.5C7 5.5 9.5 3 12 3z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span id="hint-label">Hint</span>
+        </button>
+
+        <button id="reveal-solution" class="btn btn-ghost" type="button" aria-pressed="false" aria-label="Reveal solution">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span id="reveal-label">Show Solution</span>
+        </button>
+
+        <!-- Timer controls (not graded) -->
+        <button id="timer-toggle" class="btn btn-ghost" type="button" aria-pressed="false" aria-label="Toggle timer">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 8v4l2 2" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+          <span id="timer-label">Start Timer</span>
+        </button>
+        <span id="timer-readout" class="text-sm" style="color:var(--muted)">00:00</span>
+
+        <button id="restart" class="btn btn-ghost" type="button" aria-label="Restart quiz">Restart</button>
+      </div>
+    </footer>
+
+    <!-- Results -->
+    <section id="results" class="hidden text-center mt-8" aria-live="polite">
+      <h2 class="text-3xl font-bold mb-2">Quiz Complete!</h2>
+      <p>Your final score is: <span id="final-score" class="font-bold" style="color:var(--accent)"></span></p>
+  <div id="celebrate" class="text-4xl mt-4 hidden" aria-hidden="true"></div>
+      <!-- summary + review button are injected by JS -->
+    </section>
+  </main>
+
+  <!-- Scripts (no inline JS; CSP-safe) -->
+  <script src="assets/js/quizPage.js"></script>
+  <script src="assets/js/quizEngine.js"></script>
+</body>
+</html>

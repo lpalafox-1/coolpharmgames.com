@@ -1,0 +1,483 @@
+{
+  "id": "ceutics-practice-2",
+  "title": "PSCI 71303 Pharmaceutics Quiz 2 Practice v1",
+  "pools": {
+    "easy": [
+      {
+        "type": "mcq",
+        "prompt": "Which ADME step most directly increases plasma drug concentration immediately after non‑IV dosing?",
+        "choices": [
+          "Distribution",
+          "Metabolism",
+          "Absorption",
+          "Excretion"
+        ],
+        "answer": "Absorption"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Tmax on a plasma concentration–time curve is:",
+        "choices": [
+          "Time of drug administration",
+          "Time of peak plasma concentration",
+          "Time to half‑life",
+          "Time when elimination stops"
+        ],
+        "answer": "Time of peak plasma concentration"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which route best avoids first‑pass hepatic metabolism?",
+        "choices": [
+          "Oral",
+          "Sublingual",
+          "Rectal (high placement)",
+          "Intramuscular"
+        ],
+        "answer": "Sublingual"
+      },
+      {
+        "type": "tf",
+        "prompt": "True or False: Area Under the Curve (AUC) represents overall systemic exposure to a drug.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which dosage form is most appropriate for a rapid systemic effect without swallowing?",
+        "choices": [
+          "Transdermal patch",
+          "Sublingual tablet",
+          "Topical cream",
+          "Otic drops"
+        ],
+        "answer": "Sublingual tablet"
+      },
+      {
+        "type": "short",
+        "prompt": "Term for differing solid arrangements of the same molecule (e.g., Form A vs Form B):",
+        "answerText": [
+          "polymorph",
+          "polymorphism"
+        ]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which intermolecular interaction is generally strongest among typical *intermolecular* forces?",
+        "choices": [
+          "London dispersion",
+          "Dipole–dipole",
+          "Hydrogen bonding",
+          "Ionic interaction (between ions)"
+        ],
+        "answer": "Ionic interaction (between ions)"
+      },
+      {
+        "type": "tf",
+        "prompt": "True or False: Increasing surface area of a solid drug generally increases dissolution rate.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "A drug with higher log P is typically more:",
+        "choices": [
+          "Hydrophilic",
+          "Lipophilic",
+          "Ionized in water",
+          "Likely to dissolve in saline"
+        ],
+        "answer": "Lipophilic"
+      },
+      {
+        "type": "short",
+        "prompt": "What does bioavailability (BA) describe (two words: rate & ____)?",
+        "answerText": [
+          "extent"
+        ]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which of the following best defines bioequivalence (BE)?",
+        "choices": [
+          "Same mechanism of action",
+          "Comparison of BA between products",
+          "Same excipients",
+          "Same route of administration"
+        ],
+        "answer": "Comparison of BA between products"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which statement about amorphous vs crystalline forms is MOST often true?",
+        "choices": [
+          "Amorphous has lower apparent solubility",
+          "Crystalline dissolves faster",
+          "Amorphous often has higher apparent solubility",
+          "They always have identical stability"
+        ],
+        "answer": "Amorphous often has higher apparent solubility"
+      },
+      {
+        "type": "tf",
+        "prompt": "True or False: A suspension is a solid in a liquid; an emulsion is liquid droplets dispersed in another immiscible liquid.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which factor will MOST increase simple diffusion across a membrane?",
+        "choices": [
+          "Increased membrane thickness",
+          "Lower concentration gradient",
+          "Higher lipophilicity of unionized drug",
+          "Lower temperature (far below physiologic)"
+        ],
+        "answer": "Higher lipophilicity of unionized drug"
+      },
+      {
+        "type": "mcq",
+        "prompt": "First‑pass metabolism primarily reduces:",
+        "choices": [
+          "Cmax after IV dosing",
+          "Oral bioavailability",
+          "Renal excretion rate",
+          "Distribution volume"
+        ],
+        "answer": "Oral bioavailability"
+      },
+      {
+        "type": "short",
+        "prompt": "Abbreviation for the maximum plasma concentration:",
+        "answerText": [
+          "cmax",
+          "Cmax"
+        ]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which is most likely to have the HIGHEST melting point, assuming similar size?",
+        "choices": [
+          "Molecule with three phenolic OH groups forming strong H‑bonding",
+          "Fully saturated hydrocarbon with no polar groups",
+          "Mono‑substituted benzene with one methyl group",
+          "Tertiary amine with bulky substituents but no H‑bond donors"
+        ],
+        "answer": "Molecule with three phenolic OH groups forming strong H‑bonding"
+      },
+      {
+        "type": "tf",
+        "prompt": "True or False: Generic drugs must demonstrate bioequivalence to the reference listed drug.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which route and effect pairing is CORRECT?",
+        "choices": [
+          "Topical → guaranteed systemic",
+          "Oral → always local only",
+          "Inhalation → can be local or systemic",
+          "Otic → systemic by default"
+        ],
+        "answer": "Inhalation → can be local or systemic"
+      },
+      {
+        "type": "short",
+        "prompt": "Give ONE practical method to mask bitter taste in a pediatric liquid:",
+        "answerText": [
+          "sweeteners",
+          "flavoring",
+          "coating",
+          "microencapsulation",
+          "complexation",
+          "cyclodextrin"
+        ]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which statement about partition coefficient (P) and log P is CORRECT?",
+        "choices": [
+          "Higher log P means more hydrophilic",
+          "Higher log P generally indicates greater lipophilicity",
+          "Log P is unrelated to membrane permeability",
+          "Log P is always negative"
+        ],
+        "answer": "Higher log P generally indicates greater lipophilicity"
+      },
+      {
+        "type": "tf",
+        "prompt": "True or False: IV bolus doses bypass absorption and first‑pass metabolism.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which change best INCREASES dissolution rate for a poorly soluble BCS II drug?",
+        "choices": [
+          "Use larger crystals",
+          "Micronize to increase surface area",
+          "Lower the saturation solubility (Cs)",
+          "Remove surfactant"
+        ],
+        "answer": "Micronize to increase surface area"
+      },
+      {
+        "type": "short",
+        "prompt": "Term for the reversible process of a solid drug going into solution:",
+        "answerText": [
+          "dissolution"
+        ]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Rectal dosing may partially avoid first‑pass because:",
+        "choices": [
+          "All rectal veins drain to portal vein",
+          "Lower/middle rectal veins drain to systemic circulation",
+          "The rectum has no enzymes",
+          "Rectal dosing prevents absorption"
+        ],
+        "answer": "Lower/middle rectal veins drain to systemic circulation"
+      }
+    ],
+    "hard": [
+      {
+        "type": "mcq",
+        "prompt": "In the speed‑trap analogy for first‑pass metabolism, increasing the oral dose from 1× to 2× may increase BA because:",
+        "choices": [
+          "Distribution is saturated",
+          "Enzymatic capacity saturates and some drug escapes first pass",
+          "Renal excretion is saturated at low doses",
+          "Dissolution becomes zero‑order"
+        ],
+        "answer": "Enzymatic capacity saturates and some drug escapes first pass"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which SINGLE change most increases passive transcellular absorption of a weak base in the intestine?",
+        "choices": [
+          "Lower luminal pH to 1.5",
+          "Increase lipophilicity within solubility limits",
+          "Add strong base to raise pH to 10",
+          "Decrease membrane surface area"
+        ],
+        "answer": "Increase lipophilicity within solubility limits"
+      },
+      {
+        "type": "mcq",
+        "prompt": "For a one‑compartment IV bolus model with first‑order elimination, a semilog plot of Cp vs time yields:",
+        "choices": [
+          "A parabola; slope is Kel",
+          "A straight line; slope is −Kel",
+          "A straight line; slope is +Kel",
+          "A horizontal line; slope is 0"
+        ],
+        "answer": "A straight line; slope is −Kel"
+      },
+      {
+        "type": "short",
+        "prompt": "Mathematical relationship of half‑life to Kel (use symbols):",
+        "answerText": [
+          "t1/2 = 0.693/Kel",
+          "t1/2=0.693/Kel",
+          "t1/2 = ln2/Kel",
+          "t1/2=ln2/Kel"
+        ]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Total body clearance in a one‑compartment model equals:",
+        "choices": [
+          "Vd / Kel",
+          "Dose / AUC",
+          "Vd × Kel",
+          "Kel / Vd"
+        ],
+        "answer": "Vd × Kel"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which statement about Cp0 after IV bolus is TRUE?",
+        "choices": [
+          "Cp0 increases if Vd increases (for same dose)",
+          "Cp0 = Dose / Vd",
+          "Cp0 depends on clearance only",
+          "Cp0 is unrelated to dose"
+        ],
+        "answer": "Cp0 = Dose / Vd"
+      },
+      {
+        "type": "mcq",
+        "prompt": "A formulation change lowers particle size 4× and adds a wetting agent that halves boundary layer thickness (h). By Noyes–Whitney, dissolution rate changes approximately by:",
+        "choices": [
+          "2×",
+          "4×",
+          "6×",
+          "8×"
+        ],
+        "answer": "8×"
+      },
+      {
+        "type": "short",
+        "prompt": "Convert 2 g/mL to % w/v:",
+        "answerText": [
+          "200% w/v",
+          "200 % w/v",
+          "200%"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Acetaminophen solubility is 1.4% w/v. Express as mg/mL:",
+        "answerText": [
+          "14 mg/mL",
+          "14mg/mL",
+          "14"
+        ]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Given acetaminophen solubility 1.4% w/v, can 3.08 g dissolve in 150 mL water at room temp?",
+        "choices": [
+          "Yes, because 1.4% allows any amount",
+          "No, solubility limit corresponds to 2.1 g per 150 mL",
+          "Yes, because 1.4% equals 14 mg/mL which is plenty",
+          "Insufficient information"
+        ],
+        "answer": "No, solubility limit corresponds to 2.1 g per 150 mL"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Rank typical dissolution/solubility (highest first): amorphous vs metastable crystalline vs stable crystalline:",
+        "choices": [
+          "Stable > Metastable > Amorphous",
+          "Amorphous > Metastable > Stable",
+          "Metastable > Amorphous > Stable",
+          "Stable > Amorphous > Metastable"
+        ],
+        "answer": "Amorphous > Metastable > Stable"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which property MOST strongly raises melting point among phenolic compounds of similar size?",
+        "choices": [
+          "More H‑bond donors/acceptors and stronger lattice packing",
+          "Higher log P only",
+          "Less hydrogen‑bonding capacity",
+          "Presence of one methyl substituent"
+        ],
+        "answer": "More H‑bond donors/acceptors and stronger lattice packing"
+      },
+      {
+        "type": "short",
+        "prompt": "Define partition coefficient P in words (____ in oil / ____ in water):",
+        "answerText": [
+          "concentration in oil / concentration in water",
+          "drug concentration in octanol / drug concentration in water",
+          "amount in oil / amount in water"
+        ]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Log P increases from 0.3 to 2.0. Expect:",
+        "choices": [
+          "More hydrophilic; better aqueous solubility",
+          "More lipophilic; potentially higher membrane permeability",
+          "No effect on permeability",
+          "Guaranteed higher oral bioavailability"
+        ],
+        "answer": "More lipophilic; potentially higher membrane permeability"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which TWO factors most threaten nucleic‑acid drug stability?",
+        "choices": [
+          "Low temperature and isotonicity",
+          "Nucleases and suboptimal pH/temperature",
+          "High log P and crystallinity",
+          "Distribution volume and clearance"
+        ],
+        "answer": "Nucleases and suboptimal pH/temperature"
+      },
+      {
+        "type": "mcq",
+        "prompt": "AUC is the same for Formulation A and B at equal doses, but Cmax and Tmax differ. Which statement is CORRECT?",
+        "choices": [
+          "They have equal extent of absorption but different rates",
+          "They have different extents and same rate",
+          "They are not bioequivalent by definition",
+          "The higher Cmax must be toxic"
+        ],
+        "answer": "They have equal extent of absorption but different rates"
+      },
+      {
+        "type": "mcq",
+        "prompt": "For a one‑compartment, first‑order elimination model, doubling Kel will:",
+        "choices": [
+          "Double t1/2",
+          "Halve t1/2",
+          "Leave t1/2 unchanged",
+          "Double Cp0"
+        ],
+        "answer": "Halve t1/2"
+      },
+      {
+        "type": "short",
+        "prompt": "Equation (symbols only) linking clearance, dose, and AUC (IV bolus):",
+        "answerText": [
+          "CL = Dose/AUC",
+          "CL=Dose/AUC",
+          "Clearance = Dose/AUC"
+        ]
+      },
+      {
+        "type": "mcq",
+        "prompt": "A pain‑relief capsule needs very fast onset (Tmax ~30 min). Which solid form is the BEST starting point?",
+        "choices": [
+          "Thermodynamically most stable polymorph with large crystals",
+          "Amorphous or micronized form with higher apparent solubility",
+          "Hydrate with lower solubility",
+          "Coarse stable crystalline material"
+        ],
+        "answer": "Amorphous or micronized form with higher apparent solubility"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which choice best explains why rectal high‑placement may still experience first‑pass?",
+        "choices": [
+          "Superior rectal vein drains to portal circulation",
+          "Rectum lacks veins",
+          "All rectal veins drain to systemic directly",
+          "Because dissolution is bypassed"
+        ],
+        "answer": "Superior rectal vein drains to portal circulation"
+      },
+      {
+        "type": "short",
+        "prompt": "Short phrase: What does BE compare? (____ between products)",
+        "answerText": [
+          "bioavailability between products",
+          "BA between products",
+          "rate and extent between products"
+        ]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which change is LEAST likely to increase dissolution rate?",
+        "choices": [
+          "Increasing temperature moderately",
+          "Adding a surfactant to reduce interfacial tension",
+          "Decreasing particle size (micronization)",
+          "Increasing crystal size and reducing surface area"
+        ],
+        "answer": "Increasing crystal size and reducing surface area"
+      },
+      {
+        "type": "tf",
+        "prompt": "True or False: In first‑order elimination, a constant FRACTION of drug is removed per unit time.",
+        "answer": "True"
+      },
+      {
+        "type": "tf",
+        "prompt": "True or False: Clearance (CL) has typical units of volume/time, such as L/h or mL/min.",
+        "answer": "True"
+      }
+    ]
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "id": "chapter3-review",
+  "title": "Chapter 3 Review",
+  "pools": {
+    "easy": [
+      {
+        "type": "short",
+        "prompt": "A prescription calls for 50 mg of chlorpheniramine maleate. Using a balance with a sensitivity requirement of 6 mg, explain how you would obtain 50 mg with ≤5% error.",
+        "solution": "The minimum weighable quantity (MWQ) = sensitivity × 100 / percentage error = 6 mg × 100 / 5 = 120 mg. You must weigh at least 120 mg. Weigh 150 mg drug (≥120 mg), dilute with 450 mg lactose to make 600 mg mixture. The aliquot factor is (50 mg / 150 mg) × 600 mg = 200 mg. The 200‑mg aliquot contains 50 mg of drug.",
+        "answerText": [
+          "Weigh 150 mg of drug using the aliquot method and dilute to a total of 600 mg with lactose (450 mg diluent); then take one‑third (200 mg) of the mixture to obtain 50 mg chlorpheniramine."
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "An electronic balance has a sensitivity requirement of 2 mg. Describe how to weigh 15 mg capsaicin using starch as a diluent with ≤5% error.",
+        "solution": "The MWQ is 40 mg. To weigh 15 mg accurately, weigh 60 mg of capsaicin (≥40 mg), add 100 mg starch (total 160 mg). The fraction 15/60 = 0.25, so take 0.25 × 160 mg = 40 mg mixture as the aliquot containing 15 mg capsaicin.",
+        "answerText": [
+          "Weigh at least 40 mg of capsaicin (MWQ = 2 mg×100/5 = 40 mg), dilute with 100 mg starch to a 160‑mg mixture, then take an aliquot of (15/60)×160 = 40 mg to obtain 15 mg capsaicin."
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "A balance has a sensitivity requirement of 6.5 mg. How would you weigh 20 mg of a substance with ≤2% error using the aliquot method?",
+        "solution": "Using ≤2% error: MWQ = 6.5 mg × 100 / 2 = 325 mg. Weigh at least 325 mg of substance—e.g., 400 mg—mix with 8000 mg diluent to 8400 mg. The aliquot fraction is 20/400 = 0.05; multiply by 8400 mg to get 420 mg mixture containing 20 mg drug.",
+        "answerText": [
+          "MWQ = 6.5×100/2 = 325 mg. Weigh 400 mg active drug, mix with 8000 mg diluent (total 8400 mg), then take an aliquot (20/400)×8400 = 420 mg mixture to obtain 20 mg."
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "A formula calls for 0.6 mL of coloring solution. Using a 10‑mL graduate accurate at ≥2 mL, how could you obtain 0.6 mL by the aliquot method? Use water as diluent.",
+        "solution": "The graduate's minimum accurate volume is 2 mL. Dilute 0.6 mL with water to a total of 3 mL. The factor is 10 mL/3 mL. Measure 10 mL of this mixture. The aliquot volume containing 0.6 mL is (0.6/3)×10 = 2 mL.",
+        "answerText": [
+          "Dilute 0.6 mL coloring solution with enough water to 3 mL, then measure 10 mL of mixture. The aliquot (0.6/3)×10 = 2 mL of mixture contains 0.6 mL coloring solution. Discard the rest."
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Using a 10‑mL graduate accurate for ≥2 mL, describe how to measure 1.25 mL of a dye solution by the aliquot method. Use water as the diluent.",
+        "solution": "To achieve an accurate measurement, first dilute the 1.25 mL dye solution to 5 mL; then add water to reach an 8‑mL total volume. Use the ratio (1.25/5). Measuring 8 mL mixture, the aliquot containing 1.25 mL dye is (1.25/5)×8 = 2 mL.",
+        "answerText": [
+          "Dilute 1.25 mL dye to 5 mL, then further to 8 mL. Measure 8 mL and take an aliquot equal to (1.25/5)×8 = 2 mL of mixture which contains 1.25 mL dye."
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "The pentobarbital sodium elixir formula calls for 0.75 mL orange oil per 100 mL. Using a 10‑mL graduate accurate for ≥2 mL and alcohol as diluent, how would you obtain 0.75 mL orange oil?",
+        "solution": "To allow accurate measurement with the graduate: dilute 0.75 mL orange oil with alcohol to 3 mL, then further to 8 mL. Measure the full 8‑mL portion. The aliquot needed is (0.75/3)×8 = 2 mL mixture, which contains 0.75 mL orange oil.",
+        "answerText": [
+          "Dilute 0.75 mL orange oil to 3 mL with alcohol, then to 8 mL. Measure 8 mL and take the aliquot (0.75/3)×8 = 2 mL containing 0.75 mL orange oil."
+        ]
+      }
+    ],
+    "hard": [
+      {
+        "type": "short",
+        "prompt": "In compounding, 50 mg of a substance is weighed on a balance with sensitivity 4 mg. What is the maximum potential percentage error?",
+        "solution": "Error% = (sensitivity × 100) / amount weighed = (4 × 100)/50 = 8%.",
+        "answerText": [
+          "8%",
+          "8 percent"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "A pharmacist weighed 475 mg of a substance on a balance of dubious accuracy. On a reference balance the weight was found to be 445 mg. Calculate the percentage error.",
+        "solution": "Error% = (observed − true) / true × 100 = (475 − 445)/475 × 100 ≈ 6.32%.",
+        "answerText": [
+          "6.32%",
+          "6.32 percent"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "A 10‑mL graduate weighs 42.745 g. When 5 mL distilled water is measured in it, the total weight is 47.675 g. By definition 5 mL water should weigh 5 g. What is the percentage deviation of the measured water?",
+        "solution": "Measured water weight = 47.675 − 42.745 = 4.93 g. Percent error = (5 − 4.93)/5 × 100 = 1.4%.",
+        "answerText": [
+          "1.4%",
+          "1.4 percent"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "A pharmacist attempts to weigh 0.375 g morphine sulfate on a balance of dubious accuracy. On a reference balance it is 0.4 g. Calculate the percentage error.",
+        "solution": "Error% = (0.4 − 0.375)/0.375 × 100 = 6.67%.",
+        "answerText": [
+          "6.67%",
+          "6.67 percent"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "The contents of each capsule should weigh 330 mg. What weight range per capsule falls within ±5% error?",
+        "solution": "±5% of 330 mg is 16.5 mg. Lower limit 330 − 16.5 = 313.5 mg; upper limit 330 + 16.5 = 346.5 mg.",
+        "answerText": [
+          "313.5–346.5 mg",
+          "313.5 to 346.5 mg"
+        ]
+      }
+    ]
+  }
+}

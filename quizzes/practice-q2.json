@@ -1,0 +1,829 @@
+{
+  "id": "practice-q2",
+  "title": "Practice Q2 — BDT-I (Handouts 1–6, v5)",
+  "pools": {
+    "easy": [
+      {
+        "type": "mcq",
+        "prompt": "Which amino acid is achiral?",
+        "choices": [
+          "Alanine",
+          "Valine",
+          "Glycine",
+          "Proline"
+        ],
+        "answer": "Glycine",
+        "source": "Handout 1 — LO: Recognize AA structure/chirality"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which amino acid has a side chain that forms a ring with its amino group?",
+        "choices": [
+          "Proline",
+          "Histidine",
+          "Serine",
+          "Cysteine"
+        ],
+        "answer": "Proline",
+        "source": "Handout 1 — LO: Side chain effects on structure"
+      },
+      {
+        "type": "short",
+        "prompt": "What is the pH where an amino acid has no net charge?",
+        "answer": "Isoelectric point",
+        "answerText": [
+          "pi",
+          "isoelectric point"
+        ],
+        "source": "Handout 1 — LO: Zwitterion & pI"
+      },
+      {
+        "type": "mcq",
+        "prompt": "At physiological pH, amino acids exist as:",
+        "choices": [
+          "Cations",
+          "Anions",
+          "Zwitterions",
+          "Neutral molecules"
+        ],
+        "answer": "Zwitterions",
+        "source": "Handout 1 — LO: Zwitterion"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which amino acid can form disulfide bonds?",
+        "choices": [
+          "Serine",
+          "Cysteine",
+          "Threonine",
+          "Glutamine"
+        ],
+        "answer": "Cysteine",
+        "source": "Handout 1 — LO: Side chain effects on structure"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which is a post-translational modification?",
+        "choices": [
+          "Hydroxylation",
+          "Replication",
+          "Transcription",
+          "Translation"
+        ],
+        "answer": "Hydroxylation",
+        "source": "Handout 1 — LO: PTMs"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Amino acid side chains are commonly grouped as:",
+        "choices": [
+          "Metals vs nonmetals",
+          "Nonpolar, polar uncharged, acidic, basic",
+          "Alpha vs beta",
+          "Saturated vs unsaturated"
+        ],
+        "answer": "Nonpolar, polar uncharged, acidic, basic",
+        "source": "Handout 1 — LO: AA classification"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which amino acid is aromatic?",
+        "choices": [
+          "Phenylalanine",
+          "Glycine",
+          "Serine",
+          "Aspartate"
+        ],
+        "answer": "Phenylalanine",
+        "source": "Handout 1 — LO: AA classification"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which structure level involves α-helices and β-sheets?",
+        "choices": [
+          "Primary",
+          "Secondary",
+          "Tertiary",
+          "Quaternary"
+        ],
+        "answer": "Secondary",
+        "source": "Handout 2 — LO: 1°–4° structures"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Denaturation is:",
+        "choices": [
+          "Breaking peptide bonds",
+          "Loss of native 3D structure",
+          "ATP hydrolysis",
+          "Covalent modification"
+        ],
+        "answer": "Loss of native 3D structure",
+        "source": "Handout 2 — LO: Denaturation"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Quaternary structure describes:",
+        "choices": [
+          "AA sequence",
+          "Local H-bonds",
+          "Overall 3D fold of a single chain",
+          "Arrangement of multiple polypeptides"
+        ],
+        "answer": "Arrangement of multiple polypeptides",
+        "source": "Handout 2 — LO: 1°–4° structures"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which interaction primarily stabilizes an α-helix?",
+        "choices": [
+          "Hydrogen bonds",
+          "Disulfide bonds",
+          "Ionic bonds",
+          "Peptide bonds between side chains"
+        ],
+        "answer": "Hydrogen bonds",
+        "source": "Handout 2 — LO: 1°–4° structures"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which disease is due to protein misfolding?",
+        "choices": [
+          "Alzheimer's",
+          "Asthma",
+          "Gout",
+          "Diabetes"
+        ],
+        "answer": "Alzheimer's",
+        "source": "Handout 2 — LO: Misfolding disease"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which protein stores oxygen in muscle?",
+        "choices": [
+          "Hemoglobin",
+          "Myoglobin",
+          "Collagen",
+          "Albumin"
+        ],
+        "answer": "Myoglobin",
+        "source": "Handout 3 — LO: Mb vs Hb"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which protein is fibrous?",
+        "choices": [
+          "Collagen",
+          "Hemoglobin",
+          "Myoglobin",
+          "Catalase"
+        ],
+        "answer": "Collagen",
+        "source": "Handout 3 — LO: Globular vs fibrous"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which protein exhibits cooperative O₂ binding?",
+        "choices": [
+          "Hemoglobin",
+          "Myoglobin",
+          "Collagen",
+          "Elastin"
+        ],
+        "answer": "Hemoglobin",
+        "source": "Handout 3 — LO: O₂ binding"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which effect describes Hb releasing O₂ at low pH?",
+        "choices": [
+          "Bohr effect",
+          "Pasteur effect",
+          "Haldane effect",
+          "Hill effect"
+        ],
+        "answer": "Bohr effect",
+        "source": "Handout 3 — LO: Allostery/O₂ binding"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which connective tissue disorder is linked to fibrillin?",
+        "choices": [
+          "Marfan syndrome",
+          "Osteogenesis imperfecta",
+          "Scurvy",
+          "Ehlers–Danlos"
+        ],
+        "answer": "Marfan syndrome",
+        "source": "Handout 3 — LO: Elastin disease"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Sickle cell disease results from a mutation in:",
+        "choices": [
+          "α-globin",
+          "β-globin",
+          "Collagen I",
+          "Elastin"
+        ],
+        "answer": "β-globin",
+        "source": "Handout 3 — LO: Hemoglobinopathies"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Enzymes are:",
+        "choices": [
+          "Hormones",
+          "Biological catalysts",
+          "Structural proteins",
+          "Energy storage"
+        ],
+        "answer": "Biological catalysts",
+        "source": "Handout 4 — LO: Define enzymes"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which model describes conformational adjustment after binding?",
+        "choices": [
+          "Lock & Key",
+          "Induced Fit",
+          "Isoenzyme",
+          "Allosteric"
+        ],
+        "answer": "Induced Fit",
+        "source": "Handout 4 — LO: Active site models"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which enzyme class transfers phosphate groups?",
+        "choices": [
+          "Hydrolases",
+          "Transferases",
+          "Oxidoreductases",
+          "Ligases"
+        ],
+        "answer": "Transferases",
+        "source": "Handout 4 — LO: Enzyme classes"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which enzyme class uses water to break bonds?",
+        "choices": [
+          "Hydrolases",
+          "Isomerases",
+          "Ligases",
+          "Lyases"
+        ],
+        "answer": "Hydrolases",
+        "source": "Handout 4 — LO: Enzyme classes"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Competitive inhibitors typically cause:",
+        "choices": [
+          "↑ Km, Vmax same",
+          "↓ Km, ↓ Vmax",
+          "Km same, ↓ Vmax",
+          "↑ Km, ↓ Vmax"
+        ],
+        "answer": "↑ Km, Vmax same",
+        "source": "Handout 4 — LO: Inhibition types"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which bond links monosaccharides in disaccharides?",
+        "choices": [
+          "O-glycosidic",
+          "N-glycosidic",
+          "Peptide",
+          "Phosphodiester"
+        ],
+        "answer": "O-glycosidic",
+        "source": "Handout 5 — LO: O- vs N-glycosidic"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which polysaccharide is indigestible to humans?",
+        "choices": [
+          "Glycogen",
+          "Cellulose",
+          "Starch",
+          "Amylopectin"
+        ],
+        "answer": "Cellulose",
+        "source": "Handout 5 — LO: Cellulose"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which disaccharide = glucose + galactose?",
+        "choices": [
+          "Sucrose",
+          "Maltose",
+          "Lactose",
+          "Trehalose"
+        ],
+        "answer": "Lactose",
+        "source": "Handout 5 — LO: Disaccharides"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which polysaccharide is the plant storage form of glucose?",
+        "choices": [
+          "Glycogen",
+          "Starch",
+          "Cellulose",
+          "Chitin"
+        ],
+        "answer": "Starch",
+        "source": "Handout 5 — LO: Polysaccharides"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which GAG is abundant in synovial fluid?",
+        "choices": [
+          "Hyaluronan",
+          "Heparin",
+          "Chondroitin",
+          "Dermatan"
+        ],
+        "answer": "Hyaluronan",
+        "source": "Handout 5 — LO: GAGs"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which viral protein binds sialic acid on host cells?",
+        "choices": [
+          "Hemagglutinin",
+          "Neuraminidase",
+          "Integrase",
+          "Polymerase"
+        ],
+        "answer": "Hemagglutinin",
+        "source": "Handout 5 — LO: Influenza proteins"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which sugar is found in RNA?",
+        "choices": [
+          "Ribose",
+          "Deoxyribose",
+          "Glucose",
+          "Fructose"
+        ],
+        "answer": "Ribose",
+        "source": "Handout 6 — LO: DNA vs RNA"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which sugar is found in DNA?",
+        "choices": [
+          "Ribose",
+          "Deoxyribose",
+          "Glucose",
+          "Fructose"
+        ],
+        "answer": "Deoxyribose",
+        "source": "Handout 6 — LO: DNA vs RNA"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which base is unique to RNA?",
+        "choices": [
+          "Uracil",
+          "Thymine",
+          "Cytosine",
+          "Adenine"
+        ],
+        "answer": "Uracil",
+        "source": "Handout 6 — LO: DNA vs RNA (bases)"
+      },
+      {
+        "type": "short",
+        "prompt": "How many H-bonds between G and C?",
+        "answer": "3",
+        "answerText": [
+          "3",
+          "three"
+        ],
+        "source": "Handout 6 — LO: Base pairing"
+      },
+      {
+        "type": "short",
+        "prompt": "Start codon for translation?",
+        "answer": "AUG",
+        "answerText": [
+          "aug",
+          "methionine"
+        ],
+        "source": "Handout 6 — LO: Genetic code"
+      },
+      {
+        "type": "short",
+        "prompt": "Name one stop codon.",
+        "answer": "UAA",
+        "answerText": [
+          "uaa",
+          "uag",
+          "uga"
+        ],
+        "source": "Handout 6 — LO: Genetic code"
+      }
+    ],
+    "hard": [
+      {
+        "type": "mcq",
+        "prompt": "Which substitution causes sickle cell disease?",
+        "choices": [
+          "Glu→Val at β6",
+          "Glu→Lys at β6",
+          "Gly→Val at β6",
+          "Pro→His at β6"
+        ],
+        "answer": "Glu→Val at β6",
+        "source": "Handout 3 — LO: Hemoglobinopathies"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which amino acid buffers near pH 7 due to its imidazole group?",
+        "choices": [
+          "Histidine",
+          "Arginine",
+          "Lysine",
+          "Cysteine"
+        ],
+        "answer": "Histidine",
+        "source": "Handout 1 — LO: Side chain properties"
+      },
+      {
+        "type": "short",
+        "prompt": "Which vitamin deficiency causes scurvy?",
+        "answer": "Vitamin C",
+        "answerText": [
+          "vitamin c",
+          "ascorbic acid"
+        ],
+        "source": "Handout 3 — LO: Collagen & disease"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which disorder involves brittle bones due to collagen defects?",
+        "choices": [
+          "Osteogenesis imperfecta",
+          "Marfan syndrome",
+          "Ehlers–Danlos",
+          "Thalassemia"
+        ],
+        "answer": "Osteogenesis imperfecta",
+        "source": "Handout 3 — LO: Collagen disease"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which feature stabilizes elastin?",
+        "choices": [
+          "Desmosine cross-links",
+          "Triple helix",
+          "Heme group",
+          "Glycosylation"
+        ],
+        "answer": "Desmosine cross-links",
+        "source": "Handout 3 — LO: Elastin"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Ehlers–Danlos syndrome primarily involves defects in:",
+        "choices": [
+          "Collagen processing",
+          "Fibrillin microfibrils",
+          "Elastin cross-links",
+          "Heme synthesis"
+        ],
+        "answer": "Collagen processing",
+        "source": "Handout 3 — LO: EDS"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Competitive inhibition changes enzyme kinetics by:",
+        "choices": [
+          "↑ Km, Vmax same",
+          "↓ Km, Vmax ↓",
+          "Km same, Vmax ↓",
+          "↑ Km, Vmax ↓"
+        ],
+        "answer": "↑ Km, Vmax same",
+        "source": "Handout 4 — LO: Inhibition types"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Noncompetitive inhibition changes enzyme kinetics by:",
+        "choices": [
+          "Vmax ↓, Km unchanged",
+          "↑ Km, Vmax same",
+          "Km ↓, Vmax same",
+          "Both ↓"
+        ],
+        "answer": "Vmax ↓, Km unchanged",
+        "source": "Handout 4 — LO: Inhibition types"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Allosteric enzymes switch between which states?",
+        "choices": [
+          "E and ES",
+          "T (tense) and R (relaxed)",
+          "H and D",
+          "Monomer and dimer"
+        ],
+        "answer": "T (tense) and R (relaxed)",
+        "source": "Handout 4 — LO: Allostery"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which enzyme class catalyzes intramolecular rearrangements?",
+        "choices": [
+          "Isomerases",
+          "Hydrolases",
+          "Ligases",
+          "Oxidoreductases"
+        ],
+        "answer": "Isomerases",
+        "source": "Handout 4 — LO: Enzyme classes"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which is a zymogen?",
+        "choices": [
+          "Pepsinogen",
+          "Pepsin",
+          "Hexokinase",
+          "Catalase"
+        ],
+        "answer": "Pepsinogen",
+        "source": "Handout 4 — LO: Zymogens"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which linkage makes glycogen branched?",
+        "choices": [
+          "α-1,4",
+          "α-1,6",
+          "β-1,4",
+          "β-1,6"
+        ],
+        "answer": "α-1,6",
+        "source": "Handout 5 — LO: Glycogen"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which linkage is found in amylose?",
+        "choices": [
+          "α-1,4",
+          "α-1,6",
+          "β-1,4",
+          "β-1,6"
+        ],
+        "answer": "α-1,4",
+        "source": "Handout 5 — LO: Amylose"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which linkage is found in cellulose?",
+        "choices": [
+          "α-1,4",
+          "α-1,6",
+          "β-1,4",
+          "β-1,6"
+        ],
+        "answer": "β-1,4",
+        "source": "Handout 5 — LO: Cellulose"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which disaccharide is nonreducing?",
+        "choices": [
+          "Maltose",
+          "Lactose",
+          "Sucrose",
+          "Cellobiose"
+        ],
+        "answer": "Sucrose",
+        "source": "Handout 5 — LO: Reducing sugars"
+      },
+      {
+        "type": "mcq",
+        "prompt": "In a Haworth projection, β-anomer means the anomeric OH is:",
+        "choices": [
+          "Cis to CH2OH",
+          "Trans to CH2OH",
+          "Opposite ring face to CH2OH",
+          "Not defined"
+        ],
+        "answer": "Cis to CH2OH",
+        "source": "Handout 5 — LO: α vs β anomers"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Pyranose vs furanose refers to:",
+        "choices": [
+          "6-member vs 5-member rings",
+          "α vs β anomers",
+          "Aldose vs ketose",
+          "D vs L configuration"
+        ],
+        "answer": "6-member vs 5-member rings",
+        "source": "Handout 5 — LO: Class names"
+      },
+      {
+        "type": "mcq",
+        "prompt": "D and L configurations are assigned by reference to:",
+        "choices": [
+          "Glyceraldehyde",
+          "Glucose",
+          "Ribose",
+          "Fructose"
+        ],
+        "answer": "Glyceraldehyde",
+        "source": "Handout 5 — LO: D/L configuration"
+      },
+      {
+        "type": "mcq",
+        "prompt": "A reducing sugar must have:",
+        "choices": [
+          "No anomeric carbon",
+          "A free anomeric carbon",
+          "Only β linkages",
+          "Only α linkages"
+        ],
+        "answer": "A free anomeric carbon",
+        "source": "Handout 5 — LO: Reducing sugar"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which enzyme digests starch in the mouth?",
+        "choices": [
+          "Lactase",
+          "Maltase",
+          "Amylase",
+          "Sucrase"
+        ],
+        "answer": "Amylase",
+        "source": "Handout 5 — LO: Digestion enzymes"
+      },
+      {
+        "type": "mcq",
+        "prompt": "The A and B blood group antigens differ by:",
+        "choices": [
+          "Peptide backbone",
+          "Terminal sugars",
+          "Sulfate groups",
+          "Phosphate groups"
+        ],
+        "answer": "Terminal sugars",
+        "source": "Handout 5 — LO: ABO antigens"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which is a glycoconjugate class?",
+        "choices": [
+          "Glycoproteins",
+          "Steroids",
+          "Triglycerides",
+          "Sphingomyelin"
+        ],
+        "answer": "Glycoproteins",
+        "source": "Handout 5 — LO: Glycoconjugates"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which viral protein releases influenza virions?",
+        "choices": [
+          "Hemagglutinin",
+          "Neuraminidase",
+          "Integrase",
+          "Reverse transcriptase"
+        ],
+        "answer": "Neuraminidase",
+        "source": "Handout 5 — LO: Influenza proteins"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which bond links nucleotides in DNA?",
+        "choices": [
+          "Phosphodiester",
+          "O-glycosidic",
+          "Peptide",
+          "Disulfide"
+        ],
+        "answer": "Phosphodiester",
+        "source": "Handout 6 — LO: Nucleotides"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which bond links a base to the sugar in a nucleotide?",
+        "choices": [
+          "N-glycosidic",
+          "O-glycosidic",
+          "Peptide",
+          "Hydrogen"
+        ],
+        "answer": "N-glycosidic",
+        "source": "Handout 6 — LO: Nucleotides"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which enzyme synthesizes RNA primers during replication?",
+        "choices": [
+          "Primase",
+          "DNA Pol I",
+          "Ligase",
+          "Topoisomerase"
+        ],
+        "answer": "Primase",
+        "source": "Handout 6 — LO: DNA replication"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which enzyme removes RNA primers during replication?",
+        "choices": [
+          "DNA Pol I",
+          "DNA Pol II",
+          "DNA Pol III",
+          "Ligase"
+        ],
+        "answer": "DNA Pol I",
+        "source": "Handout 6 — LO: DNA replication"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which enzyme elongates the leading strand?",
+        "choices": [
+          "DNA Pol I",
+          "DNA Pol II",
+          "DNA Pol III",
+          "Topoisomerase"
+        ],
+        "answer": "DNA Pol III",
+        "source": "Handout 6 — LO: DNA replication"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which enzyme relieves supercoiling?",
+        "choices": [
+          "Topoisomerase",
+          "Ligase",
+          "Primase",
+          "Helicase"
+        ],
+        "answer": "Topoisomerase",
+        "source": "Handout 6 — LO: DNA replication"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which enzyme joins Okazaki fragments?",
+        "choices": [
+          "Ligase",
+          "Helicase",
+          "DNA Pol III",
+          "Primase"
+        ],
+        "answer": "Ligase",
+        "source": "Handout 6 — LO: DNA replication"
+      },
+      {
+        "type": "mcq",
+        "prompt": "DNA replication is:",
+        "choices": [
+          "Conservative",
+          "Semi-conservative",
+          "Random",
+          "Dispersive"
+        ],
+        "answer": "Semi-conservative",
+        "source": "Handout 6 — LO: Replication model"
+      },
+      {
+        "type": "mcq",
+        "prompt": "After transcription in eukaryotes, which sequences are removed?",
+        "choices": [
+          "Exons",
+          "Introns",
+          "Promoters",
+          "Enhancers"
+        ],
+        "answer": "Introns",
+        "source": "Handout 6 — LO: Transcription/splicing"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which RNA has catalytic activity in ribosomes?",
+        "choices": [
+          "mRNA",
+          "tRNA",
+          "rRNA",
+          "snRNA"
+        ],
+        "answer": "rRNA",
+        "source": "Handout 6 — LO: RNAs"
+      }
+    ]
+  }
+}

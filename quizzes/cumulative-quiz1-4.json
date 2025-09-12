@@ -1,0 +1,56 @@
+{
+  "id": "cumulative-quiz1-4",
+  "title": "Cumulative Quiz 1–4 — Antihypertensives + Antilipemics + Anticoagulants (Balanced P1)",
+  "pools": {
+    "easy": [
+      { "type": "mcq", "prompt": "Amlodipine is a:", "choices": ["DHP calcium channel blocker", "Non-DHP calcium channel blocker", "ACE inhibitor", "ARB"], "answer": "DHP calcium channel blocker" },
+      { "type": "mcq", "prompt": "Losartan is a(n):", "choices": ["ACE inhibitor", "ARB", "Thiazide diuretic", "Beta blocker"], "answer": "ARB" },
+      { "type": "mcq", "prompt": "Hydrochlorothiazide is a:", "choices": ["Thiazide diuretic", "Loop diuretic", "Aldosterone antagonist", "Non-DHP CCB"], "answer": "Thiazide diuretic" },
+      { "type": "mcq", "prompt": "Metoprolol is best described as:", "choices": ["β1-selective beta blocker", "Non-selective beta blocker", "Alpha-1 blocker", "Central α2 agonist"], "answer": "β1-selective beta blocker" },
+      { "type": "mcq", "prompt": "Diltiazem belongs to:", "choices": ["Non-DHP calcium channel blocker", "DHP calcium channel blocker", "ACE inhibitor", "ARB"], "answer": "Non-DHP calcium channel blocker" },
+      { "type": "mcq", "prompt": "Hydralazine is a:", "choices": ["Direct vasodilator", "ARB", "Beta blocker", "Thiazide diuretic"], "answer": "Direct vasodilator" },
+      { "type": "tf",  "prompt": "ACE inhibitors can cause cough due to bradykinin.", "answer": "True" },
+      { "type": "tf",  "prompt": "DHP CCBs commonly cause ankle edema.", "answer": "True" },
+
+      { "type": "mcq", "prompt": "Atorvastatin (Lipitor) is a:", "choices": ["Statin", "Fibrate", "Omega-3 fatty acid", "PCSK9 inhibitor"], "answer": "Statin" },
+      { "type": "mcq", "prompt": "Rosuvastatin brand is:", "choices": ["Crestor", "Zocor", "Pravachol", "Lipitor"], "answer": "Crestor" },
+      { "type": "mcq", "prompt": "Simvastatin brand is:", "choices": ["Zocor", "Crestor", "Lipitor", "Pravachol"], "answer": "Zocor" },
+      { "type": "mcq", "prompt": "Ezetimibe is a:", "choices": ["Cholesterol absorption inhibitor", "Statin", "Fibrate", "Niacin"], "answer": "Cholesterol absorption inhibitor" },
+      { "type": "mcq", "prompt": "Fenofibrate (Tricor) is a:", "choices": ["Fibrate", "Statin", "PCSK9 inhibitor", "Omega-3"], "answer": "Fibrate" },
+      { "type": "mcq", "prompt": "Niacin (Niaspan/Niacor) class is:", "choices": ["Nicotinic acid", "Statin", "PCSK9 inhibitor", "Omega-3"], "answer": "Nicotinic acid" },
+      { "type": "mcq", "prompt": "Lovaza generic is:", "choices": ["Omega-3-acid ethyl esters", "Icosapent ethyl", "Ezetimibe", "Fenofibrate"], "answer": "Omega-3-acid ethyl esters" },
+      { "type": "mcq", "prompt": "Repatha and Praluent are:", "choices": ["PCSK9 inhibitors", "Statins", "Fibrates", "Niacin"], "answer": "PCSK9 inhibitors" },
+      { "type": "tf",  "prompt": "Inclisiran (Leqvio) is an siRNA therapy that lowers LDL.", "answer": "True" },
+
+      { "type": "mcq", "prompt": "Apixaban (Eliquis) is a:", "choices": ["Direct Factor Xa inhibitor", "Direct thrombin inhibitor", "Vitamin K antagonist", "LMWH"], "answer": "Direct Factor Xa inhibitor" },
+      { "type": "mcq", "prompt": "Rivaroxaban brand is:", "choices": ["Xarelto", "Eliquis", "Coumadin", "Lovenox"], "answer": "Xarelto" },
+      { "type": "mcq", "prompt": "Warfarin is a:", "choices": ["Vitamin K antagonist", "Direct thrombin inhibitor", "Factor Xa inhibitor", "LMWH"], "answer": "Vitamin K antagonist" },
+      { "type": "mcq", "prompt": "Enoxaparin (Lovenox) is a:", "choices": ["LMWH", "UFH", "DOAC (Xa)", "VKA"], "answer": "LMWH" },
+      { "type": "tf",  "prompt": "Warfarin is an anticoagulant.", "answer": "True" },
+      { "type": "tf",  "prompt": "Heparin and enoxaparin effects are reversed by protamine sulfate.", "answer": "True" }
+    ],
+    "hard": [
+      { "type": "mcq", "prompt": "Which combo most increases hyperkalemia risk?", "choices": ["ACE inhibitor + spironolactone", "Amlodipine + HCTZ", "Furosemide + hydralazine", "Atenolol + chlorthalidone"], "answer": "ACE inhibitor + spironolactone" },
+      { "type": "mcq", "prompt": "Which pair increases AV block risk via dual AV nodal effects?", "choices": ["Metoprolol + diltiazem", "Losartan + HCTZ", "Amlodipine + hydralazine", "Spironolactone + furosemide"], "answer": "Metoprolol + diltiazem" },
+      { "type": "mcq", "prompt": "Typical thiazide lab change:", "choices": ["↑ Calcium", "↓ Calcium", "↑ Potassium", "↓ Uric acid"], "answer": "↑ Calcium" },
+      { "type": "tf",  "prompt": "Loop diuretics may cause hypokalemia.", "answer": "True" },
+
+      { "type": "mcq", "prompt": "Core statin mechanism:", "choices": ["Inhibit HMG-CoA reductase", "Block NPC1L1", "Activate PPAR-α", "Reduce hepatic TG synthesis via LPL"], "answer": "Inhibit HMG-CoA reductase" },
+      { "type": "mcq", "prompt": "Ezetimibe acts at the:", "choices": ["Brush border of small intestine", "Hepatocyte mitochondria", "Skeletal muscle", "Kidney proximal tubule"], "answer": "Brush border of small intestine" },
+      { "type": "mcq", "prompt": "Fenofibrate most strongly lowers:", "choices": ["Triglycerides", "LDL", "Lp(a)", "HDL"], "answer": "Triglycerides" },
+      { "type": "tf",  "prompt": "PCSK9 monoclonal antibodies increase LDL receptor availability.", "answer": "True" },
+
+      { "type": "mcq", "prompt": "Warfarin requires routine monitoring of:", "choices": ["INR", "aPTT", "Anti-Xa", "Platelets"], "answer": "INR" },
+      { "type": "mcq", "prompt": "UFH infusion is commonly monitored with:", "choices": ["aPTT (or anti-Xa)", "INR", "PT/INR combo", "Platelets only"], "answer": "aPTT (or anti-Xa)" },
+      { "type": "mcq", "prompt": "Best reversal for UFH/LMWH exposure:", "choices": ["Protamine sulfate", "Vitamin K", "Idarucizumab", "Andexanet alfa"], "answer": "Protamine sulfate" },
+      { "type": "mcq", "prompt": "Apixaban and rivaroxaban are:", "choices": ["DOACs (Factor Xa inhibitors)", "VKAs", "Direct thrombin inhibitors", "Heparinoids"], "answer": "DOACs (Factor Xa inhibitors)" },
+
+      { "type": "short", "prompt": "Name one β1-selective blocker.", "answer": "metoprolol", "answerText": ["metoprolol", "atenolol", "bisoprolol", "nebivolol"] },
+      { "type": "short", "prompt": "Name one non-DHP CCB.", "answer": "verapamil", "answerText": ["verapamil", "diltiazem"] },
+      { "type": "short", "prompt": "Drug class of losartan?", "answer": "ARB", "answerText": ["arb", "angiotensin receptor blocker", "angiotensin ii receptor blocker"] },
+      { "type": "short", "prompt": "Brand for ezetimibe?", "answer": "Zetia", "answerText": ["Zetia"] },
+      { "type": "short", "prompt": "Brand for fenofibrate?", "answer": "Tricor", "answerText": ["Tricor"] },
+      { "type": "short", "prompt": "Brand for omega-3-acid ethyl esters?", "answer": "Lovaza", "answerText": ["Lovaza"] }
+    ]
+  }
+}

@@ -1,0 +1,152 @@
+{
+  "id": "sig-wildcards",
+  "title": "SIG Wildcards — Latin to English Practice",
+  "pools": {
+    "easy": [
+      {
+        "type": "short",
+        "prompt": "Translate: 'p.o. q.a.m.'",
+        "solution": "'p.o.' = by mouth; 'q.a.m.' = every morning.",
+        "answer": "by mouth every morning",
+        "answerText": ["by mouth every morning","take by mouth every morning"]
+      },
+      {
+        "type": "short",
+        "prompt": "Translate: 'gtt i o.s. b.i.d.'",
+        "solution": "'gtt i' = 1 drop; 'o.s.' = left eye; 'b.i.d.' = twice daily.",
+        "answer": "instill 1 drop in the left eye twice daily",
+        "answerText": ["instill 1 drop in the left eye twice daily","place one drop in the left eye twice a day"]
+      },
+      {
+        "type": "short",
+        "prompt": "Translate: 'Inject 30 units subcut q.o.d.'",
+        "solution": "'subcut' = subcutaneous; 'q.o.d.' = every other day.",
+        "answer": "inject 30 units subcutaneously every other day",
+        "answerText": ["inject 30 units subcutaneously every other day","inject 30 units under the skin every other day"]
+      },
+      {
+        "type": "short",
+        "prompt": "Translate: 'i tab p.o. q.h.s.'",
+        "solution": "'i tab' = one tablet; 'p.o.' = by mouth; 'q.h.s.' = at bedtime.",
+        "answer": "take 1 tablet by mouth at bedtime",
+        "answerText": ["take 1 tablet by mouth at bedtime"]
+      },
+      {
+        "type": "short",
+        "prompt": "Translate: 'ung. top q.i.d. p.r.n. pain'",
+        "solution": "'ung.' = ointment; 'top' = topically; 'q.i.d.' = four times daily; 'p.r.n.' = as needed.",
+        "answer": "apply ointment topically four times daily as needed for pain",
+        "answerText": ["apply ointment topically four times daily as needed for pain"]
+      },
+      {
+        "type": "short",
+        "prompt": "Translate: 'cap ii p.o. t.i.d. c food'",
+        "solution": "'cap ii' = two capsules; 't.i.d.' = three times daily; 'c' = with; 'food' = meals.",
+        "answer": "take 2 capsules by mouth three times daily with food",
+        "answerText": ["take 2 capsules by mouth three times daily with food"]
+      },
+      {
+        "type": "short",
+        "prompt": "Translate: 'soln 5 mL p.o. q6h p.r.n. cough'",
+        "solution": "'soln' = solution; 'q6h' = every 6 hours; 'p.r.n.' = as needed.",
+        "answer": "take 5 mL by mouth every 6 hours as needed for cough",
+        "answerText": ["take 5 mL by mouth every 6 hours as needed for cough"]
+      },
+      {
+        "type": "short",
+        "prompt": "Translate: 'susp 10 mL p.o. stat'",
+        "solution": "'susp' = suspension; 'stat' = immediately.",
+        "answer": "take 10 mL by mouth immediately",
+        "answerText": ["take 10 mL by mouth immediately"]
+      }
+    ],
+    "hard": [
+      {
+        "type": "short",
+        "prompt": "English → Latin: Take 2 tablets by mouth 30 minutes before meals.",
+        "solution": "'ii tabs' = two tablets; 'p.o.' = by mouth; '30 min a.c.' = 30 minutes before meals.",
+        "answer": "ii tabs p.o. 30 min a.c.",
+        "answerText": ["ii tabs p.o. 30 min a.c."]
+      },
+      {
+        "type": "short",
+        "prompt": "English → Latin: Apply ointment to the affected area twice daily as needed.",
+        "solution": "'ung.' = ointment; 'ad area affecta' = to affected area; 'b.i.d.' = twice daily; 'p.r.n.' = as needed.",
+        "answer": "ung. ad area affecta b.i.d. p.r.n.",
+        "answerText": ["ung. ad area affecta b.i.d. p.r.n."]
+      },
+      {
+        "type": "short",
+        "prompt": "English → Latin: Instill 1 drop in right eye three times daily.",
+        "solution": "'gtt i' = 1 drop; 'o.d.' = right eye; 't.i.d.' = three times daily.",
+        "answer": "gtt i o.d. t.i.d.",
+        "answerText": ["gtt i o.d. t.i.d."]
+      },
+      {
+        "type": "short",
+        "prompt": "English → Latin: Take 1 tablet by mouth once daily in the morning.",
+        "solution": "'i tab' = one tablet; 'p.o.' = by mouth; 'q.a.m.' = every morning.",
+        "answer": "i tab p.o. q.a.m.",
+        "answerText": ["i tab p.o. q.a.m."]
+      },
+      {
+        "type": "short",
+        "prompt": "English → Latin: Apply patch topically every 72 hours.",
+        "solution": "'top' = topically; 'q72h' = every 72 hours.",
+        "answer": "apply patch top q72h",
+        "answerText": ["apply patch top q72h"]
+      },
+      {
+        "type": "short",
+        "prompt": "English → Latin: Take 1 teaspoonful by mouth every 12 hours as needed for pain.",
+        "solution": "'i tsp' = 1 teaspoonful; 'p.o.' = by mouth; 'q12h' = every 12 hours; 'p.r.n. pain' = as needed for pain.",
+        "answer": "i tsp p.o. q12h p.r.n. pain",
+        "answerText": ["i tsp p.o. q12h p.r.n. pain"]
+      },
+      {
+        "type": "short",
+        "prompt": "English → Latin: Take 1 capsule by mouth at bedtime as needed for sleep.",
+        "solution": "'i cap' = 1 capsule; 'p.o.' = by mouth; 'q.h.s.' = at bedtime; 'p.r.n. sleep' = as needed for sleep.",
+        "answer": "i cap p.o. q.h.s. p.r.n. sleep",
+        "answerText": ["i cap p.o. q.h.s. p.r.n. sleep"]
+      },
+      {
+        "type": "short",
+        "prompt": "English → Latin: Inject 10 units subcutaneously before breakfast.",
+        "solution": "'inj.' = inject; 'subcut' = subcutaneously; 'a.c.' = before meals.",
+        "answer": "inj. 10 units subcut a.c. breakfast",
+        "answerText": ["inj. 10 units subcut a.c. breakfast"]
+      },
+      {
+        "type": "short",
+        "prompt": "Translate: 'due bis in die per os quater in die pro re nata nausea et vomitus'",
+        "solution": "'bis in die' = twice daily; 'per os' = by mouth; 'quater in die' = four times daily; 'p.r.n.' = as needed; 'nausea et vomitus' = nausea and vomiting.",
+        "answer": "take 2 by mouth four times daily as needed for nausea and vomiting",
+        "answerText": [
+          "take 2 by mouth four times daily as needed for nausea and vomiting",
+          "take two by mouth four times a day as needed for nausea and vomiting"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Translate: 'Ter capsula per os ter in die cum cibos'",
+        "solution": "'ter' = three; 'capsula' = capsule; 'per os' = by mouth; 'ter in die' = three times daily; 'cum cibos' = with food.",
+        "answer": "take three capsules by mouth three times daily with food",
+        "answerText": [
+          "take three capsules by mouth three times daily with food",
+          "three capsules by mouth three times a day with meals"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Translate: 'Unum suppositorium quaque die pro re nata hora somni'",
+        "solution": "'unum suppositorium' = one suppository; 'quaque die' = once daily; 'p.r.n.' = as needed; 'hora somni' = at bedtime.",
+        "answer": "insert one suppository once daily at bedtime as needed",
+        "answerText": [
+          "insert one suppository once daily at bedtime as needed",
+          "use one suppository daily at bedtime if needed"
+        ]
+      }
+    ]
+  }
+}

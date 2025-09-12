@@ -1,0 +1,152 @@
+/* ===== Theme tokens ===== */
+:root{
+  --bg:#f6f5f5;
+  --card:#ffffff;
+  --text:#1f2937;
+  --muted:#6b7280;
+  --accent:#8b1e3f;      /* maroon */
+  --accent-600:#731933;  /* maroon (hover) */
+  --good:#10b981;        /* green */
+  --bad:#ef4444;         /* red */
+  --ring:#e5e7eb;        /* border */
+  --blue:#3b82f6;        /* featured */
+  --blue-600:#2563eb;    /* featured (hover) */
+  --amber:#f59e0b;       /* tbd */
+}
+.dark{
+  --bg:#0f172a;
+  --card:#1f2937;
+  --text:#e5e7eb;
+  --muted:#9ca3af;
+  --accent:#b3274f;
+  --accent-600:#8b1e3f;
+  --good:#34d399;
+  --bad:#f87171;
+  --ring:#374151;
+  --blue:#60a5fa;
+  --blue-600:#3b82f6;
+  --amber:#fbbf24;
+}
+
+/* ===== Base ===== */
+html,body{background:var(--bg); color:var(--text);}
+a.quiz-link{ color:var(--accent); text-decoration:underline; }
+a.quiz-link:hover{ text-decoration:none; }
+
+/* ===== Cards / hero ===== */
+.card{
+  background:var(--card);
+  border:1px solid var(--ring);
+  border-radius:1rem;
+  box-shadow:0 10px 15px -3px rgba(0,0,0,.08), 0 4px 6px -2px rgba(0,0,0,.04);
+}
+.hero {
+  background:
+    radial-gradient(1200px 600px at 10% -20%, rgba(139,30,63,.28), transparent 40%),
+    radial-gradient(800px 400px at 100% 0%, rgba(139,30,63,.18), transparent 45%);
+}
+
+/* ===== Buttons ===== */
+.btn{ border-radius:.75rem; padding:.6rem 1rem; font-weight:600; min-height:44px; }
+.btn .btn-icon{ width:1rem; height:1rem; display:inline-block; margin-right:.5rem; vertical-align:middle; }
+.btn-ghost{ background:transparent; border:1px solid var(--ring); }
+.btn-blue{
+  background:var(--accent); color:#fff; border:1px solid var(--accent);
+}
+.btn-blue:hover{
+  background:var(--accent-600); color:#fff; border-color:var(--accent-600);
+}
+.btn-green{ background:#16a34a; color:#fff; }
+.btn-gray{ background:#e5e7eb; } .dark .btn-gray{ background:#374151; color:#e5e7eb; }
+
+/* ===== Quiz card ===== */
+.quiz-card{
+  background:var(--card);
+  border-radius:1rem;
+  box-shadow:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -2px rgba(0,0,0,.05);
+  padding:1rem 1.25rem;
+  border:1px solid var(--ring);
+}
+.explain{ display:none; margin-top:.75rem; font-size:.95rem; color:var(--muted); }
+.explain.show{ display:block; }
+.correct{ outline:2px solid var(--good); border-radius:.75rem; }
+.wrong{ outline:2px solid var(--bad); border-radius:.75rem; }
+
+/* ===== Progress bar + flame ===== */
+.progress-bar-container{
+  position:relative; width:100%; height:8px;
+  background-color:var(--ring); border-radius:9999px;
+  margin:.75rem 0 1rem; overflow:visible;
+}
+.progress-bar{
+  height:100%; background-color:var(--accent);
+  transition:width .3s ease-in-out; position:relative; z-index:1; border-radius:9999px;
+}
+.fire-flame{
+  position:absolute; right:0; top:50%;
+  transform:translateY(-50%) translateX(100%);
+  font-size:1.5rem; animation:pulse-fire 1s infinite alternate; z-index:2;
+}
+@keyframes pulse-fire{
+  from{ transform:translateY(-50%) translateX(100%) scale(var(--flame-scale,1)); }
+  to{   transform:translateY(-50%) translateX(100%) scale(calc(var(--flame-scale,1)+.1)); }
+}
+.hidden{ display:none; }
+
+/* ===== Segmented control ===== */
+.segmented{
+  display:inline-flex;
+  border:1px solid var(--ring);
+  border-radius:.75rem;
+  background:var(--card);
+  overflow:hidden;
+}
+
+/* use <a class="seg-link">5/10/20/All</a> */
+.segmented .seg-link{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:3rem;          /* ensures even width */
+  padding:.45rem .9rem;    /* breathing room */
+  min-height:44px;
+  font-weight:600;
+  font-size:.9rem;
+  text-decoration:none;
+  color:var(--text);
+  background:transparent;
+  transition:background .2s, color .2s;
+}
+.segmented .seg-link + .seg-link{ border-left:1px solid var(--ring); }
+.segmented .seg-link.active{ background:var(--accent); color:#fff; }
+.segmented .seg-link:hover{ background:var(--accent-600); color:#fff; }
+
+/* ===== Badges (place these near bottom so they win in cascade) ===== */
+.badge{
+  display:inline-flex; align-items:center; gap:.35rem;
+  font-size:.72rem; font-weight:700;
+  padding:.18rem .55rem; line-height:1;
+  border-radius:9999px;
+  box-shadow:0 1px 3px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.06);
+  margin-left:.5rem;
+  white-space:nowrap;
+}
+.badge-dot{ width:.5rem; height:.5rem; border-radius:9999px; background:currentColor; opacity:.9; }
+
+/* Variants */
+.badge-new     { background: rgba(16,185,129,.15); color:#065f46; border:1px solid rgba(16,185,129,.35); }
+.dark .badge-new { background: rgba(16,185,129,.2); color:#ecfdf5; border-color:rgba(16,185,129,.45); }
+
+.badge-featured{ background: rgba(59,130,246,.15); color:#1e40af; border:1px solid rgba(59,130,246,.35); }
+.dark .badge-featured{ background: rgba(59,130,246,.2); color:#dbeafe; border-color:rgba(59,130,246,.45); }
+
+.badge-tbd     { background: rgba(245,158,11,.18); color:#92400e; border:1px solid rgba(245,158,11,.35); }
+.dark .badge-tbd{ background: rgba(245,158,11,.22); color:#fffbeb; border-color:rgba(245,158,11,.45); }
+
+/* Optional: a designated spot inside cards to receive badges */
+.badge-slot{ display:inline-flex; align-items:center; gap:.5rem; }
+
+/* ===== Accessibility niceties ===== */
+.btn:focus-visible, .quiz-link:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+label:has(input:focus-visible){ outline: 2px dashed var(--accent); border-radius: .5rem; }
+#prompt, #options { word-wrap: break-word; overflow-wrap: anywhere; }

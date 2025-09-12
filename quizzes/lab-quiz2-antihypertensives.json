@@ -1,0 +1,53 @@
+{
+  "id": "lab-quiz2-antihypertensives",
+  "title": "Lab Quiz 2 — Antihypertensives (Balanced P1)",
+  "pools": {
+    "easy": [
+      { "type": "mcq", "prompt": "What is the brand name of Hydralazine?", "choices": ["Diovan","Vasotec","Apresoline","Catapres"], "answer": "Apresoline" },
+      { "type": "short", "prompt": "Generic name of Diovan?", "answer": "Valsartan", "answerText": ["Valsartan"] },
+      { "type": "mcq", "prompt": "Which drug is a vasodilator?", "choices": ["Spironolactone","Hydralazine","Metoprolol","Valsartan"], "answer": "Hydralazine" },
+      { "type": "short", "prompt": "Brand name of Olmesartan?", "answer": "Benicar", "answerText": ["Benicar"] },
+      { "type": "mcq", "prompt": "Drug class of Enalapril?", "choices": ["Beta Blocker","ACE Inhibitor","ARB","Diuretic"], "answer": "ACE Inhibitor" },
+      { "type": "short", "prompt": "Generic name of Cardizem?", "answer": "Diltiazem", "answerText": ["Diltiazem"] },
+      { "type": "mcq", "prompt": "Which of the following is a brand name for Metoprolol?", "choices": ["Lopressor","Inderal","Toprol XL","Tenormin"], "answer": ["Lopressor","Toprol XL"] },
+      { "type": "mcq", "prompt": "Spironolactone also belongs to which other drug class?", "choices": ["ACE Inhibitor","Aldosterone Receptor Antagonist","Beta Blocker","ARB"], "answer": "Aldosterone Receptor Antagonist" },
+      { "type": "short", "prompt": "Generic name of Catapres?", "answer": "Clonidine", "answerText": ["Clonidine"] },
+      { "type": "mcq", "prompt": "Which drug is a Thiazide Diuretic?", "choices": ["Spironolactone","Metoprolol","Chlorthalidone","Verapamil"], "answer": "Chlorthalidone" },
+      { "type": "short", "prompt": "One brand of Verapamil?", "answer": "Calan", "answerText": ["Calan","Verelan"] },
+      { "type": "mcq", "prompt": "Valsartan and Olmesartan are both:", "choices": ["Beta Blockers","Diuretics","Alpha-2 Agonists","ARBs"], "answer": "ARBs" },
+      { "type": "short", "prompt": "Generic name of Aldactone?", "answer": "Spironolactone", "answerText": ["Spironolactone"] },
+      { "type": "mcq", "prompt": "Which of the following is a Beta Blocker?", "choices": ["Enalapril","Diltiazem","Metoprolol","Clonidine"], "answer": "Metoprolol" },
+      { "type": "short", "prompt": "Generic name of Vasotec?", "answer": "Enalapril", "answerText": ["Enalapril"] },
+      { "type": "mcq", "prompt": "Which drug can treat both hypertension and angina by slowing heart rate?", "choices": ["Hydralazine","Verapamil","Spironolactone","Clonidine"], "answer": "Verapamil" },
+      { "type": "short", "prompt": "Generic name of Toprol XL?", "answer": "Metoprolol", "answerText": ["Metoprolol"] },
+      { "type": "mcq", "prompt": "Which drug has a brand name containing 'cardio'?", "choices": ["Diovan","Vasotec","Cardizem","Apresoline"], "answer": "Cardizem" },
+      { "type": "short", "prompt": "Generic name of Benicar?", "answer": "Olmesartan", "answerText": ["Olmesartan"] },
+      { "type": "mcq", "prompt": "Which class lowers BP by increasing sodium and water excretion?", "choices": ["ACE Inhibitors","Beta Blockers","Diuretics","Calcium Channel Blockers"], "answer": "Diuretics" },
+      { "type": "tf", "prompt": "Chlorthalidone and Hydrochlorothiazide are both thiazide diuretics.", "answer": "True" },
+      { "type": "mcq", "prompt": "Which drug selectively blocks beta-1 receptors?", "choices": ["Clonidine","Metoprolol","Enalapril","Valsartan"], "answer": "Metoprolol" },
+      { "type": "short", "prompt": "Brand name of Hydralazine?", "answer": "Apresoline", "answerText": ["Apresoline"] }
+    ],
+    "hard": [
+      { "type": "short", "prompt": "Which drug directly relaxes arteriolar smooth muscle?", "answer": "Hydralazine", "answerText": ["Hydralazine"] },
+      { "type": "mcq", "prompt": "Valsartan works by blocking binding of:", "choices": ["Angiotensin I","Angiotensin II","Aldosterone","Calcium"], "answer": "Angiotensin II" },
+      { "type": "mcq", "prompt": "Primary mechanism of Enalapril?", "choices": ["Inhibits conversion of angiotensin I to angiotensin II","Blocks beta-1 receptors","Increases sodium reabsorption","Stimulates alpha-2 receptors"], "answer": "Inhibits conversion of angiotensin I to angiotensin II" },
+      { "type": "mcq", "prompt": "Clonidine works by stimulating which receptor?", "choices": ["Beta-1","Alpha-2","AT1","Beta-2"], "answer": "Alpha-2" },
+      { "type": "mcq", "prompt": "Diltiazem has what effect on the heart?", "choices": ["Increases heart rate","No effect","Reduces heart rate and contractility","Causes irregular rhythm"], "answer": "Reduces heart rate and contractility" },
+      { "type": "mcq", "prompt": "Which two drugs are ARBs?", "choices": ["Hydralazine and Enalapril","Valsartan and Olmesartan","Metoprolol and Spironolactone","Clonidine and Diltiazem"], "answer": "Valsartan and Olmesartan" },
+      { "type": "mcq", "prompt": "Primary function of Beta Blockers like Metoprolol?", "choices": ["Inhibits calcium influx","Increase sympathetic outflow","Decrease HR and contractility","Relax smooth muscle"], "answer": "Decrease HR and contractility" },
+      { "type": "mcq", "prompt": "Spironolactone competes with which hormone?", "choices": ["Renin","Angiotensin II","Aldosterone","Angiotensin I"], "answer": "Aldosterone" },
+      { "type": "mcq", "prompt": "How does Chlorthalidone increase sodium and water excretion?", "choices": ["Blocks AT1","Inhibits distal sodium reabsorption","Stimulates alpha-2","Relaxes smooth muscle"], "answer": "Inhibits distal sodium reabsorption" },
+      { "type": "mcq", "prompt": "Unlike Metoprolol, Verapamil inhibits influx of:", "choices": ["Sodium","Calcium","Chloride","Potassium"], "answer": "Calcium" },
+      { "type": "short", "prompt": "Which receptor does Valsartan block?", "answer": "AT1 receptor", "answerText": ["AT1 receptor","Angiotensin II type 1 receptor"] },
+      { "type": "mcq", "prompt": "Which drug reduces sympathetic outflow from the brainstem?", "choices": ["Enalapril","Diltiazem","Clonidine","Spironolactone"], "answer": "Clonidine" },
+      { "type": "mcq", "prompt": "Function of ACE enzyme inhibited by Enalapril?", "choices": ["Converts angiotensin II to angiotensin I","Converts angiotensin I to angiotensin II","Increases HR","Excretes sodium"], "answer": "Converts angiotensin I to angiotensin II" },
+      { "type": "mcq", "prompt": "Spironolactone and Chlorthalidone both increase excretion of:", "choices": ["Potassium","Sodium and water","Calcium","Aldosterone"], "answer": "Sodium and water" },
+      { "type": "mcq", "prompt": "Which is a cardioselective Beta Blocker?", "choices": ["Clonidine","Spironolactone","Metoprolol","Enalapril"], "answer": "Metoprolol" },
+      { "type": "mcq", "prompt": "ACE inhibition by Enalapril reduces levels of:", "choices": ["Aldosterone","Angiotensin II","Bradykinin","Renin"], "answer": "Angiotensin II" },
+      { "type": "mcq", "prompt": "Valsartan vs Enalapril difference: Valsartan ___, Enalapril ___", "choices": ["Blocks AT1; inhibits ACE","Inhibits ACE; blocks AT1","Stimulates beta-1; stimulates alpha-2","Increases outflow; decreases outflow"], "answer": "Blocks AT1; inhibits ACE" },
+      { "type": "mcq", "prompt": "Which Calcium Channel Blocker most strongly reduces HR/AV node conduction?", "choices": ["Verapamil","Diltiazem","Amlodipine","Nifedipine"], "answer": "Verapamil" },
+      { "type": "short", "prompt": "Spironolactone is known as a ____ diuretic.", "answer": "Potassium-sparing", "answerText": ["Potassium-sparing","K-sparing"] },
+      { "type": "mcq", "prompt": "Which brand contains both an ACE inhibitor and a diuretic?", "choices": ["Vasotec","Diovan","Vaseretic","Aldactone"], "answer": "Vaseretic" }
+    ]
+  }
+}

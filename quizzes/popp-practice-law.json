@@ -1,0 +1,480 @@
+{
+  "id": "popp-practice-law",
+  "title": "Pharmacy Law — Community Pharmacy Practice (Unit 1, Dr. O'Brien)",
+  "pools": {
+    "easy": [
+      {
+        "type": "mcq",
+        "prompt": "Which factors are considered when placing a drug in a CSA schedule?",
+        "choices": [
+          "Abuse potential, accepted medical use, dependence risk",
+          "Price, insurance coverage, prescriber specialty",
+          "Side effect profile, manufacturer, dosage form",
+          "State law only"
+        ],
+        "answer": "Abuse potential, accepted medical use, dependence risk"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which agency enforces the Controlled Substances Act (CSA)?",
+        "choices": ["FDA", "DEA", "CDC", "CMS"],
+        "answer": "DEA"
+      },
+      {
+        "type": "tf",
+        "prompt": "The purpose of the CSA is to regulate manufacture, distribution, and dispensing of controlled substances.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Schedule I drugs are defined as:",
+        "choices": [
+          "High abuse potential, no accepted medical use",
+          "Low abuse potential, accepted medical use",
+          "Moderate abuse potential, accepted medical use",
+          "High abuse potential, accepted medical use"
+        ],
+        "answer": "High abuse potential, no accepted medical use"
+      },
+      {
+        "type": "tf",
+        "prompt": "Schedule II prescriptions cannot be refilled.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Schedule III–V prescriptions may be refilled:",
+        "choices": [
+          "Up to 5 times in 6 months if authorized",
+          "Unlimited refills in 6 months",
+          "Up to 3 times in 12 months",
+          "Never"
+        ],
+        "answer": "Up to 5 times in 6 months if authorized"
+      },
+      {
+        "type": "mcq-multiple",
+        "prompt": "Which of the following are Schedule II medications? (Select all that apply)",
+        "choices": ["Morphine", "Oxycodone", "Diazepam", "Pregabalin"],
+        "answer": ["Morphine", "Oxycodone"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which of the following is a Schedule IV medication?",
+        "choices": ["Diazepam", "Heroin", "Cocaine", "Methadone"],
+        "answer": "Diazepam"
+      },
+      {
+        "type": "mcq",
+        "prompt": "For controlled substance inventories:",
+        "choices": [
+          "Schedule II counts must be exact; Schedule III–V may be estimated if ≤1000 units",
+          "All may be estimated",
+          "All must be exact",
+          "Schedule II may be estimated"
+        ],
+        "answer": "Schedule II counts must be exact; Schedule III–V may be estimated if ≤1000 units"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Controlled substance inventories must occur:",
+        "choices": [
+          "Biennially after initial",
+          "Annually",
+          "Every 6 months",
+          "Every 3 years"
+        ],
+        "answer": "Biennially after initial"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Under federal law, controlled substance records must be kept for at least:",
+        "choices": ["2 years", "1 year", "3 years", "5 years"],
+        "answer": "2 years"
+      },
+      {
+        "type": "tf",
+        "prompt": "Pharmacists share a corresponding responsibility with prescribers to ensure controlled prescriptions are legitimate.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which law limits pseudoephedrine sales?",
+        "choices": ["Combat Methamphetamine Epidemic Act", "CSA", "OBRA 90", "DSCSA"],
+        "answer": "Combat Methamphetamine Epidemic Act"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Federal daily pseudoephedrine limit is:",
+        "choices": ["3.6 g/day", "9 g/day", "7.5 g/day", "1.2 g/day"],
+        "answer": "3.6 g/day"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Federal 30-day pseudoephedrine limit is:",
+        "choices": ["9 g/30 days", "7.5 g/30 days", "12 g/30 days", "3.6 g/30 days"],
+        "answer": "9 g/30 days"
+      },
+      {
+        "type": "tf",
+        "prompt": "Pseudoephedrine sales require photo ID and logbook records retained for 2 years.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Transfers of Schedule III–V prescriptions (no shared database) are limited to:",
+        "choices": ["One-time transfer", "Unlimited transfers", "Not allowed", "Up to 5 transfers"],
+        "answer": "One-time transfer"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Transfers of controlled prescriptions must be:",
+        "choices": [
+          "Pharmacist to pharmacist",
+          "Technician to pharmacist",
+          "Pharmacist to technician",
+          "Any licensed staff"
+        ],
+        "answer": "Pharmacist to pharmacist"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Emergency oral C-II prescriptions require follow-up written or e-signed Rx within:",
+        "choices": ["7 days", "24 hours", "3 days", "14 days"],
+        "answer": "7 days"
+      },
+      {
+        "type": "tf",
+        "prompt": "Emergency refills for essential non-controlled chronic meds are permitted under Arkansas law when prescriber unavailable.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Generic substitution is allowed unless:",
+        "choices": [
+          "Prescriber indicates DAW or prohibited by state",
+          "The payer requires generic",
+          "The drug is OTC",
+          "The patient requests generic"
+        ],
+        "answer": "Prescriber indicates DAW or prohibited by state"
+      },
+      {
+        "type": "tf",
+        "prompt": "E-prescribing of controlled substances (EPCS) is federally permitted if system requirements are met.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Arkansas law requires PDMP checks for:",
+        "choices": ["Controlled substances", "All prescriptions", "Only Schedule I", "OTCs"],
+        "answer": "Controlled substances"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which of the following must appear on an Arkansas prescription label?",
+        "choices": [
+          "Patient name, drug name, strength, directions, prescriber, pharmacy info",
+          "Patient address only",
+          "Only prescriber DEA number",
+          "Insurance BIN number"
+        ],
+        "answer": "Patient name, drug name, strength, directions, prescriber, pharmacy info"
+      },
+      {
+        "type": "tf",
+        "prompt": "Post-dating a controlled prescription is not permitted under federal law.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which list is the official source of current CSA drug schedules?",
+        "choices": [
+          "DEA Controlled Substances List",
+          "AR Dept of Health Controlled Substances List",
+          "FDA Orange Book",
+          "Pharmacy Times website"
+        ],
+        "answer": "DEA Controlled Substances List"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Chain of custody in controlled substances means:",
+        "choices": [
+          "Tracking a single dosage unit from manufacture to administration or destruction",
+          "Keeping DEA forms locked up",
+          "Having two pharmacists check every order",
+          "Chain pharmacies sharing refill data"
+        ],
+        "answer": "Tracking a single dosage unit from manufacture to administration or destruction"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Schedule II records must be:",
+        "choices": [
+          "Kept separate from other records",
+          "Filed together with OTC records",
+          "Archived only after 10 years",
+          "Submitted monthly to DEA"
+        ],
+        "answer": "Kept separate from other records"
+      },
+      {
+        "type": "tf",
+        "prompt": "A pharmacist is not required to exercise professional judgment in determination about the legitimacy of a controlled prescription. (T/F)",
+        "answer": "False"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which of the following practitioners generally does NOT have authority to prescribe Schedule II controlled substances in Arkansas?",
+        "choices": [
+          "Physician (MD/DO)",
+          "Dentist (DDS/DMD)",
+          "Optometrist",
+          "Pharmacist"
+        ],
+        "answer": "Pharmacist"
+      }
+    ],
+    "hard": [
+      {
+        "type": "mcq",
+        "prompt": "Case: A questionable opioid Rx has high quantity, benzo combo, no clear diagnosis. What should the pharmacist do?",
+        "choices": [
+          "Verify with prescriber; refuse if not legitimate",
+          "Always fill as written",
+          "Ignore and dispense",
+          "Only check PDMP"
+        ],
+        "answer": "Verify with prescriber; refuse if not legitimate"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: Pharmacy receives a phoned-in Adderall prescription with no follow-up. After 7 days, the pharmacist should:",
+        "choices": ["Report to DEA/state board", "Nothing", "Fill anyway", "Convert to refill"],
+        "answer": "Report to DEA/state board"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: Alprazolam 2000-count bottle. May inventory be estimated?",
+        "choices": [
+          "No, exact count required",
+          "Yes, always",
+          "Yes, if <1000 units",
+          "Only if DEA approves"
+        ],
+        "answer": "No, exact count required"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: Patient requests largest Sudafed box. Pharmacist must:",
+        "choices": [
+          "Check ID, logbook, ensure ≤3.6 g/day and ≤9 g/30 days",
+          "Sell any amount",
+          "Refuse sale",
+          "Report to DEA immediately"
+        ],
+        "answer": "Check ID, logbook, ensure ≤3.6 g/day and ≤9 g/30 days"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: Prescriber phones in oxycodone 3-day supply. This is:",
+        "choices": [
+          "Permitted if emergency and written Rx follows in 7 days",
+          "Never allowed",
+          "Always allowed",
+          "Allowed with unlimited supply"
+        ],
+        "answer": "Permitted if emergency and written Rx follows in 7 days"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case (Independent → Independent, no shared DB): How many transfers allowed for Schedule IV?",
+        "choices": ["One-time only", "Unlimited", "None", "Up to five"],
+        "answer": "One-time only"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case (Arkansas Walgreens → Walgreens shared system): How many transfers after initial fill?",
+        "choices": [
+          "As many times as refills remain",
+          "One transfer after initial, then locked to new pharmacy",
+          "Not transferable",
+          "Up to five"
+        ],
+        "answer": "One transfer after initial, then locked to new pharmacy"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: DAW written, patient asks for generic. Correct pharmacist action?",
+        "choices": [
+          "Dispense brand only without discussion",
+          "Substitute generic without approval",
+          "Explain brand only allowed unless prescriber authorizes; offer to contact prescriber",
+          "Ask insurance to override"
+        ],
+        "answer": "Explain brand only allowed unless prescriber authorizes; offer to contact prescriber"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case (CARA request): Non-LTCF patient requests partial fill of C-II. By when must remainder be dispensed?",
+        "choices": [
+          "30 days from written date",
+          "72 hours",
+          "7 days",
+          "6 months"
+        ],
+        "answer": "30 days from written date"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case (Stock shortage): Pharmacy can only supply part of C-II today. By when must remainder be dispensed?",
+        "choices": [
+          "Within 72 hours of first partial",
+          "Within 30 days of written date",
+          "Within 7 days of written date",
+          "Within 60 days of written date"
+        ],
+        "answer": "Within 72 hours of first partial"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case (Documentation): For partial fill at patient request, what must pharmacist record?",
+        "choices": [
+          "Date, quantity, remaining quantity, initials, and request + date",
+          "Only initials",
+          "Only remaining quantity",
+          "Nothing if within 30 days"
+        ],
+        "answer": "Date, quantity, remaining quantity, initials, and request + date"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: Hospice patient morphine Rx faxed. This fax:",
+        "choices": [
+          "May serve as original",
+          "Never valid",
+          "Only valid if converted",
+          "Requires DEA form"
+        ],
+        "answer": "May serve as original"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: Pharmacist fills C-II with post-dated Rx. This is:",
+        "choices": [
+          "Not permitted under federal law",
+          "Always permitted",
+          "Valid in Arkansas only",
+          "Valid if <30 days"
+        ],
+        "answer": "Not permitted under federal law"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: C-V pregabalin prescription. Max refills?",
+        "choices": ["Up to 5 in 6 months if authorized", "Unlimited", "None", "One only"],
+        "answer": "Up to 5 in 6 months if authorized"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: Pharmacist sells pseudoephedrine without ID. This violates:",
+        "choices": ["Combat Meth Act", "CSA only", "OBRA 90", "DSCSA"],
+        "answer": "Combat Meth Act"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: Prescriber writes C-II for self use. Which is correct?",
+        "choices": [
+          "Unacceptable under CSA and Arkansas law",
+          "Allowable if under 72-day supply",
+          "Always allowed but unethical",
+          "Depends on patient preference"
+        ],
+        "answer": "Unacceptable under CSA and Arkansas law"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: Prescriber writes C-III for spouse. This is:",
+        "choices": [
+          "Not permitted (conflict of interest/self-prescribing)",
+          "Permitted without restriction",
+          "Valid only if DAW marked",
+          "Allowed if within 3 days supply"
+        ],
+        "answer": "Not permitted (conflict of interest/self-prescribing)"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: Which is NOT required for OTC pseudoephedrine sale under CMEA?",
+        "choices": [
+          "Maintain logbook for 2 years",
+          "Employee training",
+          "Purchase limits daily/monthly",
+          "Patient must provide Social Security number"
+        ],
+        "answer": "Patient must provide Social Security number"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: PDMP purpose includes all EXCEPT:",
+        "choices": [
+          "Reduce abuse, misuse, diversion of controlled substances",
+          "Ensure pharmacists take lunch breaks",
+          "Monitor prescribing/dispensing trends",
+          "Assist in public health surveillance"
+        ],
+        "answer": "Ensure pharmacists take lunch breaks"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: Arkansas PDMP must be checked before prescribing which?",
+        "choices": [
+          "Schedule II–III opioids",
+          "First-time benzodiazepine",
+          "Both A and B",
+          "None of the above"
+        ],
+        "answer": "Both A and B"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: Pharmacist suspects prescriber is issuing controlled Rx for no legitimate purpose. Action?",
+        "choices": [
+          "Refuse to fill; document; notify authorities if needed",
+          "Fill to avoid conflict",
+          "Call insurance",
+          "Transfer Rx"
+        ],
+        "answer": "Refuse to fill; document; notify authorities if needed"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: Pharmacist notices patient fills overlapping benzo and opioid prescriptions at multiple pharmacies. This is a:",
+        "choices": [
+          "Red flag under corresponding responsibility",
+          "Always acceptable",
+          "Non-controlled issue",
+          "Insurance violation only"
+        ],
+        "answer": "Red flag under corresponding responsibility"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: Pharmacist dispenses valid oxycodone Rx but wrong strength (5 mg vs 10 mg). This is:",
+        "choices": [
+          "Dispensing error",
+          "CSA scheduling violation",
+          "PDMP violation",
+          "Pseudoephedrine violation"
+        ],
+        "answer": "Dispensing error"
+      },
+      {
+        "type": "tf",
+        "prompt": "Case: Arkansas law requires prescribers and dispensers to report controlled substance fills to PDMP.",
+        "answer": "True"
+      }
+    ]
+  }
+}

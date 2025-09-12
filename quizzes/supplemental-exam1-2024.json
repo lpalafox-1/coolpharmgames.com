@@ -1,0 +1,61 @@
+{
+  "id": "supplemental-exam1-2024",
+  "title": "Supplemental Exam 1 (2024)",
+  "pools": {
+    "easy": [
+      {
+        "type": "mcq",
+        "prompt": "Translate the signa: Take 5 mL by mouth three times daily as needed for wheezing.",
+        "choices": ["5 mL p.o. t.i.d. p.r.n. wheezing","5 mL p.o. b.i.d. wheezing","5 mL q.i.d. p.o. wheezing","Take 5 mL by mouth q.d."],
+        "answer": "5 mL p.o. t.i.d. p.r.n. wheezing",
+        "solution": "t.i.d. = three times daily; p.r.n. = as needed."
+      },
+      {
+        "type": "short",
+        "prompt": "Translate: Inhale 2 puffs by mouth twice a day.",
+        "answerText": "Inhale 2 puffs b.i.d. p.o.",
+        "solution": "'2 puffs' denotes the number; 'b.i.d.' is twice daily; 'p.o.' is by mouth."
+      },
+      {
+        "type": "short",
+        "prompt": "Write in English: 1 cap p.o. h.s. p.r.n. sleep.",
+        "answerText": "Take one capsule by mouth at bedtime as needed for sleep",
+        "solution": "'h.s.' means at bedtime; 'p.r.n.' means as needed; the indication is sleep."
+      },
+      {
+        "type": "mcq",
+        "prompt": "Convert 40 mg drug in 0.8 mL to mg/mL concentration.",
+        "choices": ["50 mg/mL","40 mg/mL","32 mg/mL","80 mg/mL"],
+        "answer": "50 mg/mL",
+        "solution": "40 ÷ 0.8 = 50 mg/mL."
+      }
+    ],
+    "hard": [
+      {
+        "type": "short",
+        "prompt": "A pharmacist weighs 475 mg substance on an inaccurate balance; true weight is 445 mg. Calculate the percentage error.",
+        "answerText": "6.32%",
+        "solution": "Error% = (475 − 445)/475 × 100 ≈ 6.32%."
+      },
+      {
+        "type": "mcq",
+        "prompt": "Translate: Mesalamine 1.2 g p.o. q.d. c food.",
+        "choices": ["Take 1.2 g mesalamine by mouth once daily with food","Take 1.2 g mesalamine by mouth every 8 hours","Take 120 mg mesalamine by mouth daily","Take 1.2 g mesalamine subcutaneously every day"],
+        "answer": "Take 1.2 g mesalamine by mouth once daily with food",
+        "solution": "'p.o.' by mouth; 'q.d.' once daily; 'c food' with food."
+      },
+      {
+        "type": "short",
+        "prompt": "A 10‑mL graduate weighs 42.745 g empty; with 5 mL water it weighs 47.675 g. Calculate the percent deviation of the measured water from 5 g.",
+        "answerText": "1.4%",
+        "solution": "Measured water weight = 47.675 − 42.745 = 4.93 g; error = (5 − 4.93)/5 × 100 = 1.4%."
+      },
+      {
+        "type": "short",
+        "prompt": "A capsule containing 330 mg contents must be within ±5% error. Determine the acceptable weight range.",
+        "answerText": "313.5–346.5 mg",
+        "solution": "5% of 330 mg = 16.5 mg; 330 ± 16.5 = 313.5–346.5 mg."
+      }
+    ]
+  }
+}

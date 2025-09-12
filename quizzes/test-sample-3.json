@@ -1,0 +1,28 @@
+{
+  "id": "test-sample-3",
+  "title": "Sample 3-question quiz (hints & calc)",
+  "questions": [
+    {
+      "type": "mcq",
+      "prompt": "Which drug is a beta-blocker?",
+      "choices": ["Lisinopril", "Metoprolol", "Amlodipine"],
+      "answer": "Metoprolol",
+      "explain": "Metoprolol is a selective beta-1 blocker used for hypertension.",
+      "hints": ["Think cardioselective agents", "-olol suffix often indicates beta-blockers"]
+    },
+    {
+      "type": "short",
+      "prompt": "Calculate the volume: If concentration is 2.0 mg/mL, how many mL for a 5 mg dose?",
+      "answerText": "2.5",
+      "tolerance": 0.01,
+      "solution": "Dose (mg) / concentration (mg/mL) = 5 / 2 = 2.5 mL",
+      "hints": "Divide dose by concentration"
+    },
+    {
+      "type": "short",
+      "prompt": "Accept any value between 4.5 and 4.6 for this example",
+      "answerText": "4.5-4.6",
+      "hints": ["Range allowed: 4.5 to 4.6"]
+    }
+  ]
+}

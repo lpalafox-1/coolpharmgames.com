@@ -1,0 +1,14 @@
+{
+  "name": "pharm-let",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "validate": "node tools/validate-quizzes.mjs",
+    "validate:quizzes": "node tools/validate-quizzes.mjs",
+    "count:questions": "node -e \"const fs=require('fs'); const files=fs.readdirSync('quizzes').filter(f=>f.endsWith('.json')); let total=0; files.forEach(f=>{const quiz=JSON.parse(fs.readFileSync('quizzes/'+f)); const easy=(quiz.pools?.easy||[]).length; const hard=(quiz.pools?.hard||[]).length; const questions=(quiz.questions||[]).length; const count=easy+hard+questions; console.log(f.padEnd(35), count.toString().padStart(3)); total+=count;}); console.log('Total questions:'.padEnd(35), total.toString().padStart(3));\"",
+    "check:links": "node tools/check-links.mjs"
+  },
+  "devDependencies": {
+    "ajv": "^8.17.1"
+  }
+}

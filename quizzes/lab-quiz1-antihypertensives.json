@@ -1,0 +1,49 @@
+{
+  "id": "lab-quiz1-antihypertensives",
+  "title": "Lab Quiz 1 — Antihypertensives (Balanced P1)",
+  "pools": {
+    "easy": [
+      { "type": "mcq", "prompt": "Losartan belongs to which class?", "choices": ["ARB", "ACE inhibitor", "Thiazide diuretic", "Loop diuretic"], "answer": "ARB" },
+      { "type": "mcq", "prompt": "Amlodipine is best described as:", "choices": ["DHP CCB", "Non-DHP CCB", "ACE inhibitor", "ARB"], "answer": "DHP CCB" },
+      { "type": "mcq", "prompt": "Diltiazem belongs to:", "choices": ["Non-DHP CCB", "DHP CCB", "Beta blocker", "ARB"], "answer": "Non-DHP CCB" },
+      { "type": "mcq", "prompt": "Hydrochlorothiazide is a:", "choices": ["Thiazide diuretic", "Loop diuretic", "Aldosterone antagonist", "ACE inhibitor"], "answer": "Thiazide diuretic" },
+      { "type": "mcq", "prompt": "Chlorthalidone is:", "choices": ["Thiazide-like diuretic", "Loop diuretic", "Potassium-sparing diuretic", "ACE inhibitor"], "answer": "Thiazide-like diuretic" },
+      { "type": "mcq", "prompt": "Furosemide is a:", "choices": ["Loop diuretic", "Thiazide diuretic", "ACE inhibitor", "ARB"], "answer": "Loop diuretic" },
+      { "type": "mcq", "prompt": "Spironolactone is a(n):", "choices": ["Aldosterone antagonist", "ARB", "ACE inhibitor", "Thiazide"], "answer": "Aldosterone antagonist" },
+      { "type": "mcq", "prompt": "Eplerenone is a(n):", "choices": ["Aldosterone antagonist", "ACE inhibitor", "ARB", "DHP CCB"], "answer": "Aldosterone antagonist" },
+      { "type": "mcq", "prompt": "Metoprolol is:", "choices": ["β1-selective blocker", "Non-selective beta blocker", "Alpha-1 blocker", "Central alpha-2 agonist"], "answer": "β1-selective blocker" },
+      { "type": "mcq", "prompt": "Propranolol is:", "choices": ["Non-selective beta blocker", "β1-selective blocker", "Alpha-1 blocker", "ARB"], "answer": "Non-selective beta blocker" },
+      { "type": "mcq", "prompt": "Clonidine's category:", "choices": ["Central alpha-2 agonist", "Direct vasodilator", "Alpha-1 blocker", "ACE inhibitor"], "answer": "Central alpha-2 agonist" },
+      { "type": "mcq", "prompt": "Hydralazine is a:", "choices": ["Direct vasodilator", "ARB", "Beta blocker", "Thiazide diuretic"], "answer": "Direct vasodilator" },
+      { "type": "tf",  "prompt": "ACE inhibitors can cause cough due to bradykinin.", "answer": "True" },
+      { "type": "tf",  "prompt": "DHP CCBs commonly cause ankle edema.", "answer": "True" },
+      { "type": "tf",  "prompt": "Thiazides may increase uric acid.", "answer": "True" },
+      { "type": "tf",  "prompt": "Non-DHP CCBs often increase heart rate.", "answer": "False" },
+      { "type": "short", "prompt": "What class is eplerenone?", "answerText": ["aldosterone antagonist", "mineralocorticoid receptor antagonist", "mra"] },
+      { "type": "short", "prompt": "What class is clonidine?", "answerText": ["central alpha-2 agonist", "central α2 agonist", "alpha 2 agonist"] },
+      { "type": "short", "prompt": "HCTZ belongs to what diuretic class?", "answerText": ["thiazide", "thiazide diuretic"] },
+      { "type": "short", "prompt": "Amlodipine belongs to what CCB subgroup?", "answerText": ["dhp ccb", "dihydropyridine", "dihydropyridine ccb"] }
+    ],
+    "hard": [
+      { "type": "mcq", "prompt": "Which combo most increases hyperkalemia risk?", "choices": ["ACEi + spironolactone", "Amlodipine + HCTZ", "Furosemide + hydralazine", "Atenolol + chlorthalidone"], "answer": "ACEi + spironolactone" },
+      { "type": "mcq", "prompt": "Which lab change is typical with thiazides?", "choices": ["↑ Calcium", "↓ Calcium", "↑ Potassium", "↓ Uric acid"], "answer": "↑ Calcium" },
+      { "type": "mcq", "prompt": "Which agent acts at the AV node and may worsen heart block?", "choices": ["Verapamil", "Amlodipine", "Losartan", "Hydrochlorothiazide"], "answer": "Verapamil" },
+      { "type": "mcq", "prompt": "Which drug directly inhibits renin?", "choices": ["Aliskiren", "Lisinopril", "Losartan", "Eplerenone"], "answer": "Aliskiren" },
+      { "type": "mcq", "prompt": "Which class primarily reduces peripheral resistance via arterial dilation?", "choices": ["DHP CCBs", "Beta blockers", "Diuretics", "Central α2 agonists"], "answer": "DHP CCBs" },
+      { "type": "mcq", "prompt": "Which β-blocker is β1-selective?", "choices": ["Bisoprolol", "Propranolol", "Nadolol", "Carvedilol"], "answer": "Bisoprolol" },
+      { "type": "mcq", "prompt": "Which increases AV block risk with β-blockers?", "choices": ["Diltiazem", "Amlodipine", "Hydralazine", "HCTZ"], "answer": "Diltiazem" },
+      { "type": "mcq", "prompt": "Dry cough develops on therapy. Best switch?", "choices": ["ACE inhibitor → ARB", "ARB → ACE inhibitor", "Thiazide → Loop", "DHP CCB → Non-DHP CCB"], "answer": "ACE inhibitor → ARB" },
+      { "type": "mcq", "prompt": "Best for resistant HTN with hyperaldosteronism:", "choices": ["Spironolactone + thiazide", "Amlodipine + beta blocker", "ARB + loop", "Hydralazine + clonidine"], "answer": "Spironolactone + thiazide" },
+      { "type": "tf",  "prompt": "ACE inhibitors usually cause hypokalemia.", "answer": "False" },
+      { "type": "tf",  "prompt": "Non-DHP CCBs commonly cause constipation (esp. verapamil).", "answer": "True" },
+      { "type": "tf",  "prompt": "Loop diuretics may cause hypokalemia.", "answer": "True" },
+      { "type": "tf",  "prompt": "ARBs increase bradykinin more than ACE inhibitors.", "answer": "False" },
+      { "type": "short", "prompt": "Name one β1-selective blocker.", "answerText": ["metoprolol", "atenolol", "bisoprolol", "nebivolol"] },
+      { "type": "short", "prompt": "Name one non-DHP CCB.", "answerText": ["verapamil", "diltiazem"] },
+      { "type": "short", "prompt": "Name one aldosterone antagonist.", "answerText": ["spironolactone", "eplerenone"] },
+      { "type": "short", "prompt": "Class of nifedipine (subcategory)?", "answerText": ["dhp ccb", "dihydropyridine", "dihydropyridine ccb"] },
+      { "type": "short", "prompt": "Drug class of losartan?", "answerText": ["arb", "angiotensin receptor blocker", "angiotensin ii receptor blocker"] },
+      { "type": "short", "prompt": "Hydralazine pharmacologic category?", "answerText": ["direct vasodilator", "vasodilator"] }
+    ]
+  }
+}

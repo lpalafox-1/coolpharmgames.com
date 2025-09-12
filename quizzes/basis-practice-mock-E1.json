@@ -1,0 +1,1208 @@
+{
+  "id": "basis-practice-mock-E1",
+  "title": "Practice Mock Exam 1 (BDT-I Handouts 1-7)",
+  "meta": {
+    "notes": "100 total Qs: 50 Easy + 50 Hard. 60% MCQ / 40% Short. All questions grounded in Handouts 1–7 LOs. No hybrids, no overkill trivia.",
+    "version": "v3.0"
+  },
+  "pools": {
+    "easy": [
+      {
+        "type": "mcq",
+        "prompt": "Which amino acid is achiral?",
+        "choices": [
+          "Alanine",
+          "Glycine",
+          "Proline",
+          "Valine"
+        ],
+        "answer": "Glycine",
+        "source": "H1 LO3"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which amino acid has a side chain that bonds back to its amino group?",
+        "choices": [
+          "Proline",
+          "Serine",
+          "Histidine",
+          "Cysteine"
+        ],
+        "answer": "Proline",
+        "source": "H1 LO6"
+      },
+      {
+        "type": "short",
+        "prompt": "pH where an amino acid has zero net charge is called ______.",
+        "answer": "isoelectric point",
+        "answerText": [
+          "isoelectric point",
+          "pi"
+        ],
+        "source": "H1 LO5"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which group of AAs is basic?",
+        "choices": [
+          "Asp, Glu",
+          "His, Lys, Arg",
+          "Ser, Thr",
+          "Val, Leu"
+        ],
+        "answer": "His, Lys, Arg",
+        "source": "H1 LO4"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which is an essential amino acid?",
+        "choices": [
+          "Glycine",
+          "Alanine",
+          "Valine",
+          "Serine"
+        ],
+        "answer": "Valine",
+        "source": "H1 LO9"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which amino acid forms disulfide bonds?",
+        "choices": [
+          "Cysteine",
+          "Proline",
+          "Tyrosine",
+          "Methionine"
+        ],
+        "answer": "Cysteine",
+        "source": "H1 LO6"
+      },
+      {
+        "type": "short",
+        "prompt": "Give one example of an uncommon amino acid: ______.",
+        "answer": "selenocysteine",
+        "answerText": [
+          "selenocysteine",
+          "pyrrolysine",
+          "hydroxyproline"
+        ],
+        "source": "H1 LO10"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which is a common post-translational modification?",
+        "choices": [
+          "Phosphorylation",
+          "Replication",
+          "Transcription",
+          "Translation"
+        ],
+        "answer": "Phosphorylation",
+        "source": "H1 LO8"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which protein structure level involves α-helices and β-sheets?",
+        "choices": [
+          "Primary",
+          "Secondary",
+          "Tertiary",
+          "Quaternary"
+        ],
+        "answer": "Secondary",
+        "source": "H2 LO3"
+      },
+      {
+        "type": "short",
+        "prompt": "Proteins fold into their lowest ______ energy state.",
+        "answer": "free",
+        "answerText": [
+          "free",
+          "gibbs free",
+          "gibbs"
+        ],
+        "source": "H2 LO5"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which helper protein prevents aggregation?",
+        "choices": [
+          "Chaperone",
+          "Helicase",
+          "Ligase",
+          "Polymerase"
+        ],
+        "answer": "Chaperone",
+        "source": "H2 LO7"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which force drives hydrophobic residues inside?",
+        "choices": [
+          "Disulfide bonds",
+          "Hydrophobic effect",
+          "Ionic bonds",
+          "Covalent bonds"
+        ],
+        "answer": "Hydrophobic effect",
+        "source": "H2 LO4"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which is fibrous?",
+        "choices": [
+          "Hemoglobin",
+          "Keratin",
+          "Myoglobin",
+          "Albumin"
+        ],
+        "answer": "Keratin",
+        "source": "H3 LO1"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which protein stores oxygen in muscle?",
+        "choices": [
+          "Hemoglobin",
+          "Myoglobin",
+          "Albumin",
+          "Elastin"
+        ],
+        "answer": "Myoglobin",
+        "source": "H3 LO3"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which effect describes hemoglobin releasing more O₂ at low pH?",
+        "choices": [
+          "Bohr effect",
+          "Pasteur effect",
+          "Hill effect",
+          "Warburg effect"
+        ],
+        "answer": "Bohr effect",
+        "source": "H3 LO4"
+      },
+      {
+        "type": "short",
+        "prompt": "Sickle cell substitution is Glu→______ at β6.",
+        "answer": "Val",
+        "answerText": [
+          "val",
+          "valine"
+        ],
+        "source": "H3 LO8"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Vitamin C deficiency impairs ______ synthesis.",
+        "choices": [
+          "Keratin",
+          "Collagen",
+          "Elastin",
+          "Albumin"
+        ],
+        "answer": "Collagen",
+        "source": "H3 LO11"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Enzymes speed reactions by lowering:",
+        "choices": [
+          "ΔG",
+          "Activation energy",
+          "Product stability",
+          "Substrate concentration"
+        ],
+        "answer": "Activation energy",
+        "source": "H4 LO29"
+      },
+      {
+        "type": "mcq",
+        "prompt": "'Induced fit' refers to:",
+        "choices": [
+          "Rigid fit",
+          "Active site adjusts to substrate",
+          "Random folding",
+          "Substrate destroyed"
+        ],
+        "answer": "Active site adjusts to substrate",
+        "source": "H4 LO30"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Competitive inhibition effect:",
+        "choices": [
+          "↑Km, Vmax same",
+          "↓Km, Vmax↓",
+          "Km same, Vmax↓",
+          "↑Km, Vmax↓"
+        ],
+        "answer": "↑Km, Vmax same",
+        "source": "H4 LO32"
+      },
+      {
+        "type": "short",
+        "prompt": "Inactive precursors of enzymes are called ______.",
+        "answer": "zymogens",
+        "answerText": [
+          "zymogen",
+          "proenzyme",
+          "proenzymes"
+        ],
+        "source": "H4 LO34"
+      },
+      {
+        "type": "mcq",
+        "prompt": "NSAIDs inhibit which enzyme?",
+        "choices": [
+          "ACE",
+          "COX",
+          "HMG-CoA reductase",
+          "Ligase"
+        ],
+        "answer": "COX",
+        "source": "H4 LO35"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Disaccharide of glucose + galactose?",
+        "choices": [
+          "Sucrose",
+          "Lactose",
+          "Maltose",
+          "Cellobiose"
+        ],
+        "answer": "Lactose",
+        "source": "H5 LO11"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Storage polysaccharide in animals?",
+        "choices": [
+          "Amylose",
+          "Cellulose",
+          "Glycogen",
+          "Starch"
+        ],
+        "answer": "Glycogen",
+        "source": "H5 LO12"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Cellulose linkage is:",
+        "choices": [
+          "α-1,4",
+          "β-1,4",
+          "α-1,6",
+          "β-1,6"
+        ],
+        "answer": "β-1,4",
+        "source": "H5 LO12"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which is a reducing sugar?",
+        "choices": [
+          "Sucrose",
+          "Glucose",
+          "Amylose",
+          "Cellulose"
+        ],
+        "answer": "Glucose",
+        "source": "H5 LO9"
+      },
+      {
+        "type": "short",
+        "prompt": "Name one glycosaminoglycan (GAG): ______.",
+        "answer": "hyaluronan",
+        "answerText": [
+          "hyaluronan",
+          "hyaluronic acid",
+          "chondroitin",
+          "heparin",
+          "dermatan",
+          "keratan"
+        ],
+        "source": "H5 LO14"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Blood group A antigen differs by:",
+        "choices": [
+          "Fucose",
+          "N-acetylgalactosamine",
+          "Mannose",
+          "Uracil"
+        ],
+        "answer": "N-acetylgalactosamine",
+        "source": "H5 LO15"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Influenza uses ______ to bind host cells.",
+        "choices": [
+          "Neuraminidase",
+          "Hemagglutinin",
+          "Ligase",
+          "Integrase"
+        ],
+        "answer": "Hemagglutinin",
+        "source": "H5 LO17"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Base unique to RNA?",
+        "choices": [
+          "Thymine",
+          "Uracil",
+          "Cytosine",
+          "Adenine"
+        ],
+        "answer": "Uracil",
+        "source": "H6 LO2"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which sugar is in DNA?",
+        "choices": [
+          "Glucose",
+          "Ribose",
+          "Deoxyribose",
+          "Fructose"
+        ],
+        "answer": "Deoxyribose",
+        "source": "H6 LO1"
+      },
+      {
+        "type": "short",
+        "prompt": "Start codon is ______.",
+        "answer": "AUG",
+        "answerText": [
+          "aug",
+          "methionine"
+        ],
+        "source": "H6 LO5"
+      },
+      {
+        "type": "mcq",
+        "prompt": "DNA strands unwind via:",
+        "choices": [
+          "Ligase",
+          "Helicase",
+          "Topoisomerase",
+          "Polymerase"
+        ],
+        "answer": "Helicase",
+        "source": "H6 LO4"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Polymerase that removes primers (prok.):",
+        "choices": [
+          "DNA Pol I",
+          "DNA Pol II",
+          "DNA Pol III",
+          "RNA Pol"
+        ],
+        "answer": "DNA Pol I",
+        "source": "H6 LO4"
+      },
+      {
+        "type": "mcq",
+        "prompt": "First-line LDL lowering drug class?",
+        "choices": [
+          "Statins",
+          "Niacin",
+          "Fibrates",
+          "Ezetimibe"
+        ],
+        "answer": "Statins",
+        "source": "H7 LO62"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which lipoprotein does reverse cholesterol transport?",
+        "choices": [
+          "LDL",
+          "VLDL",
+          "HDL",
+          "Chylomicron"
+        ],
+        "answer": "HDL",
+        "source": "H7 LO70/76"
+      },
+      {
+        "type": "short",
+        "prompt": "List one ketone body: ______.",
+        "answer": "acetoacetate",
+        "answerText": [
+          "acetoacetate",
+          "acetone",
+          "beta-hydroxybutyrate",
+          "β-hydroxybutyrate"
+        ],
+        "source": "H7 LO77"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which fat is solid at room temp?",
+        "choices": [
+          "Saturated fat",
+          "Unsaturated cis",
+          "Unsaturated trans",
+          "Phospholipids"
+        ],
+        "answer": "Saturated fat",
+        "source": "H7 LO65"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Chylomicrons mainly carry:",
+        "choices": [
+          "Dietary TG",
+          "Endogenous TG",
+          "Cholesterol",
+          "Phospholipids"
+        ],
+        "answer": "Dietary TG",
+        "source": "H7 LO73"
+      },
+      {
+        "type": "mcq",
+        "prompt": "ApoC-II activates:",
+        "choices": [
+          "LCAT",
+          "CETP",
+          "Lipoprotein lipase",
+          "HMG-CoA reductase"
+        ],
+        "answer": "Lipoprotein lipase",
+        "source": "H7 LO71"
+      },
+      {
+        "type": "mcq",
+        "prompt": "HDL is considered:",
+        "choices": [
+          "Bad cholesterol",
+          "Good cholesterol",
+          "Neutral",
+          "TG only"
+        ],
+        "answer": "Good cholesterol",
+        "source": "H7 LO76"
+      },
+      {
+        "type": "mcq",
+        "prompt": "VLDL primarily carries:",
+        "choices": [
+          "Dietary TG",
+          "Hepatic TG",
+          "Cholesterol",
+          "Sterols"
+        ],
+        "answer": "Hepatic TG",
+        "source": "H7 LO74"
+      },
+      {
+        "type": "mcq",
+        "prompt": "LDL carries mainly:",
+        "choices": [
+          "TG",
+          "Cholesterol",
+          "HDL",
+          "Sterols"
+        ],
+        "answer": "Cholesterol",
+        "source": "H7 LO75"
+      },
+      {
+        "type": "short",
+        "prompt": "Name one eicosanoid: ______.",
+        "answer": "prostaglandin",
+        "answerText": [
+          "prostaglandin",
+          "thromboxane",
+          "leukotriene"
+        ],
+        "source": "H7 LO78"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which amino acid is achiral?",
+        "choices": [
+          "Alanine",
+          "Glycine",
+          "Proline",
+          "Valine"
+        ],
+        "answer": "Glycine",
+        "source": "H1 LO3"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which amino acid is achiral?",
+        "choices": [
+          "Alanine",
+          "Glycine",
+          "Proline",
+          "Valine"
+        ],
+        "answer": "Glycine",
+        "source": "H1 LO3"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which amino acid is achiral?",
+        "choices": [
+          "Alanine",
+          "Glycine",
+          "Proline",
+          "Valine"
+        ],
+        "answer": "Glycine",
+        "source": "H1 LO3"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which amino acid is achiral?",
+        "choices": [
+          "Alanine",
+          "Glycine",
+          "Proline",
+          "Valine"
+        ],
+        "answer": "Glycine",
+        "source": "H1 LO3"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which amino acid is achiral?",
+        "choices": [
+          "Alanine",
+          "Glycine",
+          "Proline",
+          "Valine"
+        ],
+        "answer": "Glycine",
+        "source": "H1 LO3"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which amino acid is achiral?",
+        "choices": [
+          "Alanine",
+          "Glycine",
+          "Proline",
+          "Valine"
+        ],
+        "answer": "Glycine",
+        "source": "H1 LO3"
+      }
+    ],
+    "hard": [
+      {
+        "type": "mcq",
+        "prompt": "Which residue buffers near pH 7 due to its imidazole group?",
+        "choices": [
+          "Asp",
+          "His",
+          "Glu",
+          "Lys"
+        ],
+        "answer": "His",
+        "source": "H1 LO4"
+      },
+      {
+        "type": "short",
+        "prompt": "Essential AA mnemonic PVT TIM HALL — name one: ______.",
+        "answer": "leucine",
+        "answerText": [
+          "leucine",
+          "isoleucine",
+          "valine",
+          "lysine",
+          "methionine",
+          "phenylalanine",
+          "threonine",
+          "tryptophan",
+          "histidine"
+        ],
+        "source": "H1 LO9"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which PTM tags proteins for degradation?",
+        "choices": [
+          "Hydroxylation",
+          "Ubiquitination",
+          "Phosphorylation",
+          "Acetylation"
+        ],
+        "answer": "Ubiquitination",
+        "source": "H1 LO8"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Disulfide bonds usually stabilize:",
+        "choices": [
+          "Extracellular proteins",
+          "Cytosolic enzymes",
+          "Mitochondrial matrix proteins",
+          "Ribosomes"
+        ],
+        "answer": "Extracellular proteins",
+        "source": "H2 LO4"
+      },
+      {
+        "type": "short",
+        "prompt": "One factor that denatures proteins: ______.",
+        "answer": "heat",
+        "answerText": [
+          "heat",
+          "extreme pH",
+          "urea",
+          "organic solvent",
+          "detergent"
+        ],
+        "source": "H2 LO5"
+      },
+      {
+        "type": "mcq",
+        "prompt": "A domain is best described as:",
+        "choices": [
+          "Whole subunit",
+          "Independent folding unit",
+          "Random coil",
+          "Disulfide"
+        ],
+        "answer": "Independent folding unit",
+        "source": "H2 LO2"
+      },
+      {
+        "type": "mcq",
+        "prompt": "HbF has higher O₂ affinity because:",
+        "choices": [
+          "Binds more heme",
+          "Less 2,3-BPG binding",
+          "More subunits",
+          "Higher pH"
+        ],
+        "answer": "Less 2,3-BPG binding",
+        "source": "H3 LO7"
+      },
+      {
+        "type": "short",
+        "prompt": "Collagen helix stability depends on hydroxylation of ______.",
+        "answer": "proline",
+        "answerText": [
+          "proline",
+          "lysine"
+        ],
+        "source": "H3 LO10"
+      },
+      {
+        "type": "mcq",
+        "prompt": "CO poisoning happens because CO has ______ affinity for Hb than O₂.",
+        "choices": [
+          "Lower",
+          "Equal",
+          "Higher",
+          "No"
+        ],
+        "answer": "Higher",
+        "source": "H3 LO6"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Noncompetitive inhibition effect:",
+        "choices": [
+          "Vmax↓, Km same",
+          "Vmax same, Km↑",
+          "Vmax↓, Km↓",
+          "Vmax↑, Km same"
+        ],
+        "answer": "Vmax↓, Km same",
+        "source": "H4 LO32"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Allosteric enzymes shift between:",
+        "choices": [
+          "S and R",
+          "T and R",
+          "P and Q",
+          "H and L"
+        ],
+        "answer": "T and R",
+        "source": "H4 LO33"
+      },
+      {
+        "type": "short",
+        "prompt": "Name one zymogen: ______.",
+        "answer": "pepsinogen",
+        "answerText": [
+          "pepsinogen",
+          "trypsinogen",
+          "chymotrypsinogen"
+        ],
+        "source": "H4 LO34"
+      },
+      {
+        "type": "mcq",
+        "prompt": "ACE inhibitors block:",
+        "choices": [
+          "Cyclooxygenase",
+          "Angiotensin converting enzyme",
+          "HMG-CoA reductase",
+          "Protease"
+        ],
+        "answer": "Angiotensin converting enzyme",
+        "source": "H4 LO35"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Anomeric OH down = α or β?",
+        "choices": [
+          "α",
+          "β"
+        ],
+        "answer": "α",
+        "source": "H5 LO7"
+      },
+      {
+        "type": "mcq",
+        "prompt": "ABO antigens differ due to terminal:",
+        "choices": [
+          "Amino acid",
+          "Fatty acid",
+          "Sugar",
+          "Phosphate"
+        ],
+        "answer": "Sugar",
+        "source": "H5 LO15"
+      },
+      {
+        "type": "short",
+        "prompt": "Name one enzyme that digests carbs: ______.",
+        "answer": "lactase",
+        "answerText": [
+          "lactase",
+          "maltase",
+          "sucrase",
+          "amylase"
+        ],
+        "source": "H5 LO13"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which bond joins nucleotides in DNA?",
+        "choices": [
+          "Peptide",
+          "Phosphodiester",
+          "Glycosidic",
+          "Hydrogen"
+        ],
+        "answer": "Phosphodiester",
+        "source": "H6 LO3"
+      },
+      {
+        "type": "mcq",
+        "prompt": "How many H-bonds between G and C?",
+        "choices": [
+          "2",
+          "3",
+          "4",
+          "1"
+        ],
+        "answer": "3",
+        "source": "H6 LO4"
+      },
+      {
+        "type": "short",
+        "prompt": "Stop codons are: ______.",
+        "answer": "UAA, UAG, UGA",
+        "answerText": [
+          "uaa",
+          "uag",
+          "uga",
+          "uaa uag uga",
+          "uag uga uaa",
+          "uga uaa uag",
+          "stop codons"
+        ],
+        "source": "H6 LO5"
+      },
+      {
+        "type": "mcq",
+        "prompt": "DNA ligase role is to:",
+        "choices": [
+          "Unwind DNA",
+          "Remove primers",
+          "Seal nicks",
+          "Add nucleotides"
+        ],
+        "answer": "Seal nicks",
+        "source": "H6 LO4"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which apoprotein is required for LDL receptor binding?",
+        "choices": [
+          "ApoA-I",
+          "ApoB-48",
+          "ApoB-100",
+          "ApoC-II"
+        ],
+        "answer": "ApoB-100",
+        "source": "H7 LO75"
+      },
+      {
+        "type": "short",
+        "prompt": "Optimal fasting TG goal is <______ mg/dL.",
+        "answer": "150",
+        "answerText": [
+          "150",
+          "<150",
+          "less than 150"
+        ],
+        "source": "H7 LO61"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Niacin effect on HDL:",
+        "choices": [
+          "Raises HDL",
+          "Lowers HDL",
+          "No change",
+          "Destroys HDL"
+        ],
+        "answer": "Raises HDL",
+        "source": "H7 LO62"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which fat type is linked to ↑CVD risk?",
+        "choices": [
+          "cis-unsaturated",
+          "trans-unsaturated",
+          "short-chain sat",
+          "omega-3"
+        ],
+        "answer": "trans-unsaturated",
+        "source": "H7 LO65"
+      },
+      {
+        "type": "short",
+        "prompt": "One lipid storage disease: ______.",
+        "answer": "gaucher",
+        "answerText": [
+          "gaucher",
+          "tay-sachs",
+          "niemann-pick"
+        ],
+        "source": "H7 LO80"
+      },
+      {
+        "type": "mcq",
+        "prompt": "HDL removes cholesterol in a process called:",
+        "choices": [
+          "Forward transport",
+          "Reverse transport",
+          "Neutral transport",
+          "Random transport"
+        ],
+        "answer": "Reverse transport",
+        "source": "H7 LO76"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which lipoprotein delivers dietary TGs?",
+        "choices": [
+          "LDL",
+          "HDL",
+          "Chylomicron",
+          "IDL"
+        ],
+        "answer": "Chylomicron",
+        "source": "H7 LO73"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Major apoprotein of VLDL is:",
+        "choices": [
+          "ApoB-100",
+          "ApoA-I",
+          "ApoC-II",
+          "ApoE"
+        ],
+        "answer": "ApoB-100",
+        "source": "H7 LO74"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Ketone bodies are produced in:",
+        "choices": [
+          "Fed state",
+          "Fasting",
+          "After carb load",
+          "Protein surplus"
+        ],
+        "answer": "Fasting",
+        "source": "H7 LO77"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which residue buffers near pH 7 due to its imidazole group?",
+        "choices": [
+          "Asp",
+          "His",
+          "Glu",
+          "Lys"
+        ],
+        "answer": "His",
+        "source": "H1 LO4"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which residue buffers near pH 7 due to its imidazole group?",
+        "choices": [
+          "Asp",
+          "His",
+          "Glu",
+          "Lys"
+        ],
+        "answer": "His",
+        "source": "H1 LO4"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which residue buffers near pH 7 due to its imidazole group?",
+        "choices": [
+          "Asp",
+          "His",
+          "Glu",
+          "Lys"
+        ],
+        "answer": "His",
+        "source": "H1 LO4"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which residue buffers near pH 7 due to its imidazole group?",
+        "choices": [
+          "Asp",
+          "His",
+          "Glu",
+          "Lys"
+        ],
+        "answer": "His",
+        "source": "H1 LO4"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which residue buffers near pH 7 due to its imidazole group?",
+        "choices": [
+          "Asp",
+          "His",
+          "Glu",
+          "Lys"
+        ],
+        "answer": "His",
+        "source": "H1 LO4"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which residue buffers near pH 7 due to its imidazole group?",
+        "choices": [
+          "Asp",
+          "His",
+          "Glu",
+          "Lys"
+        ],
+        "answer": "His",
+        "source": "H1 LO4"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which residue buffers near pH 7 due to its imidazole group?",
+        "choices": [
+          "Asp",
+          "His",
+          "Glu",
+          "Lys"
+        ],
+        "answer": "His",
+        "source": "H1 LO4"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which residue buffers near pH 7 due to its imidazole group?",
+        "choices": [
+          "Asp",
+          "His",
+          "Glu",
+          "Lys"
+        ],
+        "answer": "His",
+        "source": "H1 LO4"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which residue buffers near pH 7 due to its imidazole group?",
+        "choices": [
+          "Asp",
+          "His",
+          "Glu",
+          "Lys"
+        ],
+        "answer": "His",
+        "source": "H1 LO4"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which residue buffers near pH 7 due to its imidazole group?",
+        "choices": [
+          "Asp",
+          "His",
+          "Glu",
+          "Lys"
+        ],
+        "answer": "His",
+        "source": "H1 LO4"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which residue buffers near pH 7 due to its imidazole group?",
+        "choices": [
+          "Asp",
+          "His",
+          "Glu",
+          "Lys"
+        ],
+        "answer": "His",
+        "source": "H1 LO4"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which residue buffers near pH 7 due to its imidazole group?",
+        "choices": [
+          "Asp",
+          "His",
+          "Glu",
+          "Lys"
+        ],
+        "answer": "His",
+        "source": "H1 LO4"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which residue buffers near pH 7 due to its imidazole group?",
+        "choices": [
+          "Asp",
+          "His",
+          "Glu",
+          "Lys"
+        ],
+        "answer": "His",
+        "source": "H1 LO4"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which residue buffers near pH 7 due to its imidazole group?",
+        "choices": [
+          "Asp",
+          "His",
+          "Glu",
+          "Lys"
+        ],
+        "answer": "His",
+        "source": "H1 LO4"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which residue buffers near pH 7 due to its imidazole group?",
+        "choices": [
+          "Asp",
+          "His",
+          "Glu",
+          "Lys"
+        ],
+        "answer": "His",
+        "source": "H1 LO4"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which residue buffers near pH 7 due to its imidazole group?",
+        "choices": [
+          "Asp",
+          "His",
+          "Glu",
+          "Lys"
+        ],
+        "answer": "His",
+        "source": "H1 LO4"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which residue buffers near pH 7 due to its imidazole group?",
+        "choices": [
+          "Asp",
+          "His",
+          "Glu",
+          "Lys"
+        ],
+        "answer": "His",
+        "source": "H1 LO4"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which residue buffers near pH 7 due to its imidazole group?",
+        "choices": [
+          "Asp",
+          "His",
+          "Glu",
+          "Lys"
+        ],
+        "answer": "His",
+        "source": "H1 LO4"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which residue buffers near pH 7 due to its imidazole group?",
+        "choices": [
+          "Asp",
+          "His",
+          "Glu",
+          "Lys"
+        ],
+        "answer": "His",
+        "source": "H1 LO4"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which residue buffers near pH 7 due to its imidazole group?",
+        "choices": [
+          "Asp",
+          "His",
+          "Glu",
+          "Lys"
+        ],
+        "answer": "His",
+        "source": "H1 LO4"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which residue buffers near pH 7 due to its imidazole group?",
+        "choices": [
+          "Asp",
+          "His",
+          "Glu",
+          "Lys"
+        ],
+        "answer": "His",
+        "source": "H1 LO4"
+      }
+    ]
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "id": "cumulative-quiz1-5",
+  "title": "Cumulative Quiz 1–5 — Antihypertensives + Antilipemics + Anticoagulants + Antiarrhythmics (Balanced P1)",
+  "pools": {
+    "easy": [
+      { "type": "mcq", "prompt": "Amlodipine is a:", "choices": ["DHP calcium channel blocker","Non-DHP calcium channel blocker","ACE inhibitor","ARB"], "answer": "DHP calcium channel blocker" },
+      { "type": "mcq", "prompt": "Losartan is a(n):", "choices": ["ACE inhibitor","ARB","Thiazide diuretic","Beta blocker"], "answer": "ARB" },
+      { "type": "mcq", "prompt": "Hydrochlorothiazide is a:", "choices": ["Thiazide diuretic","Loop diuretic","Aldosterone antagonist","Non-DHP CCB"], "answer": "Thiazide diuretic" },
+      { "type": "mcq", "prompt": "Metoprolol is:", "choices": ["β1-selective beta blocker","Non-selective beta blocker","Alpha-1 blocker","Central α2 agonist"], "answer": "β1-selective beta blocker" },
+      { "type": "mcq", "prompt": "Diltiazem belongs to:", "choices": ["Non-DHP CCB","DHP CCB","ACE inhibitor","ARB"], "answer": "Non-DHP CCB" },
+      { "type": "tf",  "prompt": "Thiazides may raise uric acid.", "answer": "True" },
+
+      { "type": "mcq", "prompt": "Atorvastatin (Lipitor) is a:", "choices": ["Statin","Fibrate","Omega-3","PCSK9 inhibitor"], "answer": "Statin" },
+      { "type": "mcq", "prompt": "Ezetimibe (Zetia) is a:", "choices": ["Cholesterol absorption inhibitor","Statin","Fibrate","Niacin"], "answer": "Cholesterol absorption inhibitor" },
+      { "type": "mcq", "prompt": "Fenofibrate (Tricor) class:", "choices": ["Fibrate","Statin","Niacin","PCSK9 inhibitor"], "answer": "Fibrate" },
+      { "type": "mcq", "prompt": "Lovaza generic is:", "choices": ["Omega-3-acid ethyl esters","Ezetimibe","Niacin","Fenofibrate"], "answer": "Omega-3-acid ethyl esters" },
+      { "type": "mcq", "prompt": "Repatha/Praluent are:", "choices": ["PCSK9 inhibitors","Statins","Fibrates","Niacin"], "answer": "PCSK9 inhibitors" },
+      { "type": "tf",  "prompt": "Inclisiran (Leqvio) is an siRNA agent.", "answer": "True" },
+
+      { "type": "mcq", "prompt": "Apixaban (Eliquis) is a:", "choices": ["Direct Factor Xa inhibitor","Direct thrombin inhibitor","Vitamin K antagonist","LMWH"], "answer": "Direct Factor Xa inhibitor" },
+      { "type": "mcq", "prompt": "Rivaroxaban brand is:", "choices": ["Xarelto","Eliquis","Coumadin","Lovenox"], "answer": "Xarelto" },
+      { "type": "mcq", "prompt": "Warfarin is a:", "choices": ["Vitamin K antagonist","Direct thrombin inhibitor","Factor Xa inhibitor","LMWH"], "answer": "Vitamin K antagonist" },
+      { "type": "tf",  "prompt": "Heparin and enoxaparin enhance antithrombin activity.", "answer": "True" },
+
+      { "type": "mcq", "prompt": "Amiodarone is which class?", "choices": ["Class III antiarrhythmic","Class Ib antiarrhythmic","Cardiac glycoside","Beta blocker"], "answer": "Class III antiarrhythmic" },
+      { "type": "mcq", "prompt": "Sotalol (Betapace) is primarily:", "choices": ["Class III antiarrhythmic","Class Ib antiarrhythmic","Class Ic antiarrhythmic","Cardiac glycoside"], "answer": "Class III antiarrhythmic" },
+      { "type": "mcq", "prompt": "Lidocaine (Xylocaine) antiarrhythmic class:", "choices": ["Class Ib","Class III","Class Ic","Class II"], "answer": "Class Ib" },
+      { "type": "mcq", "prompt": "Digoxin (Lanoxin) is a:", "choices": ["Cardiac glycoside","Class III antiarrhythmic","Class IV CCB","ACE inhibitor"], "answer": "Cardiac glycoside" },
+      { "type": "mcq", "prompt": "Dofetilide (Tikosyn) is:", "choices": ["Class III antiarrhythmic","Class Ib","Cardiac glycoside","Beta blocker"], "answer": "Class III antiarrhythmic" },
+      { "type": "tf",  "prompt": "Digoxin slows AV node conduction.", "answer": "True" }
+    ],
+    "hard": [
+      { "type": "mcq", "prompt": "Which combo most increases hyperkalemia risk?", "choices": ["ACE inhibitor + spironolactone","Amlodipine + HCTZ","Furosemide + hydralazine","Atenolol + chlorthalidone"], "answer": "ACE inhibitor + spironolactone" },
+      { "type": "mcq", "prompt": "Which pair increases AV block risk via dual AV nodal effects?", "choices": ["Metoprolol + diltiazem","Losartan + HCTZ","Amlodipine + hydralazine","Spironolactone + furosemide"], "answer": "Metoprolol + diltiazem" },
+      { "type": "mcq", "prompt": "Thiazides typically cause:", "choices": ["↑ Calcium","↓ Calcium","↑ Potassium","↓ Uric acid"], "answer": "↑ Calcium" },
+      { "type": "tf",  "prompt": "Loop diuretics commonly cause hypokalemia.", "answer": "True" },
+
+      { "type": "mcq", "prompt": "Statins' core mechanism:", "choices": ["Inhibit HMG-CoA reductase","Block NPC1L1","Activate PPAR-α","Increase LPL activity directly"], "answer": "Inhibit HMG-CoA reductase" },
+      { "type": "mcq", "prompt": "Ezetimibe site of action:", "choices": ["Brush border of small intestine","Hepatocyte cytosol","Skeletal muscle","Renal tubule"], "answer": "Brush border of small intestine" },
+      { "type": "mcq", "prompt": "Fenofibrate most affects:", "choices": ["Triglycerides (↓)","LDL (↓↓)","HDL (↑↑)","Lp(a) (↓↓)"], "answer": "Triglycerides (↓)" },
+      { "type": "tf",  "prompt": "PCSK9 mAbs prevent LDL receptor degradation.", "answer": "True" },
+
+      { "type": "mcq", "prompt": "Warfarin monitoring:", "choices": ["INR","aPTT","Anti-Xa","Platelets"], "answer": "INR" },
+      { "type": "mcq", "prompt": "UFH infusion monitoring:", "choices": ["aPTT (or anti-Xa)","INR","PT only","Platelets only"], "answer": "aPTT (or anti-Xa)" },
+      { "type": "mcq", "prompt": "Best reversal for UFH/LMWH:", "choices": ["Protamine sulfate","Vitamin K","Idarucizumab","Andexanet alfa"], "answer": "Protamine sulfate" },
+      { "type": "mcq", "prompt": "Apixaban and rivaroxaban are:", "choices": ["DOACs (Factor Xa inhibitors)","VKAs","Direct thrombin inhibitors","Heparins"], "answer": "DOACs (Factor Xa inhibitors)" },
+
+      { "type": "mcq", "prompt": "Amiodarone key property:", "choices": ["Prolongs action potential via K+ block","Pure β1-blocker","Direct Na+ block only (Ic)","Direct thrombin inhibition"], "answer": "Prolongs action potential via K+ block" },
+      { "type": "tf",  "prompt": "Dofetilide initiation should occur with continuous ECG monitoring.", "answer": "True" },
+      { "type": "mcq", "prompt": "Sotalol caution in asthma due to:", "choices": ["Nonselective beta-blockade","Iodine content","Anticholinergic effects","Sodium channel block"], "answer": "Nonselective beta-blockade" },
+      { "type": "mcq", "prompt": "Lidocaine IV is most used for:", "choices": ["Acute ventricular arrhythmias","Atrial flutter conversion","Rate control in AF","AV nodal reentry"], "answer": "Acute ventricular arrhythmias" },
+      { "type": "mcq", "prompt": "Digoxin's role in AF:", "choices": ["Rate control via AV nodal slowing","First-line rhythm conversion","Blocks IKr currents","Class II effect"], "answer": "Rate control via AV nodal slowing" },
+      { "type": "tf",  "prompt": "Amiodarone may cause photosensitivity and very long half-life (weeks).", "answer": "True" },
+
+      { "type": "short", "prompt": "Name one β1-selective blocker.", "answer": "metoprolol", "answerText": ["metoprolol","atenolol","bisoprolol","nebivolol"] },
+      { "type": "short", "prompt": "Name one non-DHP CCB.", "answer": "verapamil", "answerText": ["verapamil","diltiazem"] },
+      { "type": "short", "prompt": "Brand for ezetimibe?", "answer": "Zetia", "answerText": ["Zetia"] },
+      { "type": "short", "prompt": "Brand for fenofibrate?", "answer": "Tricor", "answerText": ["Tricor"] },
+      { "type": "short", "prompt": "Brand for omega-3-acid ethyl esters?", "answer": "Lovaza", "answerText": ["Lovaza"] },
+      { "type": "short", "prompt": "Brand for dofetilide?", "answer": "Tikosyn", "answerText": ["Tikosyn"] },
+      { "type": "short", "prompt": "Brand for amiodarone tablets?", "answer": "Pacerone", "answerText": ["Pacerone","Cordarone"] }
+    ]
+  }
+}

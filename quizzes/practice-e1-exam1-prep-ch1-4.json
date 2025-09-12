@@ -1,0 +1,213 @@
+{
+  "id": "practice-e1-exam1-prep-ch1-4",
+  "title": "Practice E1 — Exam 1 Prep (Chapters 1–4)",
+  "pools": {
+    "easy": [
+      {
+        "id": 11001,
+        "type": "short",
+        "prompt": "Convert 5 ft 7 in to centimeters. (1 in = 2.54 cm)",
+        "answerText": ["170 cm"],
+        "hints": "5 ft = 60 in; +7 in = 67 in; ×2.54.",
+        "solution": "67×2.54 = 170 cm."
+      },
+      {
+        "id": 11002,
+        "type": "short",
+        "prompt": "A cough syrup contains 10 mg/5 mL. How many mg are in 120 mL?",
+        "answerText": ["240 mg"],
+        "hints": "Find mg/mL then ×120 mL.",
+        "solution": "10/5 = 2 mg/mL; 2×120 = 240 mg."
+      },
+      {
+        "id": 11003,
+        "type": "short",
+        "prompt": "Filgrastim syringe 480 mcg/0.8 mL. How many mcg in 0.5 mL?",
+        "answerText": ["300 mcg"],
+        "hints": "mcg/mL × 0.5 mL.",
+        "solution": "480/0.8=600 mcg/mL; ×0.5=300 mcg."
+      },
+      {
+        "id": 11004,
+        "type": "short",
+        "prompt": "Convert 2.25 L + 875 mL to liters.",
+        "answerText": ["3.125 L"],
+        "hints": "875 mL = 0.875 L.",
+        "solution": "2.25+0.875=3.125 L."
+      },
+      {
+        "id": 11005,
+        "type": "short",
+        "prompt": "Convert 3.5 kg to grams.",
+        "answerText": ["3500 g"],
+        "hints": "×1000.",
+        "solution": "3.5×1000 = 3500 g."
+      },
+      {
+        "id": 11006,
+        "type": "short",
+        "prompt": "A dropper delivers 20 drops/mL. How many drops are in 2.5 mL?",
+        "answerText": ["50 drops"],
+        "hints": "drops = mL × drops/mL.",
+        "solution": "2.5×20=50 drops."
+      },
+      {
+        "id": 11007,
+        "type": "short",
+        "prompt": "A 10‑mL vial has 100 units/mL insulin. How many days will it last at 20 units/day?",
+        "answerText": ["50 days"],
+        "hints": "Total units ÷ daily dose.",
+        "solution": "10×100=1000 units; 1000/20=50 days."
+      },
+      {
+        "id": 11008,
+        "type": "short",
+        "prompt": "A label states 25 mg/5 mL. How many mg in 12 mL?",
+        "answerText": ["60 mg"],
+        "hints": "25/5 = 5 mg/mL.",
+        "solution": "5×12 = 60 mg."
+      },
+      {
+        "id": 11009,
+        "type": "short",
+        "prompt": "Solution 120 mg/10 mL. How many mg in 7.5 mL?",
+        "answerText": ["90 mg"],
+        "hints": "Find mg/mL then ×7.5 mL.",
+        "solution": "120/10=12 mg/mL; ×7.5=90 mg."
+      },
+      {
+        "id": 11010,
+        "type": "short",
+        "prompt": "How many μg are in 3.2 mg?",
+        "answerText": ["3200 mcg", "3200 μg"],
+        "hints": "1 mg = 1000 μg.",
+        "solution": "3.2×1000=3200 μg."
+      },
+      {
+        "id": 11011,
+        "type": "short",
+        "prompt": "A solution contains 25 mg per 5 mL. How many mg are in 12 mL?",
+        "answerText": ["60 mg"],
+        "hints": "25/5=5 mg/mL.",
+        "solution": "5×12=60 mg."
+      },
+      {
+        "id": 11012,
+        "type": "short",
+        "prompt": "Interpret SIG: ii gtt o.u. q.i.d.",
+        "answerText": [
+          "instill 2 drops in both eyes four times daily",
+          "place 2 drops in both eyes four times daily"
+        ],
+        "hints": "o.u.=both eyes; q.i.d.=four times daily.",
+        "solution": "Instill 2 drops in both eyes four times daily."
+      }
+    ],
+    "hard": [
+      {
+        "id": 11101,
+        "type": "short",
+        "prompt": "Balance SR = 6 mg. Minimum weighable quantity for ≤5% error?",
+        "answerText": ["120 mg"],
+        "hints": "Min weighable = (SR×100)/%error.",
+        "solution": "(6×100)/5 = 120 mg."
+      },
+      {
+        "id": 11102,
+        "type": "short",
+        "prompt": "You need 50 mg chlorpheniramine maleate. Balance SR=6 mg; error ≤5%. Explain an aliquot plan using lactose.",
+        "answerText": ["Prepare ≥120 mg mixture so a measurable aliquot contains 50 mg drug."],
+        "hints": "Make a mixture so that the weighed aliquot ≥120 mg.",
+        "solution": "Min weighable=120 mg. Example: prepare a 300 mg mixture containing 50 mg drug; weigh an aliquot that delivers 50 mg drug while the mass weighed is ≥120 mg (e.g., take 300 mg if needed, or scale parts so 120 mg aliquot contains 50 mg)."
+      },
+      {
+        "id": 11103,
+        "type": "short",
+        "prompt": "10‑mL graduate weighs 42.745 g. With 5 mL water, total 47.675 g. Compute % error vs 5 g.",
+        "answerText": ["1.4%"],
+        "hints": "Measured water = total − tare.",
+        "solution": "Measured water=47.675−42.745=4.93 g; error=(5−4.93)/5×100=1.4%."
+      },
+      {
+        "id": 11104,
+        "type": "short",
+        "prompt": "A 5‑mL ampule contains 100 mg drug. How many mg in 2.2 mL?",
+        "answerText": ["44 mg"],
+        "hints": "mg/mL × volume.",
+        "solution": "100/5=20 mg/mL; ×2.2=44 mg."
+      },
+      {
+        "id": 11105,
+        "type": "short",
+        "prompt": "A vial 0.1 mg/mL. What volume provides 40 μg?",
+        "answerText": ["0.4 mL"],
+        "hints": "Convert μg→mg, divide by conc.",
+        "solution": "40 μg=0.04 mg; 0.04/0.1=0.4 mL."
+      },
+      {
+        "id": 11106,
+        "type": "short",
+        "prompt": "Add 0.0025 kg + 1750 mg + 2.25 g + 825,000 μg (answer in grams).",
+        "answerText": ["7.325 g"],
+        "hints": "Convert all to grams.",
+        "solution": "2.5 + 1.75 + 2.25 + 0.825 = 7.325 g."
+      },
+      {
+        "id": 11107,
+        "type": "short",
+        "prompt": "A pharmacist weighed 475 mg, true weight 445 mg. % error?",
+        "answerText": ["6.32%"],
+        "hints": "(observed − true)/observed ×100.",
+        "solution": "(475−445)/475×100=6.32%."
+      },
+      {
+        "id": 11108,
+        "type": "short",
+        "prompt": "Interpret: Admin. prochlorperazine 10 mg IM q3h p.r.n. N&V",
+        "answerText": ["Administer 10 mg intramuscularly every 3 hours as needed for nausea and vomiting"],
+        "hints": "IM=intramuscular; q3h=every 3 hours.",
+        "solution": "Administer 10 mg intramuscularly every 3 hours as needed for nausea and vomiting."
+      },
+      {
+        "id": 11109,
+        "type": "short",
+        "prompt": "Need 1.25 mL dye solution; graduate accurate ≥2 mL. Describe aliquot method (water as diluent).",
+        "answerText": ["Dilute to a measurable total (e.g., 5.00 mL) then measure that aliquot."],
+        "hints": "Scale to ≥2 mL.",
+        "solution": "Add 3.75 mL water to 1.25 mL dye → 5.00 mL total; measure that 5.00 mL aliquot containing the original 1.25 mL."
+      },
+      {
+        "id": 11110,
+        "type": "short",
+        "prompt": "Each capsule target is 330 mg. What is the ±5% range?",
+        "answerText": ["313.5–346.5 mg"],
+        "hints": "0.05×target.",
+        "solution": "330±16.5 → 313.5–346.5 mg."
+      },
+      {
+        "id": 11111,
+        "type": "short",
+        "prompt": "Tablet sequence over 30 days: Day 1 q.i.d., Day 2 t.i.d., Days 3–7 b.i.d., Days 8–30 q.d. Total tablets?",
+        "answerText": ["40 tablets"],
+        "hints": "Sum each phase.",
+        "solution": "4 + 3 + (5×2) + (23×1) = 40."
+      },
+      {
+        "id": 11112,
+        "type": "short",
+        "prompt": "A solution labeled 25 mg/mL. How many mL are needed for 180 mg?",
+        "answerText": ["7.2 mL"],
+        "hints": "V = dose/conc.",
+        "solution": "180/25=7.2 mL."
+      },
+      {
+        "id": 11113,
+        "type": "short",
+        "prompt": "Balance SR=2 mg. Weigh 15 mg capsaicin with error ≤5% using starch as diluent. Outline the aliquot method.",
+        "answerText": ["Prepare a mixture ≥40 mg total and weigh an aliquot containing 15 mg capsaicin."],
+        "hints": "Min weighable = 40 mg.",
+        "solution": "Min weighable=(2×100)/5=40 mg. Prepare a mixture (e.g., 150 mg with 15 mg drug + 135 mg starch). Weigh the aliquot that contains 15 mg drug while the weighed mass ≥40 mg."
+      }
+    ]
+  }
+}

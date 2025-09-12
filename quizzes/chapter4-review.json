@@ -1,0 +1,97 @@
+{
+  "id": "chapter4-review",
+  "title": "Chapter 4 Review",
+  "pools": {
+    "easy": [
+      {
+        "type": "short",
+        "prompt": "Interpret the subscription: Disp. supp. rect. no. xii.",
+        "solution": "'Disp.' means dispense; 'supp. rect.' means rectal suppositories; 'no. xii' means twelve.",
+        "answerText": [
+          "Dispense 12 rectal suppositories",
+          "Dispense twelve rectal suppositories"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Interpret the signa: ii gtt each eye q4h p.r.n. pain.",
+        "solution": "'ii gtt' means two drops; 'each eye' implies both eyes; 'q4h' is every 4 hours; 'p.r.n. pain' is as needed for pain.",
+        "answerText": [
+          "Instill 2 drops in each eye every 4 hours as needed for pain",
+          "Place two drops in each eye every four hours as needed for pain"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Interpret the signa: 1 tbsp p.o. q6h.",
+        "solution": "'1 tbsp' is one tablespoon; 'p.o.' means by mouth; 'q6h' is every 6 hours.",
+        "answerText": [
+          "Take 1 tablespoon by mouth every 6 hours",
+          "One tablespoon orally every six hours"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Interpret the signa: Apply am & pm p.r.n. itching.",
+        "solution": "'am' and 'pm' indicate morning and evening; 'p.r.n.' means as needed; the condition is itching.",
+        "answerText": [
+          "Apply in the morning and evening as needed for itching",
+          "Apply morning and evening if needed for itching"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Interpret the signa: 1–2 tabs p.o. q4–6h u.d.",
+        "solution": "'1–2 tabs' means one or two tablets; 'p.o.' is by mouth; 'q4–6h' is every 4–6 hours; 'u.d.' means as directed (ut dictum).",
+        "answerText": [
+          "Take 1 to 2 tablets by mouth every 4 to 6 hours as directed",
+          "Take one or two tablets orally every four to six hours as directed"
+        ]
+      }
+    ],
+    "hard": [
+      {
+        "type": "short",
+        "prompt": "Translate the medication order: AMBIEN 10 mg p.o. q.h.s. × 5 d.",
+        "solution": "'p.o.' is by mouth; 'q.h.s.' means each night at bedtime; '× 5 d' indicates for five days.",
+        "answerText": [
+          "Take 10 mg Ambien by mouth at bedtime for 5 days",
+          "Administer 10 mg Ambien orally at bedtime for five days"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Translate: Administer prochlorperazine 10 mg IM q3h p.r.n. N&V.",
+        "solution": "'IM' means intramuscularly; 'q3h' is every 3 hours; 'p.r.n.' is as needed; 'N&V' stands for nausea and vomiting.",
+        "answerText": [
+          "Administer 10 mg prochlorperazine intramuscularly every 3 hours as needed for nausea and vomiting"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Translate: 1000 mL D5W q8h IV with 20 mEq KCl to every 3rd container.",
+        "solution": "D5W denotes 5% dextrose in water; q8h is every 8 hours; KCl is potassium chloride; the instruction indicates to add it to every third container.",
+        "answerText": [
+          "Infuse 1000 mL of D5W every 8 hours intravenously and add 20 mEq potassium chloride to every third container"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Translate: Cefazolin sodium 1 g IM 30 min prior to procedure.",
+        "solution": "'IM' means intramuscular; '1 g' is the dose; '30 min prior' is 30 minutes before the procedure.",
+        "answerText": [
+          "Administer 1 g cefazolin sodium intramuscularly 30 minutes before the procedure"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Translate: Mesalamine 1.2 g p.o. q.d. c food.",
+        "solution": "'p.o.' means by mouth; 'q.d.' is once daily; 'c food' is with food.",
+        "answerText": [
+          "Take 1.2 g mesalamine by mouth once daily with food",
+          "Take mesalamine 1.2 g orally once a day with food"
+        ]
+      }
+    ]
+  }
+}

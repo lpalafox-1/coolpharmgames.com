@@ -1,0 +1,305 @@
+{
+  "id": "lab-quiz3-antilipemics",
+  "title": "Lab Quiz 3 — Antilipemics",
+  "pools": {
+    "easy": [
+      {
+        "type": "mcq",
+        "prompt": "What is the brand name for Simvastatin?",
+        "choices": ["Zocor", "Lipitor", "Crestor", "Pravachol"],
+        "answer": "Zocor"
+      },
+      {
+        "type": "short",
+        "prompt": "Brand name of Atorvastatin?",
+        "answer": "Lipitor",
+        "answerText": ["Lipitor"]
+      },
+      {
+        "type": "short",
+        "prompt": "Generic name of Lipitor?",
+        "answer": "Atorvastatin",
+        "answerText": ["Atorvastatin"]
+      },
+      {
+        "type": "tf",
+        "prompt": "Rosuvastatin is a statin.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Fenofibrate belongs to what class?",
+        "choices": ["Statin", "Fibric Acid Derivative", "Omega-3", "Nicotinic Acid"],
+        "answer": "Fibric Acid Derivative"
+      },
+      {
+        "type": "short",
+        "prompt": "Brand name of Pravastatin?",
+        "answer": "Pravachol",
+        "answerText": ["Pravachol"]
+      },
+      {
+        "type": "short",
+        "prompt": "Drug category of Zetia?",
+        "answer": "Antilipemic",
+        "answerText": ["Antilipemic"]
+      },
+      {
+        "type": "tf",
+        "prompt": "Niacin is a Nicotinic Acid.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Lovaza is which type of drug?",
+        "choices": ["Statin", "Omega-3 Fatty Acid", "Fibrate", "PCSK9 Inhibitor"],
+        "answer": "Omega-3 Fatty Acid"
+      },
+      {
+        "type": "short",
+        "prompt": "Brand name of Rosuvastatin?",
+        "answer": "Crestor",
+        "answerText": ["Crestor"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drug blocks cholesterol absorption?",
+        "choices": ["Ezetimibe", "Fenofibrate", "Niacin", "Lovaza"],
+        "answer": "Ezetimibe"
+      },
+      {
+        "type": "tf",
+        "prompt": "Evolocumab is a PCSK9 inhibitor.",
+        "answer": "True"
+      },
+      {
+        "type": "short",
+        "prompt": "Brand name of Alirocumab?",
+        "answer": "Praluent",
+        "answerText": ["Praluent"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drug is a Statin?",
+        "choices": ["Niacin", "Fenofibrate", "Simvastatin", "Ezetimibe"],
+        "answer": "Simvastatin"
+      },
+      {
+        "type": "short",
+        "prompt": "Generic name of Zocor?",
+        "answer": "Simvastatin",
+        "answerText": ["Simvastatin"]
+      },
+      {
+        "type": "tf",
+        "prompt": "All statins are antilipemics.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drug is classified as Nicotinic Acid?",
+        "choices": ["Niacin", "Rosuvastatin", "Fenofibrate", "Ezetimibe"],
+        "answer": "Niacin"
+      },
+      {
+        "type": "short",
+        "prompt": "Drug class of Zetia?",
+        "answer": "Cholesterol Absorption Inhibitor",
+        "answerText": ["Cholesterol Absorption Inhibitor"]
+      },
+      {
+        "type": "short",
+        "prompt": "Generic name of Lovaza?",
+        "answer": "Omega-3-acid ethyl esters",
+        "answerText": ["Omega-3-acid ethyl esters", "Omega-3"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which statin has the brand name Crestor?",
+        "choices": ["Rosuvastatin", "Atorvastatin", "Simvastatin", "Pravastatin"],
+        "answer": "Rosuvastatin"
+      },
+      {
+        "type": "tf",
+        "prompt": "Tricor is a Fibric Acid Derivative.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drug is an siRNA therapy?",
+        "choices": ["Inclisiran", "Ezetimibe", "Fenofibrate", "Niacin"],
+        "answer": "Inclisiran"
+      },
+      {
+        "type": "short",
+        "prompt": "Generic name of Pravachol?",
+        "answer": "Pravastatin",
+        "answerText": ["Pravastatin"]
+      },
+      {
+        "type": "short",
+        "prompt": "Brand name of Atorvastatin?",
+        "answer": "Lipitor",
+        "answerText": ["Lipitor"]
+      },
+      {
+        "type": "tf",
+        "prompt": "Inclisiran is a PCSK9 monoclonal antibody.",
+        "answer": "False"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drug is an Omega-3 fatty acid?",
+        "choices": ["Lovaza", "Zetia", "Tricor", "Praluent"],
+        "answer": "Lovaza"
+      }
+    ],
+    "hard": [
+      {
+        "type": "mcq",
+        "prompt": "Statins work by inhibiting which enzyme?",
+        "choices": ["HMG-CoA Reductase", "PPAR-α", "PCSK9", "Lipase"],
+        "answer": "HMG-CoA Reductase"
+      },
+      {
+        "type": "tf",
+        "prompt": "Ezetimibe reduces cholesterol absorption in the intestine.",
+        "answer": "True"
+      },
+      {
+        "type": "short",
+        "prompt": "Fenofibrate activates which receptor?",
+        "answer": "PPAR-α",
+        "answerText": ["PPAR-α", "Peroxisome proliferator-activated receptor alpha"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Niacin reduces production of which lipoprotein?",
+        "choices": ["VLDL", "HDL", "LDL receptor", "PCSK9"],
+        "answer": "VLDL"
+      },
+      {
+        "type": "short",
+        "prompt": "Mechanism of PCSK9 inhibitors?",
+        "answer": "Prevent LDL receptor degradation",
+        "answerText": ["Prevent LDL receptor degradation", "Increase LDL receptors"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drug increases lipoprotein lipase activity?",
+        "choices": ["Omega-3 acid ethyl esters", "Ezetimibe", "Niacin", "Pravastatin"],
+        "answer": "Omega-3 acid ethyl esters"
+      },
+      {
+        "type": "short",
+        "prompt": "Generic name of Repatha?",
+        "answer": "Evolocumab",
+        "answerText": ["Evolocumab"]
+      },
+      {
+        "type": "short",
+        "prompt": "Generic name of Praluent?",
+        "answer": "Alirocumab",
+        "answerText": ["Alirocumab"]
+      },
+      {
+        "type": "tf",
+        "prompt": "Inclisiran is given as an injection.",
+        "answer": "True"
+      },
+      {
+        "type": "short",
+        "prompt": "Brand name of Ezetimibe?",
+        "answer": "Zetia",
+        "answerText": ["Zetia"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drug is a Cholesterol Absorption Inhibitor?",
+        "choices": ["Ezetimibe", "Niacin", "Fenofibrate", "Omega-3"],
+        "answer": "Ezetimibe"
+      },
+      {
+        "type": "short",
+        "prompt": "Drug class of Leqvio?",
+        "answer": "siRNA Agent",
+        "answerText": ["siRNA Agent"]
+      },
+      {
+        "type": "tf",
+        "prompt": "Alirocumab is a PCSK9 inhibitor.",
+        "answer": "True"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which of the following are statins?",
+        "choices": ["Simvastatin and Atorvastatin", "Ezetimibe and Niacin", "Lovaza and Zetia", "Inclisiran and Evolocumab"],
+        "answer": "Simvastatin and Atorvastatin"
+      },
+      {
+        "type": "short",
+        "prompt": "Brand name of Rosuvastatin?",
+        "answer": "Crestor",
+        "answerText": ["Crestor"]
+      },
+      {
+        "type": "short",
+        "prompt": "Brand name of Pravastatin?",
+        "answer": "Pravachol",
+        "answerText": ["Pravachol"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drugs are PCSK9 inhibitors?",
+        "choices": ["Evolocumab and Alirocumab", "Niacin and Fenofibrate", "Ezetimibe and Lovaza", "Simvastatin and Rosuvastatin"],
+        "answer": "Evolocumab and Alirocumab"
+      },
+      {
+        "type": "tf",
+        "prompt": "Niacin is sometimes called Vitamin B3.",
+        "answer": "True"
+      },
+      {
+        "type": "short",
+        "prompt": "Brand name of Simvastatin?",
+        "answer": "Zocor",
+        "answerText": ["Zocor"]
+      },
+      {
+        "type": "short",
+        "prompt": "Brand name of Atorvastatin?",
+        "answer": "Lipitor",
+        "answerText": ["Lipitor"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drug reduces LDL cholesterol the most?",
+        "choices": ["Statins", "Niacin", "Omega-3", "Fibrates"],
+        "answer": "Statins"
+      },
+      {
+        "type": "tf",
+        "prompt": "Ezetimibe is a statin.",
+        "answer": "False"
+      },
+      {
+        "type": "short",
+        "prompt": "Generic name of Tricor?",
+        "answer": "Fenofibrate",
+        "answerText": ["Fenofibrate"]
+      },
+      {
+        "type": "short",
+        "prompt": "Generic name of Lovaza?",
+        "answer": "Omega-3-acid ethyl esters",
+        "answerText": ["Omega-3-acid ethyl esters", "Omega-3"]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which drug lowers cholesterol absorption but does NOT inhibit HMG-CoA reductase?",
+        "choices": ["Ezetimibe", "Niacin", "Fenofibrate", "Omega-3"],
+        "answer": "Ezetimibe"
+      }
+    ]
+  }
+}
