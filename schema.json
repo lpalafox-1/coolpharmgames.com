@@ -27,7 +27,7 @@
         "type": "object",
         "required": ["type", "prompt"],
         "properties": {
-          "type": { "enum": ["mcq", "tf", "short"] },
+          "type": { "enum": ["mcq", "mcq-multiple", "tf", "short"] },
           "prompt": { "type": "string", "minLength": 1 },
           "choices": {
             "type": "array",
@@ -74,6 +74,19 @@
                 { "required": ["answerIndex"] }
               ],
               "required": ["choices"]
+            }
+          },
+          {
+            "if": { "properties": { "type": { "const": "mcq-multiple" } }, "required": ["type"] },
+            "then": {
+              "required": ["answer", "choices"],
+              "properties": {
+                "answer": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "minItems": 1
+                }
+              }
             }
           },
           {
