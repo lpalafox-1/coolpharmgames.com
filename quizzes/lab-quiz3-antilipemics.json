@@ -137,12 +137,6 @@
         "answerText": ["Pravastatin"]
       },
       {
-        "type": "short",
-        "prompt": "Brand name of Atorvastatin?",
-        "answer": "Lipitor",
-        "answerText": ["Lipitor"]
-      },
-      {
         "type": "tf",
         "prompt": "Inclisiran is a PCSK9 monoclonal antibody.",
         "answer": "False"
