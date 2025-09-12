@@ -1,10 +1,6 @@
 {
     "id": "popp-practice-mock-E1",
     "title": "Pharmacy Principles Practice Mock E1",
-    "settings": {
-        "shuffleQuestions": true,
-        "shuffleChoices": true
-    },
     "pools": {
         "easy": [
             {
