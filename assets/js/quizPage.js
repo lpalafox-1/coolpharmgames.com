@@ -33,21 +33,6 @@
     }
   });
 
-  /* ---------- Theme toggle (persist + label) ---------- */
-  const THEME_KEY = "quiz-theme";
-  const btn = document.getElementById('theme-toggle');
-  if (btn) {
-    const saved = localStorage.getItem(THEME_KEY);
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const start = saved || (prefersDark ? 'dark' : 'light');
-    document.documentElement.classList.toggle('dark', start === 'dark');
-  btn.textContent = start === 'dark' ? 'Light' : 'Dark';
-
-    btn.addEventListener('click', () => {
-      const next = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
-      document.documentElement.classList.toggle('dark', next === 'dark');
-      localStorage.setItem(THEME_KEY, next);
-  btn.textContent = next === 'dark' ? 'Light' : 'Dark';
-    });
-  }
+  /* ---------- Theme toggle is handled by quizEngine.js ---------- */
+  // Theme toggle functionality moved to quizEngine.js to avoid conflicts
 })();
