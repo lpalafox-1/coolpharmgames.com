@@ -7,49 +7,57 @@
         "type": "short",
         "prompt": "Translate to Latin: by mouth",
         "solution": "'per os' means by mouth.",
-        "answers": ["per os"]
+        "answer": "per os",
+        "answerText": ["per os"]
       },
       {
         "type": "short",
         "prompt": "Translate to Latin: at bedtime",
         "solution": "'hora somni' means at bedtime.",
-        "answers": ["hora somni"]
+        "answer": "hora somni",
+        "answerText": ["hora somni"]
       },
       {
         "type": "short",
         "prompt": "Translate to Latin: as needed",
         "solution": "'pro re nata' means as needed.",
-        "answers": ["pro re nata"]
+        "answer": "pro re nata",
+        "answerText": ["pro re nata"]
       },
       {
         "type": "short",
         "prompt": "Translate to Latin: with food",
         "solution": "'cum cibos' means with food.",
-        "answers": ["cum cibos"]
+        "answer": "cum cibos",
+        "answerText": ["cum cibos"]
       },
       {
         "type": "short",
         "prompt": "Translate to Latin: every morning",
         "solution": "'quaque mane' or 'q.a.m.' means every morning.",
-        "answers": ["quaque mane","q.a.m."]
+        "answer": "quaque mane",
+        "answerText": ["quaque mane","q.a.m."]
       },
       {
         "type": "short",
         "prompt": "Translate to Latin: every other day",
         "solution": "'quaque altera die' or 'q.o.d.' means every other day.",
-        "answers": ["quaque altera die","q.o.d."]
+        "answer": "quaque altera die",
+        "answerText": ["quaque altera die","q.o.d."]
       },
       {
         "type": "short",
         "prompt": "Translate to Latin: immediately",
         "solution": "'statim' or 'stat' means immediately.",
-        "answers": ["statim","stat"]
+        "answer": "statim",
+        "answerText": ["statim","stat"]
       },
       {
         "type": "short",
         "prompt": "Translate to Latin: by injection",
         "solution": "'per injectionem' means by injection.",
-        "answers": ["per injectionem"]
+        "answer": "per injectionem",
+        "answerText": ["per injectionem"]
       }
     ],
     "hard": [
@@ -57,67 +65,78 @@
         "type": "short",
         "prompt": "Translate to Latin: four times daily",
         "solution": "'quater in die' or 'q.i.d.' means four times daily.",
-        "answers": ["quater in die","q.i.d."]
+        "answer": "quater in die",
+        "answerText": ["quater in die","q.i.d."]
       },
       {
         "type": "short",
         "prompt": "Translate to Latin: three times daily",
         "solution": "'ter in die' or 't.i.d.' means three times daily.",
-        "answers": ["ter in die","t.i.d."]
+        "answer": "ter in die",
+        "answerText": ["ter in die","t.i.d."]
       },
       {
         "type": "short",
         "prompt": "Translate to Latin: twice daily",
         "solution": "'bis in die' or 'b.i.d.' means twice daily.",
-        "answers": ["bis in die","b.i.d."]
+        "answer": "bis in die",
+        "answerText": ["bis in die","b.i.d."]
       },
       {
         "type": "short",
         "prompt": "Translate to Latin: once daily",
         "solution": "'quaque die' or 'q.d.' means once daily.",
-        "answers": ["quaque die","q.d."]
+        "answer": "quaque die",
+        "answerText": ["quaque die","q.d."]
       },
       {
         "type": "short",
         "prompt": "Translate to Latin: before meals",
         "solution": "'ante cibos' or 'a.c.' means before meals.",
-        "answers": ["ante cibos","a.c."]
+        "answer": "ante cibos",
+        "answerText": ["ante cibos","a.c."]
       },
       {
         "type": "short",
         "prompt": "Translate to Latin: after meals",
         "solution": "'post cibos' or 'p.c.' means after meals.",
-        "answers": ["post cibos","p.c."]
+        "answer": "post cibos",
+        "answerText": ["post cibos","p.c."]
       },
       {
         "type": "short",
         "prompt": "Translate to Latin: left eye",
         "solution": "'oculus sinister' or 'o.s.' means left eye.",
-        "answers": ["oculus sinister","o.s."]
+        "answer": "oculus sinister",
+        "answerText": ["oculus sinister","o.s."]
       },
       {
         "type": "short",
         "prompt": "Translate to Latin: right eye",
         "solution": "'oculus dexter' or 'o.d.' means right eye.",
-        "answers": ["oculus dexter","o.d."]
+        "answer": "oculus dexter",
+        "answerText": ["oculus dexter","o.d."]
       },
       {
         "type": "short",
         "prompt": "Translate to Latin: both eyes",
         "solution": "'oculi uterque' or 'o.u.' means both eyes.",
-        "answers": ["oculi uterque","o.u."]
+        "answer": "oculi uterque",
+        "answerText": ["oculi uterque","o.u."]
       },
       {
         "type": "short",
         "prompt": "Translate to Latin: as directed",
         "solution": "'ut dictum' means as directed.",
-        "answers": ["ut dictum"]
+        "answer": "ut dictum",
+        "answerText": ["ut dictum"]
       },
       {
         "type": "short",
         "prompt": "Translate to Latin: every 6 hours",
         "solution": "'quaque sexta hora' or 'q6h' means every 6 hours.",
-        "answers": ["quaque sexta hora","q6h"]
+        "answer": "quaque sexta hora",
+        "answerText": ["quaque sexta hora","q6h"]
       }
     ]
   }

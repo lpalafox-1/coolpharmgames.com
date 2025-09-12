@@ -5,13 +5,21 @@
       {
         "type": "mcq",
         "prompt": "What is the brand name of Warfarin?",
-        "choices": ["Coumadin", "Xarelto", "Eliquis", "Lovenox"],
+        "choices": [
+          "Coumadin",
+          "Xarelto",
+          "Eliquis",
+          "Lovenox"
+        ],
         "answer": "Coumadin"
       },
       {
         "type": "short",
         "prompt": "Generic name of Xarelto?",
-        "answers": ["Rivaroxaban"]
+        "answer": "Rivaroxaban",
+        "answerText": [
+          "Rivaroxaban"
+        ]
       },
       {
         "type": "tf",
@@ -21,13 +29,21 @@
       {
         "type": "mcq",
         "prompt": "Which drug is a Vitamin K antagonist?",
-        "choices": ["Warfarin", "Rivaroxaban", "Apixaban", "Heparin"],
+        "choices": [
+          "Warfarin",
+          "Rivaroxaban",
+          "Apixaban",
+          "Heparin"
+        ],
         "answer": "Warfarin"
       },
       {
         "type": "short",
         "prompt": "Brand name of Apixaban?",
-        "answers": ["Eliquis"]
+        "answer": "Eliquis",
+        "answerText": [
+          "Eliquis"
+        ]
       },
       {
         "type": "tf",
@@ -37,24 +53,40 @@
       {
         "type": "mcq",
         "prompt": "Which drug is available as Lovenox?",
-        "choices": ["Enoxaparin", "Heparin", "Warfarin", "Apixaban"],
+        "choices": [
+          "Enoxaparin",
+          "Heparin",
+          "Warfarin",
+          "Apixaban"
+        ],
         "answer": "Enoxaparin"
       },
       {
         "type": "short",
         "prompt": "Generic name of Coumadin?",
-        "answers": ["Warfarin"]
+        "answer": "Warfarin",
+        "answerText": [
+          "Warfarin"
+        ]
       },
       {
         "type": "mcq",
         "prompt": "Which drug class is Xarelto?",
-        "choices": ["Direct Factor Xa Inhibitor", "Vitamin K Antagonist", "LMWH", "Heparin"],
+        "choices": [
+          "Direct Factor Xa Inhibitor",
+          "Vitamin K Antagonist",
+          "LMWH",
+          "Heparin"
+        ],
         "answer": "Direct Factor Xa Inhibitor"
       },
       {
         "type": "short",
         "prompt": "Drug category of Eliquis?",
-        "answers": ["Anticoagulant"]
+        "answer": "Anticoagulant",
+        "answerText": [
+          "Anticoagulant"
+        ]
       },
       {
         "type": "tf",
@@ -64,12 +96,20 @@
       {
         "type": "short",
         "prompt": "Brand name of Enoxaparin?",
-        "answers": ["Lovenox"]
+        "answer": "Lovenox",
+        "answerText": [
+          "Lovenox"
+        ]
       },
       {
         "type": "mcq",
         "prompt": "Which drug enhances antithrombin III?",
-        "choices": ["Heparin", "Apixaban", "Rivaroxaban", "Warfarin"],
+        "choices": [
+          "Heparin",
+          "Apixaban",
+          "Rivaroxaban",
+          "Warfarin"
+        ],
         "answer": "Heparin"
       },
       {
@@ -80,18 +120,30 @@
       {
         "type": "short",
         "prompt": "Drug class of Lovenox?",
-        "answers": ["Low Molecular Weight Heparin", "LMWH"]
+        "answer": "Low Molecular Weight Heparin",
+        "answerText": [
+          "Low Molecular Weight Heparin",
+          "LMWH"
+        ]
       },
       {
         "type": "mcq",
         "prompt": "Which drug prevents the synthesis of clotting factors II, VII, IX, X?",
-        "choices": ["Warfarin", "Enoxaparin", "Rivaroxaban", "Heparin"],
+        "choices": [
+          "Warfarin",
+          "Enoxaparin",
+          "Rivaroxaban",
+          "Heparin"
+        ],
         "answer": "Warfarin"
       },
       {
         "type": "short",
         "prompt": "Brand name of Heparin?",
-        "answers": ["Hep-Lock"]
+        "answer": "Hep-Lock",
+        "answerText": [
+          "Hep-Lock"
+        ]
       },
       {
         "type": "tf",
@@ -101,18 +153,29 @@
       {
         "type": "short",
         "prompt": "Generic name of Jantoven?",
-        "answers": ["Warfarin"]
+        "answer": "Warfarin",
+        "answerText": [
+          "Warfarin"
+        ]
       },
       {
         "type": "mcq",
         "prompt": "Which is a Low Molecular Weight Heparin (LMWH)?",
-        "choices": ["Enoxaparin", "Warfarin", "Rivaroxaban", "Apixaban"],
+        "choices": [
+          "Enoxaparin",
+          "Warfarin",
+          "Rivaroxaban",
+          "Apixaban"
+        ],
         "answer": "Enoxaparin"
       },
       {
         "type": "short",
         "prompt": "Drug class of Warfarin?",
-        "answers": ["Vitamin K Antagonist"]
+        "answer": "Vitamin K Antagonist",
+        "answerText": [
+          "Vitamin K Antagonist"
+        ]
       },
       {
         "type": "tf",
@@ -122,18 +185,31 @@
       {
         "type": "mcq",
         "prompt": "Which anticoagulant is commonly used in pregnancy (preferred over warfarin)?",
-        "choices": ["Heparin", "Warfarin", "Rivaroxaban", "Apixaban"],
+        "choices": [
+          "Heparin",
+          "Warfarin",
+          "Rivaroxaban",
+          "Apixaban"
+        ],
         "answer": "Heparin"
       },
       {
         "type": "short",
         "prompt": "Drug category of Rivaroxaban?",
-        "answers": ["Anticoagulant"]
+        "answer": "Anticoagulant",
+        "answerText": [
+          "Anticoagulant"
+        ]
       },
       {
         "type": "mcq",
         "prompt": "Which drug has the brand name Eliquis?",
-        "choices": ["Apixaban", "Rivaroxaban", "Warfarin", "Enoxaparin"],
+        "choices": [
+          "Apixaban",
+          "Rivaroxaban",
+          "Warfarin",
+          "Enoxaparin"
+        ],
         "answer": "Apixaban"
       }
     ],
@@ -141,7 +217,12 @@
       {
         "type": "mcq",
         "prompt": "Which anticoagulant requires INR monitoring?",
-        "choices": ["Warfarin", "Apixaban", "Rivaroxaban", "Enoxaparin"],
+        "choices": [
+          "Warfarin",
+          "Apixaban",
+          "Rivaroxaban",
+          "Enoxaparin"
+        ],
         "answer": "Warfarin"
       },
       {
@@ -152,18 +233,30 @@
       {
         "type": "short",
         "prompt": "Which clotting factors does Warfarin inhibit?",
-        "answers": ["II, VII, IX, X", "2, 7, 9, 10"]
+        "answer": "II, VII, IX, X",
+        "answerText": [
+          "II, VII, IX, X",
+          "2, 7, 9, 10"
+        ]
       },
       {
         "type": "mcq",
         "prompt": "Enoxaparin works by enhancing activity of?",
-        "choices": ["Antithrombin III", "Vitamin K", "Factor Xa", "Thrombin"],
+        "choices": [
+          "Antithrombin III",
+          "Vitamin K",
+          "Factor Xa",
+          "Thrombin"
+        ],
         "answer": "Antithrombin III"
       },
       {
         "type": "short",
         "prompt": "Generic name of Lovenox?",
-        "answers": ["Enoxaparin"]
+        "answer": "Enoxaparin",
+        "answerText": [
+          "Enoxaparin"
+        ]
       },
       {
         "type": "tf",
@@ -173,18 +266,31 @@
       {
         "type": "mcq",
         "prompt": "Which drug is classified as LMWH?",
-        "choices": ["Enoxaparin", "Heparin", "Rivaroxaban", "Warfarin"],
+        "choices": [
+          "Enoxaparin",
+          "Heparin",
+          "Rivaroxaban",
+          "Warfarin"
+        ],
         "answer": "Enoxaparin"
       },
       {
         "type": "short",
         "prompt": "Brand name of Rivaroxaban?",
-        "answers": ["Xarelto"]
+        "answer": "Xarelto",
+        "answerText": [
+          "Xarelto"
+        ]
       },
       {
         "type": "mcq",
         "prompt": "Which anticoagulants are DOACs (Direct Oral Anticoagulants)?",
-        "choices": ["Apixaban and Rivaroxaban", "Warfarin and Heparin", "Enoxaparin and Warfarin", "All of the above"],
+        "choices": [
+          "Apixaban and Rivaroxaban",
+          "Warfarin and Heparin",
+          "Enoxaparin and Warfarin",
+          "All of the above"
+        ],
         "answer": "Apixaban and Rivaroxaban"
       },
       {
@@ -195,18 +301,29 @@
       {
         "type": "short",
         "prompt": "Generic name of Hep-Lock?",
-        "answers": ["Heparin"]
+        "answer": "Heparin",
+        "answerText": [
+          "Heparin"
+        ]
       },
       {
         "type": "mcq",
         "prompt": "Which anticoagulant is safest to use in pregnancy?",
-        "choices": ["Heparin", "Rivaroxaban", "Apixaban", "Warfarin"],
+        "choices": [
+          "Heparin",
+          "Rivaroxaban",
+          "Apixaban",
+          "Warfarin"
+        ],
         "answer": "Heparin"
       },
       {
         "type": "short",
         "prompt": "Drug class of Eliquis?",
-        "answers": ["Direct Factor Xa Inhibitor"]
+        "answer": "Direct Factor Xa Inhibitor",
+        "answerText": [
+          "Direct Factor Xa Inhibitor"
+        ]
       },
       {
         "type": "tf",
@@ -216,24 +333,41 @@
       {
         "type": "mcq",
         "prompt": "Which anticoagulant is most associated with HIT (Heparin-Induced Thrombocytopenia)?",
-        "choices": ["Heparin", "Enoxaparin", "Warfarin", "Apixaban"],
+        "choices": [
+          "Heparin",
+          "Enoxaparin",
+          "Warfarin",
+          "Apixaban"
+        ],
         "answer": "Heparin"
       },
       {
         "type": "short",
         "prompt": "Brand names of Warfarin?",
-        "answers": ["Coumadin", "Jantoven"]
+        "answer": "Coumadin",
+        "answerText": [
+          "Coumadin",
+          "Jantoven"
+        ]
       },
       {
         "type": "mcq",
         "prompt": "Which anticoagulant prevents conversion of prothrombin to thrombin?",
-        "choices": ["Rivaroxaban", "Apixaban", "Heparin", "All of the above"],
+        "choices": [
+          "Rivaroxaban",
+          "Apixaban",
+          "Heparin",
+          "All of the above"
+        ],
         "answer": "All of the above"
       },
       {
         "type": "short",
         "prompt": "Brand name of Enoxaparin?",
-        "answers": ["Lovenox"]
+        "answer": "Lovenox",
+        "answerText": [
+          "Lovenox"
+        ]
       },
       {
         "type": "tf",
@@ -243,18 +377,30 @@
       {
         "type": "mcq",
         "prompt": "Which anticoagulant is reversed with protamine sulfate?",
-        "choices": ["Heparin", "Enoxaparin", "Both Heparin and Enoxaparin", "Warfarin"],
+        "choices": [
+          "Heparin",
+          "Enoxaparin",
+          "Both Heparin and Enoxaparin",
+          "Warfarin"
+        ],
         "answer": "Both Heparin and Enoxaparin"
       },
       {
         "type": "short",
         "prompt": "Generic name of Eliquis?",
-        "answers": ["Apixaban"]
+        "answer": "Apixaban",
+        "answerText": [
+          "Apixaban"
+        ]
       },
       {
         "type": "short",
         "prompt": "Drug class of Lovenox?",
-        "answers": ["Low Molecular Weight Heparin", "LMWH"]
+        "answer": "Low Molecular Weight Heparin",
+        "answerText": [
+          "Low Molecular Weight Heparin",
+          "LMWH"
+        ]
       },
       {
         "type": "tf",
@@ -264,13 +410,22 @@
       {
         "type": "mcq",
         "prompt": "Which drug is a Vitamin K antagonist?",
-        "choices": ["Warfarin", "Apixaban", "Enoxaparin", "Rivaroxaban"],
+        "choices": [
+          "Warfarin",
+          "Apixaban",
+          "Enoxaparin",
+          "Rivaroxaban"
+        ],
         "answer": "Warfarin"
       },
       {
         "type": "short",
         "prompt": "Which anticoagulants enhance antithrombin III?",
-        "answers": ["Heparin", "Enoxaparin"]
+        "answer": "Heparin",
+        "answerText": [
+          "Heparin",
+          "Enoxaparin"
+        ]
       }
     ]
   }

@@ -52,13 +52,13 @@
       { "type": "mcq", "prompt": "Digoxin's role in AF:", "choices": ["Rate control via AV nodal slowing","First-line rhythm conversion","Blocks IKr currents","Class II effect"], "answer": "Rate control via AV nodal slowing" },
       { "type": "tf",  "prompt": "Amiodarone may cause photosensitivity and very long half-life (weeks).", "answer": "True" },
 
-      { "type": "short", "prompt": "Name one β1-selective blocker.", "answers": ["metoprolol","atenolol","bisoprolol","nebivolol"] },
-      { "type": "short", "prompt": "Name one non-DHP CCB.", "answers": ["verapamil","diltiazem"] },
-      { "type": "short", "prompt": "Brand for ezetimibe?", "answers": ["Zetia"] },
-      { "type": "short", "prompt": "Brand for fenofibrate?", "answers": ["Tricor"] },
-      { "type": "short", "prompt": "Brand for omega-3-acid ethyl esters?", "answers": ["Lovaza"] },
-      { "type": "short", "prompt": "Brand for dofetilide?", "answers": ["Tikosyn"] },
-      { "type": "short", "prompt": "Brand for amiodarone tablets?", "answers": ["Pacerone","Cordarone"] }
+      { "type": "short", "prompt": "Name one β1-selective blocker.", "answer": "metoprolol", "answerText": ["metoprolol","atenolol","bisoprolol","nebivolol"] },
+      { "type": "short", "prompt": "Name one non-DHP CCB.", "answer": "verapamil", "answerText": ["verapamil","diltiazem"] },
+      { "type": "short", "prompt": "Brand for ezetimibe?", "answer": "Zetia", "answerText": ["Zetia"] },
+      { "type": "short", "prompt": "Brand for fenofibrate?", "answer": "Tricor", "answerText": ["Tricor"] },
+      { "type": "short", "prompt": "Brand for omega-3-acid ethyl esters?", "answer": "Lovaza", "answerText": ["Lovaza"] },
+      { "type": "short", "prompt": "Brand for dofetilide?", "answer": "Tikosyn", "answerText": ["Tikosyn"] },
+      { "type": "short", "prompt": "Brand for amiodarone tablets?", "answer": "Pacerone", "answerText": ["Pacerone","Cordarone"] }
     ]
   }
 }

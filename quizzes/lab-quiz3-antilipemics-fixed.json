@@ -10,12 +10,6 @@
       },
       {
         "type": "short",
-        "prompt": "Brand name of Atorvastatin?",
-        "answer": "Lipitor",
-        "answerText": ["Lipitor"]
-      },
-      {
-        "type": "short",
         "prompt": "Generic name of Lipitor?",
         "answer": "Atorvastatin",
         "answerText": ["Atorvastatin"]

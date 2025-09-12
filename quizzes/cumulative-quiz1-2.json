@@ -161,17 +161,20 @@
       {
         "type": "short",
         "prompt": "Name one β1-selective blocker.",
-        "answers": ["metoprolol", "atenolol", "bisoprolol", "nebivolol"]
+        "answer": "metoprolol",
+        "answerText": ["metoprolol", "atenolol", "bisoprolol", "nebivolol"]
       },
       {
         "type": "short",
         "prompt": "Name one non-DHP CCB.",
-        "answers": ["verapamil", "diltiazem"]
+        "answer": "verapamil",
+        "answerText": ["verapamil", "diltiazem"]
       },
       {
         "type": "short",
         "prompt": "Name one aldosterone antagonist (MRA).",
-        "answers": ["spironolactone", "eplerenone"]
+        "answer": "spironolactone",
+        "answerText": ["spironolactone", "eplerenone"]
       },
       {
         "type": "tf",
@@ -212,17 +215,20 @@
       {
         "type": "short",
         "prompt": "Drug class of losartan?",
-        "answers": ["arb", "angiotensin receptor blocker", "angiotensin ii receptor blocker"]
+        "answer": "ARB",
+        "answerText": ["arb", "angiotensin receptor blocker", "angiotensin ii receptor blocker"]
       },
       {
         "type": "short",
         "prompt": "Class of nifedipine (subcategory)?",
-        "answers": ["dhp ccb", "dihydropyridine", "dihydropyridine ccb"]
+        "answer": "DHP CCB",
+        "answerText": ["dhp ccb", "dihydropyridine", "dihydropyridine ccb"]
       },
       {
         "type": "short",
         "prompt": "Hydralazine pharmacologic category?",
-        "answers": ["direct vasodilator", "vasodilator"]
+        "answer": "Direct vasodilator",
+        "answerText": ["direct vasodilator", "vasodilator"]
       }
     ]
   }

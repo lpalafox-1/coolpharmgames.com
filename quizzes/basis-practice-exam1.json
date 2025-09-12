@@ -1,6 +1,6 @@
 {
-  "id": "practice-q2",
-  "title": "Practice Q2 — BDT-I (Handouts 1–6, v5)",
+  "id": "basis-practice-exam1",
+  "title": "Practice Exam 1 v2 — BDT-I (Handouts 1–7)",
   "pools": {
     "easy": [
       {
@@ -75,30 +75,6 @@
       },
       {
         "type": "mcq",
-        "prompt": "Amino acid side chains are commonly grouped as:",
-        "choices": [
-          "Metals vs nonmetals",
-          "Nonpolar, polar uncharged, acidic, basic",
-          "Alpha vs beta",
-          "Saturated vs unsaturated"
-        ],
-        "answer": "Nonpolar, polar uncharged, acidic, basic",
-        "source": "Handout 1 — LO: AA classification"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which amino acid is aromatic?",
-        "choices": [
-          "Phenylalanine",
-          "Glycine",
-          "Serine",
-          "Aspartate"
-        ],
-        "answer": "Phenylalanine",
-        "source": "Handout 1 — LO: AA classification"
-      },
-      {
-        "type": "mcq",
         "prompt": "Which structure level involves α-helices and β-sheets?",
         "choices": [
           "Primary",
@@ -120,30 +96,6 @@
         ],
         "answer": "Loss of native 3D structure",
         "source": "Handout 2 — LO: Denaturation"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Quaternary structure describes:",
-        "choices": [
-          "AA sequence",
-          "Local H-bonds",
-          "Overall 3D fold of a single chain",
-          "Arrangement of multiple polypeptides"
-        ],
-        "answer": "Arrangement of multiple polypeptides",
-        "source": "Handout 2 — LO: 1°–4° structures"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which interaction primarily stabilizes an α-helix?",
-        "choices": [
-          "Hydrogen bonds",
-          "Disulfide bonds",
-          "Ionic bonds",
-          "Peptide bonds between side chains"
-        ],
-        "answer": "Hydrogen bonds",
-        "source": "Handout 2 — LO: 1°–4° structures"
       },
       {
         "type": "mcq",
@@ -276,18 +228,6 @@
         ],
         "answer": "Hydrolases",
         "source": "Handout 4 — LO: Enzyme classes"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Competitive inhibitors typically cause:",
-        "choices": [
-          "↑ Km, Vmax same",
-          "↓ Km, ↓ Vmax",
-          "Km same, ↓ Vmax",
-          "↑ Km, ↓ Vmax"
-        ],
-        "answer": "↑ Km, Vmax same",
-        "source": "Handout 4 — LO: Inhibition types"
       },
       {
         "type": "mcq",
@@ -427,6 +367,66 @@
           "uga"
         ],
         "source": "Handout 6 — LO: Genetic code"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which lipid type is the major energy storage form?",
+        "choices": [
+          "Phospholipids",
+          "Triglycerides",
+          "Sterols",
+          "Sphingolipids"
+        ],
+        "answer": "Triglycerides",
+        "source": "Handout 7 — LO: Lipid classes"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which lipid forms the main structure of cell membranes?",
+        "choices": [
+          "Steroids",
+          "Phospholipids",
+          "Triglycerides",
+          "Free fatty acids"
+        ],
+        "answer": "Phospholipids",
+        "source": "Handout 7 — LO: Lipid classes"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Cholesterol is classified as a:",
+        "choices": [
+          "Sterol",
+          "Phospholipid",
+          "Triglyceride",
+          "Waxy hydrocarbon"
+        ],
+        "answer": "Sterol",
+        "source": "Handout 7 — LO: Lipid classes"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which lipoprotein is known as 'bad cholesterol'?",
+        "choices": [
+          "HDL",
+          "LDL",
+          "Chylomicrons",
+          "VLDL"
+        ],
+        "answer": "LDL",
+        "source": "Handout 7 — LO: Lipoproteins"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which lipoprotein is known as 'good cholesterol'?",
+        "choices": [
+          "HDL",
+          "LDL",
+          "VLDL",
+          "IDL"
+        ],
+        "answer": "HDL",
+        "source": "Handout 7 — LO: Lipoproteins"
       }
     ],
     "hard": [
@@ -823,6 +823,54 @@
         ],
         "answer": "rRNA",
         "source": "Handout 6 — LO: RNAs"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which lipid forms the main structure of cell membranes?",
+        "choices": [
+          "Steroids",
+          "Phospholipids",
+          "Triglycerides",
+          "Free fatty acids"
+        ],
+        "answer": "Phospholipids",
+        "source": "Handout 7 — LO: Lipid classes"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Cholesterol is classified as a:",
+        "choices": [
+          "Sterol",
+          "Phospholipid",
+          "Triglyceride",
+          "Glycolipid"
+        ],
+        "answer": "Sterol",
+        "source": "Handout 7 — LO: Lipid classes"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which lipoprotein is 'bad cholesterol'?",
+        "choices": [
+          "HDL",
+          "LDL",
+          "Chylomicrons",
+          "VLDL"
+        ],
+        "answer": "LDL",
+        "source": "Handout 7 — LO: Lipoproteins"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which lipoprotein is 'good cholesterol'?",
+        "choices": [
+          "HDL",
+          "LDL",
+          "VLDL",
+          "IDL"
+        ],
+        "answer": "HDL",
+        "source": "Handout 7 — LO: Lipoproteins"
       }
     ]
   }
