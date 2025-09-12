@@ -628,7 +628,11 @@ function softEq(a, b){
 
 // answer reveal helpers
 function getCorrectAnswers(q){
-  // First check for answer (common for mcq/tf), then answerText (common for short)
+  // For short-answer questions, prefer answerText if it has multiple values (e.g., stop codons)
+  if (q.type === "short" && Array.isArray(q.answerText) && q.answerText.length > 1) {
+    return q.answerText.map(String);
+  }
+  // Otherwise, use the standard priority: answer first, then answerText
   if (Array.isArray(q.answer)) return q.answer.map(String);
   if (typeof q.answer === "string") return [ q.answer ];
   if (Array.isArray(q.answerText)) return q.answerText.map(String);
