@@ -18,10 +18,9 @@
       { "type": "tf",  "prompt": "DHP CCBs commonly cause ankle edema.", "answer": "True" },
       { "type": "tf",  "prompt": "Thiazides may increase uric acid.", "answer": "True" },
       { "type": "tf",  "prompt": "Non-DHP CCBs often increase heart rate.", "answer": "False" },
-      { "type": "short", "prompt": "What class is eplerenone?", "answerText": ["aldosterone antagonist", "mineralocorticoid receptor antagonist", "mra"] },
       { "type": "short", "prompt": "What class is clonidine?", "answerText": ["central alpha-2 agonist", "central α2 agonist", "alpha 2 agonist"] },
       { "type": "short", "prompt": "HCTZ belongs to what diuretic class?", "answerText": ["thiazide", "thiazide diuretic"] },
-      { "type": "short", "prompt": "Amlodipine belongs to what CCB subgroup?", "answerText": ["dhp ccb", "dihydropyridine", "dihydropyridine ccb"] }
+      { "type": "short", "prompt": "Amlodipine belongs to what CCB subgroup?", "answerText": ["dhp ccb", "dhp", "dihydropyridine", "dihydropyridine ccb"] }
     ],
     "hard": [
       { "type": "mcq", "prompt": "Which combo most increases hyperkalemia risk?", "choices": ["ACEi + spironolactone", "Amlodipine + HCTZ", "Furosemide + hydralazine", "Atenolol + chlorthalidone"], "answer": "ACEi + spironolactone" },
