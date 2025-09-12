@@ -5,6 +5,14 @@
     "id": { "type": "string" },
     "title": { "type": "string", "minLength": 1 },
     "subtitle": { "type": "string" },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "notes": { "type": "string" },
+        "version": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
     "pools": {
       "type": "object",
       "properties": {
