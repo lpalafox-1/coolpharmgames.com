@@ -10,7 +10,6 @@
       { "type": "mcq", "prompt": "Chlorthalidone is:", "choices": ["Thiazide-like diuretic", "Loop diuretic", "Potassium-sparing diuretic", "ACE inhibitor"], "answer": "Thiazide-like diuretic" },
       { "type": "mcq", "prompt": "Furosemide is a:", "choices": ["Loop diuretic", "Thiazide diuretic", "ACE inhibitor", "ARB"], "answer": "Loop diuretic" },
       { "type": "mcq", "prompt": "Spironolactone is a(n):", "choices": ["Aldosterone antagonist", "ARB", "ACE inhibitor", "Thiazide"], "answer": "Aldosterone antagonist" },
-      { "type": "mcq", "prompt": "Eplerenone is a(n):", "choices": ["Aldosterone antagonist", "ACE inhibitor", "ARB", "DHP CCB"], "answer": "Aldosterone antagonist" },
       { "type": "mcq", "prompt": "Metoprolol is:", "choices": ["β1-selective blocker", "Non-selective beta blocker", "Alpha-1 blocker", "Central alpha-2 agonist"], "answer": "β1-selective blocker" },
       { "type": "mcq", "prompt": "Propranolol is:", "choices": ["Non-selective beta blocker", "β1-selective blocker", "Alpha-1 blocker", "ARB"], "answer": "Non-selective beta blocker" },
       { "type": "mcq", "prompt": "Clonidine's category:", "choices": ["Central alpha-2 agonist", "Direct vasodilator", "Alpha-1 blocker", "ACE inhibitor"], "answer": "Central alpha-2 agonist" },
