@@ -1,240 +1,775 @@
 {
   "id": "popp-practice-exam1",
-  "title": "Pharmacy Principles Practice Exam 1",
+  "title": "Pharmacy Principles Practice Exam 1 \u2014 v2",
+  "settings": {
+    "shuffleQuestions": true,
+    "shuffleChoices": true
+  },
   "pools": {
     "easy": [
       {
         "type": "mcq",
-        "prompt": "Which of the following best defines patient safety?",
-        "choices": ["Preventing errors and harm", "Correctly billing insurance", "Limiting patient counseling", "Documenting refills only"],
-        "answer": "Preventing errors and harm"
+        "prompt": "Which organization publishes the official 'Do Not Use' abbreviation list?",
+        "choices": [
+          "Joint Commission",
+          "ISMP",
+          "DEA",
+          "FDA"
+        ],
+        "answer": "Joint Commission"
       },
       {
         "type": "mcq",
-        "prompt": "Which federal law requires valid prescriptions and proper labeling?",
-        "choices": ["FD&C Act", "CSA", "OBRA 90", "HIPAA"],
-        "answer": "FD&C Act"
-      },
-      {
-        "type": "tf",
-        "prompt": "A valid prescription must include prescriber signature.",
-        "answer": "True"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which of the following is a look-alike/sound-alike (SALAD) drug pair?",
-        "choices": ["Atorvastatin / Acetaminophen", "Hydralazine / Hydroxyzine", "Amoxicillin / Ibuprofen", "Metformin / Omeprazole"],
-        "answer": "Hydralazine / Hydroxyzine"
+        "prompt": "Which is a system-level strategy to reduce dispensing errors?",
+        "choices": [
+          "Barcode scanning",
+          "Rely on memory",
+          "Skip verification",
+          "Ignore alerts"
+        ],
+        "answer": "Barcode scanning"
       },
       {
         "type": "mcq",
-        "prompt": "DAW means:",
-        "choices": ["Dispense As Written", "Deliver All Weekly", "Drug Authorized Withdrawal", "Dispense All Whole"],
-        "answer": "Dispense As Written"
+        "prompt": "Which is the safest notation?",
+        "choices": [
+          ".5 mg",
+          "0.5 mg",
+          "5.0 mg",
+          ".50 mg"
+        ],
+        "answer": "0.5 mg"
       },
       {
         "type": "mcq",
-        "prompt": "Which is primary literature?",
-        "choices": ["Cochrane Review", "Randomized controlled trial in NEJM", "Micromedex database", "Lexi-Drug monograph"],
-        "answer": "Randomized controlled trial in NEJM"
+        "prompt": "Best practice to prevent wrong-patient errors at pickup:",
+        "choices": [
+          "Ask favorite color",
+          "Use two identifiers",
+          "Recognize the face",
+          "Bag color"
+        ],
+        "answer": "Use two identifiers"
+      },
+      {
+        "type": "short",
+        "prompt": "Unsafe abbreviation (one example, not 'QD')",
+        "answerText": [
+          "u",
+          "iu",
+          "qod",
+          "cc",
+          "ms",
+          "mso4",
+          "mgso4"
+        ]
       },
       {
         "type": "mcq",
-        "prompt": "Which of the following is secondary literature?",
-        "choices": ["PubMed", "DailyMed", "JAMA", "Lexi-Drug"],
+        "prompt": "A dispensing error is:",
+        "choices": [
+          "Error in preparation or delivery",
+          "Any ADR",
+          "Prescriber misdiagnosis",
+          "Patient nonadherence"
+        ],
+        "answer": "Error in preparation or delivery"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which is an error of omission?",
+        "choices": [
+          "Missed interaction check",
+          "Wrong drug dispensed",
+          "Wrong patient",
+          "Wrong strength"
+        ],
+        "answer": "Missed interaction check"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which is an error of commission?",
+        "choices": [
+          "Failure to counsel",
+          "Not checking allergies",
+          "Dispensing incorrect medication",
+          "Missing auxiliary label"
+        ],
+        "answer": "Dispensing incorrect medication"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which is a system cause of error?",
+        "choices": [
+          "Workflow interruptions",
+          "High copay",
+          "Side effects",
+          "Nonadherence"
+        ],
+        "answer": "Workflow interruptions"
+      },
+      {
+        "type": "short",
+        "prompt": "Define 'near miss' (\u22644 words)",
+        "answerText": [
+          "error caught before dispensing",
+          "caught before reaching patient",
+          "intercepted before patient"
+        ]
+      },
+      {
+        "type": "mcq",
+        "prompt": "A near miss is:",
+        "choices": [
+          "Error caught before patient",
+          "Minor rash",
+          "Sentinel event",
+          "Complaint only"
+        ],
+        "answer": "Error caught before patient"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which method is proactive?",
+        "choices": [
+          "FMEA",
+          "RCA",
+          "Punishment board",
+          "After-action blame"
+        ],
+        "answer": "FMEA"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which method is reactive?",
+        "choices": [
+          "RCA",
+          "FMEA",
+          "Checklist",
+          "PAR level"
+        ],
+        "answer": "RCA"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which event qualifies as sentinel?",
+        "choices": [
+          "Wrong chemo dose causing organ failure",
+          "Late pickup",
+          "High copay",
+          "Label smudge"
+        ],
+        "answer": "Wrong chemo dose causing organ failure"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which change is most likely to increase error reporting?",
+        "choices": [
+          "Anonymous reporting option",
+          "Public blame board",
+          "Ignore minor errors",
+          "Eliminate breaks"
+        ],
+        "answer": "Anonymous reporting option"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which patient group is at highest risk for errors?",
+        "choices": [
+          "Elderly with polypharmacy",
+          "Healthy adult",
+          "Short-term antibiotic user",
+          "Teen athlete"
+        ],
+        "answer": "Elderly with polypharmacy"
+      },
+      {
+        "type": "short",
+        "prompt": "System step that encourages reporting (one)",
+        "answerText": [
+          "anonymous reporting",
+          "timely feedback",
+          "non-punitive policy",
+          "adequate staffing"
+        ]
+      },
+      {
+        "type": "mcq",
+        "prompt": "First step when receiving a DI question:",
+        "choices": [
+          "Clarify context & patient specifics",
+          "Search primary literature immediately",
+          "Quote textbook",
+          "Check pricing"
+        ],
+        "answer": "Clarify context & patient specifics"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which is a primary source?",
+        "choices": [
+          "Randomized clinical trial",
+          "Lexi-Drug",
+          "PubMed",
+          "Cochrane review"
+        ],
+        "answer": "Randomized clinical trial"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which is a secondary source?",
+        "choices": [
+          "PubMed",
+          "DailyMed",
+          "Lexi-Drug",
+          "Package insert"
+        ],
         "answer": "PubMed"
       },
       {
         "type": "mcq",
-        "prompt": "Which is a tertiary resource?",
-        "choices": ["Clinical trial abstract", "Lexi-Drug", "PubMed search", "Systematic review"],
-        "answer": "Lexi-Drug"
+        "prompt": "Which is a tertiary source (per course handout)?",
+        "choices": [
+          "DailyMed",
+          "NEJM RCT",
+          "Case report",
+          "ClinicalTrials.gov"
+        ],
+        "answer": "DailyMed"
       },
       {
         "type": "mcq",
-        "prompt": "Which agency enforces the Controlled Substances Act?",
-        "choices": ["FDA", "DEA", "CDC", "ISMP"],
+        "prompt": "Orange Book provides:",
+        "choices": [
+          "Therapeutic equivalence (AB codes)",
+          "Biologics interchangeability",
+          "FDA label text",
+          "OTC monographs"
+        ],
+        "answer": "Therapeutic equivalence (AB codes)"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Best resource for IV compatibility:",
+        "choices": [
+          "Trissel's (via Lexi)",
+          "Orange Book",
+          "Cochrane Library",
+          "ISMP"
+        ],
+        "answer": "Trissel's (via Lexi)"
+      },
+      {
+        "type": "short",
+        "prompt": "PICO: I stands for \u2192",
+        "answerText": [
+          "intervention"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "One tertiary DI source (per course)",
+        "answerText": [
+          "lexi-drug",
+          "micromedex",
+          "uptodate",
+          "dailymed"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Database for FDA-approved labeling \u2192",
+        "answerText": [
+          "dailymed"
+        ]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Which factor is NOT used for CSA scheduling?",
+        "choices": [
+          "Price",
+          "Abuse potential",
+          "Accepted medical use",
+          "Dependence risk"
+        ],
+        "answer": "Price"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Agency that enforces the CSA:",
+        "choices": [
+          "DEA",
+          "FDA",
+          "CDC",
+          "CMS"
+        ],
         "answer": "DEA"
       },
       {
-        "type": "tf",
-        "prompt": "Schedule II prescriptions can never be refilled.",
-        "answer": "True"
+        "type": "mcq",
+        "prompt": "Schedule I definition:",
+        "choices": [
+          "High abuse; no accepted medical use",
+          "Low abuse; accepted use",
+          "Moderate abuse; accepted use",
+          "Accepted use; low risk"
+        ],
+        "answer": "High abuse; no accepted medical use"
       },
       {
         "type": "mcq",
-        "prompt": "Which category of medication error is giving the wrong drug to the correct patient?",
-        "choices": ["Omission", "Commission", "Sentinel event", "Adverse drug event"],
-        "answer": "Commission"
+        "prompt": "C-II prescriptions may be:",
+        "choices": [
+          "Never refilled",
+          "Refilled once",
+          "Refilled 5x/6mo",
+          "Transferred freely"
+        ],
+        "answer": "Never refilled"
       },
       {
         "type": "mcq",
-        "prompt": "Which law limits pseudoephedrine sales?",
-        "choices": ["CSA", "Combat Methamphetamine Epidemic Act", "DSCSA", "OBRA 90"],
-        "answer": "Combat Methamphetamine Epidemic Act"
+        "prompt": "C-III/C-V refills allowed (if authorized):",
+        "choices": [
+          "5 in 6 months",
+          "Unlimited",
+          "None",
+          "One only"
+        ],
+        "answer": "5 in 6 months"
       },
       {
         "type": "mcq",
-        "prompt": "Which organization manages the MERP program?",
-        "choices": ["DEA", "FDA", "ISMP", "CDC"],
-        "answer": "ISMP"
-      },
-      {
-        "type": "tf",
-        "prompt": "DailyMed provides official FDA package insert information.",
-        "answer": "True"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which \"Right\" is violated if the correct drug is dispensed but to the wrong patient?",
-        "choices": ["Right dose", "Right drug", "Right patient", "Right route"],
-        "answer": "Right patient"
+        "prompt": "Inventory frequency for controlled substances (federal):",
+        "choices": [
+          "Every 2 years",
+          "Every 6 months",
+          "Annually",
+          "Every 3 years"
+        ],
+        "answer": "Every 2 years"
       },
       {
         "type": "mcq",
-        "prompt": "Which is required on an Arkansas prescription label?",
-        "choices": ["Patient's name", "Prescriber's DEA number", "Patient's weight", "Pharmacist initials"],
-        "answer": "Patient's name"
-      },
-      {
-        "type": "tf",
-        "prompt": "FMEA is a proactive method to identify failures before errors occur.",
-        "answer": "True"
-      },
-      {
-        "type": "mcq",
-        "prompt": "The Orange Book provides:",
-        "choices": ["Controlled substance schedules", "Therapeutic equivalence codes", "Patient safety alerts", "Drug interaction databases"],
-        "answer": "Therapeutic equivalence codes"
-      },
-      {
-        "type": "tf",
-        "prompt": "Pharmacy technicians can transfer controlled prescriptions.",
-        "answer": "False"
+        "prompt": "Transfers of C-III\u2013C-V without shared real-time DB:",
+        "choices": [
+          "One transfer",
+          "Unlimited",
+          "Not allowed",
+          "Five"
+        ],
+        "answer": "One transfer"
       },
       {
         "type": "mcq",
-        "prompt": "Which safety principle focuses on analyzing events after they occur?",
-        "choices": ["FMEA", "RCA", "PDMP", "MERP"],
-        "answer": "RCA"
+        "prompt": "Emergency oral C-II: prescriber must send follow-up within:",
+        "choices": [
+          "7 days",
+          "24 hours",
+          "3 days",
+          "14 days"
+        ],
+        "answer": "7 days"
+      },
+      {
+        "type": "short",
+        "prompt": "Daily pseudoephedrine limit (grams) \u2192",
+        "answerText": [
+          "3.6",
+          "3.6 g"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Mail-order 30-day pseudoephedrine limit (g) \u2192",
+        "answerText": [
+          "7.5",
+          "7.5 g"
+        ]
       }
     ],
     "hard": [
       {
         "type": "mcq",
-        "prompt": "A bottle of oxycodone 500-count is inventoried. Which rule applies?",
-        "choices": ["Estimate allowed", "Exact count required", "Estimate if <1000", "DEA approval required"],
-        "answer": "Exact count required"
-      },
-      {
-        "type": "tf",
-        "prompt": "All controlled substance records must be kept for at least 2 years.",
-        "answer": "True"
-      },
-      {
-        "type": "mcq",
-        "prompt": "A prescriber calls in an emergency 72-hour supply of Adderall. What follow-up is required?",
-        "choices": ["Signed Rx within 7 days", "DEA approval by phone", "Report only to state board", "No follow-up needed"],
-        "answer": "Signed Rx within 7 days"
+        "prompt": "Case: During final check, tech disables barcode due to 'slowness.' Primary risk increase?",
+        "choices": [
+          "Dispensing error",
+          "Higher copay",
+          "Insurance rejection",
+          "HIPAA breach"
+        ],
+        "answer": "Dispensing error"
       },
       {
         "type": "mcq",
-        "prompt": "Which is a sentinel event?",
-        "choices": ["Wrong drug → patient death", "Mild nausea from chemotherapy", "Delayed refill request", "Missed counseling session"],
-        "answer": "Wrong drug → patient death"
+        "prompt": "Case: Pharmacist uses name + DOB at pickup. This mainly prevents:",
+        "choices": [
+          "Wrong-patient errors",
+          "Drug interactions",
+          "Price issues",
+          "Therapeutic duplication"
+        ],
+        "answer": "Wrong-patient errors"
       },
       {
         "type": "mcq",
-        "prompt": "Which analysis method identifies workflow risks before errors occur?",
-        "choices": ["RCA", "Sentinel review", "FMEA", "MERP"],
+        "prompt": "Case: Which order entry format reduces trailing/leading zero errors?",
+        "choices": [
+          "0.5 mg",
+          ".5 mg",
+          "5.0 mg",
+          ".50 mg"
+        ],
+        "answer": "0.5 mg"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: Which workflow change best reduces interruptions at verification?",
+        "choices": [
+          "No-interruption zone",
+          "Extra counseling only",
+          "Open phone lines",
+          "Allow walk-ups during check"
+        ],
+        "answer": "No-interruption zone"
+      },
+      {
+        "type": "short",
+        "prompt": "One 'Do Not Use' item (e.g., U, IU, QOD, cc) \u2192",
+        "answerText": [
+          "u",
+          "iu",
+          "qod",
+          "cc",
+          "ms",
+          "mso4",
+          "mgso4"
+        ]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: Technician skips allergy screen; patient receives penicillin with documented allergy. Type of error?",
+        "choices": [
+          "Omission",
+          "Commission",
+          "Sentinel event",
+          "ADR"
+        ],
+        "answer": "Omission"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: Pharmacy fills metoprolol instead of metformin. Type of error?",
+        "choices": [
+          "Commission",
+          "Omission",
+          "ADR",
+          "ADE"
+        ],
+        "answer": "Commission"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: Phone calls routed away from verification area is a:",
+        "choices": [
+          "System fix",
+          "Punitive action",
+          "Labeling change",
+          "Non-clinical policy"
+        ],
+        "answer": "System fix"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: Counting 28 tablets for a 30-tablet Rx is a:",
+        "choices": [
+          "Dispensing error",
+          "Prescribing error",
+          "Administration error",
+          "Transcription error"
+        ],
+        "answer": "Dispensing error"
+      },
+      {
+        "type": "short",
+        "prompt": "Short definition of 'near miss' (\u22644 words)",
+        "answerText": [
+          "error caught before patient",
+          "intercepted before patient"
+        ]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: Wrong chemotherapy drug reached the patient and caused ICU admission. Classify event:",
+        "choices": [
+          "Sentinel event",
+          "Near miss",
+          "Omission",
+          "No event"
+        ],
+        "answer": "Sentinel event"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: Post-event analysis to determine contributing factors is:",
+        "choices": [
+          "RCA",
+          "FMEA",
+          "PDSA",
+          "5S"
+        ],
+        "answer": "RCA"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: Prospective review of process risk points is:",
+        "choices": [
+          "FMEA",
+          "RCA",
+          "After-action review",
+          "Retrospective audit"
+        ],
         "answer": "FMEA"
       },
       {
-        "type": "tf",
-        "prompt": "The Purple Book lists interchangeable biologics.",
-        "answer": "True"
+        "type": "mcq",
+        "prompt": "Which change is most likely to increase error reporting?",
+        "choices": [
+          "Anonymous reporting option",
+          "Public blame board",
+          "Ignore minor errors",
+          "Eliminate breaks"
+        ],
+        "answer": "Anonymous reporting option"
       },
       {
         "type": "mcq",
-        "prompt": "Which Orange Book code indicates drugs are therapeutically equivalent?",
-        "choices": ["AB", "BX", "B", "C-II"],
-        "answer": "AB"
+        "prompt": "Case: Who is most vulnerable to med errors?",
+        "choices": [
+          "Elderly with multiple meds",
+          "Healthy athlete",
+          "Short-term antibiotic user",
+          "No med history"
+        ],
+        "answer": "Elderly with multiple meds"
       },
       {
         "type": "mcq",
-        "prompt": "Which is NOT required on an Arkansas prescription label?",
-        "choices": ["Patient's name", "Prescriber's name", "Manufacturer (if generic)", "Prescriber's DEA number"],
-        "answer": "Prescriber's DEA number"
+        "prompt": "Case: Event prevented at verification when label typo detected. This is:",
+        "choices": [
+          "Near miss",
+          "Sentinel event",
+          "ADR",
+          "Complaint"
+        ],
+        "answer": "Near miss"
+      },
+      {
+        "type": "short",
+        "prompt": "One action that supports reporting (one)",
+        "answerText": [
+          "anonymous reporting",
+          "timely feedback",
+          "non-punitive policy",
+          "adequate staffing"
+        ]
       },
       {
         "type": "mcq",
-        "prompt": "Which schedule allows estimation of counts for bottles ≤1000 units?",
-        "choices": ["C-II", "C-III to V", "C-I", "OTC"],
-        "answer": "C-III to V"
-      },
-      {
-        "type": "tf",
-        "prompt": "ISMP is a government agency under the FDA.",
-        "answer": "False"
-      },
-      {
-        "type": "mcq",
-        "prompt": "A patient brings in another person's lisinopril bottle by mistake. Which \"Right\" failed?",
-        "choices": ["Right dose", "Right time", "Right patient", "Right route"],
-        "answer": "Right patient"
+        "prompt": "Case: Clinician asks dosing for renal impairment; best immediate step:",
+        "choices": [
+          "Clarify patient specifics",
+          "Search RCTs",
+          "Price check",
+          "Ask insurance"
+        ],
+        "answer": "Clarify patient specifics"
       },
       {
         "type": "mcq",
-        "prompt": "Which is an error of omission?",
-        "choices": ["Wrong strength dispensed", "Missed allergy check", "Wrong patient counseling sheet given", "Wrong drug given"],
-        "answer": "Missed allergy check"
-      },
-      {
-        "type": "tf",
-        "prompt": "The CSA requires inventories at least biennially.",
-        "answer": "True"
-      },
-      {
-        "type": "mcq",
-        "prompt": "A pharmacist substitutes an AB1-rated generic for an AB2-rated brand. Is this allowed?",
-        "choices": ["Yes", "No"],
-        "answer": "No"
+        "prompt": "Case: To find trials on new anticoagulant, use:",
+        "choices": [
+          "PubMed",
+          "Orange Book",
+          "Purple Book",
+          "ISMP"
+        ],
+        "answer": "PubMed"
       },
       {
         "type": "mcq",
-        "prompt": "Which type of literature includes systematic reviews and meta-analyses?",
-        "choices": ["Primary", "Secondary", "Tertiary", "Package insert"],
-        "answer": "Secondary"
+        "prompt": "Case: To check generic substitution equivalence, use:",
+        "choices": [
+          "Orange Book",
+          "DailyMed",
+          "Micromedex",
+          "Cochrane"
+        ],
+        "answer": "Orange Book"
       },
       {
         "type": "mcq",
-        "prompt": "Which factor determines drug scheduling under the CSA?",
-        "choices": ["Price", "Potential for abuse and dependence", "Manufacturer", "Dosage form"],
-        "answer": "Potential for abuse and dependence"
+        "prompt": "Case: Biosimilar interchangeability info located in:",
+        "choices": [
+          "Purple Book",
+          "Orange Book",
+          "DailyMed",
+          "ISMP"
+        ],
+        "answer": "Purple Book"
       },
       {
         "type": "mcq",
-        "prompt": "Which law requires pharmacists to counsel Medicaid patients?",
-        "choices": ["CSA", "OBRA 90", "FD&C Act", "DSCSA"],
-        "answer": "OBRA 90"
-      },
-      {
-        "type": "tf",
-        "prompt": "Natural Medicines Database is considered a primary source.",
-        "answer": "False"
-      },
-      {
-        "type": "mcq",
-        "prompt": "A pharmacy's last controlled substance inventory was done in 2024. When is the next due?",
-        "choices": ["2025", "2026", "2027", "2029"],
-        "answer": "2026"
+        "prompt": "Case: IV compatibility for vancomycin + piperacillin/tazobactam:",
+        "choices": [
+          "Trissel's (via Lexi)",
+          "Orange Book",
+          "DailyMed",
+          "PubMed"
+        ],
+        "answer": "Trissel's (via Lexi)"
       },
       {
         "type": "mcq",
-        "prompt": "Which is an adverse drug reaction (ADR), not an ADE?",
-        "choices": ["Allergic reaction to Bactrim at normal dose", "Overdose due to miscalculated BSA", "Wrong drug dispensed at checkout", "Patient non-adherence"],
-        "answer": "Allergic reaction to Bactrim at normal dose"
+        "prompt": "Case: For current boxed warning details, fastest source:",
+        "choices": [
+          "DailyMed",
+          "Orange Book",
+          "Cochrane",
+          "ClinicalTrials.gov"
+        ],
+        "answer": "DailyMed"
+      },
+      {
+        "type": "short",
+        "prompt": "PICO: C stands for \u2192",
+        "answerText": [
+          "comparison"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Name one tertiary DI source",
+        "answerText": [
+          "lexi-drug",
+          "micromedex",
+          "uptodate",
+          "dailymed"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Index to locate RCTs quickly \u2192",
+        "answerText": [
+          "pubmed"
+        ]
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: Patient requests early opioid refill; PDMP shows multiple prescribers. Best action:",
+        "choices": [
+          "Check PDMP, verify with prescriber; refuse if illegitimate",
+          "Fill to avoid conflict",
+          "Transfer pharmacy",
+          "Call insurance only"
+        ],
+        "answer": "Check PDMP, verify with prescriber; refuse if illegitimate"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: Pharmacy with shared database transfers a C-IV. Allowed:",
+        "choices": [
+          "As many times as refills remain",
+          "One time",
+          "None",
+          "Two times"
+        ],
+        "answer": "As many times as refills remain"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: Without shared DB, transfer a C-V. Allowed:",
+        "choices": [
+          "One time",
+          "Unlimited",
+          "None",
+          "Two times"
+        ],
+        "answer": "One time"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: Faxed morphine Rx from hospice. Validity?",
+        "choices": [
+          "Valid as original",
+          "Never valid",
+          "Needs DEA form",
+          "Valid only if under 18"
+        ],
+        "answer": "Valid as original"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: Inventory count for alprazolam 2000-count bottle:",
+        "choices": [
+          "Exact count",
+          "Estimate",
+          "Not required",
+          "DEA approval"
+        ],
+        "answer": "Exact count"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: Emergency oral C-II oxycodone for 3 days; follow-up?",
+        "choices": [
+          "Written/e-signed Rx within 7 days",
+          "14 days",
+          "No follow-up needed",
+          "Within 24 hours"
+        ],
+        "answer": "Written/e-signed Rx within 7 days"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: Daily pseudoephedrine sale request 4.2 g. Action:",
+        "choices": [
+          "Deny; exceeds 3.6 g/day",
+          "Allow; document later",
+          "Allow with ID only",
+          "Report DEA"
+        ],
+        "answer": "Deny; exceeds 3.6 g/day"
+      },
+      {
+        "type": "mcq",
+        "prompt": "Case: Which refills are allowed for diazepam (C-IV)?",
+        "choices": [
+          "Up to 5 in 6 months",
+          "None",
+          "Unlimited",
+          "One only"
+        ],
+        "answer": "Up to 5 in 6 months"
+      },
+      {
+        "type": "short",
+        "prompt": "Agency enforcing CSA \u2192",
+        "answerText": [
+          "dea"
+        ]
+      },
+      {
+        "type": "short",
+        "prompt": "Define 'corresponding responsibility' (\u22644 words)",
+        "answerText": [
+          "ensure rx legitimate",
+          "legitimate medical purpose"
+        ]
       }
     ]
+  },
+  "notes": {
+    "source": "Derived from Set B; removed LASA/Just Culture/fear-of-punishment phrasing; kept slide-faithful content."
   }
 }
