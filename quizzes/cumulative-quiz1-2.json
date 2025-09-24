@@ -1,235 +1,83 @@
 {
   "id": "cumulative-quiz1-2",
-  "title": "Cumulative Quiz 1–2 — Antihypertensives (Balanced P1)",
+  "title": "Cumulative Lab Quiz 1–2 — Antihypertensives (v3)",
+  },
   "pools": {
     "easy": [
-      {
-        "type": "mcq",
-        "prompt": "Lisinopril belongs to which class?",
-        "choices": ["ARB", "ACE inhibitor", "Thiazide diuretic", "Non-DHP CCB"],
-        "answer": "ACE inhibitor",
-        "explain": "ACE inhibitor."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Losartan is a(n):",
-        "choices": ["ACE inhibitor", "ARB", "Loop diuretic", "Alpha-1 blocker"],
-        "answer": "ARB",
-        "explain": "Angiotensin receptor blocker."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Amlodipine is a:",
-        "choices": ["DHP CCB", "Non-DHP CCB", "Beta blocker", "ARB"],
-        "answer": "DHP CCB",
-        "explain": "Dihydropyridine calcium channel blocker."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Hydrochlorothiazide is a:",
-        "choices": ["Thiazide diuretic", "Loop diuretic", "Aldosterone antagonist", "ACE inhibitor"],
-        "answer": "Thiazide diuretic",
-        "explain": "Thiazide diuretic."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Furosemide is primarily a:",
-        "choices": ["Loop diuretic", "Thiazide diuretic", "ACE inhibitor", "ARB"],
-        "answer": "Loop diuretic",
-        "explain": "Loop diuretic."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Spironolactone is a(n):",
-        "choices": ["Aldosterone antagonist", "Beta blocker", "ARB", "Thiazide"],
-        "answer": "Aldosterone antagonist",
-        "explain": "Mineralocorticoid receptor antagonist (MRA)."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Diltiazem is a:",
-        "choices": ["Non-DHP CCB", "DHP CCB", "ACE inhibitor", "ARB"],
-        "answer": "Non-DHP CCB",
-        "explain": "Non-dihydropyridine CCB."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Metoprolol is best described as:",
-        "choices": ["β1-selective blocker", "Non-selective beta blocker", "Alpha-1 blocker", "Central alpha-2 agonist"],
-        "answer": "β1-selective blocker",
-        "explain": "Cardioselective beta-1 blocker."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Clonidine's category is:",
-        "choices": ["Direct vasodilator", "Central alpha-2 agonist", "Alpha-1 blocker", "ACE inhibitor"],
-        "answer": "Central alpha-2 agonist",
-        "explain": "Reduces sympathetic outflow."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Hydralazine is a:",
-        "choices": ["Direct vasodilator", "ARB", "Beta blocker", "Thiazide diuretic"],
-        "answer": "Direct vasodilator",
-        "explain": "Direct arteriolar vasodilator."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which pair increases hyperkalemia risk most?",
-        "choices": ["Lisinopril + spironolactone", "Amlodipine + HCTZ", "Furosemide + hydralazine", "Atenolol + chlorthalidone"],
-        "answer": "Lisinopril + spironolactone",
-        "explain": "ACEi + MRA can raise K⁺."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which class commonly causes ankle edema?",
-        "choices": ["DHP CCBs", "ACE inhibitors", "ARBs", "Thiazides"],
-        "answer": "DHP CCBs",
-        "explain": "Precapillary arteriolar dilation."
-      },
-      {
-        "type": "tf",
-        "prompt": "ACE inhibitors can cause cough due to bradykinin.",
-        "answer": "True",
-        "explain": "Bradykinin accumulation."
-      },
-      {
-        "type": "tf",
-        "prompt": "Thiazides may raise uric acid.",
-        "answer": "True",
-        "explain": "Hyperuricemia/gout risk."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Chlorthalidone is best categorized as:",
-        "choices": ["Thiazide-like diuretic", "Loop diuretic", "Potassium-sparing", "ACE inhibitor"],
-        "answer": "Thiazide-like diuretic"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Nifedipine is a:",
-        "choices": ["DHP CCB", "Non-DHP CCB", "ACE inhibitor", "Beta blocker"],
-        "answer": "DHP CCB"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Terazosin belongs to which class?",
-        "choices": ["Alpha-1 blocker", "Beta-1 blocker", "ARB", "Loop diuretic"],
-        "answer": "Alpha-1 blocker"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Eplerenone is a(n):",
-        "choices": ["Aldosterone antagonist", "ACE inhibitor", "ARB", "DHP CCB"],
-        "answer": "Aldosterone antagonist"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Aliskiren is a:",
-        "choices": ["Direct renin inhibitor", "ACE inhibitor", "ARB", "Thiazide diuretic"],
-        "answer": "Direct renin inhibitor"
-      },
-      {
-        "type": "tf",
-        "prompt": "Non-DHP CCBs can cause bradycardia/AV block.",
-        "answer": "True",
-        "explain": "AV nodal suppression."
-      }
+      { "type": "mcq", "prompt": "Lisinopril belongs to which class?", "choices": ["Angiotensin II Receptor Blocker", "ACE inhibitor", "Thiazide diuretic", "Calcium channel blocker (non-dihydropyridine)"], "answer": ["ACE inhibitor"] },
+      { "type": "mcq", "prompt": "Losartan is a(n):", "choices": ["ACE inhibitor", "Angiotensin II Receptor Blocker", "Loop diuretic", "Alpha-1 blocker"], "answer": ["Angiotensin II Receptor Blocker"] },
+      { "type": "mcq", "prompt": "Amlodipine is a:", "choices": ["Calcium channel blocker (dihydropyridine)", "Calcium channel blocker (non-dihydropyridine)", "Beta blocker", "Angiotensin II Receptor Blocker"], "answer": ["Calcium channel blocker (dihydropyridine)"] },
+      { "type": "mcq", "prompt": "Hydrochlorothiazide is a:", "choices": ["Thiazide diuretic", "Loop diuretic", "Aldosterone receptor antagonist", "ACE inhibitor"], "answer": ["Thiazide diuretic"] },
+      { "type": "mcq", "prompt": "Furosemide is primarily a:", "choices": ["Loop diuretic", "Thiazide diuretic", "ACE inhibitor", "Angiotensin II Receptor Blocker"], "answer": ["Loop diuretic"] },
+      { "type": "mcq", "prompt": "Spironolactone is a(n):", "choices": ["Aldosterone receptor antagonist (potassium-sparing diuretic)", "Beta blocker", "Angiotensin II Receptor Blocker", "Thiazide diuretic"], "answer": ["Aldosterone receptor antagonist (potassium-sparing diuretic)"] },
+      { "type": "mcq", "prompt": "Diltiazem is a:", "choices": ["Calcium channel blocker (non-dihydropyridine)", "Calcium channel blocker (dihydropyridine)", "ACE inhibitor", "Angiotensin II Receptor Blocker"], "answer": ["Calcium channel blocker (non-dihydropyridine)"] },
+      { "type": "mcq", "prompt": "Metoprolol is best described as:", "choices": ["Beta-1 selective blocker", "Non-selective beta blocker", "Alpha-1 blocker", "Central alpha-2 agonist"], "answer": ["Beta-1 selective blocker"] },
+      { "type": "mcq", "prompt": "Clonidine's pharmacologic category:", "choices": ["Central alpha-2 agonist", "Direct vasodilator", "Alpha-1 blocker", "ACE inhibitor"], "answer": ["Central alpha-2 agonist"] },
+      { "type": "mcq", "prompt": "Hydralazine is a:", "choices": ["Direct vasodilator", "Angiotensin II Receptor Blocker", "Beta blocker", "Thiazide diuretic"], "answer": ["Direct vasodilator"] },
+
+      { "type": "mcq", "prompt": "Chlorthalidone is best categorized as:", "choices": ["Thiazide-like diuretic", "Loop diuretic", "Potassium-sparing diuretic", "ACE inhibitor"], "answer": ["Thiazide-like diuretic"] },
+      { "type": "mcq", "prompt": "Nifedipine is a:", "choices": ["Calcium channel blocker (dihydropyridine)", "Calcium channel blocker (non-dihydropyridine)", "ACE inhibitor", "Beta blocker"], "answer": ["Calcium channel blocker (dihydropyridine)"] },
+
+      { "type": "mcq", "prompt": "Brand for Losartan:", "choices": ["Cozaar","Benicar","Diovan","Vasotec"], "answer": ["Cozaar"] },
+      { "type": "mcq", "prompt": "Brand for Valsartan:", "choices": ["Diovan","Benicar","Cozaar","Vasotec"], "answer": ["Diovan"] },
+      { "type": "mcq", "prompt": "Brand for Olmesartan:", "choices": ["Benicar","Cozaar","Diovan","Coreg"], "answer": ["Benicar"] },
+      { "type": "mcq", "prompt": "Brand for Enalapril:", "choices": ["Vasotec","Cozaar","Coreg","Calan"], "answer": ["Vasotec"] },
+
+      { "type": "mcq", "prompt": "Brand for Verapamil:", "choices": ["Calan","Norvasc","Procardia","Zebeta"], "answer": ["Calan"] },
+      { "type": "mcq", "prompt": "Brand for Nifedipine:", "choices": ["Procardia","Norvasc","Calan","Cardizem"], "answer": ["Procardia"] },
+      { "type": "mcq", "prompt": "Brand for Amlodipine:", "choices": ["Norvasc","Procardia","Calan","Coreg"], "answer": ["Norvasc"] },
+
+      { "type": "mcq", "prompt": "Brand for Chlorthalidone:", "choices": ["Thalitone","Microzide","Lasix","Aldactone"], "answer": ["Thalitone"] },
+      { "type": "mcq", "prompt": "Brand for Hydrochlorothiazide:", "choices": ["Microzide","Lasix","Cozaar","Benicar"], "answer": ["Microzide"] },
+      { "type": "mcq", "prompt": "Brand for Furosemide:", "choices": ["Lasix","Microzide","Aldactone","Thalitone"], "answer": ["Lasix"] },
+      { "type": "mcq", "prompt": "Brand for Spironolactone:", "choices": ["Aldactone","Coreg","Tenormin","Zestril"], "answer": ["Aldactone"] },
+
+      { "type": "mcq", "prompt": "Brand for Carvedilol:", "choices": ["Coreg","Zebeta","Tenormin","Zestril"], "answer": ["Coreg"] },
+      { "type": "mcq", "prompt": "Brand for Bisoprolol:", "choices": ["Zebeta","Coreg","Tenormin","Cardizem"], "answer": ["Zebeta"] },
+      { "type": "mcq", "prompt": "Brand for Atenolol:", "choices": ["Tenormin","Zebeta","Coreg","Norvasc"], "answer": ["Tenormin"] },
+      { "type": "mcq", "prompt": "Brand for Diltiazem:", "choices": ["Cardizem","Norvasc","Procardia","Cozaar"], "answer": ["Cardizem"] },
+
+      { "type": "short", "prompt": "Generic for Cozaar?", "answerText": ["losartan"] },
+      { "type": "short", "prompt": "Generic for Diovan?", "answerText": ["valsartan"] },
+      { "type": "short", "prompt": "Generic for Benicar?", "answerText": ["olmesartan"] },
+      { "type": "short", "prompt": "Generic for Vasotec?", "answerText": ["enalapril"] },
+      { "type": "short", "prompt": "Generic for Zestril/Prinivil?", "answerText": ["lisinopril","zestril","prinivil"] },
+      { "type": "short", "prompt": "Generic for Norvasc?", "answerText": ["amlodipine"] },
+      { "type": "short", "prompt": "Generic for Calan?", "answerText": ["verapamil"] },
+      { "type": "short", "prompt": "Generic for Procardia?", "answerText": ["nifedipine"] },
+      { "type": "short", "prompt": "Generic for Coreg?", "answerText": ["carvedilol"] },
+      { "type": "short", "prompt": "Generic for Thalitone?", "answerText": ["chlorthalidone"] },
+      { "type": "short", "prompt": "Generic for Microzide?", "answerText": ["hydrochlorothiazide","hctz"] },
+      { "type": "short", "prompt": "Generic for Lasix?", "answerText": ["furosemide"] },
+      { "type": "short", "prompt": "Generic for Aldactone?", "answerText": ["spironolactone"] },
+
+      { "type": "mcq", "prompt": "Category of Cozaar:", "choices": ["Antihypertensive","Anticoagulant","Antilipemic","Antiarrhythmic"], "answer": ["Antihypertensive"] }
     ],
     "hard": [
-      {
-        "type": "mcq",
-        "prompt": "Which combo is most risky for AV block?",
-        "choices": ["Metoprolol + diltiazem", "Losartan + HCTZ", "Amlodipine + hydralazine", "Spironolactone + furosemide"],
-        "answer": "Metoprolol + diltiazem",
-        "explain": "Dual AV nodal suppression."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which lab change is typical with thiazides?",
-        "choices": ["↑ Calcium", "↓ Calcium", "↑ Potassium", "↑ Uric acid only"],
-        "answer": "↑ Calcium",
-        "explain": "Thiazides increase Ca²⁺ reabsorption."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which agent is relatively safe in pregnancy?",
-        "choices": ["Labetalol", "Losartan", "Enalapril", "Aliskiren"],
-        "answer": "Labetalol",
-        "explain": "ACEi/ARB/DRI are contraindicated."
-      },
-      {
-        "type": "short",
-        "prompt": "Name one β1-selective blocker.",
-        "answer": "metoprolol",
-        "answerText": ["metoprolol", "atenolol", "bisoprolol", "nebivolol"]
-      },
-      {
-        "type": "short",
-        "prompt": "Name one non-DHP CCB.",
-        "answer": "verapamil",
-        "answerText": ["verapamil", "diltiazem"]
-      },
-      {
-        "type": "short",
-        "prompt": "Name one aldosterone antagonist (MRA).",
-        "answer": "spironolactone",
-        "answerText": ["spironolactone", "eplerenone"]
-      },
-      {
-        "type": "tf",
-        "prompt": "ACE inhibitors usually cause hypokalemia.",
-        "answer": "False",
-        "explain": "They tend to raise K⁺."
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which drug directly inhibits renin?",
-        "choices": ["Aliskiren", "Lisinopril", "Losartan", "Eplerenone"],
-        "answer": "Aliskiren"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which class most reduces peripheral resistance via arterial dilation?",
-        "choices": ["DHP CCBs", "Beta blockers", "Diuretics", "Central alpha-2 agonists"],
-        "answer": "DHP CCBs"
-      },
-      {
-        "type": "mcq",
-        "prompt": "Which drug pair most increases K⁺?",
-        "choices": ["Lisinopril + eplerenone", "Atenolol + HCTZ", "Amlodipine + terazosin", "Hydralazine + furosemide"],
-        "answer": "Lisinopril + eplerenone",
-        "explain": "ACEi + MRA both raise K⁺."
-      },
-      {
-        "type": "tf",
-        "prompt": "ARBs increase bradykinin more than ACE inhibitors.",
-        "answer": "False",
-        "explain": "ACEi increase bradykinin; ARBs do not."
-      },
-      {
-        "type": "tf",
-        "prompt": "Loop diuretics commonly cause hypokalemia.",
-        "answer": "True"
-      },
-      {
-        "type": "short",
-        "prompt": "Drug class of losartan?",
-        "answer": "ARB",
-        "answerText": ["arb", "angiotensin receptor blocker", "angiotensin ii receptor blocker"]
-      },
-      {
-        "type": "short",
-        "prompt": "Class of nifedipine (subcategory)?",
-        "answer": "DHP CCB",
-        "answerText": ["dhp ccb", "dihydropyridine", "dihydropyridine ccb"]
-      },
-      {
-        "type": "short",
-        "prompt": "Hydralazine pharmacologic category?",
-        "answer": "Direct vasodilator",
-        "answerText": ["direct vasodilator", "vasodilator"]
-      }
+      { "type": "mcq", "prompt": "Mechanism of Enalapril (brand: Vasotec)?", "choices": ["Inhibits conversion of angiotensin I to angiotensin II","Blocks AT1 receptor","Blocks beta-1 receptors","Stimulates central alpha-2 receptors"], "answer": ["Inhibits conversion of angiotensin I to angiotensin II"] },
+      { "type": "mcq", "prompt": "Mechanism of Valsartan (brand: Diovan)?", "choices": ["Blocks AT1 receptor (angiotensin II)","Inhibits ACE","Blocks calcium influx in AV node","Blocks alpha-1 receptors"], "answer": ["Blocks AT1 receptor (angiotensin II)"] },
+      { "type": "mcq", "prompt": "Mechanism of Hydralazine (brand: Apresoline)?", "choices": ["Directly relaxes arteriolar smooth muscle, reducing peripheral resistance","Blocks AT1 receptor","Blocks beta-1 receptors","Inhibits calcium influx in AV node"], "answer": ["Directly relaxes arteriolar smooth muscle, reducing peripheral resistance"] },
+      { "type": "mcq", "prompt": "Mechanism of Hydrochlorothiazide (brand: Microzide)?", "choices": ["Inhibits sodium reabsorption in distal tubule → ↑ Na⁺/H₂O/K⁺/H⁺ excretion","Inhibits Na⁺/Cl⁻ reabsorption in ascending loop of Henle","Competes with aldosterone in distal tubules","Reduces AV node conduction"], "answer": ["Inhibits sodium reabsorption in distal tubule → ↑ Na⁺/H₂O/K⁺/H⁺ excretion"] },
+      { "type": "mcq", "prompt": "Mechanism of Furosemide (brand: Lasix)?", "choices": ["Inhibits Na⁺/Cl⁻ reabsorption in ascending loop of Henle","Inhibits distal sodium reabsorption","Competes with aldosterone","Stimulates central alpha-2 receptors"], "answer": ["Inhibits Na⁺/Cl⁻ reabsorption in ascending loop of Henle"] },
+      { "type": "mcq", "prompt": "Mechanism of Spironolactone (brand: Aldactone)?", "choices": ["Competes with aldosterone at distal renal tubules; ↑ Na⁺/H₂O excretion while conserving K⁺/H⁺","Blocks AT1 receptor","Blocks beta-1 receptors","Inhibits calcium influx into vascular smooth muscle"], "answer": ["Competes with aldosterone at distal renal tubules; ↑ Na⁺/H₂O excretion while conserving K⁺/H⁺"] },
+      { "type": "mcq", "prompt": "Mechanism of Verapamil (brand: Calan)?", "choices": ["Inhibits calcium influx into cardiac/vascular smooth muscle; reduces heart rate and contractility","Inhibits distal sodium reabsorption","Blocks AT1 receptor","Competes with aldosterone"], "answer": ["Inhibits calcium influx into cardiac/vascular smooth muscle; reduces heart rate and contractility"] },
+      { "type": "mcq", "prompt": "Mechanism of Amlodipine (brand: Norvasc)?", "choices": ["Inhibits calcium influx into vascular smooth and cardiac muscle → vasodilation, reduced blood pressure","Blocks AT1 receptor","Blocks beta-1 receptors","Stimulates central alpha-2 receptors"], "answer": ["Inhibits calcium influx into vascular smooth and cardiac muscle → vasodilation, reduced blood pressure"] },
+      { "type": "mcq", "prompt": "Mechanism of Clonidine (brand: Catapres)?", "choices": ["Stimulates central alpha-2 receptors → reduces sympathetic outflow","Blocks AT1 receptor","Blocks beta-1 receptors","Inhibits distal sodium reabsorption"], "answer": ["Stimulates central alpha-2 receptors → reduces sympathetic outflow"] },
+
+      { "type": "mcq", "prompt": "Which agent most strongly reduces AV node conduction?", "choices": ["Verapamil","Diltiazem","Amlodipine","Nifedipine"], "answer": ["Verapamil"] },
+      { "type": "mcq", "prompt": "Which agent lowers BP primarily via arteriolar dilation (not RAAS)?", "choices": ["Hydralazine","Enalapril","Valsartan","Spironolactone"], "answer": ["Hydralazine"] },
+      { "type": "mcq", "prompt": "Which beta blocker has alpha-blocking activity?", "choices": ["Carvedilol","Metoprolol","Atenolol","Bisoprolol"], "answer": ["Carvedilol"] },
+
+      { "type": "short", "prompt": "Class of Coreg?", "answerText": ["beta blocker with alpha-blocking activity","beta blocker with alpha blocking activity","beta-blocker with alpha-blocking activity"] },
+      { "type": "short", "prompt": "Class of Norvasc?", "answerText": ["calcium channel blocker (dihydropyridine)","dihydropyridine","dihydropyridine ccb","dhp","dhp ccb"] },
+      { "type": "short", "prompt": "Class of Calan?", "answerText": ["calcium channel blocker (non-dihydropyridine)","non-dihydropyridine","non-dihydropyridine ccb","non-dhp","non dhp"] },
+      { "type": "short", "prompt": "Drug class of Losartan?", "answerText": ["angiotensin ii receptor blocker","arb"] },
+      { "type": "short", "prompt": "Drug class of Enalapril?", "answerText": ["ace inhibitor","acei","angiotensin converting enzyme inhibitor"] },
+      { "type": "short", "prompt": "Hydralazine pharmacologic category?", "answerText": ["direct vasodilator","vasodilator"] },
+
+      { "type": "mcq", "prompt": "Contrast: Valsartan vs Enalapril — best pairing?", "choices": ["Blocks AT1; inhibits ACE","Inhibits ACE; blocks AT1","Stimulates beta-1; stimulates alpha-2","Increases outflow; decreases outflow"], "answer": ["Blocks AT1; inhibits ACE"] },
+      { "type": "mcq", "prompt": "Which class primarily reduces peripheral resistance via arterial dilation?", "choices": ["Calcium channel blockers (dihydropyridine)","Beta-1 selective blockers","Diuretics","Central alpha-2 agonists"], "answer": ["Calcium channel blockers (dihydropyridine)"] },
+      { "type": "mcq", "prompt": "Which agents increase Na⁺/H₂O excretion at the distal nephron?", "choices": ["Spironolactone and Chlorthalidone","Metoprolol and Verapamil","Clonidine and Enalapril","Valsartan and Olmesartan"], "answer": ["Spironolactone and Chlorthalidone"] }
     ]
   }
 }
