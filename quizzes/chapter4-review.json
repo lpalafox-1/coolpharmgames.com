@@ -41,8 +41,8 @@
       },
       {
         "type": "short",
-        "prompt": "Interpret the signa: 1–2 tabs p.o. q4–6h u.d.",
-        "solution": "'1–2 tabs' means one or two tablets; 'p.o.' is by mouth; 'q4–6h' is every 4–6 hours; 'u.d.' means as directed (ut dictum).",
+        "prompt": "Interpret the signa: 1-2 tabs p.o. q4-6h u.d.",
+        "solution": "'1-2 tabs' means one or two tablets; 'p.o.' is by mouth; 'q4-6h' is every 4-6 hours; 'u.d.' means as directed (ut dictum).",
         "answerText": [
           "Take 1 to 2 tablets by mouth every 4 to 6 hours as directed",
           "Take one or two tablets orally every four to six hours as directed"

@@ -1,7 +1,6 @@
 {
   "id": "lab-quiz1-antihypertensives",
-  "title": "Lab Quiz 1 — Antihypertensives (v3)",
-  },
+  "title": "Lab Quiz 1 - Antihypertensives (v3)",
   "pools": {
     "easy": [
       { "type": "mcq", "prompt": "Losartan belongs to which class?", "choices": ["Angiotensin II Receptor Blocker", "ACE inhibitor", "Thiazide diuretic", "Loop diuretic"], "answer": ["Angiotensin II Receptor Blocker"], "mapping": {"generic":"Losartan","brand":"Cozaar","class":"Angiotensin II Receptor Blocker","category":"Antihypertensive"} },
@@ -47,17 +46,17 @@
       { "type": "mcq", "prompt": "Brand → Class: Calan belongs to which class?", "choices": ["Calcium channel blocker (non-dihydropyridine)","Calcium channel blocker (dihydropyridine)","ARB","ACE inhibitor"], "answer": ["Calcium channel blocker (non-dihydropyridine)"], "mapping": {"brand":"Calan","generic":"Verapamil"} },
       { "type": "mcq", "prompt": "Generic → Class: Amlodipine belongs to which class?", "choices": ["Calcium channel blocker (dihydropyridine)","Calcium channel blocker (non-dihydropyridine)","ACE inhibitor","ARB"], "answer": ["Calcium channel blocker (dihydropyridine)"], "mapping": {"generic":"Amlodipine"} },
 
-      { "type": "mcq", "prompt": "MOA (ACE inhibitors) — Part A: Inhibits conversion of Ang ______ to Ang ______.", "choices": ["I → II","II → I","II → III","I → renin"], "answer": ["I → II"] },
-      { "type": "mcq", "prompt": "MOA (ACE inhibitors) — Part B: This decreases release of ______.", "choices": ["aldosterone","renin","AV node conduction","PCSK9"], "answer": ["aldosterone"] },
-      { "type": "mcq", "prompt": "MOA (ARBs) — Part A: Blocks ______ receptor.", "choices": ["angiotensin II","aldosterone","sodium","PCSK9"], "answer": ["angiotensin II"] },
-      { "type": "mcq", "prompt": "MOA (ARBs) — Part B: This decreases ______ secretion.", "choices": ["aldosterone","renin","AV node conduction","prothrombin"], "answer": ["aldosterone"] },
-      { "type": "mcq", "prompt": "MOA (Hydralazine) — Part A: Directly relaxes ______ smooth muscle.", "choices": ["arteriolar","venous","myocardial","bronchial"], "answer": ["arteriolar"] },
-      { "type": "mcq", "prompt": "MOA (Hydralazine) — Part B: Reduces ______ resistance.", "choices": ["peripheral","venous","airway","pulmonary"], "answer": ["peripheral"] },
-      { "type": "mcq", "prompt": "MOA (HCTZ/Chlorthalidone) — Part A: Inhibits ______ reabsorption in distal tubule.", "choices": ["sodium","chloride","calcium","VLDL"], "answer": ["sodium"] },
-      { "type": "mcq", "prompt": "MOA (HCTZ/Chlorthalidone) — Part B: Increases excretion of ______ and H₂O (also K⁺/H⁺).", "choices": ["sodium","calcium","PCSK9","renin"], "answer": ["sodium"] },
+      { "type": "mcq", "prompt": "MOA (ACE inhibitors) - Part A: Inhibits conversion of Ang ______ to Ang ______.", "choices": ["I → II","II → I","II → III","I → renin"], "answer": ["I → II"] },
+      { "type": "mcq", "prompt": "MOA (ACE inhibitors) - Part B: This decreases release of ______.", "choices": ["aldosterone","renin","AV node conduction","PCSK9"], "answer": ["aldosterone"] },
+      { "type": "mcq", "prompt": "MOA (ARBs) - Part A: Blocks ______ receptor.", "choices": ["angiotensin II","aldosterone","sodium","PCSK9"], "answer": ["angiotensin II"] },
+      { "type": "mcq", "prompt": "MOA (ARBs) - Part B: This decreases ______ secretion.", "choices": ["aldosterone","renin","AV node conduction","prothrombin"], "answer": ["aldosterone"] },
+      { "type": "mcq", "prompt": "MOA (Hydralazine) - Part A: Directly relaxes ______ smooth muscle.", "choices": ["arteriolar","venous","myocardial","bronchial"], "answer": ["arteriolar"] },
+      { "type": "mcq", "prompt": "MOA (Hydralazine) - Part B: Reduces ______ resistance.", "choices": ["peripheral","venous","airway","pulmonary"], "answer": ["peripheral"] },
+      { "type": "mcq", "prompt": "MOA (HCTZ/Chlorthalidone) - Part A: Inhibits ______ reabsorption in distal tubule.", "choices": ["sodium","chloride","calcium","VLDL"], "answer": ["sodium"] },
+      { "type": "mcq", "prompt": "MOA (HCTZ/Chlorthalidone) - Part B: Increases excretion of ______ and H₂O (also K⁺/H⁺).", "choices": ["sodium","calcium","PCSK9","renin"], "answer": ["sodium"] },
       { "type": "mcq", "prompt": "MOA (Furosemide): Inhibits reabsorption of ______ and ______ in ascending loop of Henle.", "choices": ["sodium & chloride","sodium & calcium","potassium & chloride","calcium & magnesium"], "answer": ["sodium & chloride"] },
-      { "type": "mcq", "prompt": "MOA (Spironolactone) — Part A: Competes with ______ in distal renal tubules.", "choices": ["aldosterone","renin","angiotensin II","ACE"], "answer": ["aldosterone"] },
-      { "type": "mcq", "prompt": "MOA (Spironolactone) — Part B: Conserves ______ (and H⁺) while ↑ Na⁺/H₂O excretion.", "choices": ["potassium","calcium","chloride","VLDL"], "answer": ["potassium"] },
+      { "type": "mcq", "prompt": "MOA (Spironolactone) - Part A: Competes with ______ in distal renal tubules.", "choices": ["aldosterone","renin","angiotensin II","ACE"], "answer": ["aldosterone"] },
+      { "type": "mcq", "prompt": "MOA (Spironolactone) - Part B: Conserves ______ (and H⁺) while ↑ Na⁺/H₂O excretion.", "choices": ["potassium","calcium","chloride","VLDL"], "answer": ["potassium"] },
 
       { "type": "mcq", "prompt": "Clinical: Lower BP by blocking Ang II binding at its receptor (not ACE). Best option?", "choices": ["Cozaar","Vasotec","Norvasc","Coreg"], "answer": ["Cozaar"] },
       { "type": "mcq", "prompt": "Clinical: Need direct arteriolar vasodilation to reduce peripheral resistance.", "choices": ["Apresoline","Catapres","Calan","Benicar"], "answer": ["Apresoline"] },

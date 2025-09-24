@@ -122,7 +122,7 @@
       },
       {
         "type": "short",
-        "prompt": "A patient is instructed to take 50 µg/day for 2 days, 150 µg/day on days 3–5, 250 µg/day on days 6–8, and 350 µg on day 9. How many milligrams total are taken?",
+        "prompt": "A patient is instructed to take 50 µg/day for 2 days, 150 µg/day on days 3-5, 250 µg/day on days 6-8, and 350 µg on day 9. How many milligrams total are taken?",
         "solution": "Convert µg to mg and sum: (50 µg × 2) + (150 µg × 3) + (250 µg × 3) + 350 µg = 100 µg + 450 µg + 750 µg + 350 µg = 1 650 µg = 1.65 mg.",
         "answerText": [
           "1.65 mg"

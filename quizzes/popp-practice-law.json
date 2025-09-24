@@ -1,6 +1,6 @@
 {
   "id": "popp-practice-law",
-  "title": "Pharmacy Law — Community Pharmacy Practice (Unit 1, Dr. O'Brien)",
+  "title": "Pharmacy Law - Community Pharmacy Practice (Unit 1, Dr. O'Brien)",
   "pools": {
     "easy": [
       {
@@ -43,7 +43,7 @@
       },
       {
         "type": "mcq",
-        "prompt": "Schedule III–V prescriptions may be refilled:",
+        "prompt": "Schedule III-V prescriptions may be refilled:",
         "choices": [
           "Up to 5 times in 6 months if authorized",
           "Unlimited refills in 6 months",
@@ -68,12 +68,12 @@
         "type": "mcq",
         "prompt": "For controlled substance inventories:",
         "choices": [
-          "Schedule II counts must be exact; Schedule III–V may be estimated if ≤1000 units",
+          "Schedule II counts must be exact; Schedule III-V may be estimated if ≤1000 units",
           "All may be estimated",
           "All must be exact",
           "Schedule II may be estimated"
         ],
-        "answer": "Schedule II counts must be exact; Schedule III–V may be estimated if ≤1000 units"
+        "answer": "Schedule II counts must be exact; Schedule III-V may be estimated if ≤1000 units"
       },
       {
         "type": "mcq",
@@ -122,7 +122,7 @@
       },
       {
         "type": "mcq",
-        "prompt": "Transfers of Schedule III–V prescriptions (no shared database) are limited to:",
+        "prompt": "Transfers of Schedule III-V prescriptions (no shared database) are limited to:",
         "choices": ["One-time transfer", "Unlimited transfers", "Not allowed", "Up to 5 transfers"],
         "answer": "One-time transfer"
       },
@@ -430,7 +430,7 @@
         "type": "mcq",
         "prompt": "Case: Arkansas PDMP must be checked before prescribing which?",
         "choices": [
-          "Schedule II–III opioids",
+          "Schedule II-III opioids",
           "First-time benzodiazepine",
           "Both A and B",
           "None of the above"

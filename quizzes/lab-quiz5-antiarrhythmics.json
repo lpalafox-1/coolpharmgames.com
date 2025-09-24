@@ -1,7 +1,6 @@
 {
   "id": "lab-quiz5-antiarrhythmics",
-  "title": "Lab Quiz 5 — Antiarrhythmics (v3)",
-  },
+  "title": "Lab Quiz 5 - Antiarrhythmics (v3)",
   "pools": {
     "easy": [
       { "type": "mcq", "prompt": "Amiodarone belongs to which Vaughan Williams class?", "choices": ["Class I", "Class II", "Class III", "Class IV"], "answer": "Class III" },

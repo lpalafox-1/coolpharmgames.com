@@ -1,7 +1,6 @@
 {
   "id": "cumulative-quiz1-4",
-  "title": "Quiz 4 — Anticoagulants (v3)",
-  },
+  "title": "Quiz 4 - Anticoagulants (v3)",
   "pools": {
     "easy": [
       { "type": "mcq", "prompt": "Brand name of warfarin:", "choices": ["Coumadin","Xarelto","Eliquis","Lovenox"], "answer": ["Coumadin"] },
@@ -17,7 +16,7 @@
       { "type": "short", "prompt": "Brand name of heparin:", "answerText": ["hep-lock"] },
       { "type": "mcq", "prompt": "Which anticoagulant is a Low Molecular Weight Heparin?", "choices": ["Enoxaparin","Warfarin","Rivaroxaban","Apixaban"], "answer": ["Enoxaparin"] },
       { "type": "short", "prompt": "Drug class of Lovenox:", "answerText": ["low molecular weight heparin"] },
-      { "type": "mcq", "prompt": "Which drug prevents the synthesis of vitamin K–dependent clotting factors II, VII, IX, and X?", "choices": ["Warfarin","Enoxaparin","Rivaroxaban","Heparin"], "answer": ["Warfarin"] },
+      { "type": "mcq", "prompt": "Which drug prevents the synthesis of vitamin K-dependent clotting factors II, VII, IX, and X?", "choices": ["Warfarin","Enoxaparin","Rivaroxaban","Heparin"], "answer": ["Warfarin"] },
       { "type": "short", "prompt": "Another brand name of warfarin besides Coumadin:", "answerText": ["jantoven"] },
       { "type": "mcq", "prompt": "Which drug is a direct Factor Xa inhibitor?", "choices": ["Rivaroxaban","Apixaban","Both rivaroxaban and apixaban","Heparin"], "answer": ["Both rivaroxaban and apixaban"] },
       { "type": "mcq", "prompt": "Eliquis (apixaban) belongs to:", "choices": ["Direct Factor Xa Inhibitor","Vitamin K Antagonist","Low Molecular Weight Heparin","Unfractionated Heparin"], "answer": ["Direct Factor Xa Inhibitor"] },
@@ -33,11 +32,11 @@
       { "type": "short", "prompt": "Drug class of Xarelto:", "answerText": ["direct factor xa inhibitor"] }
     ],
     "hard": [
-      { "type": "mcq", "prompt": "Warfarin mechanism per your list:", "choices": ["Inhibits synthesis of vitamin K–dependent clotting factors II, VII, IX, X","Directly inhibits Factor Xa","Enhances antithrombin III activity","Direct thrombin (IIa) inhibitor"], "answer": ["Inhibits synthesis of vitamin K–dependent clotting factors II, VII, IX, X"] },
+      { "type": "mcq", "prompt": "Warfarin mechanism per your list:", "choices": ["Inhibits synthesis of vitamin K-dependent clotting factors II, VII, IX, X","Directly inhibits Factor Xa","Enhances antithrombin III activity","Direct thrombin (IIa) inhibitor"], "answer": ["Inhibits synthesis of vitamin K-dependent clotting factors II, VII, IX, X"] },
       { "type": "mcq", "prompt": "Heparin mechanism per your list:", "choices": ["Enhances activity of antithrombin III → inhibits thrombin and Factor Xa","Directly inhibits Factor Xa","Inhibits synthesis of II, VII, IX, X","Blocks vitamin K recycling"], "answer": ["Enhances activity of antithrombin III → inhibits thrombin and Factor Xa"] },
-      { "type": "mcq", "prompt": "Enoxaparin mechanism per your list:", "choices": ["Enhances antithrombin III, inhibiting thrombin and Factor Xa","Directly inhibits thrombin","Inhibits synthesis of vitamin K–dependent factors","Blocks Factor VII only"], "answer": ["Enhances antithrombin III, inhibiting thrombin and Factor Xa"] },
-      { "type": "mcq", "prompt": "Apixaban mechanism per your list:", "choices": ["Direct Factor Xa inhibition → prevents conversion of prothrombin to thrombin","Enhances antithrombin III","Direct thrombin inhibition","Blocks vitamin K–dependent synthesis"], "answer": ["Direct Factor Xa inhibition → prevents conversion of prothrombin to thrombin"] },
-      { "type": "mcq", "prompt": "Rivaroxaban mechanism per your list:", "choices": ["Direct Factor Xa inhibition → prevents conversion of prothrombin to thrombin","Enhances antithrombin III","Direct thrombin inhibition","Blocks vitamin K–dependent synthesis"], "answer": ["Direct Factor Xa inhibition → prevents conversion of prothrombin to thrombin"] },
+      { "type": "mcq", "prompt": "Enoxaparin mechanism per your list:", "choices": ["Enhances antithrombin III, inhibiting thrombin and Factor Xa","Directly inhibits thrombin","Inhibits synthesis of vitamin K-dependent factors","Blocks Factor VII only"], "answer": ["Enhances antithrombin III, inhibiting thrombin and Factor Xa"] },
+      { "type": "mcq", "prompt": "Apixaban mechanism per your list:", "choices": ["Direct Factor Xa inhibition → prevents conversion of prothrombin to thrombin","Enhances antithrombin III","Direct thrombin inhibition","Blocks vitamin K-dependent synthesis"], "answer": ["Direct Factor Xa inhibition → prevents conversion of prothrombin to thrombin"] },
+      { "type": "mcq", "prompt": "Rivaroxaban mechanism per your list:", "choices": ["Direct Factor Xa inhibition → prevents conversion of prothrombin to thrombin","Enhances antithrombin III","Direct thrombin inhibition","Blocks vitamin K-dependent synthesis"], "answer": ["Direct Factor Xa inhibition → prevents conversion of prothrombin to thrombin"] },
       { "type": "mcq", "prompt": "Which drug requires INR monitoring for dose adjustment?", "choices": ["Warfarin","Apixaban","Rivaroxaban","Enoxaparin"], "answer": ["Warfarin"] },
       { "type": "mcq", "prompt": "Match brand to class correctly:", "choices": ["Lovenox = Low Molecular Weight Heparin","Hep-Lock = Unfractionated Heparin","Coumadin = Vitamin K Antagonist","Eliquis/Xarelto = Direct Factor Xa Inhibitors"], "answer": ["Lovenox = Low Molecular Weight Heparin","Hep-Lock = Unfractionated Heparin","Coumadin = Vitamin K Antagonist","Eliquis/Xarelto = Direct Factor Xa Inhibitors"] },
       { "type": "mcq", "prompt": "Brand → class: Xarelto", "choices": ["Direct Factor Xa Inhibitor","Vitamin K Antagonist","Low Molecular Weight Heparin","Unfractionated Heparin"], "answer": ["Direct Factor Xa Inhibitor"] },
@@ -45,7 +44,7 @@
       { "type": "mcq", "prompt": "Brand → class: Lovenox", "choices": ["Low Molecular Weight Heparin","Direct Factor Xa Inhibitor","Vitamin K Antagonist","Unfractionated Heparin"], "answer": ["Low Molecular Weight Heparin"] },
       { "type": "mcq", "prompt": "Brand → class: Coumadin/Jantoven", "choices": ["Vitamin K Antagonist","Direct Factor Xa Inhibitor","Low Molecular Weight Heparin","Unfractionated Heparin"], "answer": ["Vitamin K Antagonist"] },
       { "type": "mcq", "prompt": "Brand → class: Hep-Lock", "choices": ["Unfractionated Heparin","Direct Factor Xa Inhibitor","Vitamin K Antagonist","Low Molecular Weight Heparin"], "answer": ["Unfractionated Heparin"] },
-      { "type": "short", "prompt": "List the vitamin K–dependent clotting factors inhibited by warfarin (use numerals):", "answerText": ["2, 7, 9, 10","ii, vii, ix, x"] },
+      { "type": "short", "prompt": "List the vitamin K-dependent clotting factors inhibited by warfarin (use numerals):", "answerText": ["2, 7, 9, 10","ii, vii, ix, x"] },
       { "type": "short", "prompt": "Therapeutic category of Coumadin/Jantoven:", "answerText": ["anticoagulant"] },
       { "type": "short", "prompt": "Drug class of Eliquis/Xarelto:", "answerText": ["direct factor xa inhibitor"] },
       { "type": "short", "prompt": "Drug class of Lovenox:", "answerText": ["low molecular weight heparin"] },

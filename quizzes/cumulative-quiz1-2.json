@@ -1,7 +1,6 @@
 {
   "id": "cumulative-quiz1-2",
-  "title": "Cumulative Lab Quiz 1–2 — Antihypertensives (v3)",
-  },
+  "title": "Cumulative Lab Quiz 1-2 - Antihypertensives (v3)",
   "pools": {
     "easy": [
       { "type": "mcq", "prompt": "Lisinopril belongs to which class?", "choices": ["Angiotensin II Receptor Blocker", "ACE inhibitor", "Thiazide diuretic", "Calcium channel blocker (non-dihydropyridine)"], "answer": ["ACE inhibitor"] },
@@ -75,7 +74,7 @@
       { "type": "short", "prompt": "Drug class of Enalapril?", "answerText": ["ace inhibitor","acei","angiotensin converting enzyme inhibitor"] },
       { "type": "short", "prompt": "Hydralazine pharmacologic category?", "answerText": ["direct vasodilator","vasodilator"] },
 
-      { "type": "mcq", "prompt": "Contrast: Valsartan vs Enalapril — best pairing?", "choices": ["Blocks AT1; inhibits ACE","Inhibits ACE; blocks AT1","Stimulates beta-1; stimulates alpha-2","Increases outflow; decreases outflow"], "answer": ["Blocks AT1; inhibits ACE"] },
+      { "type": "mcq", "prompt": "Contrast: Valsartan vs Enalapril - best pairing?", "choices": ["Blocks AT1; inhibits ACE","Inhibits ACE; blocks AT1","Stimulates beta-1; stimulates alpha-2","Increases outflow; decreases outflow"], "answer": ["Blocks AT1; inhibits ACE"] },
       { "type": "mcq", "prompt": "Which class primarily reduces peripheral resistance via arterial dilation?", "choices": ["Calcium channel blockers (dihydropyridine)","Beta-1 selective blockers","Diuretics","Central alpha-2 agonists"], "answer": ["Calcium channel blockers (dihydropyridine)"] },
       { "type": "mcq", "prompt": "Which agents increase Na⁺/H₂O excretion at the distal nephron?", "choices": ["Spironolactone and Chlorthalidone","Metoprolol and Verapamil","Clonidine and Enalapril","Valsartan and Olmesartan"], "answer": ["Spironolactone and Chlorthalidone"] }
     ]

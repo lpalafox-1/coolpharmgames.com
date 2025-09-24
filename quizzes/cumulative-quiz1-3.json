@@ -1,7 +1,6 @@
 {
   "id": "cumulative-quiz1-3",
-  "title": "Cumulative Quiz 1–3 — Antihypertensives + Antilipemics (v3)",
-  },
+  "title": "Cumulative Lab Quiz 1-3 - Antihypertensives + Antilipemics (v3)",
   "pools": {
     "easy": [
       { "type": "mcq", "prompt": "Lisinopril belongs to which class?", "choices": ["ACE inhibitor","Angiotensin II Receptor Blocker","Thiazide diuretic","Calcium channel blocker (non-dihydropyridine)"], "answer": ["ACE inhibitor"] },

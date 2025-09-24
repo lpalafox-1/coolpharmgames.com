@@ -86,7 +86,7 @@
       },
       {
         "type": "mcq",
-        "prompt": "A patient takes 50 µg/day for 2 days; 150 µg/day on days 3–5; 250 µg/day on days 6–8; and 350 µg on day 9. How many milligrams total are taken?",
+        "prompt": "A patient takes 50 µg/day for 2 days; 150 µg/day on days 3-5; 250 µg/day on days 6-8; and 350 µg on day 9. How many milligrams total are taken?",
         "choices": [
           "1.65 mg",
           "0.75 mg",

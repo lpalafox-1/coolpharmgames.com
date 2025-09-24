@@ -60,7 +60,7 @@
     "hard": [
       {
         "type": "short",
-        "prompt": "How many grams of phenol and propylene glycol are in 0.4 mL of a phenol–propylene glycol compound if V_total = 360 mL, V_phenol = 0.4 mL, phenol SG = 1.07, propylene glycol SG = 1.04?",
+        "prompt": "How many grams of phenol and propylene glycol are in 0.4 mL of a phenol-propylene glycol compound if V_total = 360 mL, V_phenol = 0.4 mL, phenol SG = 1.07, propylene glycol SG = 1.04?",
         "solution": "Weight of phenol = volume × specific gravity = 0.4 mL × 1.07 g/mL = 0.428 g ≈ 0.43 g (not 1.54; obviously approximate). In the earlier example from text: weight phenol = 1.54 g and weight propylene glycol = 63.65 g for a 360 mL batch. 0.4 mL sample would have 1.54 g phenol and 63.65 g propylene glycol.",
         "answerText": [
           "Phenol ~1.54 g and propylene glycol ~63.65 g"

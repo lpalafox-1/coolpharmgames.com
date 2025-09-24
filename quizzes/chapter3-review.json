@@ -22,7 +22,7 @@
       {
         "type": "short",
         "prompt": "A balance has a sensitivity requirement of 6.5 mg. How would you weigh 20 mg of a substance with ≤2% error using the aliquot method?",
-        "solution": "Using ≤2% error: MWQ = 6.5 mg × 100 / 2 = 325 mg. Weigh at least 325 mg of substance—e.g., 400 mg—mix with 8000 mg diluent to 8400 mg. The aliquot fraction is 20/400 = 0.05; multiply by 8400 mg to get 420 mg mixture containing 20 mg drug.",
+        "solution": "Using ≤2% error: MWQ = 6.5 mg × 100 / 2 = 325 mg. Weigh at least 325 mg of substance-e.g., 400 mg-mix with 8000 mg diluent to 8400 mg. The aliquot fraction is 20/400 = 0.05; multiply by 8400 mg to get 420 mg mixture containing 20 mg drug.",
         "answerText": [
           "MWQ = 6.5×100/2 = 325 mg. Weigh 400 mg active drug, mix with 8000 mg diluent (total 8400 mg), then take an aliquot (20/400)×8400 = 420 mg mixture to obtain 20 mg."
         ]
@@ -94,7 +94,7 @@
         "prompt": "The contents of each capsule should weigh 330 mg. What weight range per capsule falls within ±5% error?",
         "solution": "±5% of 330 mg is 16.5 mg. Lower limit 330 − 16.5 = 313.5 mg; upper limit 330 + 16.5 = 346.5 mg.",
         "answerText": [
-          "313.5–346.5 mg",
+          "313.5-346.5 mg",
           "313.5 to 346.5 mg"
         ]
       }

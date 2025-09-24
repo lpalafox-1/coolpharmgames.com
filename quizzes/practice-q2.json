@@ -1,6 +1,6 @@
 {
   "id": "practice-q2",
-  "title": "Practice Q2 — BDT-I (Handouts 1–6, v5)",
+  "title": "Practice Q2 - BDT-I (Handouts 1-6, v5)",
   "pools": {
     "easy": [
       {
@@ -13,7 +13,7 @@
           "Proline"
         ],
         "answer": "Glycine",
-        "source": "Handout 1 — LO: Recognize AA structure/chirality"
+        "source": "Handout 1 - LO: Recognize AA structure/chirality"
       },
       {
         "type": "mcq",
@@ -25,7 +25,7 @@
           "Cysteine"
         ],
         "answer": "Proline",
-        "source": "Handout 1 — LO: Side chain effects on structure"
+        "source": "Handout 1 - LO: Side chain effects on structure"
       },
       {
         "type": "short",
@@ -35,7 +35,7 @@
           "pi",
           "isoelectric point"
         ],
-        "source": "Handout 1 — LO: Zwitterion & pI"
+        "source": "Handout 1 - LO: Zwitterion & pI"
       },
       {
         "type": "mcq",
@@ -47,7 +47,7 @@
           "Neutral molecules"
         ],
         "answer": "Zwitterions",
-        "source": "Handout 1 — LO: Zwitterion"
+        "source": "Handout 1 - LO: Zwitterion"
       },
       {
         "type": "mcq",
@@ -59,7 +59,7 @@
           "Glutamine"
         ],
         "answer": "Cysteine",
-        "source": "Handout 1 — LO: Side chain effects on structure"
+        "source": "Handout 1 - LO: Side chain effects on structure"
       },
       {
         "type": "mcq",
@@ -71,7 +71,7 @@
           "Translation"
         ],
         "answer": "Hydroxylation",
-        "source": "Handout 1 — LO: PTMs"
+        "source": "Handout 1 - LO: PTMs"
       },
       {
         "type": "mcq",
@@ -83,7 +83,7 @@
           "Saturated vs unsaturated"
         ],
         "answer": "Nonpolar, polar uncharged, acidic, basic",
-        "source": "Handout 1 — LO: AA classification"
+        "source": "Handout 1 - LO: AA classification"
       },
       {
         "type": "mcq",
@@ -95,7 +95,7 @@
           "Aspartate"
         ],
         "answer": "Phenylalanine",
-        "source": "Handout 1 — LO: AA classification"
+        "source": "Handout 1 - LO: AA classification"
       },
       {
         "type": "mcq",
@@ -107,7 +107,7 @@
           "Quaternary"
         ],
         "answer": "Secondary",
-        "source": "Handout 2 — LO: 1°–4° structures"
+        "source": "Handout 2 - LO: 1°-4° structures"
       },
       {
         "type": "mcq",
@@ -119,7 +119,7 @@
           "Covalent modification"
         ],
         "answer": "Loss of native 3D structure",
-        "source": "Handout 2 — LO: Denaturation"
+        "source": "Handout 2 - LO: Denaturation"
       },
       {
         "type": "mcq",
@@ -131,7 +131,7 @@
           "Arrangement of multiple polypeptides"
         ],
         "answer": "Arrangement of multiple polypeptides",
-        "source": "Handout 2 — LO: 1°–4° structures"
+        "source": "Handout 2 - LO: 1°-4° structures"
       },
       {
         "type": "mcq",
@@ -143,7 +143,7 @@
           "Peptide bonds between side chains"
         ],
         "answer": "Hydrogen bonds",
-        "source": "Handout 2 — LO: 1°–4° structures"
+        "source": "Handout 2 - LO: 1°-4° structures"
       },
       {
         "type": "mcq",
@@ -155,7 +155,7 @@
           "Diabetes"
         ],
         "answer": "Alzheimer's",
-        "source": "Handout 2 — LO: Misfolding disease"
+        "source": "Handout 2 - LO: Misfolding disease"
       },
       {
         "type": "mcq",
@@ -167,7 +167,7 @@
           "Albumin"
         ],
         "answer": "Myoglobin",
-        "source": "Handout 3 — LO: Mb vs Hb"
+        "source": "Handout 3 - LO: Mb vs Hb"
       },
       {
         "type": "mcq",
@@ -179,7 +179,7 @@
           "Catalase"
         ],
         "answer": "Collagen",
-        "source": "Handout 3 — LO: Globular vs fibrous"
+        "source": "Handout 3 - LO: Globular vs fibrous"
       },
       {
         "type": "mcq",
@@ -191,7 +191,7 @@
           "Elastin"
         ],
         "answer": "Hemoglobin",
-        "source": "Handout 3 — LO: O₂ binding"
+        "source": "Handout 3 - LO: O₂ binding"
       },
       {
         "type": "mcq",
@@ -203,7 +203,7 @@
           "Hill effect"
         ],
         "answer": "Bohr effect",
-        "source": "Handout 3 — LO: Allostery/O₂ binding"
+        "source": "Handout 3 - LO: Allostery/O₂ binding"
       },
       {
         "type": "mcq",
@@ -212,10 +212,10 @@
           "Marfan syndrome",
           "Osteogenesis imperfecta",
           "Scurvy",
-          "Ehlers–Danlos"
+          "Ehlers-Danlos"
         ],
         "answer": "Marfan syndrome",
-        "source": "Handout 3 — LO: Elastin disease"
+        "source": "Handout 3 - LO: Elastin disease"
       },
       {
         "type": "mcq",
@@ -227,7 +227,7 @@
           "Elastin"
         ],
         "answer": "β-globin",
-        "source": "Handout 3 — LO: Hemoglobinopathies"
+        "source": "Handout 3 - LO: Hemoglobinopathies"
       },
       {
         "type": "mcq",
@@ -239,7 +239,7 @@
           "Energy storage"
         ],
         "answer": "Biological catalysts",
-        "source": "Handout 4 — LO: Define enzymes"
+        "source": "Handout 4 - LO: Define enzymes"
       },
       {
         "type": "mcq",
@@ -251,7 +251,7 @@
           "Allosteric"
         ],
         "answer": "Induced Fit",
-        "source": "Handout 4 — LO: Active site models"
+        "source": "Handout 4 - LO: Active site models"
       },
       {
         "type": "mcq",
@@ -263,7 +263,7 @@
           "Ligases"
         ],
         "answer": "Transferases",
-        "source": "Handout 4 — LO: Enzyme classes"
+        "source": "Handout 4 - LO: Enzyme classes"
       },
       {
         "type": "mcq",
@@ -275,7 +275,7 @@
           "Lyases"
         ],
         "answer": "Hydrolases",
-        "source": "Handout 4 — LO: Enzyme classes"
+        "source": "Handout 4 - LO: Enzyme classes"
       },
       {
         "type": "mcq",
@@ -287,7 +287,7 @@
           "↑ Km, ↓ Vmax"
         ],
         "answer": "↑ Km, Vmax same",
-        "source": "Handout 4 — LO: Inhibition types"
+        "source": "Handout 4 - LO: Inhibition types"
       },
       {
         "type": "mcq",
@@ -299,7 +299,7 @@
           "Phosphodiester"
         ],
         "answer": "O-glycosidic",
-        "source": "Handout 5 — LO: O- vs N-glycosidic"
+        "source": "Handout 5 - LO: O- vs N-glycosidic"
       },
       {
         "type": "mcq",
@@ -311,7 +311,7 @@
           "Amylopectin"
         ],
         "answer": "Cellulose",
-        "source": "Handout 5 — LO: Cellulose"
+        "source": "Handout 5 - LO: Cellulose"
       },
       {
         "type": "mcq",
@@ -323,7 +323,7 @@
           "Trehalose"
         ],
         "answer": "Lactose",
-        "source": "Handout 5 — LO: Disaccharides"
+        "source": "Handout 5 - LO: Disaccharides"
       },
       {
         "type": "mcq",
@@ -335,7 +335,7 @@
           "Chitin"
         ],
         "answer": "Starch",
-        "source": "Handout 5 — LO: Polysaccharides"
+        "source": "Handout 5 - LO: Polysaccharides"
       },
       {
         "type": "mcq",
@@ -347,7 +347,7 @@
           "Dermatan"
         ],
         "answer": "Hyaluronan",
-        "source": "Handout 5 — LO: GAGs"
+        "source": "Handout 5 - LO: GAGs"
       },
       {
         "type": "mcq",
@@ -359,7 +359,7 @@
           "Polymerase"
         ],
         "answer": "Hemagglutinin",
-        "source": "Handout 5 — LO: Influenza proteins"
+        "source": "Handout 5 - LO: Influenza proteins"
       },
       {
         "type": "mcq",
@@ -371,7 +371,7 @@
           "Fructose"
         ],
         "answer": "Ribose",
-        "source": "Handout 6 — LO: DNA vs RNA"
+        "source": "Handout 6 - LO: DNA vs RNA"
       },
       {
         "type": "mcq",
@@ -383,7 +383,7 @@
           "Fructose"
         ],
         "answer": "Deoxyribose",
-        "source": "Handout 6 — LO: DNA vs RNA"
+        "source": "Handout 6 - LO: DNA vs RNA"
       },
       {
         "type": "mcq",
@@ -395,7 +395,7 @@
           "Adenine"
         ],
         "answer": "Uracil",
-        "source": "Handout 6 — LO: DNA vs RNA (bases)"
+        "source": "Handout 6 - LO: DNA vs RNA (bases)"
       },
       {
         "type": "short",
@@ -405,7 +405,7 @@
           "3",
           "three"
         ],
-        "source": "Handout 6 — LO: Base pairing"
+        "source": "Handout 6 - LO: Base pairing"
       },
       {
         "type": "short",
@@ -415,7 +415,7 @@
           "aug",
           "methionine"
         ],
-        "source": "Handout 6 — LO: Genetic code"
+        "source": "Handout 6 - LO: Genetic code"
       },
       {
         "type": "short",
@@ -426,7 +426,7 @@
           "uag",
           "uga"
         ],
-        "source": "Handout 6 — LO: Genetic code"
+        "source": "Handout 6 - LO: Genetic code"
       }
     ],
     "hard": [
@@ -440,7 +440,7 @@
           "Pro→His at β6"
         ],
         "answer": "Glu→Val at β6",
-        "source": "Handout 3 — LO: Hemoglobinopathies"
+        "source": "Handout 3 - LO: Hemoglobinopathies"
       },
       {
         "type": "mcq",
@@ -452,7 +452,7 @@
           "Cysteine"
         ],
         "answer": "Histidine",
-        "source": "Handout 1 — LO: Side chain properties"
+        "source": "Handout 1 - LO: Side chain properties"
       },
       {
         "type": "short",
@@ -462,7 +462,7 @@
           "vitamin c",
           "ascorbic acid"
         ],
-        "source": "Handout 3 — LO: Collagen & disease"
+        "source": "Handout 3 - LO: Collagen & disease"
       },
       {
         "type": "mcq",
@@ -470,11 +470,11 @@
         "choices": [
           "Osteogenesis imperfecta",
           "Marfan syndrome",
-          "Ehlers–Danlos",
+          "Ehlers-Danlos",
           "Thalassemia"
         ],
         "answer": "Osteogenesis imperfecta",
-        "source": "Handout 3 — LO: Collagen disease"
+        "source": "Handout 3 - LO: Collagen disease"
       },
       {
         "type": "mcq",
@@ -486,11 +486,11 @@
           "Glycosylation"
         ],
         "answer": "Desmosine cross-links",
-        "source": "Handout 3 — LO: Elastin"
+        "source": "Handout 3 - LO: Elastin"
       },
       {
         "type": "mcq",
-        "prompt": "Ehlers–Danlos syndrome primarily involves defects in:",
+        "prompt": "Ehlers-Danlos syndrome primarily involves defects in:",
         "choices": [
           "Collagen processing",
           "Fibrillin microfibrils",
@@ -498,7 +498,7 @@
           "Heme synthesis"
         ],
         "answer": "Collagen processing",
-        "source": "Handout 3 — LO: EDS"
+        "source": "Handout 3 - LO: EDS"
       },
       {
         "type": "mcq",
@@ -510,7 +510,7 @@
           "↑ Km, Vmax ↓"
         ],
         "answer": "↑ Km, Vmax same",
-        "source": "Handout 4 — LO: Inhibition types"
+        "source": "Handout 4 - LO: Inhibition types"
       },
       {
         "type": "mcq",
@@ -522,7 +522,7 @@
           "Both ↓"
         ],
         "answer": "Vmax ↓, Km unchanged",
-        "source": "Handout 4 — LO: Inhibition types"
+        "source": "Handout 4 - LO: Inhibition types"
       },
       {
         "type": "mcq",
@@ -534,7 +534,7 @@
           "Monomer and dimer"
         ],
         "answer": "T (tense) and R (relaxed)",
-        "source": "Handout 4 — LO: Allostery"
+        "source": "Handout 4 - LO: Allostery"
       },
       {
         "type": "mcq",
@@ -546,7 +546,7 @@
           "Oxidoreductases"
         ],
         "answer": "Isomerases",
-        "source": "Handout 4 — LO: Enzyme classes"
+        "source": "Handout 4 - LO: Enzyme classes"
       },
       {
         "type": "mcq",
@@ -558,7 +558,7 @@
           "Catalase"
         ],
         "answer": "Pepsinogen",
-        "source": "Handout 4 — LO: Zymogens"
+        "source": "Handout 4 - LO: Zymogens"
       },
       {
         "type": "mcq",
@@ -570,7 +570,7 @@
           "β-1,6"
         ],
         "answer": "α-1,6",
-        "source": "Handout 5 — LO: Glycogen"
+        "source": "Handout 5 - LO: Glycogen"
       },
       {
         "type": "mcq",
@@ -582,7 +582,7 @@
           "β-1,6"
         ],
         "answer": "α-1,4",
-        "source": "Handout 5 — LO: Amylose"
+        "source": "Handout 5 - LO: Amylose"
       },
       {
         "type": "mcq",
@@ -594,7 +594,7 @@
           "β-1,6"
         ],
         "answer": "β-1,4",
-        "source": "Handout 5 — LO: Cellulose"
+        "source": "Handout 5 - LO: Cellulose"
       },
       {
         "type": "mcq",
@@ -606,7 +606,7 @@
           "Cellobiose"
         ],
         "answer": "Sucrose",
-        "source": "Handout 5 — LO: Reducing sugars"
+        "source": "Handout 5 - LO: Reducing sugars"
       },
       {
         "type": "mcq",
@@ -618,7 +618,7 @@
           "Not defined"
         ],
         "answer": "Cis to CH2OH",
-        "source": "Handout 5 — LO: α vs β anomers"
+        "source": "Handout 5 - LO: α vs β anomers"
       },
       {
         "type": "mcq",
@@ -630,7 +630,7 @@
           "D vs L configuration"
         ],
         "answer": "6-member vs 5-member rings",
-        "source": "Handout 5 — LO: Class names"
+        "source": "Handout 5 - LO: Class names"
       },
       {
         "type": "mcq",
@@ -642,7 +642,7 @@
           "Fructose"
         ],
         "answer": "Glyceraldehyde",
-        "source": "Handout 5 — LO: D/L configuration"
+        "source": "Handout 5 - LO: D/L configuration"
       },
       {
         "type": "mcq",
@@ -654,7 +654,7 @@
           "Only α linkages"
         ],
         "answer": "A free anomeric carbon",
-        "source": "Handout 5 — LO: Reducing sugar"
+        "source": "Handout 5 - LO: Reducing sugar"
       },
       {
         "type": "mcq",
@@ -666,7 +666,7 @@
           "Sucrase"
         ],
         "answer": "Amylase",
-        "source": "Handout 5 — LO: Digestion enzymes"
+        "source": "Handout 5 - LO: Digestion enzymes"
       },
       {
         "type": "mcq",
@@ -678,7 +678,7 @@
           "Phosphate groups"
         ],
         "answer": "Terminal sugars",
-        "source": "Handout 5 — LO: ABO antigens"
+        "source": "Handout 5 - LO: ABO antigens"
       },
       {
         "type": "mcq",
@@ -690,7 +690,7 @@
           "Sphingomyelin"
         ],
         "answer": "Glycoproteins",
-        "source": "Handout 5 — LO: Glycoconjugates"
+        "source": "Handout 5 - LO: Glycoconjugates"
       },
       {
         "type": "mcq",
@@ -702,7 +702,7 @@
           "Reverse transcriptase"
         ],
         "answer": "Neuraminidase",
-        "source": "Handout 5 — LO: Influenza proteins"
+        "source": "Handout 5 - LO: Influenza proteins"
       },
       {
         "type": "mcq",
@@ -714,7 +714,7 @@
           "Disulfide"
         ],
         "answer": "Phosphodiester",
-        "source": "Handout 6 — LO: Nucleotides"
+        "source": "Handout 6 - LO: Nucleotides"
       },
       {
         "type": "mcq",
@@ -726,7 +726,7 @@
           "Hydrogen"
         ],
         "answer": "N-glycosidic",
-        "source": "Handout 6 — LO: Nucleotides"
+        "source": "Handout 6 - LO: Nucleotides"
       },
       {
         "type": "mcq",
@@ -738,7 +738,7 @@
           "Topoisomerase"
         ],
         "answer": "Primase",
-        "source": "Handout 6 — LO: DNA replication"
+        "source": "Handout 6 - LO: DNA replication"
       },
       {
         "type": "mcq",
@@ -750,7 +750,7 @@
           "Ligase"
         ],
         "answer": "DNA Pol I",
-        "source": "Handout 6 — LO: DNA replication"
+        "source": "Handout 6 - LO: DNA replication"
       },
       {
         "type": "mcq",
@@ -762,7 +762,7 @@
           "Topoisomerase"
         ],
         "answer": "DNA Pol III",
-        "source": "Handout 6 — LO: DNA replication"
+        "source": "Handout 6 - LO: DNA replication"
       },
       {
         "type": "mcq",
@@ -774,7 +774,7 @@
           "Helicase"
         ],
         "answer": "Topoisomerase",
-        "source": "Handout 6 — LO: DNA replication"
+        "source": "Handout 6 - LO: DNA replication"
       },
       {
         "type": "mcq",
@@ -786,7 +786,7 @@
           "Primase"
         ],
         "answer": "Ligase",
-        "source": "Handout 6 — LO: DNA replication"
+        "source": "Handout 6 - LO: DNA replication"
       },
       {
         "type": "mcq",
@@ -798,7 +798,7 @@
           "Dispersive"
         ],
         "answer": "Semi-conservative",
-        "source": "Handout 6 — LO: Replication model"
+        "source": "Handout 6 - LO: Replication model"
       },
       {
         "type": "mcq",
@@ -810,7 +810,7 @@
           "Enhancers"
         ],
         "answer": "Introns",
-        "source": "Handout 6 — LO: Transcription/splicing"
+        "source": "Handout 6 - LO: Transcription/splicing"
       },
       {
         "type": "mcq",
@@ -822,7 +822,7 @@
           "snRNA"
         ],
         "answer": "rRNA",
-        "source": "Handout 6 — LO: RNAs"
+        "source": "Handout 6 - LO: RNAs"
       }
     ]
   }

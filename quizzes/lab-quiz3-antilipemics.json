@@ -1,7 +1,6 @@
 {
   "id": "lab-quiz3-antilipemics",
-  "title": "Lab Quiz 3 — Antilipemics (v3)",
-  },
+  "title": "Lab Quiz 3 - Antilipemics (v3)",
   "pools": {
     "easy": [
       { "type": "mcq", "prompt": "What is the brand name for Simvastatin?", "choices": ["Zocor","Lipitor","Crestor","Pravachol"], "answer": ["Zocor"] },

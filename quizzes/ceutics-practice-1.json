@@ -16,7 +16,7 @@
       { "type": "mcq", "prompt": "According to ideal dosage form design, which quality is a primary concern when a medication tastes unpleasant?", "choices": ["Drug stability","Palatability","Drug release rate","Manufacturing cost"], "answer": "Palatability" },
       { "type": "mcq", "prompt": "Which factor ensures a drug remains effective over its shelf life?", "choices": ["Stability","Patient compliance","Route of administration","Bioavailability"], "answer": "Stability" },
       { "type": "short", "prompt": "Acronym for Absorption, Distribution, Metabolism, Excretion?", "answerText": "ADME" },
-      { "type": "mcq", "prompt": "What does T(max) represent on a plasma drug concentration–time curve?", "choices": ["The time the drug was administered","The time it takes for the drug to be eliminated from the body","The time it takes to reach maximum drug concentration in the plasma","The time it takes to reach steady state"], "answer": "The time it takes to reach maximum drug concentration in the plasma" },
+      { "type": "mcq", "prompt": "What does T(max) represent on a plasma drug concentration-time curve?", "choices": ["The time the drug was administered","The time it takes for the drug to be eliminated from the body","The time it takes to reach maximum drug concentration in the plasma","The time it takes to reach steady state"], "answer": "The time it takes to reach maximum drug concentration in the plasma" },
       { "type": "mcq", "prompt": "Which of the following is an example of a systemic effect?", "choices": ["An antifungal cream applied to the skin","A medicated eye drop","An oral tablet for a headache","A nasal spray for local congestion"], "answer": "An oral tablet for a headache" },
       { "type": "mcq", "prompt": "What does AUC stand for in pharmacokinetics?", "choices": ["Active Unit Count","Area Under the Curve","Absorption Uniformity Constant","Average User Concentration"], "answer": "Area Under the Curve" },
       { "type": "mcq", "prompt": "Which of the following best describes extemporaneous compounding?", "choices": ["Mass-producing a standardized drug","Creating a customized medication for an individual patient","The process of drug metabolism in the liver","Designing the drug’s primary container"], "answer": "Creating a customized medication for an individual patient" },
@@ -27,7 +27,7 @@
     ],
   "hard": [
       { "type": "mcq", "prompt": "In the \"speed trap\" analogy, the speed trap represents:", "choices": ["Drug elimination","The first-pass effect","Drug distribution","Drug absorption"], "answer": "The first-pass effect" },
-      { "type": "mcq", "prompt": "Average time for new medicine development and approval:", "choices": ["2–3 years","5–8 years","10–15 years","20–25 years"], "answer": "10–15 years" },
+      { "type": "mcq", "prompt": "Average time for new medicine development and approval:", "choices": ["2-3 years","5-8 years","10-15 years","20-25 years"], "answer": "10-15 years" },
       { "type": "mcq", "prompt": "Water cooler analogy: why does flow rate decrease over time (spigot size normal)?", "choices": ["Too little water","Pressure driving the flow decreases as water level drops","Flow rate is constant","Water gets colder"], "answer": "Pressure driving the flow decreases as water level drops" },
       { "type": "mcq", "prompt": "In dosing curves, AUC physically represents:", "choices": ["Time of Cmax","Maximum peak concentration","Rate and extent of absorption","Total drug exposure over time"], "answer": "Total drug exposure over time" },
       { "type": "short", "prompt": "ADME stage responsible for elimination via kidneys, lungs, or bile:", "answerText": "Excretion" },
@@ -40,7 +40,7 @@
       { "type": "mcq", "prompt": "NOT a pre-marketing clinical phase:", "choices": ["Phase I","Phase II","Phase III","Phase IV"], "answer": "Phase IV" },
       { "type": "short", "prompt": "Drug movement from administration site into bloodstream:", "answerText": "Absorption" },
       { "type": "mcq", "prompt": "Lower Cmax and delayed Tmax for oral vs IV is primarily due to:", "choices": ["Elimination","Metabolism","Absorption","Distribution"], "answer": "Absorption" },
-      { "type": "mcq", "prompt": "Solid drug becomes suspended/dissolved in liquid—this is:", "choices": ["Metabolism","Excretion","Dissolution","Distribution"], "answer": "Dissolution" },
+      { "type": "mcq", "prompt": "Solid drug becomes suspended/dissolved in liquid-this is:", "choices": ["Metabolism","Excretion","Dissolution","Distribution"], "answer": "Dissolution" },
   { "type": "tf", "prompt": "True or False: Dissolution rate is directly proportional to surface area.", "answer": "True" },
       { "type": "mcq", "prompt": "Drug that demonstrates bioequivalence to RLD and same therapeutic effect & safety:", "choices": ["Brand-name drug","Biosimilar","Generic drug","OTC drug"], "answer": "Generic drug" }
     ]

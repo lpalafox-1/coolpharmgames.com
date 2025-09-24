@@ -2,7 +2,7 @@
   "id": "basis-practice-mock-E1",
   "title": "Practice Mock Exam 1 (BDT-I Handouts 1-7)",
   "meta": {
-    "notes": "100 total Qs: 50 Easy + 50 Hard. 60% MCQ / 40% Short. All questions grounded in Handouts 1–7 LOs. No hybrids, no overkill trivia.",
+    "notes": "100 total Qs: 50 Easy + 50 Hard. 60% MCQ / 40% Short. All questions grounded in Handouts 1-7 LOs. No hybrids, no overkill trivia.",
     "version": "v3.0"
   },
   "pools": {
@@ -615,7 +615,7 @@
       },
       {
         "type": "short",
-        "prompt": "Essential AA mnemonic PVT TIM HALL — name one: ______.",
+        "prompt": "Essential AA mnemonic PVT TIM HALL - name one: ______.",
         "answer": "leucine",
         "answerText": [
           "leucine",

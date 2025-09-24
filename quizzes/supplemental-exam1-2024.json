@@ -53,8 +53,8 @@
       {
         "type": "short",
         "prompt": "A capsule containing 330 mg contents must be within ±5% error. Determine the acceptable weight range.",
-        "answerText": "313.5–346.5 mg",
-        "solution": "5% of 330 mg = 16.5 mg; 330 ± 16.5 = 313.5–346.5 mg."
+        "answerText": "313.5-346.5 mg",
+        "solution": "5% of 330 mg = 16.5 mg; 330 ± 16.5 = 313.5-346.5 mg."
       }
     ]
   }

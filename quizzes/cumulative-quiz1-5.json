@@ -1,6 +1,6 @@
 {
   "id": "cumulative-quiz1-5",
-  "title": "Cumulative Quiz 1–5 — (v3)",
+  "title": "Cumulative Quiz 1-5 - (v3)",
   "pools": {
     "easy": [
       { "type": "mcq", "prompt": "Lisinopril belongs to:", "choices": ["ACE inhibitor","ARB","Thiazide","Non-dihydropyridine CCB"], "answer": "ACE inhibitor" },

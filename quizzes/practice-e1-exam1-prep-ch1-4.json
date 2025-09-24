@@ -1,6 +1,6 @@
 {
   "id": "practice-e1-exam1-prep-ch1-4",
-  "title": "Practice E1 — Exam 1 Prep (Chapters 1–4)",
+  "title": "Practice E1 - Exam 1 Prep (Chapters 1-4)",
   "pools": {
     "easy": [
       {
@@ -180,14 +180,14 @@
         "id": 11110,
         "type": "short",
         "prompt": "Each capsule target is 330 mg. What is the ±5% range?",
-        "answerText": ["313.5–346.5 mg"],
+        "answerText": ["313.5-346.5 mg"],
         "hints": "0.05×target.",
-        "solution": "330±16.5 → 313.5–346.5 mg."
+        "solution": "330±16.5 → 313.5-346.5 mg."
       },
       {
         "id": 11111,
         "type": "short",
-        "prompt": "Tablet sequence over 30 days: Day 1 q.i.d., Day 2 t.i.d., Days 3–7 b.i.d., Days 8–30 q.d. Total tablets?",
+        "prompt": "Tablet sequence over 30 days: Day 1 q.i.d., Day 2 t.i.d., Days 3-7 b.i.d., Days 8-30 q.d. Total tablets?",
         "answerText": ["40 tablets"],
         "hints": "Sum each phase.",
         "solution": "4 + 3 + (5×2) + (23×1) = 40."
