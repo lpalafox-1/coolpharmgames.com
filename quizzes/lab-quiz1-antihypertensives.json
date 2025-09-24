@@ -1,9 +1,6 @@
 {
   "id": "lab-quiz1-antihypertensives",
-  "title": "Lab Quiz 1 — Antihypertensives (Balanced P1, v2.1)",
-  "meta": {
-    "source": "Top Drugs List.docx",
-    "version": "v2.1",
+  "title": "Lab Quiz 1 — Antihypertensives (v3)",
   },
   "pools": {
     "easy": [
