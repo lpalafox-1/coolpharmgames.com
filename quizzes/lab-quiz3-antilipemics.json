@@ -55,7 +55,7 @@
       { "type": "short", "prompt": "Brand name of Simvastatin?", "answerText": ["zocor"] },
       { "type": "short", "prompt": "Brand name of Pravastatin?", "answerText": ["pravachol"] },
       { "type": "mcq", "prompt": "Which drug increases HDL while lowering VLDL?", "choices": ["Niacin","Lovaza","Simvastatin","Inclisiran"], "answer": ["Niacin"] },
-      { "type": "mcq", "prompt": "PCSK9 inhibitors ultimately:", "choices": ["Increase LDL receptor recycling","Decrease LDL receptor number","Increase triglycerides","Block HMG-CoA reductase"], "answer": ["Increase LDL receptor recycling"] },
+{ "type": "mcq", "prompt": "PCSK9 inhibitors ultimately:", "choices": ["Prevent LDL receptor degradation","Decrease LDL receptor number","Increase triglycerides","Block HMG-CoA reductase"], "answer": ["Prevent LDL receptor degradation"] },
       { "type": "mcq", "prompt": "Which drug is a cholesterol absorption inhibitor?", "choices": ["Ezetimibe","Niacin","Fenofibrate","Lovaza"], "answer": ["Ezetimibe"] }
     ]
   }
