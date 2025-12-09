@@ -217,3 +217,190 @@ body.high-contrast .card {
 body.high-contrast a {
   text-decoration: underline;
 }
+
+/* ===== Mobile Responsiveness ===== */
+
+/* Tablet and larger screens */
+@media (min-width: 768px) {
+  body { font-size: 1rem; }
+}
+
+/* Mobile-first: small screens */
+@media (max-width: 640px) {
+  /* Reduce padding on mobile for space efficiency */
+  main { padding: 1rem !important; }
+  
+  /* Stack header items vertically on very small screens */
+  header.sticky-head .max-w-3xl > div {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  /* Make buttons more thumb-friendly */
+  .btn, .seg-link {
+    min-height: 48px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+  
+  /* Input fields */
+  input, select, textarea {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    font-size: 16px; /* Prevents zoom on iOS */
+    min-height: 44px;
+    padding: 0.75rem;
+  }
+  
+  /* Remove the X button on date inputs in iOS */
+  input::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+  }
+  
+  /* Better focus states on mobile */
+  input:focus, select:focus, textarea:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  
+  /* Stack controls in footer */
+  footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  
+  footer button, footer .segmented {
+    width: 100%;
+  }
+  
+  footer .ml-auto {
+    margin-left: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  /* Reduce badge font size on mobile */
+  .badge {
+    font-size: 0.65rem;
+    padding: 0.15rem 0.4rem;
+  }
+  
+  /* Make quiz cards more readable */
+  .quiz-card {
+    padding: 1rem;
+  }
+  
+  #prompt {
+    font-size: 1.1rem;
+    line-height: 1.5;
+  }
+  
+  /* Better spacing for options */
+  #options {
+    row-gap: 0.75rem !important;
+  }
+  
+  /* Font size controls on mobile */
+  .font-size-controls button {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
+  
+  /* Progress bar adjustments */
+  .progress-bar-container {
+    height: 6px;
+  }
+  
+  .fire-flame {
+    font-size: 1.25rem;
+  }
+  
+  /* Make segmented control more compact on mobile */
+  .segmented .seg-link {
+    min-width: 2.5rem;
+    padding: 0.35rem 0.6rem;
+    font-size: 0.8rem;
+  }
+  
+  /* Modal adjustments for mobile */
+  #shortcuts-modal {
+    padding: 1rem;
+  }
+  
+  #shortcuts-modal .card {
+    width: 95vw;
+    max-width: 100%;
+    padding: 1rem;
+  }
+  
+  #shortcuts-modal .grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem;
+  }
+  
+  /* Adjust min-width for quiz title */
+  h1 {
+    font-size: 1.5rem;
+    word-break: break-word;
+  }
+  
+  /* Input field improvements */
+  input {
+    font-size: 16px; /* Prevents zoom on iOS */
+    min-height: 44px;
+  }
+  
+  /* Hint text less prominent on small screens */
+  .mini-hint {
+    display: none;
+  }
+  
+  /* Better layout for score/question counters */
+  .flex.justify-between.items-center.mt-2 {
+    font-size: 0.85rem;
+  }
+}
+
+/* Medium screens (tablets) */
+@media (min-width: 641px) and (max-width: 1024px) {
+  main {
+    padding: 1.5rem;
+  }
+  
+  .btn, .seg-link {
+    min-height: 44px;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) {
+  /* Remove hover effects on touch devices */
+  .btn:hover, .seg-link:hover {
+    background: var(--card);
+    border-color: var(--ring);
+  }
+  
+  .btn-blue:hover, .btn-green:hover {
+    background: var(--accent);
+    color: white;
+  }
+  
+  /* Add active state for touch */
+  .btn:active, .seg-link:active {
+    opacity: 0.8;
+  }
+}
+
+/* High DPI screens */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .btn, .seg-link {
+    border-width: 1px;
+  }
+}
