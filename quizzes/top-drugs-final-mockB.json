@@ -32,7 +32,7 @@
 
       { "type": "short", "prompt": "Brand for Amiodarone?", "answerText": ["pacerone"] },
       { "type": "short", "prompt": "Generic for Betapace?", "answerText": ["sotalol"] },
-      { "type": "short", "prompt": "Class of Xylocaine?", "answerText": ["class ib antiarrhythmic"] },
+      { "type": "short", "prompt": "Class of Xylocaine?", "answerText": ["class ib antiarrhythmic","class ib","class 1b antiarrhythmic","class 1b"] },
       { "type": "short", "prompt": "Category of Pacerone?", "answerText": ["antiarrhythmic"] },
       { "type": "mcq", "prompt": "Which drug has this mechanism? Nonselectively blocks beta receptors and inhibits potassium channels; prolongs action potential and refractory period.", "choices": ["Betapace","Pacerone","Lanoxin","Xylocaine"], "answer": ["Betapace"] },
       { "type": "mcq", "prompt": "Pick the mechanism for Tikosyn (Dofetilide).", "choices": ["Inhibits potassium channels; prolongs action potential and refractory period of cardiac cells.","Blocks sodium channels; decreases conduction in ischemic and depolarized cells.","Inhibits calcium influx into cardiac muscle; reduces AV nodal conduction.","Directly stimulates beta-1 receptors to increase inotropy."], "answer": ["Inhibits potassium channels; prolongs action potential and refractory period of cardiac cells."] },

@@ -27,7 +27,7 @@
       { "type": "short", "prompt": "Category of Xarelto?", "answerText": ["anticoagulant","Anticoagulant"] },
       { "type": "mcq", "prompt": "Which drug has this mechanism? Directly inhibits Factor Xa, preventing conversion of prothrombin to thrombin.", "choices": ["Xarelto","Heplock","Coumadin","Pradaxa"], "answer": ["Xarelto"] },
       { "type": "mcq", "prompt": "Pick the mechanism for Lovenox (Enoxaparin).", "choices": ["Enhances antithrombin III activity; preferential inhibition of Factor Xa.","Directly inhibits thrombin (Factor IIa).","Irreversibly inhibits platelet COX-1 to reduce thromboxane A2.","Inhibits the P2Y12 receptor to prevent platelet aggregation."], "answer": ["Enhances antithrombin III activity; preferential inhibition of Factor Xa."] },
-      { "type": "short", "prompt": "Brand for Heparin?", "answerText": ["hep-lock"] },
+      { "type": "short", "prompt": "Brand for Heparin?", "answerText": ["Hep-Lock","hep-lock","Heplock","heplock","Hep Lock","hep lock"] },
       { "type": "short", "prompt": "Generic for Eliquis?", "answerText": ["apixaban"] },
 
       { "type": "short", "prompt": "Brand for Sotalol?", "answerText": ["betapace","Betapace"] },
@@ -39,7 +39,7 @@
       { "type": "short", "prompt": "Brand for Dofetilide?", "answerText": ["tikosyn","Tikosyn"] },
       { "type": "short", "prompt": "Generic for Lanoxin?", "answerText": ["digoxin"] },
 
-      { "type": "short", "prompt": "Brand for Insulin Glargine?", "answerText": ["lantus","Lantus"] },
+      { "type": "short", "prompt": "Brand for Insulin Glargine?", "answerText": ["Lantus","Basaglar","Semglee","Toujeo","Rezvoglar","lantus","basaglar","semglee","toujeo","rezvoglar"] },
       { "type": "short", "prompt": "Generic for Glucophage?", "answerText": ["metformin"] },
       { "type": "short", "prompt": "Class of Novolog?", "answerText": ["rapid-acting insulin","Rapid-acting insulin"] },
       { "type": "short", "prompt": "Category of Humalog?", "answerText": ["antidiabetic","Antidiabetic"] },
@@ -70,7 +70,7 @@
       { "type": "short", "prompt": "Generic for Neurontin?", "answerText": ["gabapentin"] },
       { "type": "short", "prompt": "Class of Dilantin?", "answerText": ["hydantoin","Hydantoin"] },
       { "type": "short", "prompt": "Category of Ambien?", "answerText": ["hypnotic","Hypnotic"] },
-      { "type": "mcq", "prompt": "Which drug has this mechanism? Inhibits voltage-dependent N-type calcium channels, facilitates GABAergic inhibition, and binds synaptic proteins to modulate neurotransmitter release.", "choices": ["Keppra","Lamictal","Topamax","Ambien"], "answer": ["Keppra"] },
+      { "type": "mcq", "prompt": "Which drug has this mechanism? Binds synaptic vesicle protein; modulates neurotransmitter release.", "choices": ["Keppra","Neurontin","Lamictal","Topamax"], "answer": ["Keppra"] },
       { "type": "mcq", "prompt": "Pick the mechanism for Lamictal (Lamotrigine).", "choices": ["Stabilizes neuronal membranes and modulates release of excitatory neurotransmitters.","Enhances GABA-mediated inhibition via benzodiazepine receptor complex.","Blocks voltage-dependent sodium channels; enhances GABA(A); antagonizes AMPA/kainate; weak carbonic anhydrase inhibitor.","Promotes sodium efflux in motor cortex neurons."], "answer": ["Stabilizes neuronal membranes and modulates release of excitatory neurotransmitters."] },
       { "type": "short", "prompt": "Brand for Topiramate?", "answerText": ["topamax","Topamax"] },
       { "type": "short", "prompt": "Generic for Synthroid?", "answerText": ["levothyroxine"] },

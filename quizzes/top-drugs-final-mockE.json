@@ -23,7 +23,7 @@
 
       { "type": "short", "prompt": "Brand for Apixaban?", "answerText": ["Eliquis","eliquis"] },
       { "type": "short", "prompt": "Generic for Coumadin?", "answerText": ["warfarin"] },
-      { "type": "short", "prompt": "Brand for Heparin (flush product)?", "answerText": ["hep-lock"] },
+      { "type": "short", "prompt": "Brand for Heparin?", "answerText": ["Hep-Lock","hep-lock","Heplock","heplock","Hep Lock","hep lock"] },
       { "type": "short", "prompt": "Generic for Lovenox?", "answerText": ["enoxaparin"] },
       { "type": "mcq", "prompt": "Coumadin → Class?", "choices": ["Vitamin K antagonist","Direct Factor Xa inhibitor","Heparin","Low molecular weight heparin"], "answer": ["Vitamin K antagonist"] },
       { "type": "mcq", "prompt": "Xarelto → Category?", "choices": ["Anticoagulant","Antihypertensive","Antilipemic","Hypnotic"], "answer": ["Anticoagulant"] },
@@ -39,7 +39,7 @@
       { "type": "mcq", "prompt": "Which drug has this mechanism? Blocks sodium channels; decreases conduction in ischemic and depolarized cells.", "choices": ["Xylocaine","Betapace","Lanoxin","Pacerone"], "answer": ["Xylocaine"] },
       { "type": "mcq", "prompt": "Pick the mechanism for Betapace (Sotalol).", "choices": ["Nonselectively blocks beta receptors and inhibits potassium channels; prolongs action potential and refractory period","Inhibits potassium channels responsible for repolarization","Slows AV nodal conduction via increased parasympathetic tone","Blocks sodium channels in ischemic tissue"], "answer": ["Nonselectively blocks beta receptors and inhibits potassium channels; prolongs action potential and refractory period"] },
 
-      { "type": "short", "prompt": "Brand for Insulin Glargine?", "answerText": ["Lantus","lantus"] },
+      { "type": "short", "prompt": "Brand for Insulin Glargine?", "answerText": ["Lantus","Basaglar","Semglee","Toujeo","Rezvoglar","lantus","basaglar","semglee","toujeo","rezvoglar"] },
       { "type": "short", "prompt": "Generic for Humalog?", "answerText": ["insulin lispro"] },
       { "type": "short", "prompt": "Brand for Insulin Aspart?", "answerText": ["Novolog","novolog"] },
       { "type": "short", "prompt": "Generic for Glucophage?", "answerText": ["metformin"] },
