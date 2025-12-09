@@ -420,6 +420,9 @@ function showResults(){
   els.results.classList.remove("hidden");
   els.final.textContent = `${state.score} / ${state.questions.length}`;
 
+  // Save to performance history
+  savePerformanceHistory();
+
   // Add compact breakdown
   const made = state.questions.filter(q=>q._answered).length;
   const wrong = made - state.score;
@@ -435,6 +438,11 @@ function showResults(){
 
   const pct = state.score / state.questions.length;
   els.celebrate.classList.toggle("hidden", !(pct === 1 || pct >= 0.9));
+
+  // Trigger confetti animation for perfect scores
+  if (pct === 1) {
+    triggerConfetti();
+  }
 
   // Review button
   let btn = els.results.querySelector('#review-btn');
@@ -721,4 +729,43 @@ function save(){
     localStorage.setItem(STORAGE_KEY(), JSON.stringify(toSave));
   } catch {}
 }
+function savePerformanceHistory(){
+  try {
+    const HISTORY_KEY = "pharmlet.history";
+    const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+    history.push({
+      quizId,
+      mode,
+      title: state.title,
+      score: state.score,
+      total: state.questions.length,
+      bestStreak: state.bestStreak,
+      timeSeconds: state.timerSeconds,
+      timestamp: new Date().toISOString()
+    });
+    // Keep only last 100 attempts
+    if (history.length > 100) history.shift();
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  } catch {}
+}
+
+function triggerConfetti(){
+  const colors = ['#8b1e3f', '#3e6990', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6'];
+  const confettiCount = 50;
+  
+  for (let i = 0; i < confettiCount; i++) {
+    setTimeout(() => {
+      const confetti = document.createElement('div');
+      confetti.className = 'confetti';
+      confetti.style.left = Math.random() * 100 + '%';
+      confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+      confetti.style.animationDelay = Math.random() * 0.5 + 's';
+      confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+      document.body.appendChild(confetti);
+      
+      setTimeout(() => confetti.remove(), 5000);
+    }, i * 30);
+  }
+}
+
 function announce(msg){ if (els.live) els.live.textContent = msg; }

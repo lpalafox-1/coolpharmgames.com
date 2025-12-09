@@ -121,6 +121,47 @@ function runHome() {
     console.warn('NEW banner expiration failed:', e);
   }
 
+  // 6) Bookmark favorite quizzes
+  const FAVORITES_KEY = "pharmlet.favorites";
+  try {
+    const favorites = new Set(JSON.parse(localStorage.getItem(FAVORITES_KEY) || "[]"));
+    
+    // Add star buttons to quiz cards
+    document.querySelectorAll(".quiz-link, a[href^='quiz.html']").forEach(link => {
+      const url = new URL(link.href, window.location.origin);
+      const quizId = url.searchParams.get("id");
+      if (!quizId) return;
+      
+      const isFavorite = favorites.has(quizId);
+      const star = document.createElement("span");
+      star.className = "favorite-star";
+      star.textContent = isFavorite ? "★" : "☆";
+      star.style.cssText = "cursor:pointer;margin-left:0.5rem;color:var(--accent);font-size:1.2em;";
+      star.title = isFavorite ? "Remove from favorites" : "Add to favorites";
+      star.setAttribute("role", "button");
+      star.setAttribute("aria-label", isFavorite ? "Remove from favorites" : "Add to favorites");
+      
+      star.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (favorites.has(quizId)) {
+          favorites.delete(quizId);
+          star.textContent = "☆";
+          star.title = "Add to favorites";
+        } else {
+          favorites.add(quizId);
+          star.textContent = "★";
+          star.title = "Remove from favorites";
+        }
+        localStorage.setItem(FAVORITES_KEY, JSON.stringify([...favorites]));
+      });
+      
+      link.appendChild(star);
+    });
+  } catch (e) {
+    console.warn('Favorites feature failed:', e);
+  }
+
   // Done: ensure menu is visible at end even if something above silently failed
   const isWelcomeOn = welcome && welcome.style.display !== "none";
   if (!isWelcomeOn && menu) menu.style.display = "";

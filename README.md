@@ -14,6 +14,30 @@ The UAMS College of Pharmacy Class of 2029 Personalized Hub is designed to assis
 All questions include hint + solution for Show/Hide (MTC) support.
 Answer types: numeric, multi-numeric, short-answer (with acceptable variants).
 
+## New Features
+
+### 📊 Performance Dashboard (`stats.html`)
+Track your quiz performance over time with:
+- Total questions answered
+- Average score percentage
+- Best streak records
+- Study days tracking
+- Performance breakdown by quiz and category
+- Recent activity history
+
+### ♿ Accessibility Improvements
+- Skip-to-content links for keyboard navigation
+- Screen reader-friendly labels and ARIA attributes
+- High contrast mode toggle (yellow/black theme for better visibility)
+- Font size controls (A-/A+ buttons, 12-24px range)
+
+### ⭐ Quality of Life Features
+- **Bookmark favorites**: Star icon next to quizzes for quick access
+- **Font size controls**: Adjust text size for better readability (persists across sessions)
+- **High contrast mode**: Enhanced visibility with bold colors and underlined links
+- **Confetti celebration**: Animated confetti for perfect quiz scores (100%)
+- All preferences saved to localStorage for seamless experience
+
 Repository layout:
 - `quizzes/` - JSON quiz files organized in folders (Chapter Reviews, Exam Practice, Supplemental, Fun Modes)
 - `assets/` - front-end JS/CSS and icons

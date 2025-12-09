@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Custom Quiz Builder — Pharm-let</title>
+  <meta name="description" content="Build custom quizzes by mixing questions from multiple sources." />
+  <meta name="theme-color" content="#8b1e3f" />
+  <link rel="icon" href="assets/icon.png" />
+
+  <!-- CSP -->
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self';
+             img-src 'self' data:;
+             style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com;
+             script-src 'self' https://cdn.tailwindcss.com;
+             connect-src 'self';">
+
+  <!-- Tailwind + site styles -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+
+  <style>
+    .quiz-selector { border: 2px solid var(--ring); border-radius: 8px; padding: 1rem; cursor: pointer; transition: all 0.2s; }
+    .quiz-selector:hover { border-color: var(--accent); background: var(--accent-light, rgba(139,30,63,0.05)); }
+    .quiz-selector.selected { border-color: var(--accent); background: var(--accent-light, rgba(139,30,63,0.1)); }
+    .quiz-selector input[type="checkbox"] { width: 1.25rem; height: 1.25rem; cursor: pointer; }
+  </style>
+</head>
+
+<body class="bg-[var(--bg)] text-[var(--text)]">
+  <!-- Header -->
+  <header class="flex justify-between items-center px-4 py-3 border-b border-[var(--ring)]">
+    <div class="flex items-center gap-3">
+      <a href="index.html" class="quiz-link">← Back to Library</a>
+      <h1 class="font-bold text-lg">Custom Quiz Builder</h1>
+    </div>
+    <button id="theme-toggle" class="btn btn-ghost" type="button" aria-label="Toggle dark/light theme">
+      <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.5"/></svg>
+      <span id="theme-label">Dark</span>
+    </button>
+  </header>
+
+  <main class="max-w-5xl mx-auto p-6">
+    <div class="mb-6">
+      <h2 class="text-2xl font-bold mb-2">Build Your Custom Quiz</h2>
+      <p style="color:var(--muted)">Select multiple quizzes to combine into one practice session. Questions will be shuffled together.</p>
+    </div>
+
+    <!-- Filter -->
+    <div class="mb-4">
+      <input 
+        id="quiz-filter" 
+        class="w-full rounded-xl border px-4 py-2"
+        style="border-color:var(--ring); background:var(--card); color:var(--text)"
+        placeholder="Filter quizzes..."
+        aria-label="Filter available quizzes"
+      />
+    </div>
+
+    <!-- Quiz Selection -->
+    <div class="grid md:grid-cols-2 gap-4 mb-6" id="quiz-list">
+      <div class="text-center py-8" style="color:var(--muted)">
+        Loading available quizzes...
+      </div>
+    </div>
+
+    <!-- Selected Summary -->
+    <div class="card p-4 mb-4">
+      <h3 class="font-semibold mb-2">Selected Quizzes</h3>
+      <div id="selected-summary" style="color:var(--muted)">
+        No quizzes selected yet.
+      </div>
+    </div>
+
+    <!-- Quiz Settings -->
+    <div class="card p-4 mb-6">
+      <h3 class="font-semibold mb-4">Quiz Settings</h3>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div>
+          <label for="difficulty-mode" class="block text-sm font-medium mb-2">Difficulty Mode</label>
+          <select id="difficulty-mode" class="w-full rounded-xl border px-3 py-2" style="border-color:var(--ring); background:var(--card); color:var(--text)">
+            <option value="easy">Easy</option>
+            <option value="hard">Hard</option>
+            <option value="final">Final</option>
+            <option value="mix">Mix All Difficulties</option>
+          </select>
+        </div>
+        <div>
+          <label for="question-limit" class="block text-sm font-medium mb-2">Number of Questions</label>
+          <select id="question-limit" class="w-full rounded-xl border px-3 py-2" style="border-color:var(--ring); background:var(--card); color:var(--text)">
+            <option value="">All Questions</option>
+            <option value="10">10 Questions</option>
+            <option value="20" selected>20 Questions</option>
+            <option value="30">30 Questions</option>
+            <option value="50">50 Questions</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex gap-3">
+      <button id="start-quiz" class="btn btn-blue" disabled>
+        Start Custom Quiz
+      </button>
+      <button id="clear-selection" class="btn btn-ghost">
+        Clear Selection
+      </button>
+    </div>
+  </main>
+
+  <script src="assets/js/custom-quiz.js" defer></script>
+</body>
+</html>

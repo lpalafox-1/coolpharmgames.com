@@ -36,10 +36,14 @@
     .pill-new{background:#10b981;color:#062b22}
     .pill-featured{background:#3b82f6;color:#061a34}
     .pill-tbd{background:#f59e0b;color:#111827}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
   </style>
 </head>
 
 <body class="bg-[var(--bg)] text-[var(--text)]">
+  <!-- Skip to main content (accessibility) -->
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50 focus:p-4 focus:bg-[var(--accent)] focus:text-white focus:rounded">Skip to main content</a>
+  
   <!-- Header -->
   <header class="flex justify-between items-center px-4 py-3 border-b border-[var(--ring)]">
     <h1 class="font-bold text-lg">Pharm-let</h1>
@@ -109,8 +113,20 @@
     </section>
 
     <!-- Classes grid -->
-    <main id="classes" class="max-w-5xl mx-auto px-4 pb-16">
-      <div class="flex items-end justify-between gap-4 mb-4">
+    <main id="main-content" class="max-w-5xl mx-auto px-4 pb-16">
+      <!-- Quick Actions -->
+      <div class="grid md:grid-cols-2 gap-4 mb-6">
+        <a href="stats.html" class="card p-4 hover:border-[var(--accent)] transition-colors">
+          <div class="font-semibold">📊 Performance Stats</div>
+          <div class="text-sm mt-1" style="color:var(--muted)">Track your progress and scores</div>
+        </a>
+        <a href="#classes-section" class="card p-4 hover:border-[var(--accent)] transition-colors">
+          <div class="font-semibold">📚 Browse All Quizzes</div>
+          <div class="text-sm mt-1" style="color:var(--muted)">Explore all available practice</div>
+        </a>
+      </div>
+
+      <div id="classes-section" class="flex items-end justify-between gap-4 mb-4">
         <h2 class="text-xl font-bold">Classes</h2>
         <!-- Quick filter -->
         <input id="class-filter" class="w-64 rounded-xl border px-3 py-2"

@@ -34,15 +34,29 @@
 </head>
 
 <body class="bg-[var(--bg)] text-[var(--text)]">
+  <!-- Skip to main content (accessibility) -->
+  <a href="#app" class="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50 focus:p-4 focus:bg-[var(--accent)] focus:text-white focus:rounded">Skip to quiz content</a>
+
   <header class="sticky-head border-b border-[var(--ring)]">
-    <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+    <div class="max-w-3xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
       <a href="index.html" class="quiz-link">← Back to Library</a>
-      <div class="flex items-center gap-3">
+      <div class="flex flex-wrap items-center gap-2 sm:gap-3">
         <button id="share" class="btn btn-ghost" type="button" aria-label="Copy quiz link">Share</button>
+
+        <!-- Font size controls -->
+        <div class="font-size-controls">
+          <button id="font-decrease" type="button" aria-label="Decrease font size">A-</button>
+          <button id="font-increase" type="button" aria-label="Increase font size">A+</button>
+        </div>
+
+        <!-- High contrast toggle -->
+        <button id="contrast-toggle" class="btn btn-ghost" type="button" aria-label="Toggle high contrast mode">
+          <span id="contrast-label">Contrast</span>
+        </button>
 
         <!-- Question count segmented control (implemented in quizPage.js) -->
         <div class="flex items-center gap-2">
-          <span class="text-sm" style="color:var(--muted)">Questions:</span>
+          <span class="text-sm hidden sm:inline" style="color:var(--muted)">Questions:</span>
           <div id="qcount-group" class="segmented" role="group" aria-label="Question count">
             <a class="seg-link" data-limit="5"  href="#">5</a>
             <a class="seg-link" data-limit="10" href="#">10</a>

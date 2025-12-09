@@ -35,4 +35,43 @@
 
   /* ---------- Theme toggle is handled by quizEngine.js ---------- */
   // Theme toggle functionality moved to quizEngine.js to avoid conflicts
+
+  /* ---------- Font size controls ---------- */
+  let fontSize = parseInt(localStorage.getItem('pharmlet.fontSize')) || 16;
+  document.documentElement.style.fontSize = fontSize + 'px';
+
+  document.getElementById('font-increase')?.addEventListener('click', () => {
+    if (fontSize < 24) {
+      fontSize += 2;
+      document.documentElement.style.fontSize = fontSize + 'px';
+      localStorage.setItem('pharmlet.fontSize', fontSize);
+    }
+  });
+
+  document.getElementById('font-decrease')?.addEventListener('click', () => {
+    if (fontSize > 12) {
+      fontSize -= 2;
+      document.documentElement.style.fontSize = fontSize + 'px';
+      localStorage.setItem('pharmlet.fontSize', fontSize);
+    }
+  });
+
+  /* ---------- High contrast mode toggle ---------- */
+  const contrastToggle = document.getElementById('contrast-toggle');
+  const contrastLabel = document.getElementById('contrast-label');
+  
+  // Load saved preference
+  const isHighContrast = localStorage.getItem('pharmlet.highContrast') === 'true';
+  if (isHighContrast) {
+    document.body.classList.add('high-contrast');
+    if (contrastLabel) contrastLabel.textContent = 'Normal';
+  }
+
+  contrastToggle?.addEventListener('click', () => {
+    const isNowHighContrast = document.body.classList.toggle('high-contrast');
+    localStorage.setItem('pharmlet.highContrast', isNowHighContrast);
+    if (contrastLabel) {
+      contrastLabel.textContent = isNowHighContrast ? 'Normal' : 'Contrast';
+    }
+  });
 })();
