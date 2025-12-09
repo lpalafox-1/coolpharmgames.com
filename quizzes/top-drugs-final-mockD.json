@@ -2,7 +2,7 @@
   "id": "top-drugs-final-mockD",
   "title": "Top Drugs Final Mock D — 88 Questions",
   "pools": {
-    "final": [
+    "easy": [
       { "type": "short", "prompt": "Brand for Lisinopril?", "answerText": ["Zestril","zestril"] },
       { "type": "short", "prompt": "Generic for Norvasc?", "answerText": ["amlodipine"] },
       { "type": "short", "prompt": "Brand for Losartan?", "answerText": ["Cozaar","cozaar"] },
@@ -18,8 +18,8 @@
       { "type": "short", "prompt": "Generic for Tricor?", "answerText": ["fenofibrate"] },
       { "type": "mcq", "prompt": "Crestor → Class?", "choices": ["HMG-CoA reductase inhibitor","PCSK9 inhibitor","Nicotinic acid","Omega-3 fatty acid"], "answer": ["HMG-CoA reductase inhibitor"] },
       { "type": "mcq", "prompt": "Lovaza → Category?", "choices": ["Antilipemic","Antihypertensive","Anticoagulant","Hypnotic"], "answer": ["Antilipemic"] },
-      { "type": "mcq", "prompt": "Which drug has this mechanism? Inhibits PCSK9, preventing LDL receptor degradation and increasing LDL clearance.", "choices": ["Repatha","Zetia","Tricor","Niaspan"], "answer": ["Repatha"] },
-      { "type": "mcq", "prompt": "Pick the mechanism for Leqvio (Inclisiran).", "choices": ["Inhibits PCSK9 synthesis via RNA interference, increasing LDL receptor availability","Inhibits cholesterol absorption at the brush border of the small intestine","Activates PPAR-alpha to increase lipolysis of triglyceride-rich particles","Inhibits lipolysis in adipose tissue and reduces hepatic VLDL synthesis"], "answer": ["Inhibits PCSK9 synthesis via RNA interference, increasing LDL receptor availability"] },
+      { "type": "mcq", "prompt": "Which drug has this mechanism? Inhibits PCSK9 protein to prevent LDL receptor degradation (monoclonal antibody).", "choices": ["Repatha","Zetia","Tricor","Niaspan"], "answer": ["Repatha"] },
+      { "type": "mcq", "prompt": "Pick the mechanism for Leqvio (Inclisiran).", "choices": ["Inhibits PCSK9 synthesis via RNA interference (siRNA).","Inhibits cholesterol absorption at the brush border of the small intestine.","Activates PPAR-alpha to increase lipolysis of triglyceride-rich particles.","Inhibits lipolysis in adipose tissue and reduces hepatic VLDL synthesis."], "answer": ["Inhibits PCSK9 synthesis via RNA interference (siRNA)."] },
 
       { "type": "short", "prompt": "Brand for Warfarin?", "answerText": ["Coumadin","coumadin"] },
       { "type": "short", "prompt": "Generic for Xarelto?", "answerText": ["rivaroxaban"] },
@@ -27,7 +27,7 @@
       { "type": "short", "prompt": "Generic for Hep-Lock?", "answerText": ["heparin"] },
       { "type": "mcq", "prompt": "Eliquis → Class?", "choices": ["Direct Factor Xa inhibitor","Vitamin K antagonist","Heparin","Low molecular weight heparin"], "answer": ["Direct Factor Xa inhibitor"] },
       { "type": "mcq", "prompt": "Coumadin → Category?", "choices": ["Anticoagulant","Antihypertensive","Antilipemic","Antipsychotic"], "answer": ["Anticoagulant"] },
-      { "type": "mcq", "prompt": "Which drug has this mechanism? Enhances antithrombin III; preferential inhibition of Factor Xa.", "choices": ["Lovenox","Coumadin","Eliquis","Xarelto"], "answer": ["Lovenox"] },
+      { "type": "mcq", "prompt": "Which drug has this mechanism? Enhances antithrombin III activity; preferential inhibition of Factor Xa.", "choices": ["Lovenox","Coumadin","Eliquis","Xarelto"], "answer": ["Lovenox"] },
       { "type": "mcq", "prompt": "Pick the mechanism for Xarelto (Rivaroxaban).", "choices": ["Directly inhibits Factor Xa, preventing conversion of prothrombin to thrombin","Inhibits synthesis of vitamin K–dependent clotting factors II, VII, IX, and X","Enhances antithrombin III, inhibiting thrombin and Factor Xa","Directly inhibits thrombin (Factor IIa)"], "answer": ["Directly inhibits Factor Xa, preventing conversion of prothrombin to thrombin"] },
 
       { "type": "short", "prompt": "Brand for Amiodarone?", "answerText": ["Pacerone","pacerone"] },
@@ -35,7 +35,7 @@
       { "type": "short", "prompt": "Brand for Lidocaine (antiarrhythmic formulation)?", "answerText": ["Xylocaine","xylocaine"] },
       { "type": "short", "prompt": "Generic for Lanoxin?", "answerText": ["digoxin"] },
       { "type": "mcq", "prompt": "Betapace → Class?", "choices": ["Class III antiarrhythmic with beta-blocking","Class Ib antiarrhythmic","Cardiac glycoside","Class II antiarrhythmic only"], "answer": ["Class III antiarrhythmic with beta-blocking"] },
-      { "type": "mcq", "prompt": "Lanoxin → Category?", "choices": ["Cardiac glycoside","Antiarrhythmic","Antihypertensive","Anticoagulant"], "answer": ["Cardiac glycoside"] },
+      { "type": "mcq", "prompt": "Lanoxin → Category?", "choices": ["Antiarrhythmic","Antihypertensive","Anticoagulant","Antilipemic"], "answer": ["Antiarrhythmic"] },
       { "type": "mcq", "prompt": "Which drug has this mechanism? Inhibits potassium channels; prolongs action potential and refractory period of cardiac cells.", "choices": ["Tikosyn","Xylocaine","Lanoxin","Inderal"], "answer": ["Tikosyn"] },
       { "type": "mcq", "prompt": "Pick the mechanism for Pacerone (Amiodarone).", "choices": ["Inhibits potassium channels responsible for repolarization; prolongs action potential and refractory period","Blocks sodium channels; decreases conduction in ischemic tissue","Slows AV nodal conduction via increased parasympathetic tone","Blocks beta-1 receptors selectively"], "answer": ["Inhibits potassium channels responsible for repolarization; prolongs action potential and refractory period"] },
 
@@ -63,8 +63,8 @@
       { "type": "short", "prompt": "Generic for Amaryl?", "answerText": ["glimepiride"] },
       { "type": "mcq", "prompt": "Glucotrol XL → Class?", "choices": ["Sulfonylurea","SGLT2 inhibitor","DPP-4 inhibitor","GLP-1 receptor agonist"], "answer": ["Sulfonylurea"] },
       { "type": "mcq", "prompt": "Farxiga → Category?", "choices": ["Antidiabetic","Antilipemic","Anticoagulant","Antihypertensive"], "answer": ["Antidiabetic"] },
-      { "type": "mcq", "prompt": "Which drug has this mechanism? Inhibits SGLT2 in the proximal renal tubules, reducing glucose reabsorption.", "choices": ["Jardiance","Amaryl","Glucotrol XL","Actos"], "answer": ["Jardiance"] },
-      { "type": "mcq", "prompt": "Pick the mechanism for Glucotrol XL (Glipizide ER).", "choices": ["Stimulates pancreatic beta cells by blocking ATP-sensitive potassium channels to increase insulin release","Inhibits DPP-4, increasing incretin levels","Inhibits SGLT2 in proximal renal tubules","Activates GLP-1 receptor"], "answer": ["Stimulates pancreatic beta cells by blocking ATP-sensitive potassium channels to increase insulin release"] },
+      { "type": "mcq", "prompt": "Which drug has this mechanism? Inhibits SGLT2 in the proximal renal tubules to reduce glucose reabsorption.", "choices": ["Jardiance","Amaryl","Glucotrol XL","Actos"], "answer": ["Jardiance"] },
+      { "type": "mcq", "prompt": "Pick the mechanism for Glucotrol XL (Glipizide ER).", "choices": ["Stimulates pancreatic beta cells by blocking ATP-sensitive potassium channels to increase insulin release.","Inhibits DPP-4, increasing incretin levels.","Inhibits SGLT2 in the proximal renal tubules to reduce glucose reabsorption.","Activates GLP-1 receptor."], "answer": ["Stimulates pancreatic beta cells by blocking ATP-sensitive potassium channels to increase insulin release."] },
 
       { "type": "short", "prompt": "Brand for Gabapentin?", "answerText": ["Neurontin","neurontin"] },
       { "type": "short", "prompt": "Generic for Keppra?", "answerText": ["levetiracetam"] },
@@ -72,7 +72,7 @@
       { "type": "short", "prompt": "Generic for Lunesta?", "answerText": ["eszopiclone"] },
       { "type": "mcq", "prompt": "Synthroid → Category?", "choices": ["Hypothyroidism agent","Anticonvulsant","Hypnotic","Antidepressant"], "answer": ["Hypothyroidism agent"] },
       { "type": "mcq", "prompt": "Topamax → Class?", "choices": ["Anticonvulsant","Hydantoin","Hypnotic","Thyroid hormone"], "answer": ["Anticonvulsant"] },
-      { "type": "mcq", "prompt": "Which drug has this mechanism? Modulates activity of voltage-gated calcium channels by binding to the alpha-2-delta subunit; indirectly influences GABAergic activity.", "choices": ["Neurontin","Keppra","Ambien","Dilantin"], "answer": ["Neurontin"] },
+      { "type": "mcq", "prompt": "Which drug has this mechanism? Binds alpha-2-delta subunit of voltage-gated calcium channels; indirectly influences GABAergic activity.", "choices": ["Neurontin","Keppra","Ambien","Dilantin"], "answer": ["Neurontin"] },
       { "type": "mcq", "prompt": "Pick the mechanism for Keppra (Levetiracetam).", "choices": ["Inhibits voltage-dependent N-type calcium channels; facilitates GABAergic inhibition; binds synaptic proteins to modulate neurotransmitter release","Enhances GABA via benzodiazepine receptor complex","Stabilizes neuronal membranes and modulates release of excitatory neurotransmitters","Blocks voltage-dependent sodium channels; enhances GABA(A); antagonizes AMPA/kainate; weak carbonic anhydrase inhibitor"], "answer": ["Inhibits voltage-dependent N-type calcium channels; facilitates GABAergic inhibition; binds synaptic proteins to modulate neurotransmitter release"] },
 
       { "type": "short", "prompt": "Brand for Escitalopram?", "answerText": ["Lexapro","lexapro"] },

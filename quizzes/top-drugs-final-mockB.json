@@ -17,7 +17,7 @@
       { "type": "short", "prompt": "Class of Zetia?", "answerText": ["cholesterol absorption inhibitor"] },
       { "type": "short", "prompt": "Category of Tricor?", "answerText": ["antilipemic"] },
       { "type": "mcq", "prompt": "Which drug has this mechanism? Inhibits HMG-CoA reductase, reducing cholesterol synthesis and increasing LDL uptake.", "choices": ["Crestor","Tricor","Lovaza","Praluent"], "answer": ["Crestor"] },
-      { "type": "mcq", "prompt": "Pick the mechanism for Repatha (Evolocumab).", "choices": ["Inhibits PCSK9, preventing LDL receptor degradation and increasing LDL clearance.","Inhibits cholesterol absorption at the brush border of the small intestine.","Activates PPAR-alpha, increasing lipolysis of triglyceride-rich particles.","Inhibits PCSK9 synthesis via RNA interference, increasing LDL receptor availability."], "answer": ["Inhibits PCSK9, preventing LDL receptor degradation and increasing LDL clearance."] },
+      { "type": "mcq", "prompt": "Pick the mechanism for Repatha (Evolocumab).", "choices": ["Inhibits PCSK9 protein to prevent LDL receptor degradation (monoclonal antibody).","Inhibits cholesterol absorption at the brush border of the small intestine.","Activates PPAR-alpha, increasing lipolysis of triglyceride-rich particles.","Inhibits PCSK9 synthesis via RNA interference, increasing LDL receptor availability."], "answer": ["Inhibits PCSK9 protein to prevent LDL receptor degradation (monoclonal antibody)."] },
       { "type": "short", "prompt": "Brand for Omega-3-acid ethyl esters?", "answerText": ["lovaza"] },
       { "type": "short", "prompt": "Generic for Leqvio?", "answerText": ["inclisiran"] },
 
@@ -26,7 +26,7 @@
       { "type": "short", "prompt": "Class of Eliquis?", "answerText": ["direct factor xa inhibitor"] },
       { "type": "short", "prompt": "Category of Lovenox?", "answerText": ["anticoagulant"] },
       { "type": "mcq", "prompt": "Which drug has this mechanism? Inhibits synthesis of vitamin K–dependent clotting factors II, VII, IX, and X.", "choices": ["Coumadin","Eliquis","Xarelto","Lovenox"], "answer": ["Coumadin"] },
-      { "type": "mcq", "prompt": "Pick the mechanism for Hep-Lock (Heparin).", "choices": ["Enhances antithrombin III, inhibiting thrombin and Factor Xa.","Directly inhibits Factor Xa, preventing conversion of prothrombin to thrombin.","Directly inhibits thrombin (Factor IIa).","Inhibits platelet P2Y12 receptor to prevent aggregation."], "answer": ["Enhances antithrombin III, inhibiting thrombin and Factor Xa."] },
+      { "type": "mcq", "prompt": "Pick the mechanism for Hep-Lock (Heparin).", "choices": ["Enhances antithrombin III activity to inhibit thrombin and Factor Xa.","Directly inhibits Factor Xa, preventing conversion of prothrombin to thrombin.","Directly inhibits thrombin (Factor IIa).","Inhibits platelet P2Y12 receptor to prevent aggregation."], "answer": ["Enhances antithrombin III activity to inhibit thrombin and Factor Xa."] },
       { "type": "short", "prompt": "Brand for Enoxaparin?", "answerText": ["lovenox"] },
       { "type": "short", "prompt": "Generic for Eliquis?", "answerText": ["apixaban"] },
 
@@ -62,7 +62,7 @@
       { "type": "short", "prompt": "Class of Invokana?", "answerText": ["sglt2 inhibitor"] },
       { "type": "short", "prompt": "Category of Amaryl?", "answerText": ["antidiabetic"] },
       { "type": "mcq", "prompt": "Which drug has this mechanism? Stimulates pancreatic beta cells by blocking ATP-sensitive potassium channels to increase insulin release.", "choices": ["Amaryl","Jardiance","Farxiga","Invokana"], "answer": ["Amaryl"] },
-      { "type": "mcq", "prompt": "Pick the mechanism for Jardiance (Empagliflozin).", "choices": ["Inhibits SGLT2 in the proximal renal tubules, reducing glucose reabsorption.","Inhibits DPP-4, increasing incretin levels and glucose-dependent insulin secretion.","Increases insulin sensitivity by activating PPAR-gamma.","Activates GLP-1 receptor; increases glucose-dependent insulin; decreases inappropriate glucagon."], "answer": ["Inhibits SGLT2 in the proximal renal tubules, reducing glucose reabsorption."] },
+      { "type": "mcq", "prompt": "Pick the mechanism for Jardiance (Empagliflozin).", "choices": ["Inhibits SGLT2 in the proximal renal tubules to reduce glucose reabsorption.","Inhibits DPP-4, increasing incretin levels and glucose-dependent insulin secretion.","Increases insulin sensitivity by activating PPAR-gamma.","Activates GLP-1 receptor; increases glucose-dependent insulin; decreases inappropriate glucagon."], "answer": ["Inhibits SGLT2 in the proximal renal tubules to reduce glucose reabsorption."] },
       { "type": "short", "prompt": "Brand for Glipizide (ER)?", "answerText": ["glucotrol xl"] },
       { "type": "short", "prompt": "Generic for Invokana?", "answerText": ["canagliflozin"] },
 

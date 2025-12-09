@@ -2,11 +2,11 @@
   "id": "top-drugs-final-mockE",
   "title": "Top Drugs Final Mock E — 88 Questions",
   "pools": {
-    "final": [
+    "easy": [
       { "type": "short", "prompt": "Brand for Enalapril?", "answerText": ["Vasotec","vasotec"] },
       { "type": "short", "prompt": "Generic for Diovan?", "answerText": ["valsartan"] },
       { "type": "short", "prompt": "Brand for Olmesartan?", "answerText": ["Benicar","benicar"] },
-      { "type": "short", "prompt": "Generic for Thalitone?", "answerText": ["chlorthalidone","chlortalidone","chlorthalidone (accept)","hemiclor (brand alt)"] },
+      { "type": "short", "prompt": "Generic for Thalitone?", "answerText": ["chlorthalidone"] },
       { "type": "mcq", "prompt": "Coreg → Class?", "choices": ["Beta blocker with alpha-blocking activity","Beta-1 selective blocker","ACE inhibitor","Calcium channel blocker (non-dihydropyridine)"], "answer": ["Beta blocker with alpha-blocking activity"] },
       { "type": "mcq", "prompt": "Norvasc → Category?", "choices": ["Antihypertensive","Antilipemic","Anticoagulant","Anticonvulsant"], "answer": ["Antihypertensive"] },
       { "type": "mcq", "prompt": "Which drug has this mechanism? Inhibits conversion of angiotensin I to angiotensin II, causing vasodilation and reduced aldosterone.", "choices": ["Vasotec","Cozaar","Procardia","Aldactone"], "answer": ["Vasotec"] },
@@ -19,15 +19,15 @@
       { "type": "mcq", "prompt": "Zetia → Class?", "choices": ["Cholesterol absorption inhibitor","HMG-CoA reductase inhibitor","Nicotinic acid","Fibric acid derivative"], "answer": ["Cholesterol absorption inhibitor"] },
       { "type": "mcq", "prompt": "Tricor → Category?", "choices": ["Antilipemic","Antihypertensive","Antidepressant","Anticoagulant"], "answer": ["Antilipemic"] },
       { "type": "mcq", "prompt": "Which drug has this mechanism? Inhibits HMG-CoA reductase, reducing cholesterol synthesis and increasing LDL uptake.", "choices": ["Crestor","Praluent","Zetia","Lovaza"], "answer": ["Crestor"] },
-      { "type": "mcq", "prompt": "Pick the mechanism for Praluent (Alirocumab).", "choices": ["Inhibits PCSK9, preventing LDL receptor degradation and increasing LDL clearance","Inhibits cholesterol absorption at the brush border","Activates PPAR-alpha to increase lipolysis of triglyceride-rich particles","Inhibits lipolysis in adipose tissue and reduces hepatic VLDL synthesis"], "answer": ["Inhibits PCSK9, preventing LDL receptor degradation and increasing LDL clearance"] },
+      { "type": "mcq", "prompt": "Pick the mechanism for Praluent (Alirocumab).", "choices": ["Inhibits PCSK9 protein to prevent LDL receptor degradation (monoclonal antibody).","Inhibits cholesterol absorption at the brush border.","Activates PPAR-alpha to increase lipolysis of triglyceride-rich particles.","Inhibits lipolysis in adipose tissue and reduces hepatic VLDL synthesis."], "answer": ["Inhibits PCSK9 protein to prevent LDL receptor degradation (monoclonal antibody)."] },
 
       { "type": "short", "prompt": "Brand for Apixaban?", "answerText": ["Eliquis","eliquis"] },
       { "type": "short", "prompt": "Generic for Coumadin?", "answerText": ["warfarin"] },
-      { "type": "short", "prompt": "Brand for Heparin (flush product)?", "answerText": ["Hep-Lock","hep-lock","heplock"] },
+      { "type": "short", "prompt": "Brand for Heparin (flush product)?", "answerText": ["hep-lock"] },
       { "type": "short", "prompt": "Generic for Lovenox?", "answerText": ["enoxaparin"] },
       { "type": "mcq", "prompt": "Coumadin → Class?", "choices": ["Vitamin K antagonist","Direct Factor Xa inhibitor","Heparin","Low molecular weight heparin"], "answer": ["Vitamin K antagonist"] },
       { "type": "mcq", "prompt": "Xarelto → Category?", "choices": ["Anticoagulant","Antihypertensive","Antilipemic","Hypnotic"], "answer": ["Anticoagulant"] },
-      { "type": "mcq", "prompt": "Which drug has this mechanism? Enhances antithrombin III, inhibiting thrombin and Factor Xa.", "choices": ["Hep-Lock","Eliquis","Lovenox","Coumadin"], "answer": ["Hep-Lock"] },
+      { "type": "mcq", "prompt": "Which drug has this mechanism? Enhances antithrombin III activity to inhibit thrombin and Factor Xa.", "choices": ["Hep-Lock","Eliquis","Lovenox","Coumadin"], "answer": ["Hep-Lock"] },
       { "type": "mcq", "prompt": "Pick the mechanism for Eliquis (Apixaban).", "choices": ["Directly inhibits Factor Xa, preventing conversion of prothrombin to thrombin","Inhibits synthesis of vitamin K–dependent clotting factors","Enhances antithrombin III with preferential Factor Xa inhibition","Directly inhibits thrombin (Factor IIa)"], "answer": ["Directly inhibits Factor Xa, preventing conversion of prothrombin to thrombin"] },
 
       { "type": "short", "prompt": "Brand for Sotalol?", "answerText": ["Betapace","betapace"] },
@@ -64,7 +64,7 @@
       { "type": "mcq", "prompt": "Invokana → Class?", "choices": ["SGLT2 inhibitor","Sulfonylurea","DPP-4 inhibitor","GLP-1 receptor agonist"], "answer": ["SGLT2 inhibitor"] },
       { "type": "mcq", "prompt": "Amaryl → Category?", "choices": ["Antidiabetic","Antilipemic","Anticoagulant","Antidepressant"], "answer": ["Antidiabetic"] },
       { "type": "mcq", "prompt": "Which drug has this mechanism? Stimulates pancreatic beta cells by blocking ATP-sensitive potassium channels to increase insulin release.", "choices": ["Glucotrol XL","Jardiance","Farxiga","Zepbound"], "answer": ["Glucotrol XL"] },
-      { "type": "mcq", "prompt": "Pick the mechanism for Invokana (Canagliflozin).", "choices": ["Inhibits SGLT2 in the proximal renal tubules, reducing glucose reabsorption","Inhibits DPP-4, increasing incretin levels","Activates GLP-1 receptor","Increases insulin sensitivity by activating PPAR-gamma"], "answer": ["Inhibits SGLT2 in the proximal renal tubules, reducing glucose reabsorption"] },
+      { "type": "mcq", "prompt": "Pick the mechanism for Invokana (Canagliflozin).", "choices": ["Inhibits SGLT2 in the proximal renal tubules to reduce glucose reabsorption.","Inhibits DPP-4, increasing incretin levels.","Activates GLP-1 receptor.","Increases insulin sensitivity by activating PPAR-gamma."], "answer": ["Inhibits SGLT2 in the proximal renal tubules to reduce glucose reabsorption."] },
 
       { "type": "short", "prompt": "Brand for Phenytoin?", "answerText": ["Dilantin","dilantin"] },
       { "type": "short", "prompt": "Generic for Ambien?", "answerText": ["zolpidem"] },
