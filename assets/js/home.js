@@ -20,18 +20,19 @@ function runHome() {
   // 1) Theme toggle (with guards)
   const THEME_KEY = "quiz-theme";
   const t = document.getElementById("theme-toggle");
-  if (t) {
+  const tLabel = document.getElementById("theme-label");
+  if (t && tLabel) {
     try {
       const saved = localStorage.getItem(THEME_KEY);
       const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)")?.matches;
       const start = saved || (prefersDark ? "dark" : "light");
       document.documentElement.classList.toggle("dark", start === "dark");
-  t.textContent = start === "dark" ? "Light" : "Dark";
+      tLabel.textContent = start === "dark" ? "Light" : "Dark";
       t.addEventListener("click", () => {
         const next = document.documentElement.classList.contains("dark") ? "light" : "dark";
         document.documentElement.classList.toggle("dark", next === "dark");
         localStorage.setItem(THEME_KEY, next);
-  t.textContent = next === "dark" ? "Light" : "Dark";
+        tLabel.textContent = next === "dark" ? "Light" : "Dark";
       });
     } catch (e) {
       console.warn("Theme toggle failed:", e);
