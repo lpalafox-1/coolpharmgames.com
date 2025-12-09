@@ -98,7 +98,7 @@ function runHome() {
   if (filter) {
     filter.addEventListener("input", () => {
       const q = filter.value.toLowerCase().trim();
-      const cards = document.querySelectorAll("#classes .card");
+      const cards = document.querySelectorAll("#classes .card, #classes-section + div .card");
       cards.forEach(card => {
         const text = card.textContent.toLowerCase();
         card.style.display = text.includes(q) ? "" : "none";
@@ -106,7 +106,45 @@ function runHome() {
     });
   }
 
-  // 5) Auto-hide NEW banners after 7 days
+  // 5) Sort quizzes
+  const sortSelect = document.getElementById("sort-quizzes");
+  if (sortSelect) {
+    sortSelect.addEventListener("change", () => {
+      const sortBy = sortSelect.value;
+      const cardsContainer = document.querySelector("#classes-section + div");
+      if (!cardsContainer) return;
+      
+      const cards = Array.from(cardsContainer.querySelectorAll(".card"));
+      
+      if (sortBy === "name") {
+        cards.sort((a, b) => {
+          const aTitle = a.querySelector("h3")?.textContent || "";
+          const bTitle = b.querySelector("h3")?.textContent || "";
+          return aTitle.localeCompare(bTitle);
+        });
+      } else if (sortBy === "recent") {
+        cards.sort((a, b) => {
+          const aNew = a.querySelector(".pill-new");
+          const bNew = b.querySelector(".pill-new");
+          if (aNew && !bNew) return -1;
+          if (!aNew && bNew) return 1;
+          if (aNew && bNew) {
+            const aDate = new Date(aNew.dataset.added || "2000-01-01");
+            const bDate = new Date(bNew.dataset.added || "2000-01-01");
+            return bDate - aDate;
+          }
+          return 0;
+        });
+      }
+      // "default" keeps original DOM order
+      
+      if (sortBy !== "default") {
+        cards.forEach(card => cardsContainer.appendChild(card));
+      }
+    });
+  }
+
+  // 6) Auto-hide NEW banners after 7 days
   try {
     const newBanners = document.querySelectorAll('.pill-new[data-added]');
     const now = new Date();

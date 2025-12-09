@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>My Favorites — Pharm-let</title>
+  <meta name="description" content="Quick access to your bookmarked quizzes." />
+  <meta name="theme-color" content="#8b1e3f" />
+  <link rel="icon" href="assets/icon.png" />
+
+  <!-- CSP -->
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self';
+             img-src 'self' data:;
+             style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com;
+             script-src 'self' https://cdn.tailwindcss.com;
+             connect-src 'self';">
+
+  <!-- Tailwind + site styles -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+
+  <style>
+    .favorite-item { background: var(--card); border: 1px solid var(--ring); border-radius: 12px; padding: 1rem; transition: all 0.2s; }
+    .favorite-item:hover { border-color: var(--accent); box-shadow: 0 4px 12px rgba(139,30,63,0.15); }
+  </style>
+</head>
+
+<body class="bg-[var(--bg)] text-[var(--text)]">
+  <!-- Header -->
+  <header class="flex justify-between items-center px-4 py-3 border-b border-[var(--ring)]">
+    <div class="flex items-center gap-3">
+      <a href="index.html" class="quiz-link">← Back to Library</a>
+      <h1 class="font-bold text-lg">My Favorites</h1>
+    </div>
+    <button id="theme-toggle" class="btn btn-ghost" type="button" aria-label="Toggle dark/light theme">
+      <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.5"/></svg>
+      <span id="theme-label">Dark</span>
+    </button>
+  </header>
+
+  <main class="max-w-5xl mx-auto p-6">
+    <div class="mb-6">
+      <h2 class="text-2xl font-bold mb-2">Bookmarked Quizzes</h2>
+      <p style="color:var(--muted)">Quick access to your favorite quizzes for efficient studying.</p>
+    </div>
+
+    <!-- Sort & Filter Options -->
+    <div class="flex flex-wrap gap-3 mb-6">
+      <select id="sort-by" class="rounded-xl border px-3 py-2" style="border-color:var(--ring); background:var(--card); color:var(--text)">
+        <option value="recent">Sort: Recently Added</option>
+        <option value="name">Sort: Name (A-Z)</option>
+        <option value="category">Sort: Category</option>
+      </select>
+      
+      <select id="filter-category" class="rounded-xl border px-3 py-2" style="border-color:var(--ring); background:var(--card); color:var(--text)">
+        <option value="">All Categories</option>
+        <option value="chapter">Chapter Reviews</option>
+        <option value="practice">Exam Practice</option>
+        <option value="lab">Lab Quizzes</option>
+        <option value="cumulative">Cumulative</option>
+        <option value="final">Final Review</option>
+        <option value="fun">Fun Modes</option>
+      </select>
+
+      <button id="clear-all" class="btn btn-ghost ml-auto">Clear All Favorites</button>
+    </div>
+
+    <!-- Favorites List -->
+    <div id="favorites-list" class="grid md:grid-cols-2 gap-4">
+      <div class="text-center py-12" style="color:var(--muted)">
+        <p class="text-lg">No favorites yet!</p>
+        <p class="mt-2">Click the star (☆) next to any quiz on the library page to add it here.</p>
+        <a href="index.html" class="btn btn-blue mt-4 inline-block">Browse Quizzes</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="assets/js/favorites.js" defer></script>
+</body>
+</html>

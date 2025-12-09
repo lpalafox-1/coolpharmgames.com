@@ -41,6 +41,7 @@
     <div class="max-w-3xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
       <a href="index.html" class="quiz-link">← Back to Library</a>
       <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+        <button id="help-shortcuts" class="btn btn-ghost" type="button" aria-label="Keyboard shortcuts help">?</button>
         <button id="share" class="btn btn-ghost" type="button" aria-label="Copy quiz link">Share</button>
 
         <!-- Font size controls -->
@@ -157,6 +158,43 @@
   <div id="celebrate" class="text-4xl mt-4 hidden" aria-hidden="true"></div>
       <!-- summary + review button are injected by JS -->
     </section>
+
+    <!-- Keyboard Shortcuts Modal -->
+    <div id="shortcuts-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50" style="display:none;">
+      <div class="card max-w-2xl w-full mx-4 p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-2xl font-bold">Keyboard Shortcuts</h2>
+          <button id="close-shortcuts" class="btn btn-ghost text-2xl" aria-label="Close">×</button>
+        </div>
+        
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <h3 class="font-semibold mb-3">Navigation</h3>
+            <div class="space-y-2 text-sm">
+              <div class="flex justify-between"><span>Next question</span><kbd class="px-2 py-1 rounded" style="background:var(--ring)">→ or N</kbd></div>
+              <div class="flex justify-between"><span>Previous question</span><kbd class="px-2 py-1 rounded" style="background:var(--ring)">← or P</kbd></div>
+              <div class="flex justify-between"><span>Check answer</span><kbd class="px-2 py-1 rounded" style="background:var(--ring)">Enter or C</kbd></div>
+              <div class="flex justify-between"><span>Restart quiz</span><kbd class="px-2 py-1 rounded" style="background:var(--ring)">R</kbd></div>
+            </div>
+          </div>
+          
+          <div>
+            <h3 class="font-semibold mb-3">Quiz Controls</h3>
+            <div class="space-y-2 text-sm">
+              <div class="flex justify-between"><span>Select option 1-9</span><kbd class="px-2 py-1 rounded" style="background:var(--ring)">1-9</kbd></div>
+              <div class="flex justify-between"><span>Show hint</span><kbd class="px-2 py-1 rounded" style="background:var(--ring)">H</kbd></div>
+              <div class="flex justify-between"><span>Reveal solution</span><kbd class="px-2 py-1 rounded" style="background:var(--ring)">S</kbd></div>
+              <div class="flex justify-between"><span>Mark for review</span><kbd class="px-2 py-1 rounded" style="background:var(--ring)">M</kbd></div>
+              <div class="flex justify-between"><span>Toggle timer</span><kbd class="px-2 py-1 rounded" style="background:var(--ring)">T</kbd></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-6 pt-4 border-t border-[var(--ring)] text-sm" style="color:var(--muted)">
+          <p>💡 Tip: Press <kbd class="px-2 py-1 rounded" style="background:var(--ring)">?</kbd> anytime to see this help menu.</p>
+        </div>
+      </div>
+    </div>
   </main>
 
   <!-- Scripts (no inline JS; CSP-safe) -->

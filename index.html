@@ -115,24 +115,39 @@
     <!-- Classes grid -->
     <main id="main-content" class="max-w-5xl mx-auto px-4 pb-16">
       <!-- Quick Actions -->
-      <div class="grid md:grid-cols-2 gap-4 mb-6">
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <a href="stats.html" class="card p-4 hover:border-[var(--accent)] transition-colors">
           <div class="font-semibold">📊 Performance Stats</div>
           <div class="text-sm mt-1" style="color:var(--muted)">Track your progress and scores</div>
         </a>
-        <a href="#classes-section" class="card p-4 hover:border-[var(--accent)] transition-colors">
-          <div class="font-semibold">📚 Browse All Quizzes</div>
-          <div class="text-sm mt-1" style="color:var(--muted)">Explore all available practice</div>
+        <a href="favorites.html" class="card p-4 hover:border-[var(--accent)] transition-colors">
+          <div class="font-semibold">⭐ My Favorites</div>
+          <div class="text-sm mt-1" style="color:var(--muted)">Bookmarked quizzes</div>
+        </a>
+        <a href="review-queue.html" class="card p-4 hover:border-[var(--accent)] transition-colors">
+          <div class="font-semibold">🎯 Review Queue</div>
+          <div class="text-sm mt-1" style="color:var(--muted)">Practice wrong answers</div>
+        </a>
+        <a href="study-timer.html" class="card p-4 hover:border-[var(--accent)] transition-colors">
+          <div class="font-semibold">⏱️ Study Timer</div>
+          <div class="text-sm mt-1" style="color:var(--muted)">Track study sessions</div>
         </a>
       </div>
 
       <div id="classes-section" class="flex items-end justify-between gap-4 mb-4">
         <h2 class="text-xl font-bold">Classes</h2>
         <!-- Quick filter -->
-        <input id="class-filter" class="w-64 rounded-xl border px-3 py-2"
-               style="border-color:var(--ring); background:var(--card); color:var(--text)"
-               placeholder="Filter: e.g., Anticoagulants, Easy, POPP"
-               aria-label="Filter quizzes by name or topic" />
+        <div class="flex gap-2">
+          <select id="sort-quizzes" class="rounded-xl border px-3 py-2 text-sm" style="border-color:var(--ring); background:var(--card); color:var(--text)">
+            <option value="default">Sort: Default</option>
+            <option value="name">Sort: Name (A-Z)</option>
+            <option value="recent">Sort: Recently Added</option>
+          </select>
+          <input id="class-filter" class="w-64 rounded-xl border px-3 py-2 text-sm"
+                 style="border-color:var(--ring); background:var(--card); color:var(--text)"
+                 placeholder="Filter: e.g., Anticoagulants, Easy, POPP"
+                 aria-label="Filter quizzes by name or topic" />
+        </div>
       </div>
 
       <div class="grid md:grid-cols-2 gap-4">
@@ -528,7 +543,7 @@
 
       <!-- Footer -->
       <div class="text-center text-sm py-6 mt-6" style="color:var(--muted)">
-        <p>📚 <strong>Over 1184 practice questions</strong> currently available across comprehensive quiz topics</p>
+        <p>📚 <strong>Over 1600 practice questions</strong> currently available across comprehensive quiz topics</p>
         <p class="mt-1">Additional content added regularly as course materials expand</p>
       </div>
       <footer class="text-center text-sm py-4" style="color:var(--muted)">

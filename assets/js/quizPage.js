@@ -33,6 +33,45 @@
     }
   });
 
+  /* ---------- Keyboard shortcuts modal ---------- */
+  const modal = document.getElementById('shortcuts-modal');
+  const helpBtn = document.getElementById('help-shortcuts');
+  const closeBtn = document.getElementById('close-shortcuts');
+  
+  function showModal() {
+    if (modal) {
+      modal.style.display = 'flex';
+      modal.classList.remove('hidden');
+    }
+  }
+  
+  function hideModal() {
+    if (modal) {
+      modal.style.display = 'none';
+      modal.classList.add('hidden');
+    }
+  }
+  
+  helpBtn?.addEventListener('click', showModal);
+  closeBtn?.addEventListener('click', hideModal);
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) hideModal();
+  });
+  
+  // Show modal on '?' key
+  window.addEventListener('keydown', (e) => {
+    if (e.key === '?' && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey) {
+      const activeEl = document.activeElement;
+      if (activeEl?.tagName !== 'INPUT' && activeEl?.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        showModal();
+      }
+    }
+    if (e.key === 'Escape') {
+      hideModal();
+    }
+  });
+
   /* ---------- Theme toggle is handled by quizEngine.js ---------- */
   // Theme toggle functionality moved to quizEngine.js to avoid conflicts
 

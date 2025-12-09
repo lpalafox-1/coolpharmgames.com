@@ -733,6 +733,31 @@ function savePerformanceHistory(){
   try {
     const HISTORY_KEY = "pharmlet.history";
     const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+    
+    // Track wrong answers for review queue
+    const wrongAnswers = state.questions
+      .filter(q => q._answered && !q._correct)
+      .map(q => ({
+        quizId,
+        mode,
+        questionId: q._id,
+        prompt: q.prompt,
+        type: q.type,
+        choices: q.choices || null,
+        answer: q.answer || q.answerText || q.answerIndex,
+        userAnswer: q._user,
+        timestamp: new Date().toISOString()
+      }));
+    
+    if (wrongAnswers.length > 0) {
+      const REVIEW_KEY = "pharmlet.review-queue";
+      const reviewQueue = JSON.parse(localStorage.getItem(REVIEW_KEY) || "[]");
+      reviewQueue.push(...wrongAnswers);
+      // Keep last 500 wrong answers
+      if (reviewQueue.length > 500) reviewQueue.splice(0, reviewQueue.length - 500);
+      localStorage.setItem(REVIEW_KEY, JSON.stringify(reviewQueue));
+    }
+    
     history.push({
       quizId,
       mode,

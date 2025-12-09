@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Study Timer — Pharm-let</title>
+  <meta name="description" content="Track study time with Pomodoro timer and session tracking." />
+  <meta name="theme-color" content="#8b1e3f" />
+  <link rel="icon" href="assets/icon.png" />
+
+  <!-- CSP -->
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self';
+             img-src 'self' data:;
+             style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com;
+             script-src 'self' https://cdn.tailwindcss.com;
+             connect-src 'self';">
+
+  <!-- Tailwind + site styles -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+
+  <style>
+    .timer-display { font-size: 5rem; font-weight: 700; color: var(--accent); line-height: 1; font-variant-numeric: tabular-nums; }
+    .timer-circle { width: 300px; height: 300px; }
+    .progress-ring { transform: rotate(-90deg); }
+    .progress-ring-circle { fill: none; stroke: var(--ring); stroke-width: 12; }
+    .progress-ring-fill { fill: none; stroke: var(--accent); stroke-width: 12; stroke-linecap: round; transition: stroke-dashoffset 0.5s; }
+    .session-card { background: var(--card); border: 1px solid var(--ring); border-radius: 12px; padding: 1rem; }
+  </style>
+</head>
+
+<body class="bg-[var(--bg)] text-[var(--text)]">
+  <!-- Header -->
+  <header class="flex justify-between items-center px-4 py-3 border-b border-[var(--ring)]">
+    <div class="flex items-center gap-3">
+      <a href="index.html" class="quiz-link">← Back to Library</a>
+      <h1 class="font-bold text-lg">Study Timer</h1>
+    </div>
+    <button id="theme-toggle" class="btn btn-ghost" type="button" aria-label="Toggle dark/light theme">
+      <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.5"/></svg>
+      <span id="theme-label">Dark</span>
+    </button>
+  </header>
+
+  <main class="max-w-5xl mx-auto p-6">
+    <!-- Timer Mode Selection -->
+    <div class="flex justify-center gap-3 mb-8">
+      <button id="mode-session" class="btn btn-blue active">Session Timer</button>
+      <button id="mode-pomodoro" class="btn btn-ghost">Pomodoro (25/5)</button>
+    </div>
+
+    <!-- Timer Display -->
+    <div class="flex flex-col items-center mb-8">
+      <div class="timer-circle relative flex items-center justify-center mb-6">
+        <svg class="progress-ring absolute inset-0" width="300" height="300">
+          <circle class="progress-ring-circle" cx="150" cy="150" r="138" />
+          <circle id="progress-ring-fill" class="progress-ring-fill" cx="150" cy="150" r="138" 
+                  stroke-dasharray="867" stroke-dashoffset="0" />
+        </svg>
+        <div id="timer-display" class="timer-display">00:00</div>
+      </div>
+      
+      <div class="flex gap-3">
+        <button id="start-timer" class="btn btn-blue px-8">Start</button>
+        <button id="pause-timer" class="btn btn-ghost px-8 hidden">Pause</button>
+        <button id="reset-timer" class="btn btn-ghost px-8">Reset</button>
+      </div>
+
+      <div id="pomodoro-status" class="mt-4 text-sm hidden" style="color:var(--muted)">
+        Work Session • 0 completed today
+      </div>
+    </div>
+
+    <!-- Session Stats -->
+    <div class="grid md:grid-cols-3 gap-4 mb-8">
+      <div class="session-card">
+        <div class="text-sm" style="color:var(--muted)">Today's Study Time</div>
+        <div class="text-2xl font-bold mt-1" style="color:var(--accent)" id="today-time">0h 0m</div>
+      </div>
+      <div class="session-card">
+        <div class="text-sm" style="color:var(--muted)">This Week</div>
+        <div class="text-2xl font-bold mt-1" style="color:var(--accent)" id="week-time">0h 0m</div>
+      </div>
+      <div class="session-card">
+        <div class="text-sm" style="color:var(--muted)">Total Sessions</div>
+        <div class="text-2xl font-bold mt-1" style="color:var(--accent)" id="total-sessions">0</div>
+      </div>
+    </div>
+
+    <!-- Recent Sessions -->
+    <section>
+      <h2 class="text-xl font-bold mb-4">Recent Study Sessions</h2>
+      <div class="card p-4">
+        <div id="recent-sessions" class="space-y-3">
+          <p style="color:var(--muted)">No sessions yet. Start your first study session!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Clear Data -->
+    <div class="text-center mt-6">
+      <button id="clear-sessions" class="btn btn-ghost text-sm">Clear All Session Data</button>
+    </div>
+  </main>
+
+  <script src="assets/js/study-timer.js" defer></script>
+</body>
+</html>
