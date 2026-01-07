@@ -25,15 +25,11 @@ public class QuizEngine {
 
         try {
             List<Drug> masterPool = loadMasterPool();
-            List<Drug> selectedDrugs = selectDrugs(masterPool, quizNumber);
+            Quiz quiz = generateQuiz(masterPool, quizNumber);
 
-            if (selectedDrugs.size() < 10) {
-                System.out.println("Warning: Only found " + selectedDrugs.size() + " drugs for the quiz.");
-            } else {
-                 System.out.println("Selected " + selectedDrugs.size() + " drugs.");
-            }
+            int total = quiz.pools.lab1.size() + quiz.pools.lab2.size();
+            System.out.println("Generated quiz with " + total + " total questions in pools.");
 
-            Quiz quiz = generateQuiz(selectedDrugs, quizNumber);
             saveQuiz(quiz, quizNumber);
 
         } catch (IOException e) {
@@ -46,53 +42,53 @@ public class QuizEngine {
         return mapper.readValue(new File(MASTER_POOL_FILE), new TypeReference<List<Drug>>(){});
     }
 
-    private static List<Drug> selectDrugs(List<Drug> masterPool, int quizNumber) {
-        List<Drug> lab2QuizX = masterPool.stream()
-                .filter(d -> d.metadata.lab == 2 && d.metadata.quiz == quizNumber)
-                .collect(Collectors.toList());
-
-        List<Drug> lab1QuizLteX = masterPool.stream()
-                .filter(d -> d.metadata.lab == 1 && d.metadata.quiz <= quizNumber)
-                .collect(Collectors.toList());
-
-        Collections.shuffle(lab2QuizX);
-        Collections.shuffle(lab1QuizLteX);
-
-        List<Drug> selected = new ArrayList<>();
-
-        // Pick exactly 6 from lab 2 quiz X
-        for (int i = 0; i < 6 && i < lab2QuizX.size(); i++) {
-            selected.add(lab2QuizX.get(i));
-        }
-
-        // Pick exactly 4 from lab 1 quiz <= X
-        // Ensure no duplicates if possible
-        Set<String> selectedGenerics = selected.stream().map(d -> d.generic.toLowerCase()).collect(Collectors.toSet());
-
-        int count = 0;
-        for (Drug d : lab1QuizLteX) {
-            if (count >= 4) break;
-            if (!selectedGenerics.contains(d.generic.toLowerCase())) {
-                selected.add(d);
-                selectedGenerics.add(d.generic.toLowerCase());
-                count++;
-            }
-        }
-
-        return selected;
-    }
-
-    private static Quiz generateQuiz(List<Drug> drugs, int quizNumber) {
+    private static Quiz generateQuiz(List<Drug> masterPool, int quizNumber) {
         Quiz quiz = new Quiz();
         quiz.id = "generated-quiz-" + quizNumber;
         quiz.title = "Generated Quiz " + quizNumber;
         quiz.pools = new Pools();
-        quiz.pools.easy = new ArrayList<>();
+        quiz.blueprint = new HashMap<>();
 
+        // Logic for source pools
+        List<Drug> lab2Pool = masterPool.stream()
+                .filter(d -> d.metadata.lab == 2 && d.metadata.quiz == quizNumber)
+                .collect(Collectors.toList());
+
+        List<Drug> lab1Pool;
+        if (quizNumber == 1) {
+            // Lab 1 Weeks 1-3
+            lab1Pool = masterPool.stream()
+                .filter(d -> d.metadata.lab == 1 && d.metadata.week >= 1 && d.metadata.week <= 3)
+                .collect(Collectors.toList());
+        } else if (quizNumber == 2) {
+            // Lab 1 Weeks 4-6
+            lab1Pool = masterPool.stream()
+                .filter(d -> d.metadata.lab == 1 && d.metadata.week >= 4 && d.metadata.week <= 6)
+                .collect(Collectors.toList());
+        } else {
+             // Default fallback for other quizzes (e.g. cumulative)
+             lab1Pool = masterPool.stream()
+                .filter(d -> d.metadata.lab == 1 && d.metadata.quiz <= quizNumber)
+                .collect(Collectors.toList());
+        }
+
+        // Add to pools
+        quiz.pools.lab2 = generateQuestions(lab2Pool);
+        quiz.pools.lab1 = generateQuestions(lab1Pool);
+
+        // Create blueprint for 'easy' mode
+        List<BlueprintRule> rules = new ArrayList<>();
+        rules.add(new BlueprintRule("lab2", 6));
+        rules.add(new BlueprintRule("lab1", 4));
+        quiz.blueprint.put("easy", rules);
+
+        return quiz;
+    }
+
+    private static List<Question> generateQuestions(List<Drug> drugs) {
+        List<Question> questions = new ArrayList<>();
         for (Drug drug : drugs) {
             // Generate questions based on rules
-            // Rules: 'Short' questions are only for Brand-Generic. Use Multiple Choice for MOA, Class, and Category.
-
             List<String> questionTypes = new ArrayList<>();
             if (drug.brand != null) {
                 questionTypes.add("brand-generic");
@@ -104,6 +100,11 @@ public class QuizEngine {
 
             if (questionTypes.isEmpty()) continue;
 
+            // Generate ALL possible question types for the pool to maximize variety?
+            // Or just one random per drug?
+            // If we want randomization per attempt, having multiple questions per drug is better.
+            // But let's stick to 1 per drug for now to avoid bloating, or maybe 2.
+            // Let's generate 1 random one for now.
             String type = questionTypes.get(new Random().nextInt(questionTypes.size()));
 
             Question q = null;
@@ -126,18 +127,15 @@ public class QuizEngine {
             }
 
             if (q != null) {
-                // Add mapping
                 q.mapping = new HashMap<>();
                 q.mapping.put("generic", drug.generic);
                 if (drug.brand != null) q.mapping.put("brand", drug.brand);
                 if (drug.drugClass != null) q.mapping.put("class", drug.drugClass);
                 if (drug.category != null) q.mapping.put("category", drug.category);
-
-                quiz.pools.easy.add(q);
+                questions.add(q);
             }
         }
-
-        return quiz;
+        return questions;
     }
 
     private static Question createShortQuestion(String prompt, String answer) {
@@ -215,6 +213,7 @@ public class QuizEngine {
     public static class Metadata {
         public int lab;
         public int quiz;
+        public int week;
         public boolean is_new;
     }
 
@@ -222,10 +221,24 @@ public class QuizEngine {
         public String id;
         public String title;
         public Pools pools;
+        public Map<String, List<BlueprintRule>> blueprint;
+    }
+
+    public static class BlueprintRule {
+        public String source;
+        public int count;
+        public BlueprintRule() {}
+        public BlueprintRule(String source, int count) {
+            this.source = source;
+            this.count = count;
+        }
     }
 
     public static class Pools {
         public List<Question> easy;
+        // Dynamic fields for pools
+        public List<Question> lab1;
+        public List<Question> lab2;
     }
 
     public static class Question {

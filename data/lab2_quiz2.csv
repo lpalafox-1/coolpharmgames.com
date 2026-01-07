@@ -1,11 +1,8 @@
-Generic Name,Brand Name,Medication Class,Category,Full MOA
-Cetirizine,Zyrtec,"H1 Antagonist, 2nd Generation",Antihistamine,Selectively inhibits peripheral Histamine-1 (H1) receptors.
-Diphenhydramine,Benadryl,"H1 Antagonist, 1st Generation",Antihistamine,Inhibits Histamine-1(H1) receptors peripherally and centrally.
-Meloxicam,Mobic,NSAID,Analgesic,"Inhibits cyclooxygenase (COX-1 and COX-2), decreasing the formation of prostaglandins. "
-Celecoxib,Celebrex,COX-2 Selective NSAID,Analgesic,"Inhibits cyclooxygenase (COX-2), decreasing the formation of prostaglandins. "
-
-Generic Name,Brand Name,Medication Class,Category,Full MOA
-Hydrocodone,Norco (with APAP),Opioid Analgesic,Analgesic; Opioid,"Binds to mu-opioid receptors in the CNS, altering the perception of and response to pain. "
-Omeprazole,Prilosec,Proton Pump Inhibitor (PPI),Antacid,"Inhibits the H+/K+ ATPase enzyme system in the gastric parietal cells, reducing the production of gastric acid. "
-Famotidine,Pepcid,Histamine H2 Receptor Antagonist,Antacid,"Inhibits histamine at H2 receptors of the gastric parietal cells, reducing gastric acid secretion. "
-Ondansetron,Zofran,Selective 5-HT3 Receptor Antagonist,Antiemetic,"Selectively inhibits 5-HT3 receptors which blocks serotonin, both peripherally on vagal nerve terminals and centrally. "
+Generic Name,Brand Name,Medication Class,Full Mechanism of Action (MOA)
+Prasugrel,Effient,Thienopyridine P2Y12 Antagonist,Inhibits platelet activation and aggregation by irreversibly binding to the P2Y12 class of ADP receptors on platelets.
+Ticagrelor,Brilinta,P2Y12 Antagonist,"Reversibly binds to the P2Y12 ADP receptor on platelets, inhibiting platelet activation and aggregation."
+Aspirin,Bayer,Antiplatelet Agent,"Inhibits cyclooxygenase-1 (COX-1) and cyclooxygenase-2 (COX-2), reducing the formation of thromboxane A2 and inhibiting platelet aggregation."
+Isosorbide Mononitrate,Imdur,Nitrate,"Relaxes vascular smooth muscle by increasing nitric oxide, leading to vasodilation."
+Valsartan/sacubitril,Entresto,ARB & Neprilysin Inhibitor,"Selectively blocks binding of angiotensin II to AT1 receptor, preventing vasoconstriction and reducing aldosterone secretion; inhibits neprilysin to induce vasodilation and natriuresis."
+Alteplase,Activase,Thrombolytic Agent,"Converts plasminogen to plasmin, leading to the degradation of fibrin in thrombi."
+Tenecteplase,TNKase,Thrombolytic Agent,"Converts plasminogen to plasmin, leading to the degradation of fibrin in thrombi."

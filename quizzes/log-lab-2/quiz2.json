@@ -2,96 +2,109 @@
   "id" : "generated-quiz-2",
   "title" : "Generated Quiz 2",
   "pools" : {
-    "easy" : [ {
+    "easy" : null,
+    "lab1" : [ {
       "type" : "short",
-      "prompt" : "What is the brand name for Hydrocodone?",
+      "prompt" : "What is the generic name for Zocor?",
       "choices" : null,
       "answer" : null,
-      "answerText" : [ "norco (with apap)" ],
+      "answerText" : [ "simvastatin" ],
       "mapping" : {
-        "category" : "Analgesic; Opioid",
-        "brand" : "Norco (with APAP)",
-        "class" : "Opioid Analgesic",
-        "generic" : "Hydrocodone"
-      }
-    }, {
-      "type" : "short",
-      "prompt" : "What is the brand name for Diphenhydramine?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "benadryl" ],
-      "mapping" : {
-        "category" : "Antihistamine",
-        "brand" : "Benadryl",
-        "class" : "H1 Antagonist, 1st Generation",
-        "generic" : "Diphenhydramine"
+        "category" : "Antilipemic",
+        "brand" : "Zocor",
+        "class" : "HMG-CoA Reductase Inhibitor",
+        "generic" : "Simvastatin"
       }
     }, {
       "type" : "mcq",
-      "prompt" : "Which class does Omeprazole belong to?",
-      "choices" : [ "ACE inhibitor", "Calcium channel blocker (dihydropyridine)", "Proton Pump Inhibitor (PPI)", "Thiazide diuretic" ],
-      "answer" : [ "Proton Pump Inhibitor (PPI)" ],
+      "prompt" : "What is the MOA of Rosuvastatin?",
+      "choices" : [ "Inhibits HMG-CoA reductase, reducing cholesterol synthesis and increasing LDL uptake from the blood.", "Blocks angiotensin II from binding to its receptor", "Inhibits conversion of angiotensin I to angiotensin II", "Competes with aldosterone in the distal tubule" ],
+      "answer" : [ "Inhibits HMG-CoA reductase, reducing cholesterol synthesis and increasing LDL uptake from the blood." ],
       "answerText" : null,
       "mapping" : {
-        "category" : "Antacid",
-        "brand" : "Prilosec",
-        "class" : "Proton Pump Inhibitor (PPI)",
-        "generic" : "Omeprazole"
+        "category" : "Antilipemic",
+        "brand" : "Crestor",
+        "class" : "HMG-CoA Reductase Inhibitor",
+        "generic" : "Rosuvastatin"
       }
     }, {
       "type" : "short",
-      "prompt" : "What is the brand name for Meloxicam?",
+      "prompt" : "What is the brand name for Atorvastatin?",
       "choices" : null,
       "answer" : null,
-      "answerText" : [ "mobic" ],
+      "answerText" : [ "lipitor" ],
       "mapping" : {
-        "category" : "Analgesic",
-        "brand" : "Mobic",
-        "class" : "NSAID",
-        "generic" : "Meloxicam"
+        "category" : "Antilipemic",
+        "brand" : "Lipitor",
+        "class" : "HMG-CoA Reductase Inhibitor",
+        "generic" : "Atorvastatin"
       }
     }, {
       "type" : "short",
-      "prompt" : "What is the generic name for Zofran?",
+      "prompt" : "What is the brand name for Pravastatin?",
       "choices" : null,
       "answer" : null,
-      "answerText" : [ "ondansetron" ],
+      "answerText" : [ "pravachol" ],
       "mapping" : {
-        "category" : "Antiemetic",
-        "brand" : "Zofran",
-        "class" : "Selective 5-HT3 Receptor Antagonist",
-        "generic" : "Ondansetron"
+        "category" : "Antilipemic",
+        "brand" : "Pravachol",
+        "class" : "HMG-CoA Reductase Inhibitor",
+        "generic" : "Pravastatin"
       }
     }, {
       "type" : "mcq",
-      "prompt" : "Which class does Celecoxib belong to?",
-      "choices" : [ "COX-2 Selective NSAID", "Thiazide diuretic", "Aldosterone receptor antagonist", "ACE inhibitor" ],
-      "answer" : [ "COX-2 Selective NSAID" ],
+      "prompt" : "What is the MOA of Fenofibrate?",
+      "choices" : [ "Competes with aldosterone in the distal tubule", "Inhibits conversion of angiotensin I to angiotensin II", "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle", "Activates peroxisome proliferator-activated receptor-alpha (PPAR-a), leading to lipolysis and elimination of triglyceride-rich particles." ],
+      "answer" : [ "Activates peroxisome proliferator-activated receptor-alpha (PPAR-a), leading to lipolysis and elimination of triglyceride-rich particles." ],
       "answerText" : null,
       "mapping" : {
-        "category" : "Analgesic",
-        "brand" : "Celebrex",
-        "class" : "COX-2 Selective NSAID",
-        "generic" : "Celecoxib"
-      }
-    }, {
-      "type" : "mcq",
-      "prompt" : "What is the MOA of Apixaban?",
-      "choices" : [ "Blocks calcium channels in vascular smooth muscle", "Inhibits factor Xa, preventing the conversion of prothrombin to thrombin.", "Blocks angiotensin II from binding to its receptor", "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle" ],
-      "answer" : [ "Inhibits factor Xa, preventing the conversion of prothrombin to thrombin." ],
-      "answerText" : null,
-      "mapping" : {
-        "category" : "Anticoagulant",
-        "brand" : "Eliquis",
-        "class" : "Direct Factor Xa Inhibitor",
-        "generic" : "Apixaban"
+        "category" : "Antilipemic",
+        "brand" : "Tricor",
+        "class" : "Fibric Acid Derivative",
+        "generic" : "Fenofibrate"
       }
     }, {
       "type" : "short",
-      "prompt" : "What is the brand name for Evolocumab?",
+      "prompt" : "What is the brand name for Niacin?",
       "choices" : null,
       "answer" : null,
-      "answerText" : [ "repatha" ],
+      "answerText" : [ "niaspan; niacor" ],
+      "mapping" : {
+        "category" : "Antilipemic",
+        "brand" : "Niaspan; Niacor",
+        "class" : "Nicotinic Acid",
+        "generic" : "Niacin"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "Which class does Omega-3 esters belong to?",
+      "choices" : [ "Aldosterone receptor antagonist", "Angiotensin II Receptor Blocker", "Beta-1 selective blocker", "Omega-3 Fatty Acid" ],
+      "answer" : [ "Omega-3 Fatty Acid" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Antilipemic",
+        "brand" : "Lovaza",
+        "class" : "Omega-3 Fatty Acid",
+        "generic" : "Omega-3 esters"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "Which class does Ezetimibe belong to?",
+      "choices" : [ "Calcium channel blocker (dihydropyridine)", "Aldosterone receptor antagonist", "Loop diuretic", "Cholesterol Absorp. Inhibitor" ],
+      "answer" : [ "Cholesterol Absorp. Inhibitor" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Antilipemic",
+        "brand" : "Zetia",
+        "class" : "Cholesterol Absorp. Inhibitor",
+        "generic" : "Ezetimibe"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the MOA of Evolocumab?",
+      "choices" : [ "Blocks calcium channels in vascular smooth muscle", "Competes with aldosterone in the distal tubule", "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle", "Inhibits PCSK9 which degrades LDL receptors; increases the number of LDL receptors available to clear LDL." ],
+      "answer" : [ "Inhibits PCSK9 which degrades LDL receptors; increases the number of LDL receptors available to clear LDL." ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Antilipemic",
         "brand" : "Repatha",
@@ -100,8 +113,68 @@
       }
     }, {
       "type" : "mcq",
+      "prompt" : "What is the category of Alirocumab?",
+      "choices" : [ "Anticoagulant", "Antilipemic", "Antiarrhythmic", "Antihypertensive" ],
+      "answer" : [ "Antilipemic" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Antilipemic",
+        "brand" : "Praluent",
+        "class" : "PCSK9 Inhibitor",
+        "generic" : "Alirocumab"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the category of Inclisiran?",
+      "choices" : [ "Antiarrhythmic", "Antihypertensive", "Anticoagulant", "Antilipemic" ],
+      "answer" : [ "Antilipemic" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Antilipemic",
+        "brand" : "Leqvio",
+        "class" : "siRNA Agent",
+        "generic" : "Inclisiran"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "Which class does Warfarin belong to?",
+      "choices" : [ "Fibric acid derivative", "Beta-1 selective blocker", "Loop diuretic", "Vitamin K Antagonist" ],
+      "answer" : [ "Vitamin K Antagonist" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Anticoagulant",
+        "brand" : "Coumadin, Jantoven",
+        "class" : "Vitamin K Antagonist",
+        "generic" : "Warfarin"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the generic name for Xarelto?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "rivaroxaban" ],
+      "mapping" : {
+        "category" : "Anticoagulant",
+        "brand" : "Xarelto",
+        "class" : "Direct Factor Xa Inhibitor",
+        "generic" : "Rivaroxaban"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "Which class does Apixaban belong to?",
+      "choices" : [ "Calcium channel blocker (non-dihydropyridine)", "HMG-CoA reductase inhibitor", "Beta-1 selective blocker", "Direct Factor Xa Inhibitor" ],
+      "answer" : [ "Direct Factor Xa Inhibitor" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Anticoagulant",
+        "brand" : "Eliquis",
+        "class" : "Direct Factor Xa Inhibitor",
+        "generic" : "Apixaban"
+      }
+    }, {
+      "type" : "mcq",
       "prompt" : "What is the MOA of Heparin?",
-      "choices" : [ "Inhibits Na+/Cl- reabsorption in the distal tubule", "Blocks angiotensin II from binding to its receptor", "Blocks calcium channels in vascular smooth muscle", "Enhances the activity of antithrombin III, inhibiting thrombin and factor Xa." ],
+      "choices" : [ "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle", "Inhibits Na+/Cl- reabsorption in the distal tubule", "Enhances the activity of antithrombin III, inhibiting thrombin and factor Xa.", "Blocks calcium channels in vascular smooth muscle" ],
       "answer" : [ "Enhances the activity of antithrombin III, inhibiting thrombin and factor Xa." ],
       "answerText" : null,
       "mapping" : {
@@ -112,16 +185,194 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "Which class does Chlorthalidone belong to?",
-      "choices" : [ "Thiazide Diuretic", "Angiotensin II Receptor Blocker", "Thiazide diuretic", "HMG-CoA reductase inhibitor" ],
-      "answer" : [ "Thiazide Diuretic" ],
+      "prompt" : "Which class does Enoxaparin belong to?",
+      "choices" : [ "Aldosterone receptor antagonist", "HMG-CoA reductase inhibitor", "ACE inhibitor", "Low Molecular Weight Heparin" ],
+      "answer" : [ "Low Molecular Weight Heparin" ],
       "answerText" : null,
       "mapping" : {
-        "category" : "Antihypertensive",
-        "brand" : "Hemiclor; Thalitone",
-        "class" : "Thiazide Diuretic",
-        "generic" : "Chlorthalidone"
+        "category" : "Anticoagulant",
+        "brand" : "Lovenox",
+        "class" : "Low Molecular Weight Heparin",
+        "generic" : "Enoxaparin"
       }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the brand name for Amiodarone?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "nexterone, pacerone" ],
+      "mapping" : {
+        "category" : "Antiarrhythmic",
+        "brand" : "Nexterone, Pacerone",
+        "class" : "Class III Antiarrhythmic",
+        "generic" : "Amiodarone"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the brand name for Sotalol?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "betapace" ],
+      "mapping" : {
+        "category" : "Antiarrhythmic",
+        "brand" : "Betapace",
+        "class" : "Class III Antiarrhythmic",
+        "generic" : "Sotalol"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the generic name for Lanoxin?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "digoxin" ],
+      "mapping" : {
+        "category" : "Antiarrhythmic",
+        "brand" : "Lanoxin",
+        "class" : "Cardiac Glycoside",
+        "generic" : "Digoxin"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the brand name for Metformin?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "glucophage" ],
+      "mapping" : {
+        "category" : "Antidiabetic",
+        "brand" : "Glucophage",
+        "class" : "Biguanide",
+        "generic" : "Metformin"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the category of Insulin Glargine?",
+      "choices" : [ "Antidiabetic", "Antihypertensive", "Antiarrhythmic", "Anticoagulant" ],
+      "answer" : [ "Antidiabetic" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Antidiabetic",
+        "brand" : "Lantus, Basaglar, Toujeo, Semglee",
+        "class" : "Long-acting Insulin",
+        "generic" : "Insulin Glargine"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "Which class does Sitagliptin belong to?",
+      "choices" : [ "HMG-CoA reductase inhibitor", "ACE inhibitor", "DPP-4 Inhibitor", "Aldosterone receptor antagonist" ],
+      "answer" : [ "DPP-4 Inhibitor" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Antidiabetic",
+        "brand" : "Januvia",
+        "class" : "DPP-4 Inhibitor",
+        "generic" : "Sitagliptin"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the brand name for Empagliflozin?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "jardiance" ],
+      "mapping" : {
+        "category" : "Antidiabetic",
+        "brand" : "Jardiance",
+        "class" : "SGLT2 Inhibitor",
+        "generic" : "Empagliflozin"
+      }
+    } ],
+    "lab2" : [ {
+      "type" : "short",
+      "prompt" : "What is the brand name for Prasugrel?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "effient" ],
+      "mapping" : {
+        "category" : "Inhibits platelet activation and aggregation by irreversibly binding to the P2Y12 class of ADP receptors on platelets.",
+        "brand" : "Effient",
+        "class" : "Thienopyridine P2Y12 Antagonist",
+        "generic" : "Prasugrel"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the brand name for Ticagrelor?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "brilinta" ],
+      "mapping" : {
+        "category" : "Reversibly binds to the P2Y12 ADP receptor on platelets, inhibiting platelet activation and aggregation.",
+        "brand" : "Brilinta",
+        "class" : "P2Y12 Antagonist",
+        "generic" : "Ticagrelor"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "Which class does Aspirin belong to?",
+      "choices" : [ "Beta-1 selective blocker", "HMG-CoA reductase inhibitor", "Thiazide diuretic", "Antiplatelet Agent" ],
+      "answer" : [ "Antiplatelet Agent" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Inhibits cyclooxygenase-1 (COX-1) and cyclooxygenase-2 (COX-2), reducing the formation of thromboxane A2 and inhibiting platelet aggregation.",
+        "brand" : "Bayer",
+        "class" : "Antiplatelet Agent",
+        "generic" : "Aspirin"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the brand name for Isosorbide Mononitrate?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "imdur" ],
+      "mapping" : {
+        "category" : "Relaxes vascular smooth muscle by increasing nitric oxide, leading to vasodilation.",
+        "brand" : "Imdur",
+        "class" : "Nitrate",
+        "generic" : "Isosorbide Mononitrate"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the brand name for Valsartan/sacubitril?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "entresto" ],
+      "mapping" : {
+        "category" : "Selectively blocks binding of angiotensin II to AT1 receptor, preventing vasoconstriction and reducing aldosterone secretion; inhibits neprilysin to induce vasodilation and natriuresis.",
+        "brand" : "Entresto",
+        "class" : "ARB & Neprilysin Inhibitor",
+        "generic" : "Valsartan/sacubitril"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the brand name for Alteplase?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "activase" ],
+      "mapping" : {
+        "category" : "Converts plasminogen to plasmin, leading to the degradation of fibrin in thrombi.",
+        "brand" : "Activase",
+        "class" : "Thrombolytic Agent",
+        "generic" : "Alteplase"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the brand name for Tenecteplase?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "tnkase" ],
+      "mapping" : {
+        "category" : "Converts plasminogen to plasmin, leading to the degradation of fibrin in thrombi.",
+        "brand" : "TNKase",
+        "class" : "Thrombolytic Agent",
+        "generic" : "Tenecteplase"
+      }
+    } ]
+  },
+  "blueprint" : {
+    "easy" : [ {
+      "source" : "lab2",
+      "count" : 6
+    }, {
+      "source" : "lab1",
+      "count" : 4
     } ]
   }
 }

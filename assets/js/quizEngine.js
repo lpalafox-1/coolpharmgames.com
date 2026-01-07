@@ -112,7 +112,21 @@ async function main() {
   const data = await res.json();
 
   let allPool = [];
-  if (data.pools) {
+  // Stratified sampling support via blueprint
+  if (data.blueprint && data.blueprint[mode]) {
+    const rules = data.blueprint[mode]; // e.g. [{ source: "lab2", count: 6 }, { source: "lab1", count: 4 }]
+    rules.forEach(rule => {
+      const sourcePool = data.pools[rule.source] || [];
+      // Shuffle source pool and take count
+      const subPool = shuffledCopy(sourcePool);
+      // If count is specified, limit it. If not, take all.
+      const count = typeof rule.count === 'number' ? rule.count : sourcePool.length;
+      allPool.push(...subPool.slice(0, count));
+    });
+    // If we have a limit param, we might want to respect it relative to the blueprint?
+    // The blueprint usually defines the total composition (e.g. 10 items).
+    // If limitParam is smaller than blueprint total, we just slice the final result later.
+  } else if (data.pools) {
     const keys = Object.keys(data.pools || {});
     if (mode === 'all' || mode === 'mix') {
       allPool = keys.reduce((acc,k)=> acc.concat(Array.isArray(data.pools[k])?data.pools[k]:[]), []);
