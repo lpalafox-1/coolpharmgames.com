@@ -1,0 +1,371 @@
+{
+  "id" : "generated-quiz-2",
+  "title" : "Generated Quiz 2",
+  "pools" : {
+    "easy" : null,
+    "lab1" : [ {
+      "type" : "mcq",
+      "prompt" : "What is the category of Simvastatin?",
+      "choices" : [ "Anticoagulant", "Antiarrhythmic", "Antilipemic", "Antihypertensive" ],
+      "answer" : [ "Antilipemic" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Antilipemic",
+        "brand" : "Zocor",
+        "class" : "HMG-CoA Reductase Inhibitor",
+        "generic" : "Simvastatin"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the MOA of Rosuvastatin?",
+      "choices" : [ "Inhibits HMG-CoA reductase, reducing cholesterol synthesis and increasing LDL uptake from the blood.", "Blocks calcium channels in vascular smooth muscle", "Blocks angiotensin II from binding to its receptor", "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle" ],
+      "answer" : [ "Inhibits HMG-CoA reductase, reducing cholesterol synthesis and increasing LDL uptake from the blood." ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Antilipemic",
+        "brand" : "Crestor",
+        "class" : "HMG-CoA Reductase Inhibitor",
+        "generic" : "Rosuvastatin"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the brand name for Atorvastatin?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "lipitor" ],
+      "mapping" : {
+        "category" : "Antilipemic",
+        "brand" : "Lipitor",
+        "class" : "HMG-CoA Reductase Inhibitor",
+        "generic" : "Atorvastatin"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the MOA of Pravastatin?",
+      "choices" : [ "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle", "Inhibits HMG-CoA reductase, reducing cholesterol synthesis and increasing LDL uptake from the blood.", "Inhibits Na+/Cl- reabsorption in the distal tubule", "Blocks calcium channels in vascular smooth muscle" ],
+      "answer" : [ "Inhibits HMG-CoA reductase, reducing cholesterol synthesis and increasing LDL uptake from the blood." ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Antilipemic",
+        "brand" : "Pravachol",
+        "class" : "HMG-CoA Reductase Inhibitor",
+        "generic" : "Pravastatin"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "Which class does Fenofibrate belong to?",
+      "choices" : [ "Fibric Acid Derivative", "Calcium channel blocker (dihydropyridine)", "Fibric acid derivative", "Thiazide diuretic" ],
+      "answer" : [ "Fibric Acid Derivative" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Antilipemic",
+        "brand" : "Tricor",
+        "class" : "Fibric Acid Derivative",
+        "generic" : "Fenofibrate"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the brand name for Niacin?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "niaspan; niacor" ],
+      "mapping" : {
+        "category" : "Antilipemic",
+        "brand" : "Niaspan; Niacor",
+        "class" : "Nicotinic Acid",
+        "generic" : "Niacin"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the brand name for Omega-3 esters?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "lovaza" ],
+      "mapping" : {
+        "category" : "Antilipemic",
+        "brand" : "Lovaza",
+        "class" : "Omega-3 Fatty Acid",
+        "generic" : "Omega-3 esters"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the category of Ezetimibe?",
+      "choices" : [ "Antilipemic", "Anticoagulant", "Antihypertensive", "Antiarrhythmic" ],
+      "answer" : [ "Antilipemic" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Antilipemic",
+        "brand" : "Zetia",
+        "class" : "Cholesterol Absorp. Inhibitor",
+        "generic" : "Ezetimibe"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the generic name for Repatha?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "evolocumab" ],
+      "mapping" : {
+        "category" : "Antilipemic",
+        "brand" : "Repatha",
+        "class" : "PCSK9 Inhibitor",
+        "generic" : "Evolocumab"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the generic name for Praluent?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "alirocumab" ],
+      "mapping" : {
+        "category" : "Antilipemic",
+        "brand" : "Praluent",
+        "class" : "PCSK9 Inhibitor",
+        "generic" : "Alirocumab"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the generic name for Leqvio?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "inclisiran" ],
+      "mapping" : {
+        "category" : "Antilipemic",
+        "brand" : "Leqvio",
+        "class" : "siRNA Agent",
+        "generic" : "Inclisiran"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the generic name for Coumadin, Jantoven?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "warfarin" ],
+      "mapping" : {
+        "category" : "Anticoagulant",
+        "brand" : "Coumadin, Jantoven",
+        "class" : "Vitamin K Antagonist",
+        "generic" : "Warfarin"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the brand name for Rivaroxaban?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "xarelto" ],
+      "mapping" : {
+        "category" : "Anticoagulant",
+        "brand" : "Xarelto",
+        "class" : "Direct Factor Xa Inhibitor",
+        "generic" : "Rivaroxaban"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the category of Apixaban?",
+      "choices" : [ "Anticoagulant", "Antilipemic", "Antihypertensive", "Antiarrhythmic" ],
+      "answer" : [ "Anticoagulant" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Anticoagulant",
+        "brand" : "Eliquis",
+        "class" : "Direct Factor Xa Inhibitor",
+        "generic" : "Apixaban"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "Which class does Heparin belong to?",
+      "choices" : [ "Calcium channel blocker (non-dihydropyridine)", "Anticoagulant", "Calcium channel blocker (dihydropyridine)", "ACE inhibitor" ],
+      "answer" : [ "Anticoagulant" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Anticoagulant",
+        "brand" : "Hep-Lock",
+        "class" : "Anticoagulant",
+        "generic" : "Heparin"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the MOA of Enoxaparin?",
+      "choices" : [ "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle", "Enhances the activity of antithrombin III, inhibiting thrombin and factor Xa.", "Inhibits conversion of angiotensin I to angiotensin II", "Blocks calcium channels in vascular smooth muscle" ],
+      "answer" : [ "Enhances the activity of antithrombin III, inhibiting thrombin and factor Xa." ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Anticoagulant",
+        "brand" : "Lovenox",
+        "class" : "Low Molecular Weight Heparin",
+        "generic" : "Enoxaparin"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the MOA of Amiodarone?",
+      "choices" : [ "Blocks angiotensin II from binding to its receptor", "Inhibits Na+/Cl- reabsorption in the distal tubule", "Inhibits potassium channels responsible for repolarization of the cardiac cell membrane; Prolongs the action potential and refractory period of cardiac cells.", "Inhibits conversion of angiotensin I to angiotensin II" ],
+      "answer" : [ "Inhibits potassium channels responsible for repolarization of the cardiac cell membrane; Prolongs the action potential and refractory period of cardiac cells." ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Antiarrhythmic",
+        "brand" : "Nexterone, Pacerone",
+        "class" : "Class III Antiarrhythmic",
+        "generic" : "Amiodarone"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the MOA of Sotalol?",
+      "choices" : [ "Inhibits Na+/Cl- reabsorption in the distal tubule", "Nonselectively blocks beta-adrenergic receptors and potassium channels to prolong the action potential and refractory period of cardiac cells.", "Inhibits conversion of angiotensin I to angiotensin II", "Blocks angiotensin II from binding to its receptor" ],
+      "answer" : [ "Nonselectively blocks beta-adrenergic receptors and potassium channels to prolong the action potential and refractory period of cardiac cells." ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Antiarrhythmic",
+        "brand" : "Betapace",
+        "class" : "Class III Antiarrhythmic",
+        "generic" : "Sotalol"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the generic name for Lanoxin?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "digoxin" ],
+      "mapping" : {
+        "category" : "Antiarrhythmic",
+        "brand" : "Lanoxin",
+        "class" : "Cardiac Glycoside",
+        "generic" : "Digoxin"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the MOA of Metformin?",
+      "choices" : [ "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle", "Blocks calcium channels in vascular smooth muscle", "Decreases hepatic glucose production, decreases intestinal absorption of glucose, and improves insulin sensitivity by increasing peripheral glucose uptake.", "Competes with aldosterone in the distal tubule" ],
+      "answer" : [ "Decreases hepatic glucose production, decreases intestinal absorption of glucose, and improves insulin sensitivity by increasing peripheral glucose uptake." ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Antidiabetic",
+        "brand" : "Glucophage",
+        "class" : "Biguanide",
+        "generic" : "Metformin"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the generic name for Lantus, Basaglar, Toujeo, Semglee?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "insulin glargine" ],
+      "mapping" : {
+        "category" : "Antidiabetic",
+        "brand" : "Lantus, Basaglar, Toujeo, Semglee",
+        "class" : "Long-acting Insulin",
+        "generic" : "Insulin Glargine"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the generic name for Januvia?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "sitagliptin" ],
+      "mapping" : {
+        "category" : "Antidiabetic",
+        "brand" : "Januvia",
+        "class" : "DPP-4 Inhibitor",
+        "generic" : "Sitagliptin"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the category of Empagliflozin?",
+      "choices" : [ "Antihypertensive", "Antiarrhythmic", "Antidiabetic", "Antilipemic" ],
+      "answer" : [ "Antidiabetic" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Antidiabetic",
+        "brand" : "Jardiance",
+        "class" : "SGLT2 Inhibitor",
+        "generic" : "Empagliflozin"
+      }
+    } ],
+    "lab2" : [ {
+      "type" : "short",
+      "prompt" : "What is the brand name for Prasugrel?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "effient" ],
+      "mapping" : {
+        "brand" : "Effient",
+        "class" : "Thienopyridine P2Y12 Antagonist",
+        "generic" : "Prasugrel"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the MOA of Ticagrelor?",
+      "choices" : [ "Inhibits Na+/Cl- reabsorption in the distal tubule", "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle", "Reversibly binds to the P2Y12 ADP receptor on platelets, inhibiting platelet activation and aggregation.", "Competes with aldosterone in the distal tubule" ],
+      "answer" : [ "Reversibly binds to the P2Y12 ADP receptor on platelets, inhibiting platelet activation and aggregation." ],
+      "answerText" : null,
+      "mapping" : {
+        "brand" : "Brilinta",
+        "class" : "P2Y12 Antagonist",
+        "generic" : "Ticagrelor"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "Which class does Aspirin belong to?",
+      "choices" : [ "Beta-1 selective blocker", "Fibric acid derivative", "ACE inhibitor", "Antiplatelet Agent" ],
+      "answer" : [ "Antiplatelet Agent" ],
+      "answerText" : null,
+      "mapping" : {
+        "brand" : "Bayer",
+        "class" : "Antiplatelet Agent",
+        "generic" : "Aspirin"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the MOA of Isosorbide Mononitrate?",
+      "choices" : [ "Inhibits Na+/Cl- reabsorption in the distal tubule", "Relaxes vascular smooth muscle by increasing nitric oxide, leading to vasodilation.", "Blocks angiotensin II from binding to its receptor", "Competes with aldosterone in the distal tubule" ],
+      "answer" : [ "Relaxes vascular smooth muscle by increasing nitric oxide, leading to vasodilation." ],
+      "answerText" : null,
+      "mapping" : {
+        "brand" : "Imdur",
+        "class" : "Nitrate",
+        "generic" : "Isosorbide Mononitrate"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "Which class does Valsartan/sacubitril belong to?",
+      "choices" : [ "ARB & Neprilysin Inhibitor", "Calcium channel blocker (non-dihydropyridine)", "Angiotensin II Receptor Blocker", "Beta-1 selective blocker" ],
+      "answer" : [ "ARB & Neprilysin Inhibitor" ],
+      "answerText" : null,
+      "mapping" : {
+        "brand" : "Entresto",
+        "class" : "ARB & Neprilysin Inhibitor",
+        "generic" : "Valsartan/sacubitril"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the brand name for Alteplase?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "activase" ],
+      "mapping" : {
+        "brand" : "Activase",
+        "class" : "Thrombolytic Agent",
+        "generic" : "Alteplase"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the MOA of Tenecteplase?",
+      "choices" : [ "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle", "Inhibits conversion of angiotensin I to angiotensin II", "Inhibits Na+/Cl- reabsorption in the distal tubule", "Converts plasminogen to plasmin, leading to the degradation of fibrin in thrombi." ],
+      "answer" : [ "Converts plasminogen to plasmin, leading to the degradation of fibrin in thrombi." ],
+      "answerText" : null,
+      "mapping" : {
+        "brand" : "TNKase",
+        "class" : "Thrombolytic Agent",
+        "generic" : "Tenecteplase"
+      }
+    } ]
+  },
+  "blueprint" : {
+    "easy" : [ {
+      "source" : "lab2",
+      "count" : 6
+    }, {
+      "source" : "lab1",
+      "count" : 4
+    } ]
+  }
+}
