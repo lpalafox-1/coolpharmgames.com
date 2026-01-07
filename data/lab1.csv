@@ -1,0 +1,29 @@
+Generic Name,Brand Name,Medication Class,Category,Full Mechanism of Action (MOA)
+Lisinopril,Zestril,ACE Inhibitor,Antihypertensive,"Inhibits the conversion of angiotensin I to angiotensin II, causing vasodilation and reduction in the release of aldosterone."
+Amlodipine,Norvasc,CCB (Dihydropyridine),Antihypertensive,"Inhibits the influx of calcium ions into vascular smooth muscle and cardiac muscle, resulting in decreased peripheral vascular resistance and reduced blood pressure."
+Losartan,Cozaar,ARB,Antihypertensive,"Selectively blocks the binding of angiotensin II to the AT1 receptor, preventing vasoconstriction and reducing the secretion of aldosterone."
+Hydrochlorothiazide,Microzide,Thiazide Diuretic,Antihypertensive,"Inhibits sodium reabsorption in the distal tubules causing increased excretion of sodium and water, as well as potassium and hydrogen ions."
+Furosemide,Lasix,Loop Diuretic,Antihypertensive,Inhibits the reabsorption of sodium and chloride in the ascending loop of Henle and distal renal tubule.
+Generic Name,Brand Name,Medication Class,Category,Full Mechanism of Action (MOA)
+Hydralazine,Apresoline,Vasodilator,Antihypertensive,"Directly relaxes arteriolar smooth muscle, reducing peripheral vascular resistance."
+Valsartan,Diovan,ARB,Antihypertensive,"Selectively blocks the binding of angiotensin II to the AT1 receptor, preventing vasoconstriction and reducing the secretion of aldosterone."
+Olmesartan,Benicar,ARB,Antihypertensive,"Selectively blocks the binding of angiotensin II to the AT1 receptor, preventing vasoconstriction and reducing the secretion of aldosterone."
+Enalapril,Vasotec,ACE Inhibitor,Antihypertensive,"Inhibits the conversion of angiotensin I to angiotensin II, causing vasodilation and reduction in the release of aldosterone."
+Clonidine,Catapres,Alpha-2 Adrenergic Agonist,Antihypertensive,"Stimulates alpha-2 adrenergic receptors in the brainstem, reducing sympathetic outflow and decreasing blood pressure."
+Diltiazem,Cardizem,CCB (Non-Dihydropyridine),Antihypertensive,"Inhibits the influx of calcium ions into vascular smooth muscle, leading to vasodilation and reduced heart rate."
+Verapamil,Calan; Verelan,CCB (Non-Dihydropyridine),Antihypertensive,"Inhibits the influx of calcium ions into vascular smooth muscle, leading to vasodilation and reduced heart rate."
+Metoprolol,Lopressor; Toprol XL,Beta Blocker,Antihypertensive,"Selectively blocks beta1-adrenergic receptors in the heart and smooth muscle, decreasing heart rate and contractility."
+Spironolactone,Aldactone,Potassium Sparing Diuretic,Antihypertensive,"Competes with aldosterone in the distal renal tubules, increasing sodium and water excretion while conserving potassium and hydrogen ions."
+Chlorthalidone,Hemiclor; Thalitone,Thiazide Diuretic,Antihypertensive,"Inhibits sodium reabsorption in the distal tubules causing increased excretion of sodium and water, as well as potassium and hydrogen ions."
+Generic Name,Brand Name,Medication Class,Category,Full Mechanism of Action (MOA)
+Simvastatin,Zocor,HMG-CoA Reductase Inhibitor,Antilipemic,"Inhibits HMG-CoA reductase, reducing cholesterol synthesis and increasing LDL uptake from the blood."
+Rosuvastatin,Crestor,HMG-CoA Reductase Inhibitor,Antilipemic,"Inhibits HMG-CoA reductase, reducing cholesterol synthesis and increasing LDL uptake from the blood."
+Atorvastatin,Lipitor,HMG-CoA Reductase Inhibitor,Antilipemic,"Inhibits HMG-CoA reductase, reducing cholesterol synthesis and increasing LDL uptake from the blood."
+Pravastatin,Pravachol,HMG-CoA Reductase Inhibitor,Antilipemic,"Inhibits HMG-CoA reductase, reducing cholesterol synthesis and increasing LDL uptake from the blood."
+Fenofibrate,Tricor,Fibric Acid Derivative,Antilipemic,"Activates peroxisome proliferator-activated receptor-alpha (PPAR-a), leading to lipolysis and elimination of triglyceride-rich particles."
+Niacin,Niaspan; Niacor,Nicotinic Acid,Antilipemic,"Inhibits lipolysis in adipose tissue, reduces hepatic VLDL synthesis, and increases HDL levels."
+Omega-3 esters,Lovaza,Omega-3 Fatty Acid,Antilipemic,Reduces hepatic triglyceride synthesis and increases plasma lipoprotein lipase activity.
+Ezetimibe,Zetia,Cholesterol Absorp. Inhibitor,Antilipemic,Inhibits the absorption of cholesterol at the brush border of the small intestine.
+Evolocumab,Repatha,PCSK9 Inhibitor,Antilipemic,Inhibits PCSK9 which degrades LDL receptors; increases the number of LDL receptors available to clear LDL.
+Alirocumab,Praluent,PCSK9 Inhibitor,Antilipemic,Inhibits PCSK9 which degrades LDL receptors; increases the number of LDL receptors available to clear LDL.
+Inclisiran,Leqvio,siRNA Agent,Antilipemic,"Inhibits PCSK9 synthesis via RNA interference, leading to less LDL receptor breakdown and lower LDL levels."

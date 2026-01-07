@@ -1,0 +1,398 @@
+[
+  {
+    "generic": "Lisinopril",
+    "brand": "Zestril",
+    "class": "ACE Inhibitor",
+    "category": "Antihypertensive",
+    "moa": "Inhibits the conversion of angiotensin I to angiotensin II, causing vasodilation and reduction in the release of aldosterone.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Amlodipine",
+    "brand": "Norvasc",
+    "class": "CCB (Dihydropyridine)",
+    "category": "Antihypertensive",
+    "moa": "Inhibits the influx of calcium ions into vascular smooth muscle and cardiac muscle, resulting in decreased peripheral vascular resistance and reduced blood pressure.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Losartan",
+    "brand": "Cozaar",
+    "class": "ARB",
+    "category": "Antihypertensive",
+    "moa": "Selectively blocks the binding of angiotensin II to the AT1 receptor, preventing vasoconstriction and reducing the secretion of aldosterone.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Hydrochlorothiazide",
+    "brand": "Microzide",
+    "class": "Thiazide Diuretic",
+    "category": "Antihypertensive",
+    "moa": "Inhibits sodium reabsorption in the distal tubules causing increased excretion of sodium and water, as well as potassium and hydrogen ions.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Furosemide",
+    "brand": "Lasix",
+    "class": "Loop Diuretic",
+    "category": "Antihypertensive",
+    "moa": "Inhibits the reabsorption of sodium and chloride in the ascending loop of Henle and distal renal tubule.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Hydralazine",
+    "brand": "Apresoline",
+    "class": "Vasodilator",
+    "category": "Antihypertensive",
+    "moa": "Directly relaxes arteriolar smooth muscle, reducing peripheral vascular resistance.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Valsartan",
+    "brand": "Diovan",
+    "class": "ARB",
+    "category": "Antihypertensive",
+    "moa": "Selectively blocks the binding of angiotensin II to the AT1 receptor, preventing vasoconstriction and reducing the secretion of aldosterone.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Olmesartan",
+    "brand": "Benicar",
+    "class": "ARB",
+    "category": "Antihypertensive",
+    "moa": "Selectively blocks the binding of angiotensin II to the AT1 receptor, preventing vasoconstriction and reducing the secretion of aldosterone.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Enalapril",
+    "brand": "Vasotec",
+    "class": "ACE Inhibitor",
+    "category": "Antihypertensive",
+    "moa": "Inhibits the conversion of angiotensin I to angiotensin II, causing vasodilation and reduction in the release of aldosterone.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Clonidine",
+    "brand": "Catapres",
+    "class": "Alpha-2 Adrenergic Agonist",
+    "category": "Antihypertensive",
+    "moa": "Stimulates alpha-2 adrenergic receptors in the brainstem, reducing sympathetic outflow and decreasing blood pressure.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Diltiazem",
+    "brand": "Cardizem",
+    "class": "CCB (Non-Dihydropyridine)",
+    "category": "Antihypertensive",
+    "moa": "Inhibits the influx of calcium ions into vascular smooth muscle, leading to vasodilation and reduced heart rate.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Verapamil",
+    "brand": "Calan; Verelan",
+    "class": "CCB (Non-Dihydropyridine)",
+    "category": "Antihypertensive",
+    "moa": "Inhibits the influx of calcium ions into vascular smooth muscle, leading to vasodilation and reduced heart rate.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Metoprolol",
+    "brand": "Lopressor; Toprol XL",
+    "class": "Beta Blocker",
+    "category": "Antihypertensive",
+    "moa": "Selectively blocks beta1-adrenergic receptors in the heart and smooth muscle, decreasing heart rate and contractility.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Spironolactone",
+    "brand": "Aldactone",
+    "class": "Potassium Sparing Diuretic",
+    "category": "Antihypertensive",
+    "moa": "Competes with aldosterone in the distal renal tubules, increasing sodium and water excretion while conserving potassium and hydrogen ions.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Chlorthalidone",
+    "brand": "Hemiclor; Thalitone",
+    "class": "Thiazide Diuretic",
+    "category": "Antihypertensive",
+    "moa": "Inhibits sodium reabsorption in the distal tubules causing increased excretion of sodium and water, as well as potassium and hydrogen ions.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Simvastatin",
+    "brand": "Zocor",
+    "class": "HMG-CoA Reductase Inhibitor",
+    "category": "Antilipemic",
+    "moa": "Inhibits HMG-CoA reductase, reducing cholesterol synthesis and increasing LDL uptake from the blood.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Rosuvastatin",
+    "brand": "Crestor",
+    "class": "HMG-CoA Reductase Inhibitor",
+    "category": "Antilipemic",
+    "moa": "Inhibits HMG-CoA reductase, reducing cholesterol synthesis and increasing LDL uptake from the blood.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Atorvastatin",
+    "brand": "Lipitor",
+    "class": "HMG-CoA Reductase Inhibitor",
+    "category": "Antilipemic",
+    "moa": "Inhibits HMG-CoA reductase, reducing cholesterol synthesis and increasing LDL uptake from the blood.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Pravastatin",
+    "brand": "Pravachol",
+    "class": "HMG-CoA Reductase Inhibitor",
+    "category": "Antilipemic",
+    "moa": "Inhibits HMG-CoA reductase, reducing cholesterol synthesis and increasing LDL uptake from the blood.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Fenofibrate",
+    "brand": "Tricor",
+    "class": "Fibric Acid Derivative",
+    "category": "Antilipemic",
+    "moa": "Activates peroxisome proliferator-activated receptor-alpha (PPAR-a), leading to lipolysis and elimination of triglyceride-rich particles.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Niacin",
+    "brand": "Niaspan; Niacor",
+    "class": "Nicotinic Acid",
+    "category": "Antilipemic",
+    "moa": "Inhibits lipolysis in adipose tissue, reduces hepatic VLDL synthesis, and increases HDL levels.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Omega-3 esters",
+    "brand": "Lovaza",
+    "class": "Omega-3 Fatty Acid",
+    "category": "Antilipemic",
+    "moa": "Reduces hepatic triglyceride synthesis and increases plasma lipoprotein lipase activity.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Ezetimibe",
+    "brand": "Zetia",
+    "class": "Cholesterol Absorp. Inhibitor",
+    "category": "Antilipemic",
+    "moa": "Inhibits the absorption of cholesterol at the brush border of the small intestine.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Evolocumab",
+    "brand": "Repatha",
+    "class": "PCSK9 Inhibitor",
+    "category": "Antilipemic",
+    "moa": "Inhibits PCSK9 which degrades LDL receptors; increases the number of LDL receptors available to clear LDL.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Alirocumab",
+    "brand": "Praluent",
+    "class": "PCSK9 Inhibitor",
+    "category": "Antilipemic",
+    "moa": "Inhibits PCSK9 which degrades LDL receptors; increases the number of LDL receptors available to clear LDL.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Inclisiran",
+    "brand": "Leqvio",
+    "class": "siRNA Agent",
+    "category": "Antilipemic",
+    "moa": "Inhibits PCSK9 synthesis via RNA interference, leading to less LDL receptor breakdown and lower LDL levels.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Prasugrel",
+    "brand": "Effient",
+    "class": "Thienopyridine P2Y12 Antagonist",
+    "category": null,
+    "moa": "Inhibits platelet activation and aggregation by irreversibly binding to the P2Y12 class of ADP receptors on platelets.",
+    "metadata": {
+      "lab": 2,
+      "quiz": 1,
+      "is_new": true
+    }
+  },
+  {
+    "generic": "Ticagrelor",
+    "brand": "Brilinta",
+    "class": "P2Y12 Antagonist",
+    "category": null,
+    "moa": "Reversibly binds to the P2Y12 ADP receptor on platelets, inhibiting platelet activation and aggregation.",
+    "metadata": {
+      "lab": 2,
+      "quiz": 1,
+      "is_new": true
+    }
+  },
+  {
+    "generic": "Aspirin",
+    "brand": "Bayer",
+    "class": "Antiplatelet Agent",
+    "category": null,
+    "moa": "Inhibits cyclooxygenase-1 (COX-1) and cyclooxygenase-2 (COX-2), reducing the formation of thromboxane A2 and inhibiting platelet aggregation.",
+    "metadata": {
+      "lab": 2,
+      "quiz": 1,
+      "is_new": true
+    }
+  },
+  {
+    "generic": "Isosorbide Mononitrate",
+    "brand": "Imdur",
+    "class": "Nitrate",
+    "category": null,
+    "moa": "Relaxes vascular smooth muscle by increasing nitric oxide, leading to vasodilation.",
+    "metadata": {
+      "lab": 2,
+      "quiz": 1,
+      "is_new": true
+    }
+  },
+  {
+    "generic": "Valsartan/sacubitril",
+    "brand": "Entresto",
+    "class": "ARB & Neprilysin Inhibitor",
+    "category": null,
+    "moa": "Selectively blocks binding of angiotensin II to AT1 receptor, preventing vasoconstriction and reducing aldosterone secretion; inhibits neprilysin to induce vasodilation and natriuresis.",
+    "metadata": {
+      "lab": 2,
+      "quiz": 1,
+      "is_new": true
+    }
+  },
+  {
+    "generic": "Alteplase",
+    "brand": "Activase",
+    "class": "Thrombolytic Agent",
+    "category": null,
+    "moa": "Converts plasminogen to plasmin, leading to the degradation of fibrin in thrombi.",
+    "metadata": {
+      "lab": 2,
+      "quiz": 1,
+      "is_new": true
+    }
+  },
+  {
+    "generic": "Tenecteplase",
+    "brand": "TNKase",
+    "class": "Thrombolytic Agent",
+    "category": null,
+    "moa": "Converts plasminogen to plasmin, leading to the degradation of fibrin in thrombi.",
+    "metadata": {
+      "lab": 2,
+      "quiz": 1,
+      "is_new": true
+    }
+  }
+]
