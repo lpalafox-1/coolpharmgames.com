@@ -1,0 +1,330 @@
+{
+  "id" : "generated-quiz-6",
+  "title" : "Generated Quiz 6",
+  "pools" : {
+    "easy" : null,
+    "lab1" : [ {
+      "type" : "mcq",
+      "prompt" : "What is the category of Sertraline?",
+      "choices" : [ "Antihypertensive", "Psychiatry", "Antilipemic", "Anticoagulant" ],
+      "answer" : [ "Psychiatry" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Psychiatry",
+        "brand" : "Zoloft",
+        "class" : "SSRI",
+        "generic" : "Sertraline"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the category of Fluoxetine?",
+      "choices" : [ "Psychiatry", "Antihypertensive", "Antilipemic", "Antiarrhythmic" ],
+      "answer" : [ "Psychiatry" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Psychiatry",
+        "brand" : "Prozac",
+        "class" : "SSRI",
+        "generic" : "Fluoxetine"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "Which class does Escitalopram belong to?",
+      "choices" : [ "SSRI", "Calcium channel blocker (non-dihydropyridine)", "Fibric acid derivative", "Beta-1 selective blocker" ],
+      "answer" : [ "SSRI" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Psychiatry",
+        "brand" : "Lexapro",
+        "class" : "SSRI",
+        "generic" : "Escitalopram"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "Which class does Duloxetine belong to?",
+      "choices" : [ "SNRI", "ACE inhibitor", "Loop diuretic", "Calcium channel blocker (dihydropyridine)" ],
+      "answer" : [ "SNRI" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Psychiatry",
+        "brand" : "Cymbalta",
+        "class" : "SNRI",
+        "generic" : "Duloxetine"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "Which class does Venlafaxine belong to?",
+      "choices" : [ "Loop diuretic", "Angiotensin II Receptor Blocker", "SNRI", "ACE inhibitor" ],
+      "answer" : [ "SNRI" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Psychiatry",
+        "brand" : "Effexor",
+        "class" : "SNRI",
+        "generic" : "Venlafaxine"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the category of Bupropion?",
+      "choices" : [ "Antihypertensive", "Anticoagulant", "Psychiatry", "Antiarrhythmic" ],
+      "answer" : [ "Psychiatry" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Psychiatry",
+        "brand" : "Wellbutrin",
+        "class" : "DNRI",
+        "generic" : "Bupropion"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "Which class does Trazodone belong to?",
+      "choices" : [ "Aldosterone receptor antagonist", "Serotonin Reuptake Inhibitor / Antagonist", "HMG-CoA reductase inhibitor", "Calcium channel blocker (dihydropyridine)" ],
+      "answer" : [ "Serotonin Reuptake Inhibitor / Antagonist" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Psychiatry",
+        "brand" : "Desyrel",
+        "class" : "Serotonin Reuptake Inhibitor / Antagonist",
+        "generic" : "Trazodone"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "Which class does Citalopram belong to?",
+      "choices" : [ "Thiazide diuretic", "SSRI", "Calcium channel blocker (dihydropyridine)", "Calcium channel blocker (non-dihydropyridine)" ],
+      "answer" : [ "SSRI" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Psychiatry",
+        "brand" : "Celexa",
+        "class" : "SSRI",
+        "generic" : "Citalopram"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "Which class does Paroxetine belong to?",
+      "choices" : [ "ACE inhibitor", "Loop diuretic", "HMG-CoA reductase inhibitor", "SSRI" ],
+      "answer" : [ "SSRI" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Psychiatry",
+        "brand" : "Paxil",
+        "class" : "SSRI",
+        "generic" : "Paroxetine"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the brand name for Amitriptyline?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "elavil" ],
+      "mapping" : {
+        "category" : "Psychiatry",
+        "brand" : "Elavil",
+        "class" : "Tricyclic Antidepressant",
+        "generic" : "Amitriptyline"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the category of Mirtazapine?",
+      "choices" : [ "Anticoagulant", "Psychiatry", "Antihypertensive", "Antiarrhythmic" ],
+      "answer" : [ "Psychiatry" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Psychiatry",
+        "brand" : "Remeron",
+        "class" : "Alpha-2 Antagonist",
+        "generic" : "Mirtazapine"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the MOA of Alprazolam?",
+      "choices" : [ "Blocks calcium channels in vascular smooth muscle", "Binds to stereospecific benzodiazepine receptors on the postsynaptic GABA neuron.", "Inhibits Na+/Cl- reabsorption in the distal tubule", "Inhibits conversion of angiotensin I to angiotensin II" ],
+      "answer" : [ "Binds to stereospecific benzodiazepine receptors on the postsynaptic GABA neuron." ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Psychiatry",
+        "brand" : "Xanax",
+        "class" : "Benzodiazepine",
+        "generic" : "Alprazolam"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the generic name for Ambien?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "zolpidem" ],
+      "mapping" : {
+        "category" : "Psychiatry",
+        "brand" : "Ambien",
+        "class" : "Non-benzodiazepine Hypnotic",
+        "generic" : "Zolpidem"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the brand name for Quetiapine?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "seroquel" ],
+      "mapping" : {
+        "category" : "Psychiatry",
+        "brand" : "Seroquel",
+        "class" : "Atypical Antipsychotic",
+        "generic" : "Quetiapine"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the MOA of Risperidone?",
+      "choices" : [ "Inhibits conversion of angiotensin I to angiotensin II", "Blocks calcium channels in vascular smooth muscle", "Inhibits Na+/Cl- reabsorption in the distal tubule", "Antagonist at dopamine D2 and serotonin 5-HT2 receptors." ],
+      "answer" : [ "Antagonist at dopamine D2 and serotonin 5-HT2 receptors." ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Psychiatry",
+        "brand" : "Risperdal",
+        "class" : "Atypical Antipsychotic",
+        "generic" : "Risperidone"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the generic name for Zyprexa?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "olanzapine" ],
+      "mapping" : {
+        "category" : "Psychiatry",
+        "brand" : "Zyprexa",
+        "class" : "Atypical Antipsychotic",
+        "generic" : "Olanzapine"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the brand name for Haloperidol?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "haldol" ],
+      "mapping" : {
+        "category" : "Psychiatry",
+        "brand" : "Haldol",
+        "class" : "First-Generation Antipsychotic",
+        "generic" : "Haloperidol"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the generic name for Valium?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "diazepam" ],
+      "mapping" : {
+        "category" : "Psychiatry",
+        "brand" : "Valium",
+        "class" : "Benzodiazepine",
+        "generic" : "Diazepam"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the MOA of Lorazepam?",
+      "choices" : [ "Blocks calcium channels in vascular smooth muscle", "Inhibits Na+/Cl- reabsorption in the distal tubule", "Binds to stereospecific benzodiazepine receptors on the postsynaptic GABA neuron.", "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle" ],
+      "answer" : [ "Binds to stereospecific benzodiazepine receptors on the postsynaptic GABA neuron." ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Psychiatry",
+        "brand" : "Ativan",
+        "class" : "Benzodiazepine",
+        "generic" : "Lorazepam"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the MOA of Buspirone?",
+      "choices" : [ "Blocks angiotensin II from binding to its receptor", "High affinity for serotonin 5-HT1A and 5-HT2 receptors; moderate affinity for dopamine D2 receptors.", "Inhibits Na+/Cl- reabsorption in the distal tubule", "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle" ],
+      "answer" : [ "High affinity for serotonin 5-HT1A and 5-HT2 receptors; moderate affinity for dopamine D2 receptors." ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Psychiatry",
+        "brand" : "Buspar",
+        "class" : "Anxiolytic",
+        "generic" : "Buspirone"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "Which class does Lithium belong to?",
+      "choices" : [ "HMG-CoA reductase inhibitor", "Antimanic Agent", "Loop diuretic", "Aldosterone receptor antagonist" ],
+      "answer" : [ "Antimanic Agent" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Psychiatry",
+        "brand" : "Lithobid",
+        "class" : "Antimanic Agent",
+        "generic" : "Lithium"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "Which class does Hydroxyzine belong to?",
+      "choices" : [ "Antihistamine", "Loop diuretic", "HMG-CoA reductase inhibitor", "Angiotensin II Receptor Blocker" ],
+      "answer" : [ "Antihistamine" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Psychiatry / Allergy",
+        "brand" : "Atarax; Vistaril",
+        "class" : "Antihistamine",
+        "generic" : "Hydroxyzine"
+      }
+    } ],
+    "lab2" : [ {
+      "type" : "short",
+      "prompt" : "What is the brand name for Amoxicillin?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "amoxil" ],
+      "mapping" : {
+        "category" : "Antibiotic",
+        "brand" : "Amoxil",
+        "class" : "Penicillin Antibiotic",
+        "generic" : "Amoxicillin"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the category of Azithromycin?",
+      "choices" : [ "Antihypertensive", "Antilipemic", "Antibiotic", "Anticoagulant" ],
+      "answer" : [ "Antibiotic" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Antibiotic",
+        "brand" : "Zithromax",
+        "class" : "Macrolide Antibiotic",
+        "generic" : "Azithromycin"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the brand name for Ciprofloxacin?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "cipro" ],
+      "mapping" : {
+        "category" : "Antibiotic",
+        "brand" : "Cipro",
+        "class" : "Fluoroquinolone Antibiotic",
+        "generic" : "Ciprofloxacin"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the brand name for Doxycycline?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "vibramycin" ],
+      "mapping" : {
+        "category" : "Antibiotic",
+        "brand" : "Vibramycin",
+        "class" : "Tetracycline Antibiotic",
+        "generic" : "Doxycycline"
+      }
+    } ]
+  },
+  "blueprint" : {
+    "easy" : [ {
+      "source" : "lab2",
+      "count" : 6
+    }, {
+      "source" : "lab1",
+      "count" : 4
+    } ]
+  }
+}

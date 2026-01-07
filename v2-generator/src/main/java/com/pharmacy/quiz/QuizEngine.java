@@ -65,6 +65,31 @@ public class QuizEngine {
             lab1Pool = masterPool.stream()
                 .filter(d -> d.metadata.lab == 1 && d.metadata.week >= 4 && d.metadata.week <= 6)
                 .collect(Collectors.toList());
+        } else if (quizNumber == 3) {
+            // Lab 1 Weeks 6-7
+            lab1Pool = masterPool.stream()
+                .filter(d -> d.metadata.lab == 1 && d.metadata.week >= 6 && d.metadata.week <= 7)
+                .collect(Collectors.toList());
+        } else if (quizNumber == 4) {
+            // Lab 1 Week 8
+            lab1Pool = masterPool.stream()
+                .filter(d -> d.metadata.lab == 1 && d.metadata.week == 8)
+                .collect(Collectors.toList());
+        } else if (quizNumber == 5) {
+            // Lab 1 Week 9
+            lab1Pool = masterPool.stream()
+                .filter(d -> d.metadata.lab == 1 && d.metadata.week == 9)
+                .collect(Collectors.toList());
+        } else if (quizNumber == 6) {
+            // Lab 1 Weeks 10-11
+            lab1Pool = masterPool.stream()
+                .filter(d -> d.metadata.lab == 1 && d.metadata.week >= 10 && d.metadata.week <= 11)
+                .collect(Collectors.toList());
+        } else if (quizNumber >= 7 && quizNumber <= 11) {
+            // Lab 1 Weeks 1-15
+            lab1Pool = masterPool.stream()
+                .filter(d -> d.metadata.lab == 1 && d.metadata.week >= 1 && d.metadata.week <= 15)
+                .collect(Collectors.toList());
         } else {
              // Default fallback for other quizzes (e.g. cumulative)
              lab1Pool = masterPool.stream()

@@ -1,0 +1,210 @@
+{
+  "id" : "generated-quiz-3",
+  "title" : "Generated Quiz 3",
+  "pools" : {
+    "easy" : null,
+    "lab1" : [ {
+      "type" : "short",
+      "prompt" : "What is the brand name for Warfarin?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "coumadin" ],
+      "mapping" : {
+        "category" : "Anticoagulant",
+        "brand" : "Coumadin",
+        "class" : "Vitamin K Antagonist",
+        "generic" : "Warfarin"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the category of Rivaroxaban?",
+      "choices" : [ "Antilipemic", "Antihypertensive", "Anticoagulant", "Antiarrhythmic" ],
+      "answer" : [ "Anticoagulant" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Anticoagulant",
+        "brand" : "Xarelto",
+        "class" : "Factor Xa Inhibitor",
+        "generic" : "Rivaroxaban"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the generic name for Eliquis?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "apixaban" ],
+      "mapping" : {
+        "category" : "Anticoagulant",
+        "brand" : "Eliquis",
+        "class" : "Factor Xa Inhibitor",
+        "generic" : "Apixaban"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the category of Enoxaparin?",
+      "choices" : [ "Anticoagulant", "Antilipemic", "Antiarrhythmic", "Antihypertensive" ],
+      "answer" : [ "Anticoagulant" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Anticoagulant",
+        "brand" : "Lovenox",
+        "class" : "LMWH",
+        "generic" : "Enoxaparin"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "Which class does Amiodarone belong to?",
+      "choices" : [ "Calcium channel blocker (non-dihydropyridine)", "Thiazide diuretic", "Class III Antiarrhythmic", "HMG-CoA reductase inhibitor" ],
+      "answer" : [ "Class III Antiarrhythmic" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Antiarrhythmic",
+        "brand" : "Pacerone",
+        "class" : "Class III Antiarrhythmic",
+        "generic" : "Amiodarone"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the brand name for Digoxin?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "lanoxin" ],
+      "mapping" : {
+        "category" : "Antiarrhythmic",
+        "brand" : "Lanoxin",
+        "class" : "Cardiac Glycoside",
+        "generic" : "Digoxin"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the category of Sotalol?",
+      "choices" : [ "Antihypertensive", "Antiarrhythmic", "Antilipemic", "Anticoagulant" ],
+      "answer" : [ "Antiarrhythmic" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Antiarrhythmic",
+        "brand" : "Betapace",
+        "class" : "Class III Antiarrhythmic",
+        "generic" : "Sotalol"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the MOA of Metformin?",
+      "choices" : [ "Blocks calcium channels in vascular smooth muscle", "Blocks angiotensin II from binding to its receptor", "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle", "Decreases hepatic glucose production and improves insulin sensitivity." ],
+      "answer" : [ "Decreases hepatic glucose production and improves insulin sensitivity." ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Antidiabetic",
+        "brand" : "Glucophage",
+        "class" : "Biguanide",
+        "generic" : "Metformin"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the generic name for Lantus?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "insulin glargine" ],
+      "mapping" : {
+        "category" : "Antidiabetic",
+        "brand" : "Lantus",
+        "class" : "Long-acting Insulin",
+        "generic" : "Insulin Glargine"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the category of Sitagliptin?",
+      "choices" : [ "Antihypertensive", "Antilipemic", "Antidiabetic", "Antiarrhythmic" ],
+      "answer" : [ "Antidiabetic" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Antidiabetic",
+        "brand" : "Januvia",
+        "class" : "DPP-4 Inhibitor",
+        "generic" : "Sitagliptin"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the generic name for Jardiance?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "empagliflozin" ],
+      "mapping" : {
+        "category" : "Antidiabetic",
+        "brand" : "Jardiance",
+        "class" : "SGLT2 Inhibitor",
+        "generic" : "Empagliflozin"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the category of Glipizide?",
+      "choices" : [ "Antiarrhythmic", "Antidiabetic", "Antihypertensive", "Anticoagulant" ],
+      "answer" : [ "Antidiabetic" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Antidiabetic",
+        "brand" : "Glucotrol",
+        "class" : "Sulfonylurea",
+        "generic" : "Glipizide"
+      }
+    } ],
+    "lab2" : [ {
+      "type" : "short",
+      "prompt" : "What is the brand name for Pregabalin?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "lyrica" ],
+      "mapping" : {
+        "category" : "Neurology",
+        "brand" : "Lyrica",
+        "class" : "Gaba Analog",
+        "generic" : "Pregabalin"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "Which class does Topiramate belong to?",
+      "choices" : [ "Calcium channel blocker (dihydropyridine)", "Anticonvulsant", "HMG-CoA reductase inhibitor", "Aldosterone receptor antagonist" ],
+      "answer" : [ "Anticonvulsant" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Neurology",
+        "brand" : "Topamax",
+        "class" : "Anticonvulsant",
+        "generic" : "Topiramate"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "Which class does Levetiracetam belong to?",
+      "choices" : [ "ACE inhibitor", "Aldosterone receptor antagonist", "Calcium channel blocker (dihydropyridine)", "Anticonvulsant" ],
+      "answer" : [ "Anticonvulsant" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Neurology",
+        "brand" : "Keppra",
+        "class" : "Anticonvulsant",
+        "generic" : "Levetiracetam"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the brand name for Sumatriptan?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "imitrex" ],
+      "mapping" : {
+        "category" : "Neurology",
+        "brand" : "Imitrex",
+        "class" : "5-HT 1B/1D Receptor Agonist",
+        "generic" : "Sumatriptan"
+      }
+    } ]
+  },
+  "blueprint" : {
+    "easy" : [ {
+      "source" : "lab2",
+      "count" : 6
+    }, {
+      "source" : "lab1",
+      "count" : 4
+    } ]
+  }
+}
