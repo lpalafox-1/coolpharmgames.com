@@ -61,6 +61,11 @@ def main():
     lab2_drugs = parse_csv("data/lab2_quiz1.csv", lab2_meta, has_category=False)
     all_drugs.extend(lab2_drugs)
 
+    # Process Lab 2 Quiz 2
+    lab2_q2_meta = {"lab": 2, "quiz": 2, "is_new": True}
+    lab2_q2_drugs = parse_csv("data/lab2_quiz2.csv", lab2_q2_meta, has_category=True)
+    all_drugs.extend(lab2_q2_drugs)
+
     # Write to master_pool.json
     with open("master_pool.json", "w", encoding='utf-8') as f:
         json.dump(all_drugs, f, indent=2)

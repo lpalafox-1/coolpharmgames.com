@@ -312,6 +312,150 @@
     }
   },
   {
+    "generic": "Warfarin",
+    "brand": "Coumadin, Jantoven",
+    "class": "Vitamin K Antagonist",
+    "category": "Anticoagulant",
+    "moa": "Inhibits the synthesis of vitamin K-dependent clotting factors II, VII, IX, and X.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Rivaroxaban",
+    "brand": "Xarelto",
+    "class": "Direct Factor Xa Inhibitor",
+    "category": "Anticoagulant",
+    "moa": "Inhibits factor Xa, preventing the conversion of prothrombin to thrombin.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Apixaban",
+    "brand": "Eliquis",
+    "class": "Direct Factor Xa Inhibitor",
+    "category": "Anticoagulant",
+    "moa": "Inhibits factor Xa, preventing the conversion of prothrombin to thrombin.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Heparin",
+    "brand": "Hep-Lock",
+    "class": "Anticoagulant",
+    "category": "Anticoagulant",
+    "moa": "Enhances the activity of antithrombin III, inhibiting thrombin and factor Xa.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Enoxaparin",
+    "brand": "Lovenox",
+    "class": "Low Molecular Weight Heparin",
+    "category": "Anticoagulant",
+    "moa": "Enhances the activity of antithrombin III, inhibiting thrombin and factor Xa.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Amiodarone",
+    "brand": "Nexterone, Pacerone",
+    "class": "Class III Antiarrhythmic",
+    "category": "Antiarrhythmic",
+    "moa": "Inhibits potassium channels responsible for repolarization of the cardiac cell membrane; Prolongs the action potential and refractory period of cardiac cells.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Sotalol",
+    "brand": "Betapace",
+    "class": "Class III Antiarrhythmic",
+    "category": "Antiarrhythmic",
+    "moa": "Nonselectively blocks beta-adrenergic receptors and potassium channels to prolong the action potential and refractory period of cardiac cells.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Digoxin",
+    "brand": "Lanoxin",
+    "class": "Cardiac Glycoside",
+    "category": "Antiarrhythmic",
+    "moa": "Affects parasympathetic stimulation, slowing conduction through the AV node and slowing heart rate.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Metformin",
+    "brand": "Glucophage",
+    "class": "Biguanide",
+    "category": "Antidiabetic",
+    "moa": "Decreases hepatic glucose production, decreases intestinal absorption of glucose, and improves insulin sensitivity by increasing peripheral glucose uptake.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Insulin Glargine",
+    "brand": "Lantus, Basaglar, Toujeo, Semglee",
+    "class": "Long-acting Insulin",
+    "category": "Antidiabetic",
+    "moa": "Functions as basal glycemic control by regulating glucose metabolism; stimulates glucose uptake in skeletal muscle and fat and inhibits hepatic glucose production.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Sitagliptin",
+    "brand": "Januvia",
+    "class": "DPP-4 Inhibitor",
+    "category": "Antidiabetic",
+    "moa": "Inhibits dipeptidyl peptidase-4 (DPP-4), increasing incretin levels and enhancing glucose-dependent insulin secretion.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
+    "generic": "Empagliflozin",
+    "brand": "Jardiance",
+    "class": "SGLT2 Inhibitor",
+    "category": "Antidiabetic",
+    "moa": "Inhibits sodium-glucose cotransporter 2 (SGLT2) in the proximal renal tubules, reducing glucose reabsorption.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false
+    }
+  },
+  {
     "generic": "Prasugrel",
     "brand": "Effient",
     "class": "Thienopyridine P2Y12 Antagonist",
@@ -392,6 +536,102 @@
     "metadata": {
       "lab": 2,
       "quiz": 1,
+      "is_new": true
+    }
+  },
+  {
+    "generic": "Cetirizine",
+    "brand": "Zyrtec",
+    "class": "H1 Antagonist, 2nd Generation",
+    "category": "Antihistamine",
+    "moa": "Selectively inhibits peripheral Histamine-1 (H1) receptors.",
+    "metadata": {
+      "lab": 2,
+      "quiz": 2,
+      "is_new": true
+    }
+  },
+  {
+    "generic": "Diphenhydramine",
+    "brand": "Benadryl",
+    "class": "H1 Antagonist, 1st Generation",
+    "category": "Antihistamine",
+    "moa": "Inhibits Histamine-1(H1) receptors peripherally and centrally.",
+    "metadata": {
+      "lab": 2,
+      "quiz": 2,
+      "is_new": true
+    }
+  },
+  {
+    "generic": "Meloxicam",
+    "brand": "Mobic",
+    "class": "NSAID",
+    "category": "Analgesic",
+    "moa": "Inhibits cyclooxygenase (COX-1 and COX-2), decreasing the formation of prostaglandins.",
+    "metadata": {
+      "lab": 2,
+      "quiz": 2,
+      "is_new": true
+    }
+  },
+  {
+    "generic": "Celecoxib",
+    "brand": "Celebrex",
+    "class": "COX-2 Selective NSAID",
+    "category": "Analgesic",
+    "moa": "Inhibits cyclooxygenase (COX-2), decreasing the formation of prostaglandins.",
+    "metadata": {
+      "lab": 2,
+      "quiz": 2,
+      "is_new": true
+    }
+  },
+  {
+    "generic": "Hydrocodone",
+    "brand": "Norco (with APAP)",
+    "class": "Opioid Analgesic",
+    "category": "Analgesic; Opioid",
+    "moa": "Binds to mu-opioid receptors in the CNS, altering the perception of and response to pain.",
+    "metadata": {
+      "lab": 2,
+      "quiz": 2,
+      "is_new": true
+    }
+  },
+  {
+    "generic": "Omeprazole",
+    "brand": "Prilosec",
+    "class": "Proton Pump Inhibitor (PPI)",
+    "category": "Antacid",
+    "moa": "Inhibits the H+/K+ ATPase enzyme system in the gastric parietal cells, reducing the production of gastric acid.",
+    "metadata": {
+      "lab": 2,
+      "quiz": 2,
+      "is_new": true
+    }
+  },
+  {
+    "generic": "Famotidine",
+    "brand": "Pepcid",
+    "class": "Histamine H2 Receptor Antagonist",
+    "category": "Antacid",
+    "moa": "Inhibits histamine at H2 receptors of the gastric parietal cells, reducing gastric acid secretion.",
+    "metadata": {
+      "lab": 2,
+      "quiz": 2,
+      "is_new": true
+    }
+  },
+  {
+    "generic": "Ondansetron",
+    "brand": "Zofran",
+    "class": "Selective 5-HT3 Receptor Antagonist",
+    "category": "Antiemetic",
+    "moa": "Selectively inhibits 5-HT3 receptors which blocks serotonin, both peripherally on vagal nerve terminals and centrally.",
+    "metadata": {
+      "lab": 2,
+      "quiz": 2,
       "is_new": true
     }
   }

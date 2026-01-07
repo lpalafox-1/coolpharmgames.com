@@ -1,0 +1,127 @@
+{
+  "id" : "generated-quiz-2",
+  "title" : "Generated Quiz 2",
+  "pools" : {
+    "easy" : [ {
+      "type" : "short",
+      "prompt" : "What is the brand name for Hydrocodone?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "norco (with apap)" ],
+      "mapping" : {
+        "category" : "Analgesic; Opioid",
+        "brand" : "Norco (with APAP)",
+        "class" : "Opioid Analgesic",
+        "generic" : "Hydrocodone"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the brand name for Diphenhydramine?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "benadryl" ],
+      "mapping" : {
+        "category" : "Antihistamine",
+        "brand" : "Benadryl",
+        "class" : "H1 Antagonist, 1st Generation",
+        "generic" : "Diphenhydramine"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "Which class does Omeprazole belong to?",
+      "choices" : [ "ACE inhibitor", "Calcium channel blocker (dihydropyridine)", "Proton Pump Inhibitor (PPI)", "Thiazide diuretic" ],
+      "answer" : [ "Proton Pump Inhibitor (PPI)" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Antacid",
+        "brand" : "Prilosec",
+        "class" : "Proton Pump Inhibitor (PPI)",
+        "generic" : "Omeprazole"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the brand name for Meloxicam?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "mobic" ],
+      "mapping" : {
+        "category" : "Analgesic",
+        "brand" : "Mobic",
+        "class" : "NSAID",
+        "generic" : "Meloxicam"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the generic name for Zofran?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "ondansetron" ],
+      "mapping" : {
+        "category" : "Antiemetic",
+        "brand" : "Zofran",
+        "class" : "Selective 5-HT3 Receptor Antagonist",
+        "generic" : "Ondansetron"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "Which class does Celecoxib belong to?",
+      "choices" : [ "COX-2 Selective NSAID", "Thiazide diuretic", "Aldosterone receptor antagonist", "ACE inhibitor" ],
+      "answer" : [ "COX-2 Selective NSAID" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Analgesic",
+        "brand" : "Celebrex",
+        "class" : "COX-2 Selective NSAID",
+        "generic" : "Celecoxib"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the MOA of Apixaban?",
+      "choices" : [ "Blocks calcium channels in vascular smooth muscle", "Inhibits factor Xa, preventing the conversion of prothrombin to thrombin.", "Blocks angiotensin II from binding to its receptor", "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle" ],
+      "answer" : [ "Inhibits factor Xa, preventing the conversion of prothrombin to thrombin." ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Anticoagulant",
+        "brand" : "Eliquis",
+        "class" : "Direct Factor Xa Inhibitor",
+        "generic" : "Apixaban"
+      }
+    }, {
+      "type" : "short",
+      "prompt" : "What is the brand name for Evolocumab?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "repatha" ],
+      "mapping" : {
+        "category" : "Antilipemic",
+        "brand" : "Repatha",
+        "class" : "PCSK9 Inhibitor",
+        "generic" : "Evolocumab"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "What is the MOA of Heparin?",
+      "choices" : [ "Inhibits Na+/Cl- reabsorption in the distal tubule", "Blocks angiotensin II from binding to its receptor", "Blocks calcium channels in vascular smooth muscle", "Enhances the activity of antithrombin III, inhibiting thrombin and factor Xa." ],
+      "answer" : [ "Enhances the activity of antithrombin III, inhibiting thrombin and factor Xa." ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Anticoagulant",
+        "brand" : "Hep-Lock",
+        "class" : "Anticoagulant",
+        "generic" : "Heparin"
+      }
+    }, {
+      "type" : "mcq",
+      "prompt" : "Which class does Chlorthalidone belong to?",
+      "choices" : [ "Thiazide Diuretic", "Angiotensin II Receptor Blocker", "Thiazide diuretic", "HMG-CoA reductase inhibitor" ],
+      "answer" : [ "Thiazide Diuretic" ],
+      "answerText" : null,
+      "mapping" : {
+        "category" : "Antihypertensive",
+        "brand" : "Hemiclor; Thalitone",
+        "class" : "Thiazide Diuretic",
+        "generic" : "Chlorthalidone"
+      }
+    } ]
+  }
+}

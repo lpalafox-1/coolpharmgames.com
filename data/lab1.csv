@@ -27,3 +27,17 @@ Ezetimibe,Zetia,Cholesterol Absorp. Inhibitor,Antilipemic,Inhibits the absorptio
 Evolocumab,Repatha,PCSK9 Inhibitor,Antilipemic,Inhibits PCSK9 which degrades LDL receptors; increases the number of LDL receptors available to clear LDL.
 Alirocumab,Praluent,PCSK9 Inhibitor,Antilipemic,Inhibits PCSK9 which degrades LDL receptors; increases the number of LDL receptors available to clear LDL.
 Inclisiran,Leqvio,siRNA Agent,Antilipemic,"Inhibits PCSK9 synthesis via RNA interference, leading to less LDL receptor breakdown and lower LDL levels."
+Generic Name,Brand Name,Medication Class,Category,Full MOA
+Warfarin,"Coumadin, Jantoven",Vitamin K Antagonist,Anticoagulant,"Inhibits the synthesis of vitamin K-dependent clotting factors II, VII, IX, and X."
+Rivaroxaban,Xarelto,Direct Factor Xa Inhibitor,Anticoagulant,"Inhibits factor Xa, preventing the conversion of prothrombin to thrombin."
+Apixaban,Eliquis,Direct Factor Xa Inhibitor,Anticoagulant,"Inhibits factor Xa, preventing the conversion of prothrombin to thrombin."
+Heparin,Hep-Lock,Anticoagulant,Anticoagulant,"Enhances the activity of antithrombin III, inhibiting thrombin and factor Xa."
+Enoxaparin,Lovenox,Low Molecular Weight Heparin,Anticoagulant,"Enhances the activity of antithrombin III, inhibiting thrombin and factor Xa."
+Amiodarone,"Nexterone, Pacerone",Class III Antiarrhythmic,Antiarrhythmic,Inhibits potassium channels responsible for repolarization of the cardiac cell membrane; Prolongs the action potential and refractory period of cardiac cells.
+Sotalol,Betapace,Class III Antiarrhythmic,Antiarrhythmic,Nonselectively blocks beta-adrenergic receptors and potassium channels to prolong the action potential and refractory period of cardiac cells.
+Digoxin,Lanoxin,Cardiac Glycoside,Antiarrhythmic,"Affects parasympathetic stimulation, slowing conduction through the AV node and slowing heart rate."
+Generic Name,Brand Name,Medication Class,Category,Full MOA
+Metformin,Glucophage,Biguanide,Antidiabetic,"Decreases hepatic glucose production, decreases intestinal absorption of glucose, and improves insulin sensitivity by increasing peripheral glucose uptake. "
+Insulin Glargine,"Lantus, Basaglar, Toujeo, Semglee",Long-acting Insulin,Antidiabetic,Functions as basal glycemic control by regulating glucose metabolism; stimulates glucose uptake in skeletal muscle and fat and inhibits hepatic glucose production.
+Sitagliptin,Januvia,DPP-4 Inhibitor,Antidiabetic,"Inhibits dipeptidyl peptidase-4 (DPP-4), increasing incretin levels and enhancing glucose-dependent insulin secretion. "
+Empagliflozin,Jardiance,SGLT2 Inhibitor,Antidiabetic,"Inhibits sodium-glucose cotransporter 2 (SGLT2) in the proximal renal tubules, reducing glucose reabsorption. "
