@@ -4,6 +4,10 @@ import os
 
 def parse_csv(filepath, default_metadata, has_category=True, has_week=False):
     entries = []
+    if not os.path.exists(filepath):
+        print(f"Warning: File not found: {filepath}")
+        return []
+
     with open(filepath, 'r', encoding='utf-8') as f:
         reader = csv.reader(f)
         header = None
@@ -54,25 +58,40 @@ def parse_csv(filepath, default_metadata, has_category=True, has_week=False):
 def main():
     all_drugs = []
 
-    # Process Lab 1
-    lab1_meta = {"lab": 1, "quiz": 1, "is_new": False}
-    # lab1.csv has category and week
-    lab1_drugs = parse_csv("v2-generator/data/lab1.csv", lab1_meta, has_category=True, has_week=True)
-    all_drugs.extend(lab1_drugs)
+    # Configuration for data sources
+    # Format: { "path": str, "meta": dict, "has_category": bool, "has_week": bool }
+    data_sources = [
+        {
+            "path": "v2-generator/data/lab1.csv",
+            "meta": {"lab": 1, "quiz": 1, "is_new": False},
+            "has_category": True,
+            "has_week": True
+        },
+        {
+            "path": "v2-generator/data/lab2_quiz1.csv",
+            "meta": {"lab": 2, "quiz": 1, "is_new": True},
+            "has_category": True,
+            "has_week": False
+        },
+        {
+            "path": "v2-generator/data/lab2_quiz2.csv",
+            "meta": {"lab": 2, "quiz": 2, "is_new": True},
+            "has_category": False,
+            "has_week": False
+        },
+        # Add new blocks here as they come in:
+        # { "path": "v2-generator/data/lab1_part2.csv", ... }
+    ]
 
-    # Process Lab 2 Quiz 1
-    lab2_meta = {"lab": 2, "quiz": 1, "is_new": True}
-    lab2_drugs = parse_csv("v2-generator/data/lab2_quiz1.csv", lab2_meta, has_category=True) # Lab2 Quiz 1 now has category/MOA structure similar to Lab 1? No, prompt said "Cetirizine..." list.
-    # Let's check the CSV content again. I wrote it as: "Generic Name,Brand Name,Medication Class,Category,Full MOA"
-    # So has_category=True.
-    all_drugs.extend(lab2_drugs)
-
-    # Process Lab 2 Quiz 2
-    lab2_q2_meta = {"lab": 2, "quiz": 2, "is_new": True}
-    lab2_q2_drugs = parse_csv("v2-generator/data/lab2_quiz2.csv", lab2_q2_meta, has_category=False) # "Prasugrel..." list.
-    # I wrote it as: "Generic Name,Brand Name,Medication Class,Full Mechanism of Action (MOA)"
-    # So has_category=False.
-    all_drugs.extend(lab2_q2_drugs)
+    for source in data_sources:
+        drugs = parse_csv(
+            source["path"],
+            source["meta"],
+            has_category=source["has_category"],
+            has_week=source.get("has_week", False)
+        )
+        all_drugs.extend(drugs)
+        print(f"Loaded {len(drugs)} items from {source['path']}")
 
     # Write to master_pool.json in v2-generator root
     with open("v2-generator/master_pool.json", "w", encoding='utf-8') as f:
