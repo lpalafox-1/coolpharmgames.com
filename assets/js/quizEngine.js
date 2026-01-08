@@ -60,6 +60,8 @@ async function main() {
 function initTheme() {
   const isDark = localStorage.getItem("quiz-theme") === "dark";
   document.documentElement.classList.toggle("dark", isDark);
+  
+  // Instant theme toggle wiring
   if (els.themeToggle) {
     els.themeToggle.onpointerdown = (e) => {
       e.preventDefault();
@@ -143,19 +145,42 @@ function wireEvents() {
   };
   els.restart.onclick = () => location.reload();
 
-  // FONT SCALING (Fixed for regular computer experience)
+  // FONT SCALING (A+ / A-)
   const fontInc = document.getElementById("font-increase");
   const fontDec = document.getElementById("font-decrease");
   if (fontInc && fontDec) {
-    fontInc.onclick = () => { state.currentScale += 0.1; els.card.style.fontSize = `${state.currentScale}rem`; };
-    fontDec.onclick = () => { if(state.currentScale > 0.7) state.currentScale -= 0.1; els.card.style.fontSize = `${state.currentScale}rem`; };
+    fontInc.onclick = (e) => { 
+      e.preventDefault();
+      state.currentScale += 0.1; 
+      els.card.style.fontSize = `${state.currentScale}rem`; 
+    };
+    fontDec.onclick = (e) => { 
+      e.preventDefault();
+      if(state.currentScale > 0.7) state.currentScale -= 0.1; 
+      els.card.style.fontSize = `${state.currentScale}rem`; 
+    };
   }
 
+  // HELP MODAL (?)
   if (els.helpShortcuts) {
     els.helpShortcuts.onpointerdown = (e) => {
       e.preventDefault();
       const modal = document.getElementById("shortcuts-modal");
-      if (modal) { modal.style.display = "flex"; modal.classList.remove("hidden"); }
+      if (modal) {
+        modal.style.display = "flex";
+        modal.classList.remove("hidden");
+        // Update the inner shortcut list for full information
+        const listContainer = modal.querySelector('.space-y-4');
+        if (listContainer) {
+          listContainer.innerHTML = `
+            <div class="flex justify-between items-center"><span>Next / Check Answer</span><kbd>Enter</kbd></div>
+            <div class="flex justify-between items-center"><span>Navigate</span><kbd>← / →</kbd></div>
+            <div class="flex justify-between items-center"><span>Jump to Q</span><kbd>1 - 0</kbd></div>
+            <div class="flex justify-between items-center"><span>Pause Clock</span><kbd>T</kbd></div>
+            <div class="flex justify-between items-center"><span>Mark Question</span><kbd>M</kbd></div>
+          `;
+        }
+      }
     };
   }
   const closeBtn = document.getElementById("close-shortcuts");
@@ -165,6 +190,7 @@ function wireEvents() {
       if (modal) { modal.style.display = "none"; modal.classList.add("hidden"); }
     };
   }
+
   if (els.timerReadout) {
     els.timerReadout.onpointerdown = (e) => {
       e.preventDefault();
@@ -184,7 +210,7 @@ function wireEvents() {
   };
   els.hintBtn.onclick = () => {
     const q = state.questions[state.index];
-    alert(`Hint: Starts with "${q.answer[0]}". Class: ${q.drugRef?.class || 'N/A'}`);
+    alert(`Hint: Starts with "${q.answer[0]}". Category: ${q.drugRef?.category || 'N/A'}`);
   };
   els.revealBtn.onclick = () => {
     const q = state.questions[state.index];
@@ -213,7 +239,7 @@ function render() {
   const q = state.questions[state.index];
   if (!q) return;
 
-  // FIX: SHOW CATEGORY ONLY (Prevents SPOILING the answer if class is the answer)
+  // FIX: ONLY show Category context. Strip specific Class spoilers.
   if (els.drugCtx) {
     els.drugCtx.textContent = q.drugRef ? (q.drugRef.category || "Drug Review") : "";
   }
