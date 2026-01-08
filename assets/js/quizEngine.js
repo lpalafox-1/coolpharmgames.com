@@ -84,6 +84,7 @@ function updateTimerDisplay() {
   const mins = Math.floor(state.timerSeconds / 60);
   const secs = state.timerSeconds % 60;
   if (els.timerReadout) {
+    // The .padStart(2, '0') is the key to keeping it centered!
     els.timerReadout.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
   }
 }
