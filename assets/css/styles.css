@@ -217,23 +217,36 @@ label:has(input:focus-visible){ outline: 2px dashed var(--accent); border-radius
   pointer-events: none;
 }
 
-/* ===== Timer update ===== */
+/* ===== Timer update fix ===== */
 
 #timer-readout {
-  font-variant-numeric: tabular-nums; /* Prevents numbers from "jumping" when they change */
+  /* This prevents the timer from "jumping" or "wiggling" as numbers change */
+  font-variant-numeric: tabular-nums; 
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 4rem; /* Ensures a consistent "circle" or "box" shape */
+  min-width: 4.5rem; 
   font-weight: 700;
   letter-spacing: -0.02em;
+  transition: opacity 0.3s ease;
 }
 
+/* Mobile centering and sizing */
 @media (max-width: 640px) {
   #timer-readout {
-    font-size: 1.25rem; /* Makes it slightly larger and bolder on mobile */
-    line-height: 1;
+    font-size: 1.25rem; 
+    padding: 0.25rem 0.75rem;
   }
+}
+
+/* Pause animation feedback */
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.1; }
 }
 
 /* ===== Font size controls ===== */
