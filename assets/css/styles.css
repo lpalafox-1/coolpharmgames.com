@@ -217,6 +217,25 @@ label:has(input:focus-visible){ outline: 2px dashed var(--accent); border-radius
   pointer-events: none;
 }
 
+/* ===== Timer update ===== */
+
+#timer-readout {
+  font-variant-numeric: tabular-nums; /* Prevents numbers from "jumping" when they change */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 4rem; /* Ensures a consistent "circle" or "box" shape */
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+@media (max-width: 640px) {
+  #timer-readout {
+    font-size: 1.25rem; /* Makes it slightly larger and bolder on mobile */
+    line-height: 1;
+  }
+}
+
 /* ===== Font size controls ===== */
 .font-size-controls {
   display: flex;
