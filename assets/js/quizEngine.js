@@ -56,16 +56,16 @@ async function main() {
   render();
 }
 
-// --- TIMER LOGIC ---
+// --- TIMER ---
 function startSmartTimer() {
   if (state.timerHandle) clearInterval(state.timerHandle);
   const count = state.questions.length;
   if (weekParam) {
-    state.timerSeconds = 600; // 10 mins for Lab 2
+    state.timerSeconds = 600; 
   } else {
-    if (count <= 20) state.timerSeconds = 900;      // 15m
-    else if (count <= 50) state.timerSeconds = 2700; // 45m
-    else state.timerSeconds = 7200;                  // 2h
+    if (count <= 20) state.timerSeconds = 900;
+    else if (count <= 50) state.timerSeconds = 2700;
+    else state.timerSeconds = 7200;
   }
   state.timerHandle = setInterval(timerTick, 1000);
 }
@@ -88,7 +88,7 @@ function updateTimerDisplay() {
   }
 }
 
-// --- DATA LOADING ---
+// --- DATA ---
 async function loadDynamicQuiz() {
   const res = await fetch("assets/data/master_pool.json", { cache: "no-store" });
   const pool = await res.json();
@@ -131,21 +131,23 @@ function createQuestion(drug, all) {
   return { type: "mcq", prompt: `<b>${t.l}</b> for <b>${drug.generic}</b>?`, choices: shuffled([...distract(drug[t.k], t.k), drug[t.k]]), answer: drug[t.k], drugRef: drug };
 }
 
-// --- CORE INTERACTION ---
+// --- EVENTS ---
 function wireEvents() {
   els.next.onclick = () => { if (state.index < state.questions.length - 1) { state.index++; render(); } else showResults(); };
   els.prev.onclick = () => { if (state.index > 0) { state.index--; render(); } };
   els.check.onclick = () => {
     const q = state.questions[state.index];
-    const val = (q.type === "mcq") ? els.options.querySelector("input:checked")?.value : els.shortInput.value;
+    let val = (q.type === "mcq") ? els.options.querySelector("input:checked")?.value : els.shortInput.value;
     if (val) scoreCurrent(val);
   };
   els.restart.onclick = () => location.reload();
 
-  // Mobile Tap-to-Pause
+  // Mobile-Optimized Timer
   if (els.timerReadout) {
     els.timerReadout.style.cursor = "pointer";
-    els.timerReadout.onclick = () => {
+    els.timerReadout.style.webkitTapHighlightColor = "transparent";
+    els.timerReadout.onclick = (e) => {
+      e.preventDefault();
       if (state.timerHandle) {
         clearInterval(state.timerHandle);
         state.timerHandle = null;
@@ -173,18 +175,15 @@ function wireEvents() {
     if (!q._answered) scoreCurrent("SKIPPED_REVEALED");
   };
 
-  // Keyboard Mastery Shortcuts
+  // Mastery Keyboard Shortcuts
   window.onkeydown = (e) => {
     if (document.activeElement.tagName === 'INPUT' && e.key !== 'Enter') return;
-    
-    // Jump to Q 1-10
     if (e.key >= '1' && e.key <= '9') {
       const idx = parseInt(e.key) - 1;
       if (state.questions[idx]) { state.index = idx; render(); }
     } else if (e.key === '0') {
       if (state.questions[9]) { state.index = 9; render(); }
     }
-    
     if (e.key === "ArrowRight") { if (state.index < state.questions.length - 1) { state.index++; render(); } } 
     else if (e.key === "ArrowLeft") { if (state.index > 0) { state.index--; render(); } } 
     else if (e.key.toLowerCase() === "t") { if (els.timerReadout) els.timerReadout.click(); } 
@@ -211,8 +210,23 @@ function render() {
   if (q.type === "mcq") {
     q.choices.forEach(c => {
       const lbl = document.createElement("label");
-      lbl.className = `flex items-start gap-3 p-3 border rounded-xl cursor-pointer hover:bg-gray-50 transition-colors ${q._user === c ? 'ring-2 ring-blue-500' : ''}`;
-      lbl.innerHTML = `<input type="radio" name="opt" value="${c}" class="mt-1 flex-shrink-0" ${q._user === c ? 'checked' : ''} ${q._answered ? 'disabled' : ''}> <span class="flex-1 text-sm sm:text-base">${c}</span>`;
+      lbl.className = `flex items-center gap-3 p-4 border rounded-xl cursor-pointer transition-all active:scale-[0.98] mb-2 ${q._user === c ? 'ring-2 ring-[#8b1e3f] bg-[#8b1e3f]/5' : 'border-[var(--ring)]'}`;
+      lbl.style.webkitTapHighlightColor = "transparent";
+      
+      lbl.innerHTML = `
+        <input type="radio" name="opt" value="${c}" class="w-5 h-5 accent-[#8b1e3f]" ${q._user === c ? 'checked' : ''} ${q._answered ? 'disabled' : ''}>
+        <span class="flex-1 text-base leading-tight">${c}</span>
+      `;
+
+      lbl.onclick = () => {
+        if (!q._answered) {
+          const rad = lbl.querySelector('input');
+          if (rad) rad.checked = true;
+          q._user_temp = c; 
+          document.querySelectorAll('#options label').forEach(l => l.classList.remove('ring-2', 'ring-[#8b1e3f]', 'bg-[#8b1e3f]/5'));
+          lbl.classList.add('ring-2', 'ring-[#8b1e3f]', 'bg-[#8b1e3f]/5');
+        }
+      };
       els.options.appendChild(lbl);
     });
   } else {
@@ -247,7 +261,6 @@ function scoreCurrent(val) {
   q._correct = isCorrect;
   if (isCorrect) state.score++;
   
-  // Save current progress for mastery tracking
   const storageKey = weekParam ? `pharmlet.week${weekParam}.easy` : `pharmlet.${quizId}.easy`;
   localStorage.setItem(storageKey, JSON.stringify({score: state.score, total: state.questions.length}));
   
