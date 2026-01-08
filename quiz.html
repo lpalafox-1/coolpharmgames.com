@@ -20,7 +20,6 @@
   <style>
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
     
-    /* Font Scaling Root */
     #question-card { font-size: 1rem; transition: font-size 0.2s ease; }
     
     .mastery-header { 
@@ -34,9 +33,10 @@
     .animate-pulse { animation: pulse 2s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-    /* Responsive Button Scaling for Desktop */
+    /* Desktop Refinement: Normalizes button sizes and layout */
     @media (min-width: 1024px) {
-      .action-btn { max-width: 250px; padding: 1rem 2rem !important; font-size: 0.875rem !important; }
+      .action-btn { max-width: 250px; padding: 1rem 1.5rem !important; font-size: 0.875rem !important; border-radius: 12px !important; }
+      #question-card { padding: 3rem !important; }
     }
   </style>
 </head>
@@ -44,8 +44,10 @@
 <body class="bg-[var(--bg)] text-[var(--text)] font-sans antialiased transition-colors duration-300">
   <header class="mastery-header">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      
       <div class="flex-1 flex items-center gap-4">
         <a href="index.html" class="text-sm font-bold opacity-70 hover:opacity-100">← <span class="hidden lg:inline">Back to Hub</span></a>
+        
         <div class="hidden md:flex gap-1 border-l border-[var(--ring)] pl-4">
           <button id="font-decrease" class="p-1 px-2 hover:bg-black/5 dark:hover:bg-white/5 rounded text-xs font-bold border border-[var(--ring)]">A-</button>
           <button id="font-increase" class="p-1 px-2 hover:bg-black/5 dark:hover:bg-white/5 rounded text-xs font-bold border border-[var(--ring)]">A+</button>
@@ -72,9 +74,9 @@
     <div id="nav-map" class="mb-8 flex flex-wrap gap-2 justify-center"></div>
 
     <div class="grid lg:grid-cols-[1fr_350px] gap-8 items-start">
-      <section id="question-card" class="bg-[var(--card)] rounded-3xl p-6 sm:p-12 border border-[var(--ring)] shadow-xl shadow-black/5">
-        <div id="drug-context" class="text-[10px] uppercase tracking-widest text-[#8b1e3f] font-black mb-2 opacity-60"></div>
-        <h2 id="prompt" class="text-xl sm:text-2xl font-bold leading-tight mb-8">Loading...</h2>
+      <section id="question-card" class="bg-[var(--card)] rounded-3xl p-6 border border-[var(--ring)] shadow-xl shadow-black/5">
+        <div id="drug-context" class="text-[10px] uppercase tracking-widest text-[#8b1e3f] font-black mb-3 opacity-60"></div>
+        <h2 id="prompt" class="text-xl sm:text-2xl lg:text-3xl font-bold leading-tight mb-8">Loading...</h2>
         <div id="options" class="space-y-4" role="radiogroup"></div>
         <div id="short-wrap" class="mt-8 hidden">
           <input id="short-input" class="w-full rounded-2xl border border-[var(--ring)] bg-[var(--bg)] px-5 py-5 text-xl outline-[#8b1e3f]" placeholder="Type answer...">
@@ -84,12 +86,12 @@
 
       <aside class="hidden lg:flex flex-col gap-6 sticky top-24">
         <div class="card p-6 border border-[var(--ring)] bg-[var(--bg)]/50 rounded-2xl">
-          <h3 class="text-[10px] font-black uppercase opacity-40 mb-4 tracking-widest">Mastery Controls</h3>
-          <div class="grid grid-cols-2 gap-3">
-            <button onclick="document.getElementById('mark').click()" class="p-3 bg-[var(--card)] border border-[var(--ring)] rounded-xl text-xs font-bold hover:bg-[#8b1e3f] hover:text-white transition-all">🚩 Mark</button>
-            <button onclick="document.getElementById('hint-btn').click()" class="p-3 bg-[var(--card)] border border-[var(--ring)] rounded-xl text-xs font-bold hover:bg-[#8b1e3f] hover:text-white transition-all">💡 Hint</button>
-            <button onclick="document.getElementById('reveal-solution').click()" class="p-3 bg-[var(--card)] border border-[var(--ring)] rounded-xl text-xs font-bold hover:bg-[#8b1e3f] hover:text-white transition-all">👁️ Reveal</button>
-            <button onclick="document.getElementById('restart').click()" class="p-3 bg-red-500/10 text-red-600 border border-red-500/20 rounded-xl text-xs font-bold hover:bg-red-500 hover:text-white transition-all">🔄 Reset</button>
+          <h3 class="text-[10px] font-black uppercase opacity-40 mb-5 tracking-widest">Mastery Controls</h3>
+          <div class="grid grid-cols-1 gap-3">
+            <button onclick="document.getElementById('mark').click()" class="p-4 bg-[var(--card)] border border-[var(--ring)] rounded-2xl text-xs font-bold hover:bg-[#8b1e3f] hover:text-white transition-all">🚩 Mark Question</button>
+            <button onclick="document.getElementById('hint-btn').click()" class="p-4 bg-[var(--card)] border border-[var(--ring)] rounded-2xl text-xs font-bold hover:bg-[#8b1e3f] hover:text-white transition-all">💡 Get Hint</button>
+            <button onclick="document.getElementById('reveal-solution').click()" class="p-4 bg-[var(--card)] border border-[var(--ring)] rounded-2xl text-xs font-bold hover:bg-[#8b1e3f] hover:text-white transition-all">👁️ Reveal Answer</button>
+            <button onclick="document.getElementById('restart').click()" class="p-4 bg-red-500/5 text-red-600 border border-red-500/10 rounded-2xl text-xs font-bold hover:bg-red-500 hover:text-white transition-all">🔄 Reset Quiz</button>
           </div>
         </div>
       </aside>
