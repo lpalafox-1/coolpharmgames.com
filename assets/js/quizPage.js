@@ -3,24 +3,43 @@
   /* ---------- Segmented "Questions" control ---------- */
   const group = document.getElementById('qcount-group');
   if (group) {
+    // Check if this is a log-lab-2 quiz (dynamic, accessed via ?week= parameter)
     const url = new URL(location.href);
-    const current = url.searchParams.get('limit') || ''; // '' means All
+    const weekParam = url.searchParams.get('week');
+    
+    if (weekParam) {
+      // DYNAMIC QUIZ (Log Lab 2): Hide question count dropdown and force limit=10
+      // Hide the entire flex container (qcount-group's parent: "flex items-center gap-2")
+      const container = group.closest('div');
+      if (container) {
+        container.style.display = 'none';
+      }
+      
+      // Force limit=10 if not already set
+      if (!url.searchParams.get('limit')) {
+        url.searchParams.set('limit', '10');
+        history.replaceState(null, '', url.toString());
+      }
+    } else {
+      // STATIC QUIZ: Show dropdown and allow user selection
+      const current = url.searchParams.get('limit') || ''; // '' means All
 
-    // mark active
-    group.querySelectorAll('.seg-link').forEach(link => {
-      const val = link.getAttribute('data-limit') ?? '';
-      link.classList.toggle('active', val === current);
+      // mark active
+      group.querySelectorAll('.seg-link').forEach(link => {
+        const val = link.getAttribute('data-limit') ?? '';
+        link.classList.toggle('active', val === current);
 
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const u = new URL(location.href);
-        const next = link.getAttribute('data-limit') ?? '';
-        if (next) u.searchParams.set('limit', next);
-        else u.searchParams.delete('limit');  // All
-        // keep id/mode/seed as-is
-        location.href = u.toString();
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const u = new URL(location.href);
+          const next = link.getAttribute('data-limit') ?? '';
+          if (next) u.searchParams.set('limit', next);
+          else u.searchParams.delete('limit');  // All
+          // keep id/mode/seed as-is
+          location.href = u.toString();
+        });
       });
-    });
+    }
   }
 
   /* ---------- Share button ---------- */

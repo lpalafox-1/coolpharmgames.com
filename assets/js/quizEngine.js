@@ -5,9 +5,12 @@
 
 const params = new URLSearchParams(location.search);
 const quizId = params.get("id");
+const weekParam = parseInt(params.get("week") || "", 10);
 const mode   = (params.get("mode") || "easy").toLowerCase();
 const limitParam = parseInt(params.get("limit") || "", 10);
 const seedParam  = parseInt(params.get("seed")  || "", 10);
+
+let masterPoolData = null;
 
 const els = {
   title: document.getElementById("quiz-title"),
@@ -39,6 +42,21 @@ const els = {
 };
 
 const THEME_KEY = "quiz-theme";
+
+// --- STRICT SYLLABUS CONFIGURATION ---
+const QUIZ_CONFIG = {
+  'log-lab-2-quiz-1': { newWeek: 1, reviewWeeks: [1, 2, 3] },
+  'log-lab-2-quiz-2': { newWeek: 2, reviewWeeks: [4, 5, 6] },
+  'log-lab-2-quiz-3': { newWeek: 3, reviewWeeks: [6, 7] },
+  'log-lab-2-quiz-4': { newWeek: 4, reviewWeeks: [8] }, // Strict Constraint
+  'log-lab-2-quiz-5': { newWeek: 5, reviewWeeks: [9] },
+  'log-lab-2-quiz-6': { newWeek: 6, reviewWeeks: [10, 11] },
+  'log-lab-2-quiz-7': { newWeek: 7, reviewWeeks: 'ALL' },
+  'log-lab-2-quiz-8': { newWeek: 8, reviewWeeks: 'ALL' },
+  'log-lab-2-quiz-9': { newWeek: 9, reviewWeeks: 'ALL' },
+  'log-lab-2-quiz-10': { newWeek: 10, reviewWeeks: 'ALL' },
+  'log-lab-2-quiz-11': { newWeek: 11, reviewWeeks: 'ALL' }
+};
 
 // Wait for DOM to be ready before setting up theme
 if (document.readyState === 'loading') {
@@ -80,33 +98,89 @@ const state = {
   timerHandle: null,
 };
 
-const STORAGE_KEY = () => `pharmlet.${quizId}.${mode}`;
+const STORAGE_KEY = () => `pharmlet.${quizId || 'week'+weekParam}.${mode}`;
 
 // Wait for DOM to be ready before starting
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
-    main().catch(err => {
-      console.error(err);
-      if (els.title) els.title.textContent = 'Quiz not found';
-      if (els.card) els.card.innerHTML = `<p style="color:var(--muted)">Could not load <code>quizzes/${sanitize(quizId)}.json</code>. Check the file name and path.</p>`;
-    });
+    main().catch(handleError);
   });
 } else {
-  main().catch(err => {
-    console.error(err);
-    if (els.title) els.title.textContent = 'Quiz not found';
-    if (els.card) els.card.innerHTML = `<p style="color:var(--muted)">Could not load <code>quizzes/${sanitize(quizId)}.json</code>. Check the file name and path.</p>`;
-  });
+  main().catch(handleError);
+}
+
+function handleError(err) {
+  console.error(err);
+  if (els.title) els.title.textContent = 'Quiz Error';
+  if (els.card) els.card.innerHTML = `<div class="p-4"><p style="color:var(--muted)">Error loading quiz: ${err.message}</p></div>`;
 }
 
 async function main() {
-  if (!quizId) throw new Error("Missing ?id=…");
-
   // Check if required DOM elements exist
   if (!els.title || !els.card) {
-    throw new Error("Required DOM elements not found. Make sure the HTML structure is correct.");
+    throw new Error("Required DOM elements not found.");
   }
 
+  if (weekParam) {
+    // --- DYNAMIC MODE ---
+    await loadDynamicQuiz();
+  } else if (quizId) {
+    // --- STATIC MODE ---
+    await loadStaticQuiz();
+  } else {
+    throw new Error("Missing ?id=… or ?week=…");
+  }
+
+  finalizeSetup();
+}
+
+async function loadDynamicQuiz() {
+  if (!masterPoolData) {
+    const res = await fetch("master_pool.json", { cache: "no-store" });
+    if (!res.ok) throw new Error(`Failed to load master pool: ${res.status}`);
+    masterPoolData = await res.json();
+  }
+
+  // If generation produced zero questions, attempt fallback to v2-generator master pool
+  if (!masterPoolData || masterPoolData.length === 0) {
+    try {
+      const altRes = await fetch("v2-generator/master_pool.json", { cache: "no-store" });
+      if (altRes.ok) {
+        const alt = await altRes.json();
+        // merge unique entries by generic+brand
+        const seen = new Set(masterPoolData.map(d => `${d.generic}||${d.brand}`));
+        const merged = masterPoolData.slice();
+        alt.forEach(d => {
+          const key = `${d.generic}||${d.brand}`;
+          if (!seen.has(key)) { seen.add(key); merged.push(d); }
+        });
+        masterPoolData = merged;
+      }
+    } catch (e) {
+      // swallow fallback errors; we'll surface empty quiz to user later
+    }
+  }
+
+  // Set global window.masterPool for generateQuiz function
+  window.masterPool = masterPoolData;
+
+  // Generate quiz using strict config
+  const dynamicQuizId = `log-lab-2-quiz-${weekParam}`;
+  const selectedDrugs = generateQuiz(dynamicQuizId);
+
+  // Convert drugs to questions
+  const questions = selectedDrugs.map(drug => createQuestion(drug, masterPoolData));
+
+  state.title = `Log Lab 2 Week ${QUIZ_CONFIG[dynamicQuizId]?.newWeek || weekParam}`;
+  state.questions = questions.map((q, i) => ({
+    ...q,
+    _answered:false, _correct:false, _user:null,
+    _choices: Array.isArray(q.choices) ? shuffledCopy(q.choices) : (q.type === "tf" ? ["True","false"] : null),
+    _id: i
+  }));
+}
+
+async function loadStaticQuiz() {
   const res = await fetch(`quizzes/${quizId}.json`, { cache: "no-store" });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const data = await res.json();
@@ -114,18 +188,13 @@ async function main() {
   let allPool = [];
   // Stratified sampling support via blueprint
   if (data.blueprint && data.blueprint[mode]) {
-    const rules = data.blueprint[mode]; // e.g. [{ source: "lab2", count: 6 }, { source: "lab1", count: 4 }]
+    const rules = data.blueprint[mode];
     rules.forEach(rule => {
       const sourcePool = data.pools[rule.source] || [];
-      // Shuffle source pool and take count
       const subPool = shuffledCopy(sourcePool);
-      // If count is specified, limit it. If not, take all.
       const count = typeof rule.count === 'number' ? rule.count : sourcePool.length;
       allPool.push(...subPool.slice(0, count));
     });
-    // If we have a limit param, we might want to respect it relative to the blueprint?
-    // The blueprint usually defines the total composition (e.g. 10 items).
-    // If limitParam is smaller than blueprint total, we just slice the final result later.
   } else if (data.pools) {
     const keys = Object.keys(data.pools || {});
     if (mode === 'all' || mode === 'mix') {
@@ -133,21 +202,16 @@ async function main() {
     } else if (data.pools[mode]) {
       allPool = data.pools[mode] || [];
     } else {
-      // unknown mode: default to merge
       allPool = keys.reduce((acc,k)=> acc.concat(Array.isArray(data.pools[k])?data.pools[k]:[]), []);
     }
   } else {
     allPool = data.questions || [];
   }
+
   if (!Array.isArray(allPool) || allPool.length === 0) {
-    if (els.title) els.title.textContent = data.title || "Quiz";
-    if (els.card) {
-      els.card.innerHTML = `<div class="p-4"><p style="color:var(--muted)">No questions found for mode "${sanitize(mode)}". Try switching to another mode (easy/hard) or check back later.</p></div>`;
-      els.results?.classList.add("hidden");
-      els.card.classList.remove("hidden");
-    }
-    return;
+    throw new Error(`No questions found for mode "${mode}"`);
   }
+
   const poolCopy = [...allPool];
   if (Number.isFinite(seedParam)) seededShuffle(poolCopy, seedParam);
   else shuffleInPlace(poolCopy);
@@ -159,27 +223,147 @@ async function main() {
   state.questions = pool.map((q, i) => ({
     ...q,
     _answered:false, _correct:false, _user:null,
-    _choices: Array.isArray(q.choices) ? shuffledCopy(q.choices) : (q.type === "tf" ? ["True","False"] : null),
+    _choices: Array.isArray(q.choices) ? shuffledCopy(q.choices) : (q.type === "tf" ? ["True","false"] : null),
     _id: i
   }));
+}
 
+function finalizeSetup() {
   // restore saved session if present (and same length)
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY()) || "null");
     if (saved && Array.isArray(saved.questions) && saved.questions.length === state.questions.length) {
-      Object.assign(state, saved, { review:false, timerHandle:null }); // never resume in review; no running timer
+      Object.assign(state, saved, { review:false, timerHandle:null });
       state.marked = new Set(saved.marked || []);
     }
   } catch {}
 
-  if (els.title) els.title.textContent = `${state.title} — ${capitalize(mode)}`;
+  if (els.title) els.title.textContent = `${state.title}`;
   if (els.qtotal) els.qtotal.textContent = state.questions.length;
 
   wireEvents();
   render();
 }
 
-/* ---------- events ---------- */
+/* ---------- DYNAMIC GENERATION LOGIC ---------- */
+
+function generateQuiz(quizId) {
+  // 1. Check if this is a strict Log Lab 2 quiz
+  const config = QUIZ_CONFIG[quizId];
+  if (!config) {
+    // Fallback for old legacy quizzes
+    console.log('Legacy quiz detected:', quizId);
+    return []; 
+  }
+
+  const pool = window.masterPool || [];
+  let selectedQuestions = [];
+
+  // 2. Fetch NEW Material (6 Questions)
+  // STRICTLY matching lab 2 and the specific new week
+  let newMaterial = pool.filter(d => Number(d.metadata?.lab) === 2 && Number(d.metadata?.week) === config.newWeek);
+  newMaterial = newMaterial.sort(() => 0.5 - Math.random()).slice(0, 6);
+  selectedQuestions.push(...newMaterial);
+
+  // 3. Fetch REVIEW Material (Fill to 10)
+  let reviewPool = [];
+  if (config.reviewWeeks === 'ALL') {
+    reviewPool = pool.filter(d => Number(d.metadata?.lab) === 1);
+  } else {
+    // STRICTLY matching lab 1 and the allowed review weeks array
+    reviewPool = pool.filter(d => Number(d.metadata?.lab) === 1 && config.reviewWeeks.includes(Number(d.metadata?.week)));
+  }
+
+  // Fill remaining slots
+  let needed = 10 - selectedQuestions.length;
+  let reviewQuestions = reviewPool.sort(() => 0.5 - Math.random()).slice(0, needed);
+  selectedQuestions.push(...reviewQuestions);
+
+  // 4. Emergency Backfill (Only from allowed review pool)
+  while (selectedQuestions.length < 10 && reviewPool.length > 0) {
+    let extra = reviewPool[Math.floor(Math.random() * reviewPool.length)];
+    if (!selectedQuestions.includes(extra)) selectedQuestions.push(extra);
+  }
+
+  return selectedQuestions;
+}
+
+function createQuestion(drug, allDrugs) {
+  // Determine question types based on available data
+  const types = [];
+  if (drug.brand) { types.push("brand-generic", "generic-brand"); }
+  if (drug.class) { types.push("class"); }
+  if (drug.category) { types.push("category"); }
+  if (drug.moa) { types.push("moa"); }
+
+  if (types.length === 0) {
+    return { type: "short", prompt: `Error: No data for ${drug.generic}`, answer: "error" };
+  }
+
+  const type = types[Math.floor(Math.random() * types.length)];
+  let q = {};
+
+  switch (type) {
+    case "brand-generic":
+      q = {
+        type: "short",
+        prompt: `What is the generic name for ${drug.brand}?`,
+        answerText: [drug.generic.toLowerCase()],
+        mapping: { generic: drug.generic, brand: drug.brand }
+      };
+      break;
+    case "generic-brand":
+      q = {
+        type: "short",
+        prompt: `What is the brand name for ${drug.generic}?`,
+        answerText: [drug.brand.toLowerCase()],
+        mapping: { generic: drug.generic, brand: drug.brand }
+      };
+      break;
+    case "class":
+      q = createMCQ(
+        `Which class does ${drug.generic} belong to?`,
+        drug.class,
+        getDistractors(drug.class, allDrugs, d => d.class, 3)
+      );
+      break;
+    case "category":
+      q = createMCQ(
+        `What is the category of ${drug.generic}?`,
+        drug.category,
+        getDistractors(drug.category, allDrugs, d => d.category, 3)
+      );
+      break;
+    case "moa":
+      q = createMCQ(
+        `What is the MOA of ${drug.generic}?`,
+        drug.moa,
+        getDistractors(drug.moa, allDrugs, d => d.moa, 3)
+      );
+      break;
+  }
+  return q;
+}
+
+function createMCQ(prompt, answer, distractors) {
+  const choices = shuffledCopy([...distractors, answer]);
+  return {
+    type: "mcq",
+    prompt: prompt,
+    choices: choices,
+    answer: [answer]
+  };
+}
+
+function getDistractors(correct, allDrugs, extractor, count) {
+  const unique = new Set();
+  allDrugs.forEach(d => {
+    const val = extractor(d);
+    if (val && val !== correct) unique.add(val);
+  });
+  const list = Array.from(unique);
+  return shuffledCopy(list).slice(0, count);
+}
 function wireEvents(){
   els.prev?.addEventListener("click", () => { if (state.index>0) { state.index--; render(); save(); } });
   els.next?.addEventListener("click", () => {
@@ -478,22 +662,33 @@ function restart(){
   state.currentStreak = 0; state.bestStreak = 0;
   state.marked = new Set();
   
-  // Randomize question order on restart
-  shuffleInPlace(state.questions);
-  
-  // Re-shuffle multiple choice answers for each question
-  state.questions.forEach(q => {
-    Object.assign(q, {_answered:false,_correct:false,_user:null});
-    if (Array.isArray(q.choices)) {
-      q._choices = shuffledCopy(q.choices);
-    }
-  });
+  if (weekParam && masterPoolData) {
+    // --- DYNAMIC RESTART ---
+    window.masterPool = masterPoolData;
+    const dynamicQuizId = `log-lab-2-quiz-${weekParam}`;
+    const selectedDrugs = generateQuiz(dynamicQuizId);
+    const questions = selectedDrugs.map(drug => createQuestion(drug, masterPoolData));
+    state.questions = questions.map((q, i) => ({
+      ...q,
+      _answered:false, _correct:false, _user:null,
+      _choices: Array.isArray(q.choices) ? shuffledCopy(q.choices) : (q.type === "tf" ? ["True","False"] : null),
+      _id: i
+    }));
+  } else {
+    // --- STATIC RESTART ---
+    shuffleInPlace(state.questions);
+    state.questions.forEach(q => {
+      Object.assign(q, {_answered:false,_correct:false,_user:null});
+      if (Array.isArray(q.choices)) {
+        q._choices = shuffledCopy(q.choices);
+      }
+    });
+  }
   
   els.results.classList.add("hidden");
   els.card.classList.remove("hidden");
   els.check.classList.remove("hidden");
   els.next.classList.add("hidden");
-  // reset timer readout but keep setting off
   state.timerSeconds = 0; stopTimer(); updateTimerReadout();
   render();
 }
@@ -747,12 +942,8 @@ function savePerformanceHistory(){
   try {
     const HISTORY_KEY = "pharmlet.history";
     const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
-    
-    // Track wrong answers for review queue
-    const wrongAnswers = state.questions
-      .filter(q => q._answered && !q._correct)
-      .map(q => ({
-        quizId,
+    const wrongAnswers = state.questions.filter(q => q._answered && !q._correct).map(q => ({
+        quizId: quizId || ('week'+weekParam),
         mode,
         questionId: q._id,
         prompt: q.prompt,
@@ -762,18 +953,15 @@ function savePerformanceHistory(){
         userAnswer: q._user,
         timestamp: new Date().toISOString()
       }));
-    
     if (wrongAnswers.length > 0) {
       const REVIEW_KEY = "pharmlet.review-queue";
       const reviewQueue = JSON.parse(localStorage.getItem(REVIEW_KEY) || "[]");
       reviewQueue.push(...wrongAnswers);
-      // Keep last 500 wrong answers
       if (reviewQueue.length > 500) reviewQueue.splice(0, reviewQueue.length - 500);
       localStorage.setItem(REVIEW_KEY, JSON.stringify(reviewQueue));
     }
-    
     history.push({
-      quizId,
+      quizId: quizId || ('week'+weekParam),
       mode,
       title: state.title,
       score: state.score,
@@ -782,7 +970,6 @@ function savePerformanceHistory(){
       timeSeconds: state.timerSeconds,
       timestamp: new Date().toISOString()
     });
-    // Keep only last 100 attempts
     if (history.length > 100) history.shift();
     localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
   } catch {}
