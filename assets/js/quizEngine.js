@@ -60,8 +60,6 @@ async function main() {
 function initTheme() {
   const isDark = localStorage.getItem("quiz-theme") === "dark";
   document.documentElement.classList.toggle("dark", isDark);
-  
-  // Instant theme toggle wiring
   if (els.themeToggle) {
     els.themeToggle.onpointerdown = (e) => {
       e.preventDefault();
@@ -145,23 +143,24 @@ function wireEvents() {
   };
   els.restart.onclick = () => location.reload();
 
-  // FONT SCALING (A+ / A-)
+  // NUCLEAR FONT SCALING (A+ / A-)
   const fontInc = document.getElementById("font-increase");
   const fontDec = document.getElementById("font-decrease");
   if (fontInc && fontDec) {
     fontInc.onclick = (e) => { 
       e.preventDefault();
       state.currentScale += 0.1; 
-      els.card.style.fontSize = `${state.currentScale}rem`; 
+      document.documentElement.style.setProperty('--quiz-size', `${state.currentScale}rem`); 
     };
     fontDec.onclick = (e) => { 
       e.preventDefault();
-      if(state.currentScale > 0.7) state.currentScale -= 0.1; 
-      els.card.style.fontSize = `${state.currentScale}rem`; 
+      if(state.currentScale > 0.7) {
+        state.currentScale -= 0.1; 
+        document.documentElement.style.setProperty('--quiz-size', `${state.currentScale}rem`); 
+      }
     };
   }
 
-  // HELP MODAL (?)
   if (els.helpShortcuts) {
     els.helpShortcuts.onpointerdown = (e) => {
       e.preventDefault();
@@ -169,7 +168,6 @@ function wireEvents() {
       if (modal) {
         modal.style.display = "flex";
         modal.classList.remove("hidden");
-        // Update the inner shortcut list for full information
         const listContainer = modal.querySelector('.space-y-4');
         if (listContainer) {
           listContainer.innerHTML = `
@@ -239,9 +237,16 @@ function render() {
   const q = state.questions[state.index];
   if (!q) return;
 
-  // FIX: ONLY show Category context. Strip specific Class spoilers.
+  // AGGRESSIVE ANTI-SPOILER CHECK
   if (els.drugCtx) {
-    els.drugCtx.textContent = q.drugRef ? (q.drugRef.category || "Drug Review") : "";
+    const isSpoilerType = q.prompt.toLowerCase().includes('class') || 
+                         q.prompt.toLowerCase().includes('moa');
+    
+    if (isSpoilerType) {
+      els.drugCtx.textContent = "Drug Review"; // Hide specific class answer
+    } else {
+      els.drugCtx.textContent = q.drugRef ? (q.drugRef.category || "Top Drug") : "";
+    }
   }
 
   els.qnum.textContent = state.index + 1;
