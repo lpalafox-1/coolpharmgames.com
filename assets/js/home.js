@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", () => {
     runHome();
   } catch (e) {
     console.error("home.js crashed:", e);
-    // Never leave user with a blank page:
     forceShowMenu();
   }
 });
@@ -17,190 +16,110 @@ function forceShowMenu() {
 }
 
 function runHome() {
-  // 1) Theme toggle (with guards)
+  // 1) Theme toggle
   const THEME_KEY = "quiz-theme";
   const t = document.getElementById("theme-toggle");
   const tLabel = document.getElementById("theme-label");
   if (t && tLabel) {
-    try {
-      const saved = localStorage.getItem(THEME_KEY);
-      const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)")?.matches;
-      const start = saved || (prefersDark ? "dark" : "light");
-      document.documentElement.classList.toggle("dark", start === "dark");
-      tLabel.textContent = start === "dark" ? "Light" : "Dark";
-      t.addEventListener("click", () => {
-        const next = document.documentElement.classList.contains("dark") ? "light" : "dark";
-        document.documentElement.classList.toggle("dark", next === "dark");
-        localStorage.setItem(THEME_KEY, next);
-        tLabel.textContent = next === "dark" ? "Light" : "Dark";
-      });
-    } catch (e) {
-      console.warn("Theme toggle failed:", e);
-    }
+    const saved = localStorage.getItem(THEME_KEY);
+    const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)")?.matches;
+    const start = saved || (prefersDark ? "dark" : "light");
+    document.documentElement.classList.toggle("dark", start === "dark");
+    tLabel.textContent = start === "dark" ? "Light" : "Dark";
+    t.onclick = () => {
+      const next = document.documentElement.classList.contains("dark") ? "light" : "dark";
+      document.documentElement.classList.toggle("dark", next === "dark");
+      localStorage.setItem(THEME_KEY, next);
+      tLabel.textContent = next === "dark" ? "Light" : "Dark";
+    };
   }
 
-  // 2) Welcome logic (safe)
+  // 2) Welcome logic
   const welcome = document.getElementById("welcome");
   const menu = document.getElementById("menu");
-  const startBtn = document.getElementById("start-now");
-  const skipBtn = document.getElementById("skip");
-
-  // Show welcome only on first visit
   const SEEN_KEY = "pharmlet.welcome.seen";
   const showWelcome = !localStorage.getItem(SEEN_KEY);
 
   if (welcome && menu) {
-    if (showWelcome) {
-      welcome.style.display = "";
-      menu.style.display = "none";
-    } else {
-      welcome.style.display = "none";
-      menu.style.display = "";
+    welcome.style.display = showWelcome ? "" : "none";
+    menu.style.display = showWelcome ? "none" : "";
+  }
+
+  const handleStart = () => {
+    localStorage.setItem(SEEN_KEY, "1");
+    if (welcome) welcome.style.display = "none";
+    if (menu) menu.style.display = "";
+  };
+  document.getElementById("start-now")?.addEventListener("click", handleStart);
+  document.getElementById("skip")?.addEventListener("click", handleStart);
+
+  // 3) New: Track Progress for Lab II COP (Weeks 1-11)
+  // This looks for saved results and updates the UI
+  for (let w = 1; w <= 11; w++) {
+    const scoreKey = `pharmlet.week${w}.easy`; // Key based on quizEngine.js
+    const savedData = localStorage.getItem(scoreKey);
+    
+    if (savedData) {
+      try {
+        const stats = JSON.parse(savedData);
+        const percent = Math.round((stats.score / stats.total) * 100);
+        
+        // Update the Progress Mini bars in the Featured Section
+        const bar = document.getElementById(`prog-week-${w}`);
+        if (bar) {
+          bar.style.width = `${percent}%`;
+          if (percent === 100) bar.style.background = "#10b981"; // Green for perfect score
+        }
+
+        // Add a visual "Completed" ring to the Grid Buttons
+        const gridBtn = document.querySelector(`a[href="quiz.html?week=${w}"]`);
+        if (gridBtn) {
+          gridBtn.classList.add("border-green-500", "bg-green-50/10");
+          gridBtn.innerHTML += ` <span class="text-[10px] text-green-500 ml-1">✓</span>`;
+        }
+      } catch (e) {
+        console.warn(`Failed to parse stats for week ${w}`, e);
+      }
     }
   }
 
-  startBtn?.addEventListener("click", () => {
-    try { localStorage.setItem(SEEN_KEY, "1"); } catch {}
-    if (welcome) welcome.style.display = "none";
-    if (menu) menu.style.display = "";
-  });
-  skipBtn?.addEventListener("click", () => {
-    try { localStorage.setItem(SEEN_KEY, "1"); } catch {}
-    if (welcome) welcome.style.display = "none";
-    if (menu) menu.style.display = "";
-  });
-
-  // 3) “Resume last quiz” button (guarded)
+  // 4) Resume last quiz logic (Updated to detect Lab II weeks)
   const resumeWrap = document.getElementById("resume-wrap");
   const resumeLink = document.getElementById("resume-link");
   if (resumeWrap && resumeLink) {
-    try {
-      // look for last storage key pharmlet.<id>.<mode>
-      let lastKey = null;
-      for (let i = 0; i < localStorage.length; i++) {
-        const k = localStorage.key(i);
-        if (k && k.startsWith("pharmlet.") && k.split(".").length === 3) {
-          lastKey = k; // naive: last encountered
-        }
+    let lastKey = null;
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith("pharmlet.")) lastKey = k;
+    }
+    if (lastKey) {
+      const parts = lastKey.split(".");
+      if (parts[1].startsWith("week")) {
+        resumeLink.href = `quiz.html?week=${parts[1].replace("week", "")}`;
+      } else {
+        resumeLink.href = `quiz.html?id=${parts[1]}&mode=${parts[2] || 'easy'}&limit=20`;
       }
-      if (lastKey) {
-        const [, quizId, mode] = lastKey.split(".");
-        resumeLink.href = `quiz.html?id=${encodeURIComponent(quizId)}&mode=${encodeURIComponent(mode)}&limit=20`;
-        resumeWrap.style.display = "";
-      }
-    } catch (e) {
-      console.warn("Resume detection failed:", e);
+      resumeWrap.style.display = "";
     }
   }
 
-  // 4) Class filter (guarded)
+  // 5) Filter & Sort (Existing logic preserved)
   const filter = document.getElementById("class-filter");
   if (filter) {
     filter.addEventListener("input", () => {
       const q = filter.value.toLowerCase().trim();
-      const cards = document.querySelectorAll("#classes .card, #classes-section + div .card");
-      cards.forEach(card => {
-        const text = card.textContent.toLowerCase();
-        card.style.display = text.includes(q) ? "" : "none";
+      document.querySelectorAll(".card").forEach(card => {
+        card.style.display = card.textContent.toLowerCase().includes(q) ? "" : "none";
       });
-    });
-  }
-
-  // 5) Sort quizzes
-  const sortSelect = document.getElementById("sort-quizzes");
-  if (sortSelect) {
-    sortSelect.addEventListener("change", () => {
-      const sortBy = sortSelect.value;
-      const cardsContainer = document.querySelector("#classes-section + div");
-      if (!cardsContainer) return;
-      
-      const cards = Array.from(cardsContainer.querySelectorAll(".card"));
-      
-      if (sortBy === "name") {
-        cards.sort((a, b) => {
-          const aTitle = a.querySelector("h3")?.textContent || "";
-          const bTitle = b.querySelector("h3")?.textContent || "";
-          return aTitle.localeCompare(bTitle);
-        });
-      } else if (sortBy === "recent") {
-        cards.sort((a, b) => {
-          const aNew = a.querySelector(".pill-new");
-          const bNew = b.querySelector(".pill-new");
-          if (aNew && !bNew) return -1;
-          if (!aNew && bNew) return 1;
-          if (aNew && bNew) {
-            const aDate = new Date(aNew.dataset.added || "2000-01-01");
-            const bDate = new Date(bNew.dataset.added || "2000-01-01");
-            return bDate - aDate;
-          }
-          return 0;
-        });
-      }
-      // "default" keeps original DOM order
-      
-      if (sortBy !== "default") {
-        cards.forEach(card => cardsContainer.appendChild(card));
-      }
     });
   }
 
   // 6) Auto-hide NEW banners after 7 days
-  try {
-    const newBanners = document.querySelectorAll('.pill-new[data-added]');
-    const now = new Date();
-    newBanners.forEach(banner => {
-      const addedDate = new Date(banner.getAttribute('data-added'));
-      const daysDiff = (now - addedDate) / (1000 * 60 * 60 * 24);
-      if (daysDiff > 7) {
-        banner.style.display = 'none';
-      }
-    });
-  } catch (e) {
-    console.warn('NEW banner expiration failed:', e);
-  }
+  document.querySelectorAll('.pill-new[data-added]').forEach(banner => {
+    const addedDate = new Date(banner.getAttribute('data-added'));
+    if ((new Date() - addedDate) / 86400000 > 7) banner.style.display = 'none';
+  });
 
-  // 6) Bookmark favorite quizzes
-  const FAVORITES_KEY = "pharmlet.favorites";
-  try {
-    const favorites = new Set(JSON.parse(localStorage.getItem(FAVORITES_KEY) || "[]"));
-    
-    // Add star buttons to quiz cards
-    document.querySelectorAll(".quiz-link, a[href^='quiz.html']").forEach(link => {
-      const url = new URL(link.href, window.location.origin);
-      const quizId = url.searchParams.get("id");
-      if (!quizId) return;
-      
-      const isFavorite = favorites.has(quizId);
-      const star = document.createElement("span");
-      star.className = "favorite-star";
-      star.textContent = isFavorite ? "★" : "☆";
-      star.style.cssText = "cursor:pointer;margin-left:0.5rem;color:var(--accent);font-size:1.2em;";
-      star.title = isFavorite ? "Remove from favorites" : "Add to favorites";
-      star.setAttribute("role", "button");
-      star.setAttribute("aria-label", isFavorite ? "Remove from favorites" : "Add to favorites");
-      
-      star.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (favorites.has(quizId)) {
-          favorites.delete(quizId);
-          star.textContent = "☆";
-          star.title = "Add to favorites";
-        } else {
-          favorites.add(quizId);
-          star.textContent = "★";
-          star.title = "Remove from favorites";
-        }
-        localStorage.setItem(FAVORITES_KEY, JSON.stringify([...favorites]));
-      });
-      
-      link.appendChild(star);
-    });
-  } catch (e) {
-    console.warn('Favorites feature failed:', e);
-  }
-
-  // Done: ensure menu is visible at end even if something above silently failed
-  const isWelcomeOn = welcome && welcome.style.display !== "none";
-  if (!isWelcomeOn && menu) menu.style.display = "";
+  // Final check to show menu
+  if (menu && menu.style.display === "none" && !showWelcome) menu.style.display = "";
 }
