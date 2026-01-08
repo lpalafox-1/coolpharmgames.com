@@ -51,38 +51,17 @@ async function main() {
   if (els.title) els.title.textContent = state.title;
   if (els.qtotal) els.qtotal.textContent = state.questions.length;
   
-  // ... inside wireEvents() ...
-  window.onkeydown = (e) => {
-    if (document.activeElement.tagName === 'INPUT' && e.key !== 'Enter') return;
-    
-    // mastery navigation (1-9 and 0 for 10)
-    if (e.key >= '1' && e.key <= '9') {
-      const idx = parseInt(e.key) - 1;
-      if (state.questions[idx]) { state.index = idx; render(); }
-    } else if (e.key === '0') {
-      if (state.questions[9]) { state.index = 9; render(); }
-    }
-    
-    if (e.key === "ArrowRight") { if (state.index < state.questions.length - 1) { state.index++; render(); } } 
-    else if (e.key === "ArrowLeft") { if (state.index > 0) { state.index--; render(); } } 
-    else if (e.key.toLowerCase() === "t") { if (els.timerReadout) els.timerReadout.click(); } 
-    else if (e.key.toLowerCase() === "m") { if (els.mark) els.mark.click(); }
-    else if (e.key === "Enter") { 
-      if (!state.questions[state.index]._answered) els.check.click(); 
-      else if (state.index < state.questions.length - 1) els.next.click(); 
-    }
-  };
   startSmartTimer(); 
   wireEvents();
   render();
 }
 
+// --- TIMER LOGIC ---
 function startSmartTimer() {
   if (state.timerHandle) clearInterval(state.timerHandle);
   const count = state.questions.length;
-  
   if (weekParam) {
-    state.timerSeconds = 600; // 10 mins
+    state.timerSeconds = 600; // 10 mins for Lab 2
   } else {
     if (count <= 20) state.timerSeconds = 900;      // 15m
     else if (count <= 50) state.timerSeconds = 2700; // 45m
@@ -109,6 +88,7 @@ function updateTimerDisplay() {
   }
 }
 
+// --- DATA LOADING ---
 async function loadDynamicQuiz() {
   const res = await fetch("assets/data/master_pool.json", { cache: "no-store" });
   const pool = await res.json();
@@ -116,7 +96,7 @@ async function loadDynamicQuiz() {
   const newPool = pool.filter(d => Number(d.metadata?.lab) === 2 && Number(d.metadata?.week) === weekParam);
   const revPool = (reviewWeeks === 'ALL') ? pool.filter(d => Number(d.metadata?.lab) === 1) : pool.filter(d => Number(d.metadata?.lab) === 1 && reviewWeeks.includes(Number(d.metadata?.week)));
   const combined = [...shuffled(newPool).slice(0, 6), ...shuffled(revPool).slice(0, 4)];
-  state.title = `Log Lab 2 Week ${weekParam}`;
+  state.title = `Top Drug Quiz ${weekParam}`;
   state.questions = shuffled(combined).map((d, i) => ({ ...createQuestion(d, pool), _id: i, drugRef: d }));
 }
 
@@ -142,7 +122,7 @@ function createQuestion(drug, all) {
   if (r < 0.25 && (drug.class || drug.category)) {
     const second = drug.class || drug.category;
     const key = drug.class ? 'class' : 'category';
-    return { type: "mcq", prompt: `Identify the <b>Brand</b> and <b>Class</b> for <b>${drug.generic}</b>?`, choices: shuffled([`${singleBrand} / ${second}`, `${singleBrand} / ${getRandomVal(key)}`, `${getRandomVal('brand').split(/[,/]/)[0]} / ${second}`, `${getRandomVal('brand').split(/[,/]/)[0]} / ${getRandomVal(key)}`]), answer: `${singleBrand} / ${second}`, drugRef: drug };
+    return { type: "mcq", prompt: `Identify <b>Brand & Class</b> for <b>${drug.generic}</b>?`, choices: shuffled([`${singleBrand} / ${second}`, `${singleBrand} / ${getRandomVal(key)}`, `${getRandomVal('brand').split(/[,/]/)[0]} / ${second}`, `${getRandomVal('brand').split(/[,/]/)[0]} / ${getRandomVal(key)}`]), answer: `${singleBrand} / ${second}`, drugRef: drug };
   }
   if (r < 0.60) return { type: "short", prompt: `Generic for <b>${singleBrand}</b>?`, answer: drug.generic, drugRef: drug };
   if (r < 0.85) return { type: "short", prompt: `Brand for <b>${drug.generic}</b>?`, answer: singleBrand, drugRef: drug };
@@ -151,6 +131,7 @@ function createQuestion(drug, all) {
   return { type: "mcq", prompt: `<b>${t.l}</b> for <b>${drug.generic}</b>?`, choices: shuffled([...distract(drug[t.k], t.k), drug[t.k]]), answer: drug[t.k], drugRef: drug };
 }
 
+// --- CORE INTERACTION ---
 function wireEvents() {
   els.next.onclick = () => { if (state.index < state.questions.length - 1) { state.index++; render(); } else showResults(); };
   els.prev.onclick = () => { if (state.index > 0) { state.index--; render(); } };
@@ -161,7 +142,7 @@ function wireEvents() {
   };
   els.restart.onclick = () => location.reload();
 
-  // MOBILE & T-KEY TIMER PAUSE
+  // Mobile Tap-to-Pause
   if (els.timerReadout) {
     els.timerReadout.style.cursor = "pointer";
     els.timerReadout.onclick = () => {
@@ -192,12 +173,26 @@ function wireEvents() {
     if (!q._answered) scoreCurrent("SKIPPED_REVEALED");
   };
 
+  // Keyboard Mastery Shortcuts
   window.onkeydown = (e) => {
     if (document.activeElement.tagName === 'INPUT' && e.key !== 'Enter') return;
+    
+    // Jump to Q 1-10
+    if (e.key >= '1' && e.key <= '9') {
+      const idx = parseInt(e.key) - 1;
+      if (state.questions[idx]) { state.index = idx; render(); }
+    } else if (e.key === '0') {
+      if (state.questions[9]) { state.index = 9; render(); }
+    }
+    
     if (e.key === "ArrowRight") { if (state.index < state.questions.length - 1) { state.index++; render(); } } 
     else if (e.key === "ArrowLeft") { if (state.index > 0) { state.index--; render(); } } 
     else if (e.key.toLowerCase() === "t") { if (els.timerReadout) els.timerReadout.click(); } 
-    else if (e.key === "Enter") { if (!state.questions[state.index]._answered) els.check.click(); else if (state.index < state.questions.length - 1) els.next.click(); }
+    else if (e.key.toLowerCase() === "m") { if (els.mark) els.mark.click(); }
+    else if (e.key === "Enter") { 
+      if (!state.questions[state.index]._answered) els.check.click(); 
+      else if (state.index < state.questions.length - 1) els.next.click(); 
+    }
   };
 }
 
@@ -252,7 +247,7 @@ function scoreCurrent(val) {
   q._correct = isCorrect;
   if (isCorrect) state.score++;
   
-  // Save result for Home.js tracking
+  // Save current progress for mastery tracking
   const storageKey = weekParam ? `pharmlet.week${weekParam}.easy` : `pharmlet.${quizId}.easy`;
   localStorage.setItem(storageKey, JSON.stringify({score: state.score, total: state.questions.length}));
   
