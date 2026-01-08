@@ -2,11 +2,7 @@
 const params = new URLSearchParams(location.search);
 const quizId = params.get("id");
 const weekParam = parseInt(params.get("week") || "", 10);
-const mode   = (params.get("mode") || "easy").toLowerCase();
 const limitParam = parseInt(params.get("limit") || "", 10);
-const seedParam  = parseInt(params.get("seed")  || "", 10);
-
-let masterPoolData = null;
 
 const els = {
   title: document.getElementById("quiz-title"),
@@ -24,236 +20,209 @@ const els = {
   restart: document.getElementById("restart"),
   results: document.getElementById("results"),
   final: document.getElementById("final-score"),
-  celebrate: document.getElementById("celebrate"),
   card: document.getElementById("question-card"),
-  progressBar: document.getElementById("progress-bar"),
-  fire: document.getElementById("fire-flame"),
-  fireCount: document.getElementById("fire-count"),
-  live: document.getElementById("live"),
-  themeToggle: document.getElementById("theme-toggle"),
-  navMap: document.getElementById("nav-map"),
-  mark: document.getElementById("mark"),
-  timerToggle: document.getElementById("timer-toggle"),
+  navMap: document.getElementById("nav-map"), 
   timerReadout: document.getElementById("timer-readout"),
+  mark: document.getElementById("mark"),
+  hintBtn: document.getElementById("hint-btn"),
+  revealBtn: document.getElementById("reveal-solution")
 };
 
-const THEME_KEY = "quiz-theme";
-
-const QUIZ_CONFIG = {
-  'log-lab-2-quiz-1': { newWeek: 1, reviewWeeks: [1, 2, 3] },
-  'log-lab-2-quiz-2': { newWeek: 2, reviewWeeks: [4, 5, 6] },
-  'log-lab-2-quiz-3': { newWeek: 3, reviewWeeks: [6, 7] },
-  'log-lab-2-quiz-4': { newWeek: 4, reviewWeeks: [8] }, 
-  'log-lab-2-quiz-5': { newWeek: 5, reviewWeeks: [9] },
-  'log-lab-2-quiz-6': { newWeek: 6, reviewWeeks: [10, 11] },
-  'log-lab-2-quiz-7': { newWeek: 7, reviewWeeks: 'ALL' },
-  'log-lab-2-quiz-8': { newWeek: 8, reviewWeeks: 'ALL' },
-  'log-lab-2-quiz-9': { newWeek: 9, reviewWeeks: 'ALL' },
-  'log-lab-2-quiz-10': { newWeek: 10, reviewWeeks: 'ALL' },
-  'log-lab-2-quiz-11': { newWeek: 11, reviewWeeks: 'ALL' }
+const state = { 
+  questions: [], index: 0, score: 0, title: "",
+  timerSeconds: 0, timerHandle: null, marked: new Set()
 };
 
-const state = {
-  title: "",
-  questions: [],
-  index: 0,
-  score: 0,
-  review: false,
-  currentStreak: 0,
-  bestStreak: 0,
-  marked: new Set(),
-  timerEnabled: false,
-  timerSeconds: 0,
-  timerHandle: null,
+const GAME_PLAN = {
+  1: [1, 2, 3], 2: [4, 5, 6], 3: [6, 7], 4: [8],
+  5: [9], 6: [10, 11], 7: 'ALL', 8: 'ALL', 9: 'ALL', 10: 'ALL', 11: 'ALL'
 };
-
-const STORAGE_KEY = () => `pharmlet.${quizId || 'week'+weekParam}.${mode}`;
-
-function initTheme() {
-  applyTheme(localStorage.getItem(THEME_KEY) || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
-  if (els.themeToggle) {
-    els.themeToggle.addEventListener("click", () => {
-      const next = document.documentElement.classList.contains("dark") ? "light" : "dark";
-      applyTheme(next); localStorage.setItem(THEME_KEY, next);
-    });
-  }
-}
-
-function applyTheme(mode){
-  document.documentElement.classList.toggle("dark", mode === "dark");
-  if (els.themeToggle) els.themeToggle.textContent = mode === "dark" ? "Light" : "Dark";
-}
 
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
-  main().catch(handleError);
+  main().catch(console.error);
 });
 
-function handleError(err) {
-  console.error(err);
-  if (els.title) els.title.textContent = 'Quiz Error';
-  if (els.card) els.card.innerHTML = `<div class="p-4"><p style="color:var(--muted)">Error: ${err.message}</p></div>`;
-}
-
 async function main() {
-  if (!els.title || !els.card) return;
   if (weekParam) await loadDynamicQuiz();
   else if (quizId) await loadStaticQuiz();
-  else throw new Error("Missing ?id=… or ?week=…");
-  finalizeSetup();
-}
-
-async function loadDynamicQuiz() {
-  if (!masterPoolData) {
-    const res = await fetch("assets/data/master_pool.json", { cache: "no-store" });
-    if (!res.ok) throw new Error(`Failed to load master pool`);
-    masterPoolData = await res.json();
-  }
-  window.masterPool = masterPoolData;
-  const dynamicQuizId = `log-lab-2-quiz-${weekParam}`;
-  const selectedDrugs = generateQuiz(dynamicQuizId);
-  const questions = selectedDrugs.map(drug => createQuestion(drug, masterPoolData));
-
-  state.title = `Log Lab 2 Week ${weekParam}`;
-  state.questions = questions.map((q, i) => ({
-    ...q,
-    _answered:false, _correct:false, _user:null,
-    _choices: Array.isArray(q.choices) ? shuffledCopy(q.choices) : (q.type === "tf" ? ["True","False"] : null),
-    _id: i
-  }));
-}
-
-async function loadStaticQuiz() {
-  const res = await fetch(`quizzes/${quizId}.json`, { cache: "no-store" });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const data = await res.json();
-  let allPool = data.pools ? Object.values(data.pools).flat() : (data.questions || []);
   
-  const poolCopy = [...allPool];
-  shuffleInPlace(poolCopy);
-  const limit = limitParam > 0 ? limitParam : poolCopy.length;
-  const pool = poolCopy.slice(0, limit);
-
-  state.title = data.title || "Quiz";
-  state.questions = pool.map((q, i) => ({
-    ...q,
-    _answered:false, _correct:false, _user:null,
-    _choices: Array.isArray(q.choices) ? shuffledCopy(q.choices) : (q.type === "tf" ? ["True","False"] : null),
-    _id: i
-  }));
-}
-
-function finalizeSetup() {
   if (els.title) els.title.textContent = state.title;
   if (els.qtotal) els.qtotal.textContent = state.questions.length;
+  
+  startCountdown(); 
   wireEvents();
   render();
 }
 
-function generateQuiz(quizId) {
-  const config = QUIZ_CONFIG[quizId];
-  if (!config) return [];
-  const pool = window.masterPool || [];
+function startCountdown() {
+  if (state.timerHandle) clearInterval(state.timerHandle);
+  state.timerSeconds = (weekParam) ? 600 : 1800; 
+  state.timerHandle = setInterval(timerTick, 1000);
+}
+
+function timerTick() {
+  if (state.timerSeconds <= 0) {
+    clearInterval(state.timerHandle);
+    if (els.timerReadout) els.timerReadout.classList.add("text-red-500", "font-bold");
+    return;
+  }
+  state.timerSeconds--;
+  updateTimerDisplay();
+}
+
+function updateTimerDisplay() {
+  const mins = Math.floor(state.timerSeconds / 60);
+  const secs = state.timerSeconds % 60;
+  if (els.timerReadout) {
+    els.timerReadout.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+  }
+}
+
+async function loadDynamicQuiz() {
+  const res = await fetch("assets/data/master_pool.json", { cache: "no-store" });
+  const pool = await res.json();
+  const reviewWeeks = GAME_PLAN[weekParam] || 'ALL';
+  const newPool = pool.filter(d => Number(d.metadata?.lab) === 2 && Number(d.metadata?.week) === weekParam);
+  const revPool = (reviewWeeks === 'ALL') ? pool.filter(d => Number(d.metadata?.lab) === 1) : pool.filter(d => Number(d.metadata?.lab) === 1 && reviewWeeks.includes(Number(d.metadata?.week)));
+  const selected = [...shuffled(newPool).slice(0, 6), ...shuffled(revPool).slice(0, 4)];
+  state.title = `Log Lab 2 Week ${weekParam}`;
+  state.questions = selected.map((d, i) => ({ ...createQuestion(d, pool), _id: i, drugRef: d }));
+}
+
+async function loadStaticQuiz() {
+  const res = await fetch(`quizzes/${quizId}.json`, { cache: "no-store" });
+  const data = await res.json();
+  const pool = data.pools ? Object.values(data.pools).flat() : (data.questions || []);
+  const limit = limitParam > 0 ? Math.min(limitParam, pool.length) : pool.length;
+  state.title = data.title || "Quiz";
+  state.questions = shuffled(pool).slice(0, limit).map((q, i) => ({ ...q, _id: i }));
+}
+
+function createQuestion(drug, all) {
+  const distract = (val, key) => [...new Set(all.map(d => d[key]).filter(v => v && v !== val))].sort(() => 0.5 - Math.random()).slice(0, 3);
+  const brandList = drug.brand ? drug.brand.split(/[,/]/).map(b => b.trim()) : ["N/A"];
+  const singleBrand = brandList[Math.floor(Math.random() * brandList.length)];
+  const r = Math.random();
+
+  if (r < 0.20 && (drug.class || drug.category)) {
+    const second = drug.class || drug.category;
+    return { type: "mcq", prompt: `Brand and Class for <b>${drug.generic}</b>?`, choices: shuffled([`${singleBrand} / ${second}`, `${singleBrand} / ${distract(second, drug.class?'class':'category')[0]}`, `Wrong / ${second}`, `Wrong / Wrong`]), answer: `${singleBrand} / ${second}` };
+  }
+  if (r < 0.60) return { type: "short", prompt: `Generic for brand <b>${singleBrand}</b>?`, answer: drug.generic };
+  if (r < 0.80) return { type: "short", prompt: `Brand for generic <b>${drug.generic}</b>?`, answer: singleBrand };
+  const mcqTypes = [{l:'Classification', k:'class'}, {l:'Category', k:'category'}, {l:'MOA', k:'moa'}].filter(x => drug[x.k]);
+  const t = mcqTypes[Math.floor(Math.random() * mcqTypes.length)];
+  return { type: "mcq", prompt: `<b>${t.l}</b> for <b>${drug.generic}</b>?`, choices: shuffled([...distract(drug[t.k], t.k), drug[t.k]]), answer: drug[t.k] };
+}
+
+function wireEvents() {
+  els.next.onclick = () => { state.index++; render(); };
+  els.prev.onclick = () => { if (state.index > 0) { state.index--; render(); } };
+  els.check.onclick = () => {
+    const q = state.questions[state.index];
+    const val = (q.type === "mcq") ? els.options.querySelector("input:checked")?.value : els.shortInput.value;
+    if (val) scoreCurrent(val);
+  };
+  els.restart.onclick = () => location.reload();
+
+  if (els.timerReadout) {
+    els.timerReadout.onclick = () => {
+      if (state.timerHandle) {
+        clearInterval(state.timerHandle);
+        state.timerHandle = null;
+        els.timerReadout.style.opacity = "0.4";
+      } else {
+        state.timerHandle = setInterval(timerTick, 1000);
+        els.timerReadout.style.opacity = "1";
+      }
+    };
+  }
   
-  let newMaterial = pool.filter(d => Number(d.metadata?.lab) === 2 && Number(d.metadata?.week) === config.newWeek);
-  let reviewPool = (config.reviewWeeks === 'ALL') 
-    ? pool.filter(d => Number(d.metadata?.lab) === 1)
-    : pool.filter(d => Number(d.metadata?.lab) === 1 && config.reviewWeeks.includes(Number(d.metadata?.week)));
+  els.mark.onclick = () => {
+    if (state.marked.has(state.index)) state.marked.delete(state.index);
+    else state.marked.add(state.index);
+    renderNavMap();
+  };
 
-  const selected = shuffledCopy(newMaterial).slice(0, 6);
-  const review = shuffledCopy(reviewPool).slice(0, 10 - selected.length);
-  return [...selected, ...review];
+  els.hintBtn.onclick = () => {
+    const q = state.questions[state.index];
+    alert(`Hint: Starts with "${q.answer[0]}". Class: ${q.drugRef?.class || 'N/A'}`);
+  };
+
+  els.revealBtn.onclick = () => {
+    const q = state.questions[state.index];
+    if (!q._answered) scoreCurrent("SKIPPED_REVEALED");
+  };
+
+  window.onkeydown = (e) => {
+    if (document.activeElement.tagName === 'INPUT' && e.key !== 'Enter') return;
+    if (e.key === "ArrowRight") { if (state.index < state.questions.length - 1) { state.index++; render(); } } 
+    else if (e.key === "ArrowLeft") { if (state.index > 0) { state.index--; render(); } } 
+    else if (e.key === "Enter") { if (!state.questions[state.index]._answered) els.check.click(); else if (state.index < state.questions.length - 1) els.next.click(); }
+    else if (e.key === "m") { els.mark.click(); }
+  };
 }
 
-function createQuestion(drug, allDrugs) {
-  const types = [];
-  if (drug.brand) types.push("brand-generic", "generic-brand");
-  if (drug.class) types.push("class");
-  if (drug.category) types.push("category");
-  if (drug.moa) types.push("moa");
+function render() {
+  const q = state.questions[state.index];
+  if (!q) { clearInterval(state.timerHandle); return showResults(); }
 
-  const type = types[Math.floor(Math.random() * types.length)];
-  const distract = (val, key) => getDistractors(val, allDrugs, d => d[key], 3);
-
-  if (type === "brand-generic") return { type: "short", prompt: `Generic name for <b>${drug.brand}</b>?`, answer: drug.generic };
-  if (type === "generic-brand") return { type: "short", prompt: `Brand name for <b>${drug.generic}</b>?`, answer: drug.brand };
-  if (type === "class") return createMCQ(`Class of ${drug.generic}?`, drug.class, distract(drug.class, 'class'));
-  if (type === "category") return createMCQ(`Category of ${drug.generic}?`, drug.category, distract(drug.category, 'category'));
-  if (type === "moa") return createMCQ(`MOA of ${drug.generic}?`, drug.moa, distract(drug.moa, 'moa'));
-  return { type: "short", prompt: "Error", answer: "error" };
-}
-
-function createMCQ(prompt, answer, distractors) {
-  return { type: "mcq", prompt, choices: [...distractors, answer], answer: [answer] };
-}
-
-function getDistractors(correct, all, extractor, count) {
-  const vals = [...new Set(all.map(extractor).filter(v => v && v !== correct))];
-  return shuffledCopy(vals).slice(0, count);
-}
-
-function wireEvents(){
-  els.next?.addEventListener("click", () => {
-    if (state.index < state.questions.length - 1) { state.index++; render(); }
-    else showResults();
-  });
-  els.prev?.addEventListener("click", () => { if (state.index > 0) { state.index--; render(); } });
-  els.check?.addEventListener("click", () => {
-    const q = currentQ();
-    if (q.type === "short") scoreCurrent(els.shortInput.value);
-    else {
-      const sel = els.options.querySelector("input:checked");
-      if (sel) scoreCurrent(sel.value);
-    }
-  });
-  els.restart?.addEventListener("click", () => location.reload());
-}
-
-function render(){
-  const q = currentQ();
-  if (!q) return;
   els.qnum.textContent = state.index + 1;
   els.prompt.innerHTML = q.prompt;
   els.options.innerHTML = "";
   els.shortWrap.classList.add("hidden");
   els.explain.classList.remove("show");
+  
+  els.prev.disabled = (state.index === 0);
+  els.check.classList.toggle("hidden", !!q._answered);
+  els.next.classList.toggle("hidden", !q._answered);
 
   if (q.type === "mcq") {
-    q._choices.forEach(c => {
-      const btn = document.createElement("label");
-      btn.className = "flex items-center gap-2 p-2 border rounded cursor-pointer";
-      btn.innerHTML = `<input type="radio" name="opt" value="${c}"> ${c}`;
-      els.options.appendChild(btn);
+    q.choices.forEach(c => {
+      const lbl = document.createElement("label");
+      lbl.className = `flex items-start gap-3 p-3 border rounded-xl cursor-pointer hover:bg-gray-50 transition-colors ${q._user === c ? 'ring-2 ring-blue-500' : ''}`;
+      lbl.innerHTML = `<input type="radio" name="opt" value="${c}" class="mt-1 flex-shrink-0" ${q._user === c ? 'checked' : ''} ${q._answered ? 'disabled' : ''}> <span class="flex-1 text-sm sm:text-base">${c}</span>`;
+      els.options.appendChild(lbl);
     });
   } else {
     els.shortWrap.classList.remove("hidden");
-    els.shortInput.value = "";
-    els.shortInput.focus();
+    els.shortInput.value = q._user || "";
+    q._answered ? els.shortInput.setAttribute("disabled", "true") : els.shortInput.removeAttribute("disabled");
   }
-  
-  els.check.classList.remove("hidden");
-  els.next.classList.add("hidden");
+
+  if (q._answered) renderAnswerReveal(q);
+  renderNavMap(); 
+}
+
+function renderNavMap() {
+  if (!els.navMap) return;
+  els.navMap.innerHTML = "";
+  state.questions.forEach((q, i) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    let colorClass = "bg-gray-200 text-gray-600";
+    if (q._answered) colorClass = q._correct ? "bg-green-500 text-white" : "bg-red-500 text-white";
+    else if (state.marked.has(i)) colorClass = "bg-yellow-400 text-black ring-2 ring-yellow-600";
+    
+    btn.className = `w-8 h-8 rounded-lg text-xs font-bold transition-all ${i === state.index ? 'ring-2 ring-blue-500' : ''} ${colorClass}`;
+    btn.textContent = i + 1;
+    btn.onclick = () => { state.index = i; render(); };
+    els.navMap.appendChild(btn);
+  });
 }
 
 function scoreCurrent(val) {
-  const q = currentQ();
-  const isCorrect = isCorrectChoice(q, val);
-  q._answered = true;
+  const q = state.questions[state.index];
+  const isCorrect = val.trim().toLowerCase() === q.answer.toLowerCase();
+  q._answered = true; q._user = (val === "SKIPPED_REVEALED") ? "Revealed" : val;
   q._correct = isCorrect;
-  state.score += isCorrect ? 1 : 0;
-  
-  renderAnswerReveal(q);
-  els.check.classList.add("hidden");
-  els.next.classList.remove("hidden");
-}
-
-function isCorrectChoice(q, val) {
-  const ans = Array.isArray(q.answer) ? q.answer[0] : q.answer;
-  return val.trim().toLowerCase() === ans.trim().toLowerCase();
+  if (isCorrect) state.score++;
+  render();
 }
 
 function renderAnswerReveal(q) {
-  els.explain.innerHTML = `<b>Answer:</b> ${Array.isArray(q.answer) ? q.answer[0] : q.answer}`;
+  els.explain.innerHTML = `<div class="p-3 rounded-lg ${q._correct ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}"><b>${q._correct ? 'Correct!' : 'Incorrect.'}</b> Answer: <b>${q.answer}</b></div>`;
   els.explain.classList.add("show");
 }
 
@@ -263,7 +232,15 @@ function showResults() {
   els.final.textContent = `${state.score} / ${state.questions.length}`;
 }
 
-function currentQ() { return state.questions[state.index]; }
-function shuffleInPlace(a){ for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } }
-function shuffledCopy(a){ const b=[...a]; shuffleInPlace(b); return b; }
-function sanitize(s=""){ return s; }
+function initTheme() {
+  const isDark = localStorage.getItem("quiz-theme") === "dark";
+  document.documentElement.classList.toggle("dark", isDark);
+  if (els.themeToggle) {
+    els.themeToggle.onclick = () => {
+      const d = document.documentElement.classList.toggle("dark");
+      localStorage.setItem("quiz-theme", d ? "dark" : "light");
+    };
+  }
+}
+
+function shuffled(a) { return [...a].sort(() => 0.5 - Math.random()); }
