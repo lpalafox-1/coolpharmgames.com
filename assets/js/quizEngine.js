@@ -56,20 +56,17 @@ async function main() {
   render();
 }
 
-// --- SMART SCALING TIMER ---
 function startSmartTimer() {
   if (state.timerHandle) clearInterval(state.timerHandle);
-  
   const count = state.questions.length;
+  
   if (weekParam) {
-    state.timerSeconds = 600; // 10 mins for Lab 2
+    state.timerSeconds = 600; // 10 mins
   } else {
-    // Smart Scaling for Legacy
     if (count <= 20) state.timerSeconds = 900;      // 15m
     else if (count <= 50) state.timerSeconds = 2700; // 45m
     else state.timerSeconds = 7200;                  // 2h
   }
-
   state.timerHandle = setInterval(timerTick, 1000);
 }
 
@@ -91,27 +88,15 @@ function updateTimerDisplay() {
   }
 }
 
-// --- DATA LOADING & SHUFFLING ---
 async function loadDynamicQuiz() {
   const res = await fetch("assets/data/master_pool.json", { cache: "no-store" });
   const pool = await res.json();
   const reviewWeeks = GAME_PLAN[weekParam] || 'ALL';
-
   const newPool = pool.filter(d => Number(d.metadata?.lab) === 2 && Number(d.metadata?.week) === weekParam);
-  const revPool = (reviewWeeks === 'ALL') 
-    ? pool.filter(d => Number(d.metadata?.lab) === 1)
-    : pool.filter(d => Number(d.metadata?.lab) === 1 && reviewWeeks.includes(Number(d.metadata?.week)));
-
-  const combined = [
-    ...shuffled(newPool).slice(0, 6), 
-    ...shuffled(revPool).slice(0, 4)
-  ];
-
-  // SHUFFLE the final 10 so the mix is random
-  const finalSet = shuffled(combined);
-
+  const revPool = (reviewWeeks === 'ALL') ? pool.filter(d => Number(d.metadata?.lab) === 1) : pool.filter(d => Number(d.metadata?.lab) === 1 && reviewWeeks.includes(Number(d.metadata?.week)));
+  const combined = [...shuffled(newPool).slice(0, 6), ...shuffled(revPool).slice(0, 4)];
   state.title = `Log Lab 2 Week ${weekParam}`;
-  state.questions = finalSet.map((d, i) => ({ ...createQuestion(d, pool), _id: i, drugRef: d }));
+  state.questions = shuffled(combined).map((d, i) => ({ ...createQuestion(d, pool), _id: i, drugRef: d }));
 }
 
 async function loadStaticQuiz() {
@@ -123,15 +108,12 @@ async function loadStaticQuiz() {
   state.questions = shuffled(pool).slice(0, limit).map((q, i) => ({ ...q, _id: i }));
 }
 
-// --- MCQ DISTRACTOR LOGIC ---
 function createQuestion(drug, all) {
   const getRandomVal = (key) => {
     const vals = all.map(d => d[key]).filter(v => v && v !== drug[key]);
     return vals[Math.floor(Math.random() * vals.length)];
   };
-
   const distract = (val, key) => [...new Set(all.map(d => d[key]).filter(v => v && v !== val))].sort(() => 0.5 - Math.random()).slice(0, 3);
-  
   const brandList = drug.brand ? drug.brand.split(/[,/]/).map(b => b.trim()) : ["N/A"];
   const singleBrand = brandList[Math.floor(Math.random() * brandList.length)];
   const r = Math.random();
@@ -139,22 +121,10 @@ function createQuestion(drug, all) {
   if (r < 0.25 && (drug.class || drug.category)) {
     const second = drug.class || drug.category;
     const key = drug.class ? 'class' : 'category';
-    return { 
-      type: "mcq", 
-      prompt: `Identify the <b>Brand</b> and <b>Class</b> for <b>${drug.generic}</b>?`, 
-      choices: shuffled([
-        `${singleBrand} / ${second}`,
-        `${singleBrand} / ${getRandomVal(key)}`,
-        `${getRandomVal('brand').split(/[,/]/)[0]} / ${second}`,
-        `${getRandomVal('brand').split(/[,/]/)[0]} / ${getRandomVal(key)}`
-      ]), 
-      answer: `${singleBrand} / ${second}`,
-      drugRef: drug
-    };
+    return { type: "mcq", prompt: `Identify the <b>Brand</b> and <b>Class</b> for <b>${drug.generic}</b>?`, choices: shuffled([`${singleBrand} / ${second}`, `${singleBrand} / ${getRandomVal(key)}`, `${getRandomVal('brand').split(/[,/]/)[0]} / ${second}`, `${getRandomVal('brand').split(/[,/]/)[0]} / ${getRandomVal(key)}`]), answer: `${singleBrand} / ${second}`, drugRef: drug };
   }
   if (r < 0.60) return { type: "short", prompt: `Generic for <b>${singleBrand}</b>?`, answer: drug.generic, drugRef: drug };
   if (r < 0.85) return { type: "short", prompt: `Brand for <b>${drug.generic}</b>?`, answer: singleBrand, drugRef: drug };
-  
   const mcqTypes = [{l:'Classification', k:'class'}, {l:'Category', k:'category'}, {l:'MOA', k:'moa'}].filter(x => drug[x.k]);
   const t = mcqTypes[Math.floor(Math.random() * mcqTypes.length)];
   return { type: "mcq", prompt: `<b>${t.l}</b> for <b>${drug.generic}</b>?`, choices: shuffled([...distract(drug[t.k], t.k), drug[t.k]]), answer: drug[t.k], drugRef: drug };
@@ -170,11 +140,18 @@ function wireEvents() {
   };
   els.restart.onclick = () => location.reload();
 
-  // PAUSE/RESUME TIMER
+  // MOBILE & T-KEY TIMER PAUSE
   if (els.timerReadout) {
+    els.timerReadout.style.cursor = "pointer";
     els.timerReadout.onclick = () => {
-      if (state.timerHandle) { clearInterval(state.timerHandle); state.timerHandle = null; els.timerReadout.style.opacity = "0.4"; }
-      else { state.timerHandle = setInterval(timerTick, 1000); els.timerReadout.style.opacity = "1"; }
+      if (state.timerHandle) {
+        clearInterval(state.timerHandle);
+        state.timerHandle = null;
+        els.timerReadout.classList.add("opacity-30", "animate-pulse");
+      } else {
+        state.timerHandle = setInterval(timerTick, 1000);
+        els.timerReadout.classList.remove("opacity-30", "animate-pulse");
+      }
     };
   }
   
@@ -194,92 +171,9 @@ function wireEvents() {
     if (!q._answered) scoreCurrent("SKIPPED_REVEALED");
   };
 
-  // KEYBOARD
   window.onkeydown = (e) => {
     if (document.activeElement.tagName === 'INPUT' && e.key !== 'Enter') return;
     if (e.key === "ArrowRight") { if (state.index < state.questions.length - 1) { state.index++; render(); } } 
     else if (e.key === "ArrowLeft") { if (state.index > 0) { state.index--; render(); } } 
-    else if (e.key === "Enter") { if (!state.questions[state.index]._answered) els.check.click(); else if (state.index < state.questions.length - 1) els.next.click(); }
-  };
-}
-
-function render() {
-  const q = state.questions[state.index];
-  if (!q) return;
-
-  els.qnum.textContent = state.index + 1;
-  els.prompt.innerHTML = q.prompt;
-  els.options.innerHTML = "";
-  els.shortWrap.classList.add("hidden");
-  els.explain.classList.remove("show");
-  
-  els.prev.disabled = (state.index === 0);
-  els.check.classList.toggle("hidden", !!q._answered);
-  els.next.classList.toggle("hidden", !q._answered);
-
-  if (q.type === "mcq") {
-    q.choices.forEach(c => {
-      const lbl = document.createElement("label");
-      lbl.className = `flex items-start gap-3 p-3 border rounded-xl cursor-pointer hover:bg-gray-50 transition-colors ${q._user === c ? 'ring-2 ring-blue-500' : ''}`;
-      lbl.innerHTML = `<input type="radio" name="opt" value="${c}" class="mt-1 flex-shrink-0" ${q._user === c ? 'checked' : ''} ${q._answered ? 'disabled' : ''}> <span class="flex-1 text-sm sm:text-base">${c}</span>`;
-      els.options.appendChild(lbl);
-    });
-  } else {
-    els.shortWrap.classList.remove("hidden");
-    els.shortInput.value = q._user || "";
-    q._answered ? els.shortInput.setAttribute("disabled", "true") : els.shortInput.removeAttribute("disabled");
-  }
-
-  if (q._answered) renderAnswerReveal(q);
-  renderNavMap(); 
-}
-
-function renderNavMap() {
-  if (!els.navMap) return;
-  els.navMap.innerHTML = "";
-  state.questions.forEach((q, i) => {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    let colorClass = "bg-gray-200 text-gray-600";
-    if (q._answered) colorClass = q._correct ? "bg-green-500 text-white" : "bg-red-500 text-white";
-    else if (state.marked.has(i)) colorClass = "bg-yellow-400 text-black ring-2 ring-yellow-600";
-    
-    btn.className = `w-8 h-8 rounded-lg text-xs font-bold transition-all ${i === state.index ? 'ring-2 ring-blue-500' : ''} ${colorClass}`;
-    btn.textContent = i + 1;
-    btn.onclick = () => { state.index = i; render(); };
-    els.navMap.appendChild(btn);
-  });
-}
-
-function scoreCurrent(val) {
-  const q = state.questions[state.index];
-  const isCorrect = val.trim().toLowerCase() === q.answer.toLowerCase();
-  q._answered = true; q._user = (val === "SKIPPED_REVEALED") ? "Revealed" : val;
-  q._correct = isCorrect;
-  if (isCorrect) state.score++;
-  render();
-}
-
-function renderAnswerReveal(q) {
-  els.explain.innerHTML = `<div class="p-3 rounded-lg ${q._correct ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}"><b>${q._correct ? 'Correct!' : 'Answer:'}</b> <b>${q.answer}</b></div>`;
-  els.explain.classList.add("show");
-}
-
-function showResults() {
-  els.card.classList.add("hidden");
-  els.results.classList.remove("hidden");
-  els.final.textContent = `${state.score} / ${state.questions.length}`;
-}
-
-function initTheme() {
-  const isDark = localStorage.getItem("quiz-theme") === "dark";
-  document.documentElement.classList.toggle("dark", isDark);
-  if (els.themeToggle) {
-    els.themeToggle.onclick = () => {
-      const d = document.documentElement.classList.toggle("dark");
-      localStorage.setItem("quiz-theme", d ? "dark" : "light");
-    };
-  }
-}
-
-function shuffled(a) { return [...a].sort(() => 0.5 - Math.random()); }
+    else if (e.key.toLowerCase() === "t") { if (els.timerReadout) els.timerReadout.click(); } 
+    else if (e.key === "Enter") { if (!state.questions
