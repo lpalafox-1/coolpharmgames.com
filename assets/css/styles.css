@@ -485,3 +485,43 @@ body.high-contrast a {
     border-width: 1px;
   }
 }
+
+/* --- DESKTOP REFINEMENT --- */
+@media (min-width: 1024px) {
+  /* Shrink those giant buttons for mouse users */
+  #check, #next, #prev {
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+    font-size: 0.875rem !important;
+    border-radius: 12px !important;
+    max-width: 200px; /* Stops the "Check Answer" from stretching forever */
+    margin: 0 auto;
+  }
+
+  /* Make the question card feel more professional */
+  #question-card {
+    padding: 2.5rem !important;
+    border-radius: 20px !important;
+  }
+
+  /* Adjust the header text */
+  #quiz-title {
+    opacity: 0.8 !important;
+    font-size: 0.75rem !important;
+  }
+
+  /* Fix the footer layout on desktop */
+  footer {
+    flex-direction: row !important;
+    justify-content: center !important;
+    gap: 1.5rem !important;
+  }
+}
+
+/* --- MOBILE UI (Keep the Big Buttons for Thumbs) --- */
+@media (max-width: 1023px) {
+  #check, #next {
+    width: 100%;
+    padding: 1.25rem;
+  }
+}
