@@ -25,7 +25,8 @@ const els = {
   timerReadout: document.getElementById("timer-readout"),
   mark: document.getElementById("mark"),
   hintBtn: document.getElementById("hint-btn"),
-  revealBtn: document.getElementById("reveal-solution")
+  revealBtn: document.getElementById("reveal-solution"),
+  themeToggle: document.getElementById("theme-toggle")
 };
 
 const state = { 
@@ -50,14 +51,25 @@ async function main() {
   if (els.title) els.title.textContent = state.title;
   if (els.qtotal) els.qtotal.textContent = state.questions.length;
   
-  startCountdown(); 
+  startSmartTimer(); 
   wireEvents();
   render();
 }
 
-function startCountdown() {
+// --- SMART SCALING TIMER ---
+function startSmartTimer() {
   if (state.timerHandle) clearInterval(state.timerHandle);
-  state.timerSeconds = (weekParam) ? 600 : 1800; 
+  
+  const count = state.questions.length;
+  if (weekParam) {
+    state.timerSeconds = 600; // 10 mins for Lab 2
+  } else {
+    // Smart Scaling for Legacy
+    if (count <= 20) state.timerSeconds = 900;      // 15m
+    else if (count <= 50) state.timerSeconds = 2700; // 45m
+    else state.timerSeconds = 7200;                  // 2h
+  }
+
   state.timerHandle = setInterval(timerTick, 1000);
 }
 
@@ -79,15 +91,27 @@ function updateTimerDisplay() {
   }
 }
 
+// --- DATA LOADING & SHUFFLING ---
 async function loadDynamicQuiz() {
   const res = await fetch("assets/data/master_pool.json", { cache: "no-store" });
   const pool = await res.json();
   const reviewWeeks = GAME_PLAN[weekParam] || 'ALL';
+
   const newPool = pool.filter(d => Number(d.metadata?.lab) === 2 && Number(d.metadata?.week) === weekParam);
-  const revPool = (reviewWeeks === 'ALL') ? pool.filter(d => Number(d.metadata?.lab) === 1) : pool.filter(d => Number(d.metadata?.lab) === 1 && reviewWeeks.includes(Number(d.metadata?.week)));
-  const selected = [...shuffled(newPool).slice(0, 6), ...shuffled(revPool).slice(0, 4)];
+  const revPool = (reviewWeeks === 'ALL') 
+    ? pool.filter(d => Number(d.metadata?.lab) === 1)
+    : pool.filter(d => Number(d.metadata?.lab) === 1 && reviewWeeks.includes(Number(d.metadata?.week)));
+
+  const combined = [
+    ...shuffled(newPool).slice(0, 6), 
+    ...shuffled(revPool).slice(0, 4)
+  ];
+
+  // SHUFFLE the final 10 so the mix is random
+  const finalSet = shuffled(combined);
+
   state.title = `Log Lab 2 Week ${weekParam}`;
-  state.questions = selected.map((d, i) => ({ ...createQuestion(d, pool), _id: i, drugRef: d }));
+  state.questions = finalSet.map((d, i) => ({ ...createQuestion(d, pool), _id: i, drugRef: d }));
 }
 
 async function loadStaticQuiz() {
@@ -99,25 +123,45 @@ async function loadStaticQuiz() {
   state.questions = shuffled(pool).slice(0, limit).map((q, i) => ({ ...q, _id: i }));
 }
 
+// --- MCQ DISTRACTOR LOGIC ---
 function createQuestion(drug, all) {
+  const getRandomVal = (key) => {
+    const vals = all.map(d => d[key]).filter(v => v && v !== drug[key]);
+    return vals[Math.floor(Math.random() * vals.length)];
+  };
+
   const distract = (val, key) => [...new Set(all.map(d => d[key]).filter(v => v && v !== val))].sort(() => 0.5 - Math.random()).slice(0, 3);
+  
   const brandList = drug.brand ? drug.brand.split(/[,/]/).map(b => b.trim()) : ["N/A"];
   const singleBrand = brandList[Math.floor(Math.random() * brandList.length)];
   const r = Math.random();
 
-  if (r < 0.20 && (drug.class || drug.category)) {
+  if (r < 0.25 && (drug.class || drug.category)) {
     const second = drug.class || drug.category;
-    return { type: "mcq", prompt: `Brand and Class for <b>${drug.generic}</b>?`, choices: shuffled([`${singleBrand} / ${second}`, `${singleBrand} / ${distract(second, drug.class?'class':'category')[0]}`, `Wrong / ${second}`, `Wrong / Wrong`]), answer: `${singleBrand} / ${second}` };
+    const key = drug.class ? 'class' : 'category';
+    return { 
+      type: "mcq", 
+      prompt: `Identify the <b>Brand</b> and <b>Class</b> for <b>${drug.generic}</b>?`, 
+      choices: shuffled([
+        `${singleBrand} / ${second}`,
+        `${singleBrand} / ${getRandomVal(key)}`,
+        `${getRandomVal('brand').split(/[,/]/)[0]} / ${second}`,
+        `${getRandomVal('brand').split(/[,/]/)[0]} / ${getRandomVal(key)}`
+      ]), 
+      answer: `${singleBrand} / ${second}`,
+      drugRef: drug
+    };
   }
-  if (r < 0.60) return { type: "short", prompt: `Generic for brand <b>${singleBrand}</b>?`, answer: drug.generic };
-  if (r < 0.80) return { type: "short", prompt: `Brand for generic <b>${drug.generic}</b>?`, answer: singleBrand };
+  if (r < 0.60) return { type: "short", prompt: `Generic for <b>${singleBrand}</b>?`, answer: drug.generic, drugRef: drug };
+  if (r < 0.85) return { type: "short", prompt: `Brand for <b>${drug.generic}</b>?`, answer: singleBrand, drugRef: drug };
+  
   const mcqTypes = [{l:'Classification', k:'class'}, {l:'Category', k:'category'}, {l:'MOA', k:'moa'}].filter(x => drug[x.k]);
   const t = mcqTypes[Math.floor(Math.random() * mcqTypes.length)];
-  return { type: "mcq", prompt: `<b>${t.l}</b> for <b>${drug.generic}</b>?`, choices: shuffled([...distract(drug[t.k], t.k), drug[t.k]]), answer: drug[t.k] };
+  return { type: "mcq", prompt: `<b>${t.l}</b> for <b>${drug.generic}</b>?`, choices: shuffled([...distract(drug[t.k], t.k), drug[t.k]]), answer: drug[t.k], drugRef: drug };
 }
 
 function wireEvents() {
-  els.next.onclick = () => { state.index++; render(); };
+  els.next.onclick = () => { if (state.index < state.questions.length - 1) { state.index++; render(); } else showResults(); };
   els.prev.onclick = () => { if (state.index > 0) { state.index--; render(); } };
   els.check.onclick = () => {
     const q = state.questions[state.index];
@@ -126,16 +170,11 @@ function wireEvents() {
   };
   els.restart.onclick = () => location.reload();
 
+  // PAUSE/RESUME TIMER
   if (els.timerReadout) {
     els.timerReadout.onclick = () => {
-      if (state.timerHandle) {
-        clearInterval(state.timerHandle);
-        state.timerHandle = null;
-        els.timerReadout.style.opacity = "0.4";
-      } else {
-        state.timerHandle = setInterval(timerTick, 1000);
-        els.timerReadout.style.opacity = "1";
-      }
+      if (state.timerHandle) { clearInterval(state.timerHandle); state.timerHandle = null; els.timerReadout.style.opacity = "0.4"; }
+      else { state.timerHandle = setInterval(timerTick, 1000); els.timerReadout.style.opacity = "1"; }
     };
   }
   
@@ -155,18 +194,18 @@ function wireEvents() {
     if (!q._answered) scoreCurrent("SKIPPED_REVEALED");
   };
 
+  // KEYBOARD
   window.onkeydown = (e) => {
     if (document.activeElement.tagName === 'INPUT' && e.key !== 'Enter') return;
     if (e.key === "ArrowRight") { if (state.index < state.questions.length - 1) { state.index++; render(); } } 
     else if (e.key === "ArrowLeft") { if (state.index > 0) { state.index--; render(); } } 
     else if (e.key === "Enter") { if (!state.questions[state.index]._answered) els.check.click(); else if (state.index < state.questions.length - 1) els.next.click(); }
-    else if (e.key === "m") { els.mark.click(); }
   };
 }
 
 function render() {
   const q = state.questions[state.index];
-  if (!q) { clearInterval(state.timerHandle); return showResults(); }
+  if (!q) return;
 
   els.qnum.textContent = state.index + 1;
   els.prompt.innerHTML = q.prompt;
@@ -222,7 +261,7 @@ function scoreCurrent(val) {
 }
 
 function renderAnswerReveal(q) {
-  els.explain.innerHTML = `<div class="p-3 rounded-lg ${q._correct ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}"><b>${q._correct ? 'Correct!' : 'Incorrect.'}</b> Answer: <b>${q.answer}</b></div>`;
+  els.explain.innerHTML = `<div class="p-3 rounded-lg ${q._correct ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}"><b>${q._correct ? 'Correct!' : 'Answer:'}</b> <b>${q.answer}</b></div>`;
   els.explain.classList.add("show");
 }
 
