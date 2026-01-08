@@ -273,8 +273,8 @@ function generateQuizFromPool(masterPool, week) {
   else lab1Filter = d => d.metadata.lab === 1 && d.metadata.quiz <= week; // Fallback
 
   // 2. Define New Schedule (Lab 2)
-  // Lab 2 items are tagged with quiz: X which aligns with week: X
-  const lab2Filter = d => d.metadata.lab === 2 && d.metadata.quiz === week;
+  // Lab 2 items are tagged with week: X (previously quiz: X)
+  const lab2Filter = d => d.metadata.lab === 2 && d.metadata.week === week;
 
   // 3. Filter Pools
   const lab1Pool = masterPool.filter(lab1Filter);
