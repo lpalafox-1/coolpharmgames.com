@@ -176,4 +176,82 @@ function wireEvents() {
     if (e.key === "ArrowRight") { if (state.index < state.questions.length - 1) { state.index++; render(); } } 
     else if (e.key === "ArrowLeft") { if (state.index > 0) { state.index--; render(); } } 
     else if (e.key.toLowerCase() === "t") { if (els.timerReadout) els.timerReadout.click(); } 
-    else if (e.key === "Enter") { if (!state.questions
+    else if (e.key === "Enter") { if (!state.questions[state.index]._answered) els.check.click(); else if (state.index < state.questions.length - 1) els.next.click(); }
+  };
+}
+
+function render() {
+  const q = state.questions[state.index];
+  if (!q) return;
+  els.qnum.textContent = state.index + 1;
+  els.prompt.innerHTML = q.prompt;
+  els.options.innerHTML = "";
+  els.shortWrap.classList.add("hidden");
+  els.explain.classList.remove("show");
+  els.prev.disabled = (state.index === 0);
+  els.check.classList.toggle("hidden", !!q._answered);
+  els.next.classList.toggle("hidden", !q._answered);
+
+  if (q.type === "mcq") {
+    q.choices.forEach(c => {
+      const lbl = document.createElement("label");
+      lbl.className = `flex items-start gap-3 p-3 border rounded-xl cursor-pointer hover:bg-gray-50 transition-colors ${q._user === c ? 'ring-2 ring-blue-500' : ''}`;
+      lbl.innerHTML = `<input type="radio" name="opt" value="${c}" class="mt-1 flex-shrink-0" ${q._user === c ? 'checked' : ''} ${q._answered ? 'disabled' : ''}> <span class="flex-1 text-sm sm:text-base">${c}</span>`;
+      els.options.appendChild(lbl);
+    });
+  } else {
+    els.shortWrap.classList.remove("hidden");
+    els.shortInput.value = q._user || "";
+    q._answered ? els.shortInput.setAttribute("disabled", "true") : els.shortInput.removeAttribute("disabled");
+  }
+  if (q._answered) renderAnswerReveal(q);
+  renderNavMap(); 
+}
+
+function renderNavMap() {
+  if (!els.navMap) return;
+  els.navMap.innerHTML = "";
+  state.questions.forEach((q, i) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    let colorClass = "bg-gray-200 text-gray-600";
+    if (q._answered) colorClass = q._correct ? "bg-green-500 text-white" : "bg-red-500 text-white";
+    else if (state.marked.has(i)) colorClass = "bg-yellow-400 text-black ring-2 ring-yellow-600";
+    btn.className = `w-8 h-8 rounded-lg text-xs font-bold transition-all ${i === state.index ? 'ring-2 ring-blue-500' : ''} ${colorClass}`;
+    btn.textContent = i + 1;
+    btn.onclick = () => { state.index = i; render(); };
+    els.navMap.appendChild(btn);
+  });
+}
+
+function scoreCurrent(val) {
+  const q = state.questions[state.index];
+  const isCorrect = val.trim().toLowerCase() === q.answer.toLowerCase();
+  q._answered = true; q._user = (val === "SKIPPED_REVEALED") ? "Revealed" : val;
+  q._correct = isCorrect;
+  if (isCorrect) state.score++;
+  
+  // Save result for Home.js tracking
+  const storageKey = weekParam ? `pharmlet.week${weekParam}.easy` : `pharmlet.${quizId}.easy`;
+  localStorage.setItem(storageKey, JSON.stringify({score: state.score, total: state.questions.length}));
+  
+  render();
+}
+
+function renderAnswerReveal(q) {
+  els.explain.innerHTML = `<div class="p-3 rounded-lg ${q._correct ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}"><b>${q._correct ? 'Correct!' : 'Answer:'}</b> <b>${q.answer}</b></div>`;
+  els.explain.classList.add("show");
+}
+
+function showResults() {
+  els.card.classList.add("hidden");
+  els.results.classList.remove("hidden");
+  els.final.textContent = `${state.score} / ${state.questions.length}`;
+}
+
+function initTheme() {
+  const isDark = localStorage.getItem("quiz-theme") === "dark";
+  document.documentElement.classList.toggle("dark", isDark);
+}
+
+function shuffled(a) { return [...a].sort(() => 0.5 - Math.random()); }
