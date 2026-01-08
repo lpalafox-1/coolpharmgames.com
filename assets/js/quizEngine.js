@@ -26,7 +26,8 @@ const els = {
   mark: document.getElementById("mark"),
   hintBtn: document.getElementById("hint-btn"),
   revealBtn: document.getElementById("reveal-solution"),
-  themeToggle: document.getElementById("theme-toggle")
+  themeToggle: document.getElementById("theme-toggle"),
+  helpShortcuts: document.getElementById("help-shortcuts")
 };
 
 const state = { 
@@ -56,17 +57,25 @@ async function main() {
   render();
 }
 
+// --- THEME ---
+function initTheme() {
+  const isDark = localStorage.getItem("quiz-theme") === "dark";
+  document.documentElement.classList.toggle("dark", isDark);
+  
+  if (els.themeToggle) {
+    els.themeToggle.onpointerdown = (e) => {
+      e.preventDefault();
+      const d = document.documentElement.classList.toggle("dark");
+      localStorage.setItem("quiz-theme", d ? "dark" : "light");
+    };
+  }
+}
+
 // --- TIMER ---
 function startSmartTimer() {
   if (state.timerHandle) clearInterval(state.timerHandle);
   const count = state.questions.length;
-  if (weekParam) {
-    state.timerSeconds = 600; 
-  } else {
-    if (count <= 20) state.timerSeconds = 900;
-    else if (count <= 50) state.timerSeconds = 2700;
-    else state.timerSeconds = 7200;
-  }
+  state.timerSeconds = weekParam ? 600 : (count <= 20 ? 900 : (count <= 50 ? 2700 : 7200));
   state.timerHandle = setInterval(timerTick, 1000);
 }
 
@@ -84,7 +93,6 @@ function updateTimerDisplay() {
   const mins = Math.floor(state.timerSeconds / 60);
   const secs = state.timerSeconds % 60;
   if (els.timerReadout) {
-    // The .padStart(2, '0') is the key to keeping it centered!
     els.timerReadout.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
   }
 }
@@ -143,15 +151,29 @@ function wireEvents() {
   };
   els.restart.onclick = () => location.reload();
 
-  // Mobile-Optimized Timer
+  // Pointer Events for Mobile Buttons
+  if (els.helpShortcuts) {
+    els.helpShortcuts.onpointerdown = (e) => {
+      e.preventDefault();
+      const modal = document.getElementById("shortcuts-modal");
+      if (modal) { modal.style.display = "flex"; modal.classList.remove("hidden"); }
+    };
+  }
+  
+  const closeShortcuts = document.getElementById("close-shortcuts");
+  if (closeShortcuts) {
+    closeShortcuts.onclick = () => {
+      const modal = document.getElementById("shortcuts-modal");
+      if (modal) { modal.style.display = "none"; modal.classList.add("hidden"); }
+    };
+  }
+
   if (els.timerReadout) {
     els.timerReadout.style.cursor = "pointer";
-    els.timerReadout.style.webkitTapHighlightColor = "transparent";
-    els.timerReadout.onclick = (e) => {
+    els.timerReadout.onpointerdown = (e) => {
       e.preventDefault();
       if (state.timerHandle) {
-        clearInterval(state.timerHandle);
-        state.timerHandle = null;
+        clearInterval(state.timerHandle); state.timerHandle = null;
         els.timerReadout.classList.add("opacity-30", "animate-pulse");
       } else {
         state.timerHandle = setInterval(timerTick, 1000);
@@ -176,7 +198,6 @@ function wireEvents() {
     if (!q._answered) scoreCurrent("SKIPPED_REVEALED");
   };
 
-  // Mastery Keyboard Shortcuts
   window.onkeydown = (e) => {
     if (document.activeElement.tagName === 'INPUT' && e.key !== 'Enter') return;
     if (e.key >= '1' && e.key <= '9') {
@@ -212,18 +233,10 @@ function render() {
     q.choices.forEach(c => {
       const lbl = document.createElement("label");
       lbl.className = `flex items-center gap-3 p-4 border rounded-xl cursor-pointer transition-all active:scale-[0.98] mb-2 ${q._user === c ? 'ring-2 ring-[#8b1e3f] bg-[#8b1e3f]/5' : 'border-[var(--ring)]'}`;
-      lbl.style.webkitTapHighlightColor = "transparent";
-      
-      lbl.innerHTML = `
-        <input type="radio" name="opt" value="${c}" class="w-5 h-5 accent-[#8b1e3f]" ${q._user === c ? 'checked' : ''} ${q._answered ? 'disabled' : ''}>
-        <span class="flex-1 text-base leading-tight">${c}</span>
-      `;
-
+      lbl.innerHTML = `<input type="radio" name="opt" value="${c}" class="w-5 h-5 accent-[#8b1e3f]" ${q._user === c ? 'checked' : ''} ${q._answered ? 'disabled' : ''}> <span class="flex-1 text-base leading-tight">${c}</span>`;
       lbl.onclick = () => {
         if (!q._answered) {
-          const rad = lbl.querySelector('input');
-          if (rad) rad.checked = true;
-          q._user_temp = c; 
+          const rad = lbl.querySelector('input'); if (rad) rad.checked = true;
           document.querySelectorAll('#options label').forEach(l => l.classList.remove('ring-2', 'ring-[#8b1e3f]', 'bg-[#8b1e3f]/5'));
           lbl.classList.add('ring-2', 'ring-[#8b1e3f]', 'bg-[#8b1e3f]/5');
         }
@@ -245,9 +258,7 @@ function renderNavMap() {
   state.questions.forEach((q, i) => {
     const btn = document.createElement("button");
     btn.type = "button";
-    let colorClass = "bg-gray-200 text-gray-600";
-    if (q._answered) colorClass = q._correct ? "bg-green-500 text-white" : "bg-red-500 text-white";
-    else if (state.marked.has(i)) colorClass = "bg-yellow-400 text-black ring-2 ring-yellow-600";
+    let colorClass = q._answered ? (q._correct ? "bg-green-500 text-white" : "bg-red-500 text-white") : (state.marked.has(i) ? "bg-yellow-400 text-black ring-2 ring-yellow-600" : "bg-gray-200 text-gray-600");
     btn.className = `w-8 h-8 rounded-lg text-xs font-bold transition-all ${i === state.index ? 'ring-2 ring-blue-500' : ''} ${colorClass}`;
     btn.textContent = i + 1;
     btn.onclick = () => { state.index = i; render(); };
@@ -261,10 +272,8 @@ function scoreCurrent(val) {
   q._answered = true; q._user = (val === "SKIPPED_REVEALED") ? "Revealed" : val;
   q._correct = isCorrect;
   if (isCorrect) state.score++;
-  
   const storageKey = weekParam ? `pharmlet.week${weekParam}.easy` : `pharmlet.${quizId}.easy`;
   localStorage.setItem(storageKey, JSON.stringify({score: state.score, total: state.questions.length}));
-  
   render();
 }
 
