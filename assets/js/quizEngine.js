@@ -27,12 +27,14 @@ const els = {
   hintBtn: document.getElementById("hint-btn"),
   revealBtn: document.getElementById("reveal-solution"),
   themeToggle: document.getElementById("theme-toggle"),
-  helpShortcuts: document.getElementById("help-shortcuts")
+  helpShortcuts: document.getElementById("help-shortcuts"),
+  drugCtx: document.getElementById("drug-context") // Context for "Vague" fix
 };
 
 const state = { 
   questions: [], index: 0, score: 0, title: "",
-  timerSeconds: 0, timerHandle: null, marked: new Set()
+  timerSeconds: 0, timerHandle: null, marked: new Set(),
+  currentScale: 1.0 // Track font scaling
 };
 
 const GAME_PLAN = {
@@ -151,7 +153,15 @@ function wireEvents() {
   };
   els.restart.onclick = () => location.reload();
 
-  // Pointer Events for Mobile Buttons
+  // FONT SCALING (DESKTOP)
+  const fontInc = document.getElementById("font-increase");
+  const fontDec = document.getElementById("font-decrease");
+  if (fontInc && fontDec) {
+    fontInc.onclick = () => { state.currentScale += 0.1; els.card.style.fontSize = `${state.currentScale}rem`; };
+    fontDec.onclick = () => { state.currentScale -= 0.1; els.card.style.fontSize = `${state.currentScale}rem`; };
+  }
+
+  // MODAL / HELP
   if (els.helpShortcuts) {
     els.helpShortcuts.onpointerdown = (e) => {
       e.preventDefault();
@@ -160,9 +170,9 @@ function wireEvents() {
     };
   }
   
-  const closeShortcuts = document.getElementById("close-shortcuts");
-  if (closeShortcuts) {
-    closeShortcuts.onclick = () => {
+  const closeBtn = document.getElementById("close-shortcuts");
+  if (closeBtn) {
+    closeBtn.onclick = () => {
       const modal = document.getElementById("shortcuts-modal");
       if (modal) { modal.style.display = "none"; modal.classList.add("hidden"); }
     };
@@ -220,6 +230,12 @@ function wireEvents() {
 function render() {
   const q = state.questions[state.index];
   if (!q) return;
+
+  // RENDER CONTEXT (Fixes "Vague" cards)
+  if (els.drugCtx) {
+    els.drugCtx.textContent = q.drugRef ? (q.drugRef.class || q.drugRef.category) : '';
+  }
+
   els.qnum.textContent = state.index + 1;
   els.prompt.innerHTML = q.prompt;
   els.options.innerHTML = "";
