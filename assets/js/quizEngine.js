@@ -4,8 +4,8 @@ const quizId = params.get("id");
 const weekParam = parseInt(params.get("week") || "", 10);
 const limitParam = parseInt(params.get("limit") || "", 10);
 
-// SAFE ELEMENT LOADER: Prevents script crash if an ID is missing in HTML
-const getEl = (id) => document.getElementById(id) || console.warn(`Missing ID: ${id}`);
+// SAFE ELEMENT LOADER: Prevents the "White Screen" crash if an ID is missing
+const getEl = (id) => document.getElementById(id) || { textContent: "", innerHTML: "", style: {}, classList: { add:()=>{}, remove:()=>{}, toggle:()=>{} }, setAttribute:()=>{}, removeAttribute:()=>{} };
 
 const els = {
   title: getEl("quiz-title"),
@@ -65,8 +65,8 @@ async function main() {
 function initTheme() {
   const isDark = localStorage.getItem("quiz-theme") === "dark";
   document.documentElement.classList.toggle("dark", isDark);
-  if (els.themeToggle) {
-    els.themeToggle.onclick = (e) => {
+  if (els.themeToggle && els.themeToggle.onclick !== undefined) {
+    els.themeToggle.onclick = () => {
       const d = document.documentElement.classList.toggle("dark");
       localStorage.setItem("quiz-theme", d ? "dark" : "light");
     };
@@ -83,7 +83,7 @@ function startSmartTimer() {
 function timerTick() {
   if (state.timerSeconds <= 0) {
     clearInterval(state.timerHandle);
-    if (els.timerReadout) els.timerReadout.classList.add("text-red-500", "font-bold");
+    els.timerReadout.classList.add("text-red-500", "font-bold");
     return;
   }
   state.timerSeconds--;
@@ -93,7 +93,7 @@ function timerTick() {
 function updateTimerDisplay() {
   const mins = Math.floor(state.timerSeconds / 60);
   const secs = state.timerSeconds % 60;
-  if (els.timerReadout) els.timerReadout.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+  els.timerReadout.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
 async function loadDynamicQuiz() {
@@ -138,16 +138,16 @@ function createQuestion(drug, all) {
 }
 
 function wireEvents() {
-  if (els.next) els.next.onclick = () => { if (state.index < state.questions.length - 1) { state.index++; render(); } else showResults(); };
-  if (els.prev) els.prev.onclick = () => { if (state.index > 0) { state.index--; render(); } };
-  if (els.check) els.check.onclick = () => {
+  els.next.onclick = () => { if (state.index < state.questions.length - 1) { state.index++; render(); } else showResults(); };
+  els.prev.onclick = () => { if (state.index > 0) { state.index--; render(); } };
+  els.check.onclick = () => {
     const q = state.questions[state.index];
     let val = (q.type === "mcq") ? els.options.querySelector("input:checked")?.value : els.shortInput.value;
     if (val) scoreCurrent(val);
   };
-  if (els.restart) els.restart.onclick = () => location.reload();
+  els.restart.onclick = () => location.reload();
 
-  // FONT SCALING (A+ / A-)
+  // NUCLEAR FONT SCALING (A+ / A-)
   const fontInc = document.getElementById("font-increase");
   const fontDec = document.getElementById("font-decrease");
   if (fontInc && fontDec) {
@@ -169,7 +169,20 @@ function wireEvents() {
     els.helpShortcuts.onclick = (e) => {
       e.preventDefault();
       const modal = document.getElementById("shortcuts-modal");
-      if (modal) { modal.style.display = "flex"; modal.classList.remove("hidden"); }
+      if (modal) {
+        modal.style.display = "flex";
+        modal.classList.remove("hidden");
+        const listContainer = modal.querySelector('.space-y-4');
+        if (listContainer) {
+          listContainer.innerHTML = `
+            <div class="flex justify-between items-center"><span>Next / Check Answer</span><kbd>Enter</kbd></div>
+            <div class="flex justify-between items-center"><span>Navigate</span><kbd>← / →</kbd></div>
+            <div class="flex justify-between items-center"><span>Jump to Q</span><kbd>1 - 0</kbd></div>
+            <div class="flex justify-between items-center"><span>Pause Clock</span><kbd>T</kbd></div>
+            <div class="flex justify-between items-center"><span>Mark Question</span><kbd>M</kbd></div>
+          `;
+        }
+      }
     };
   }
   const closeBtn = document.getElementById("close-shortcuts");
@@ -179,6 +192,7 @@ function wireEvents() {
       if (modal) { modal.style.display = "none"; modal.classList.add("hidden"); }
     };
   }
+
   if (els.timerReadout) {
     els.timerReadout.onclick = (e) => {
       e.preventDefault();
@@ -191,16 +205,16 @@ function wireEvents() {
       }
     };
   }
-  if (els.mark) els.mark.onclick = () => {
+  els.mark.onclick = () => {
     if (state.marked.has(state.index)) state.marked.delete(state.index);
     else state.marked.add(state.index);
     renderNavMap();
   };
-  if (els.hintBtn) els.hintBtn.onclick = () => {
+  els.hintBtn.onclick = () => {
     const q = state.questions[state.index];
     alert(`Hint: Starts with "${q.answer[0]}". Category: ${q.drugRef?.category || 'N/A'}`);
   };
-  if (els.revealBtn) els.revealBtn.onclick = () => {
+  els.revealBtn.onclick = () => {
     const q = state.questions[state.index];
     if (!q._answered) scoreCurrent("Revealed");
   };
@@ -214,11 +228,11 @@ function wireEvents() {
     }
     if (e.key === "ArrowRight") { if (state.index < state.questions.length - 1) { state.index++; render(); } } 
     else if (e.key === "ArrowLeft") { if (state.index > 0) { state.index--; render(); } } 
-    else if (e.key.toLowerCase() === "t") { if (els.timerReadout) els.timerReadout.click(); } 
-    else if (e.key.toLowerCase() === "m") { if (els.mark) els.mark.click(); }
+    else if (e.key.toLowerCase() === "t") { els.timerReadout.click(); } 
+    else if (e.key.toLowerCase() === "m") { els.mark.click(); }
     else if (e.key === "Enter") { 
-      if (!state.questions[state.index]?._answered) { if(els.check) els.check.click(); } 
-      else if (state.index < state.questions.length - 1) { if(els.next) els.next.click(); } 
+      if (!state.questions[state.index]?._answered) { els.check.click(); } 
+      else if (state.index < state.questions.length - 1) { els.next.click(); } 
     }
   };
 }
@@ -227,20 +241,20 @@ function render() {
   const q = state.questions[state.index];
   if (!q) return;
 
-  // NUCLEAR SPOILER FIX
+  // NUCLEAR SPOILER FIX: Hides "Class" or "MOA" from top context label
   if (els.drugCtx) {
     const isSpoiler = q.prompt.toLowerCase().includes('class') || q.prompt.toLowerCase().includes('moa');
     els.drugCtx.textContent = isSpoiler ? "Drug Review" : (q.drugRef?.category || "");
   }
 
-  if (els.qnum) els.qnum.textContent = state.index + 1;
-  if (els.prompt) els.prompt.innerHTML = q.prompt;
-  if (els.options) els.options.innerHTML = "";
-  if (els.shortWrap) els.shortWrap.classList.add("hidden");
-  if (els.explain) els.explain.classList.remove("show");
-  if (els.prev) els.prev.disabled = (state.index === 0);
-  if (els.check) els.check.classList.toggle("hidden", !!q._answered);
-  if (els.next) els.next.classList.toggle("hidden", !q._answered);
+  els.qnum.textContent = state.index + 1;
+  els.prompt.innerHTML = q.prompt;
+  els.options.innerHTML = "";
+  els.shortWrap.classList.add("hidden");
+  els.explain.classList.remove("show");
+  els.prev.disabled = (state.index === 0);
+  els.check.classList.toggle("hidden", !!q._answered);
+  els.next.classList.toggle("hidden", !q._answered);
 
   if (q.type === "mcq") {
     q.choices.forEach(c => {
@@ -254,21 +268,18 @@ function render() {
           lbl.classList.add('ring-2', 'ring-[#8b1e3f]', 'bg-[#8b1e3f]/5');
         }
       };
-      if (els.options) els.options.appendChild(lbl);
+      els.options.appendChild(lbl);
     });
   } else {
-    if (els.shortWrap) els.shortWrap.classList.remove("hidden");
-    if (els.shortInput) {
-        els.shortInput.value = q._user || "";
-        q._answered ? els.shortInput.setAttribute("disabled", "true") : els.shortInput.removeAttribute("disabled");
-    }
+    els.shortWrap.classList.remove("hidden");
+    els.shortInput.value = q._user || "";
+    q._answered ? els.shortInput.setAttribute("disabled", "true") : els.shortInput.removeAttribute("disabled");
   }
   if (q._answered) renderAnswerReveal(q);
   renderNavMap(); 
 }
 
 function renderNavMap() {
-  if (!els.navMap) return;
   els.navMap.innerHTML = "";
   state.questions.forEach((q, i) => {
     const btn = document.createElement("button");
@@ -291,16 +302,14 @@ function scoreCurrent(val) {
 }
 
 function renderAnswerReveal(q) {
-  if (els.explain) {
-    els.explain.innerHTML = `<div class="p-3 rounded-lg ${q._correct ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}"><b>${q._correct ? 'Correct!' : 'Answer:'}</b> <b>${q.answer}</b></div>`;
-    els.explain.classList.add("show");
-  }
+  els.explain.innerHTML = `<div class="p-3 rounded-lg ${q._correct ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}"><b>${q._correct ? 'Correct!' : 'Answer:'}</b> <b>${q.answer}</b></div>`;
+  els.explain.classList.add("show");
 }
 
 function showResults() {
-  if (els.card) els.card.classList.add("hidden");
-  if (els.results) els.results.classList.remove("hidden");
-  if (els.final) els.final.textContent = `${state.score} / ${state.questions.length}`;
+  els.card.classList.add("hidden");
+  els.results.classList.remove("hidden");
+  els.final.textContent = `${state.score} / ${state.questions.length}`;
 }
 
 function shuffled(a) { return [...a].sort(() => 0.5 - Math.random()); }
