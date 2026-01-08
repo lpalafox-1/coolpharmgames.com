@@ -5,16 +5,7 @@
     "class": "Thienopyridine P2Y12 Antagonist",
     "category": "Antiplatelet",
     "moa": "Inhibits platelet activation and aggregation by irreversibly binding to the P2Y12 class of ADP receptors on platelets.",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "metadata": {
-      "lab": 2,
-      "quiz": 1,
-      "is_new": true,
-      "week": 1
-    }
-=======
     "metadata": { "lab": 2, "week": 1, "is_new": true }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Ticagrelor",
@@ -22,16 +13,7 @@
     "class": "P2Y12 Antagonist",
     "category": "Antiplatelet",
     "moa": "Reversibly binds to the P2Y12 ADP receptor on platelets, inhibiting platelet activation and aggregation.",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "metadata": {
-      "lab": 2,
-      "quiz": 1,
-      "is_new": true,
-      "week": 1
-    }
-=======
     "metadata": { "lab": 2, "week": 1, "is_new": true }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Aspirin",
@@ -39,16 +21,7 @@
     "class": "Antiplatelet Agent",
     "category": "Antiplatelet",
     "moa": "Inhibits cyclooxygenase-1 (COX-1) and cyclooxygenase-2 (COX-2), reducing the formation of thromboxane A2 and inhibiting platelet aggregation.",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "metadata": {
-      "lab": 2,
-      "quiz": 1,
-      "is_new": true,
-      "week": 1
-    }
-=======
     "metadata": { "lab": 2, "week": 1, "is_new": true }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Isosorbide Mononitrate",
@@ -56,36 +29,15 @@
     "class": "Nitrate",
     "category": "Heart Failure/Antianginal",
     "moa": "Relaxes vascular smooth muscle by increasing nitric oxide, leading to vasodilation.",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "metadata": {
-      "lab": 2,
-      "quiz": 1,
-      "is_new": true,
-      "week": 1
-    }
-=======
     "metadata": { "lab": 2, "week": 1, "is_new": true }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Valsartan/sacubitril",
     "brand": "Entresto",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "class": "ARB & Neprilysin Inhibitor",
-    "category": "Heart Failure",
-    "moa": "Selectively blocks binding of angiotensin II to AT1 receptor, preventing vasoconstriction and reducing aldosterone secretion; inhibits neprilysin to induce vasodilation and natriuresis.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 1,
-      "is_new": true,
-      "week": 1
-    }
-=======
     "class": "Angiotensin II Receptor Blocker (ARB) and Neprilysin Inhibitor",
     "category": "Heart Failure/Antianginal",
     "moa": "Selectively blocks the binding of angiotensin II to the AT1 receptor, preventing vasoconstriction and reducing the secretion of aldosterone; inhibits neprilysin to induce vasodilation and natriuresis",
     "metadata": { "lab": 2, "week": 1, "is_new": true }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Alteplase",
@@ -93,16 +45,7 @@
     "class": "Thrombolytic Agent",
     "category": "Antithrombolytics/ACS",
     "moa": "Converts plasminogen to plasmin, leading to the degradation of fibrin in thrombi.",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "metadata": {
-      "lab": 2,
-      "quiz": 1,
-      "is_new": true,
-      "week": 1
-    }
-=======
     "metadata": { "lab": 2, "week": 1, "is_new": true }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Tenecteplase",
@@ -110,196 +53,6 @@
     "class": "Thrombolytic Agent",
     "category": "Antithrombolytics/ACS",
     "moa": "Converts plasminogen to plasmin, leading to the degradation of fibrin in thrombi.",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "metadata": {
-      "lab": 2,
-      "quiz": 1,
-      "is_new": true,
-      "week": 1
-    }
-  },
-  {
-    "generic": "Pantoprazole",
-    "brand": "Protonix",
-    "class": "Proton Pump Inhibitor (PPI)",
-    "category": "Gastrointestinal",
-    "moa": "Suppresses gastric acid secretion by specific inhibition of the H+/K+-ATPase enzyme system at the secretory surface of the gastric parietal cell.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 2,
-      "is_new": true,
-      "week": 2
-    }
-  },
-  {
-    "generic": "Metoclopramide",
-    "brand": "Reglan",
-    "class": "Dopamine Antagonist / Prokinetic",
-    "category": "Gastrointestinal",
-    "moa": "Blocks dopamine receptors and (at higher doses) serotonin receptors in the chemoreceptor trigger zone; enhances the response to acetylcholine in the upper GI tract.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 2,
-      "is_new": true,
-      "week": 2
-    }
-  },
-  {
-    "generic": "Ondansetron",
-    "brand": "Zofran",
-    "class": "5-HT3 Receptor Antagonist",
-    "category": "Gastrointestinal",
-    "moa": "Blocks serotonin receptors peripherally on vagal nerve terminals and centrally in the chemoreceptor trigger zone.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 2,
-      "is_new": true,
-      "week": 2
-    }
-  },
-  {
-    "generic": "Lansoprazole",
-    "brand": "Prevacid",
-    "class": "PPI",
-    "category": "Gastrointestinal",
-    "moa": "Inhibits the H+/K+ ATPase enzyme system in gastric parietal cells.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 2,
-      "is_new": true,
-      "week": 2
-    }
-  },
-  {
-    "generic": "Desloratadine",
-    "brand": "Clarinex",
-    "class": "H1 Antagonist",
-    "category": "Antihistamine",
-    "moa": "Long-acting, non-sedating peripheral H1 receptor antagonist.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 2,
-      "is_new": true,
-      "week": 2
-    }
-  },
-  {
-    "generic": "Levocetirizine",
-    "brand": "Xyzal",
-    "class": "H1 Antagonist",
-    "category": "Antihistamine",
-    "moa": "Selectively inhibits peripheral H1 receptors.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 2,
-      "is_new": true,
-      "week": 2
-    }
-  },
-  {
-    "generic": "Codeine / APAP",
-    "brand": "Tylenol #3",
-    "class": "Opioid Combination",
-    "category": "Analgesic",
-    "moa": "Binds to mu-opioid receptors in the CNS and inhibits prostaglandin synthesis in the CNS.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 2,
-      "is_new": true,
-      "week": 2
-    }
-  },
-  {
-    "generic": "Fentanyl",
-    "brand": "Duragesic",
-    "class": "Opioid Analgesic",
-    "category": "Analgesic",
-    "moa": "Pure mu-opioid receptor agonist, inhibiting ascending pain pathways.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 2,
-      "is_new": true,
-      "week": 2
-    }
-  },
-  {
-    "generic": "Hydromorphone",
-    "brand": "Dilaudid",
-    "class": "Opioid Analgesic",
-    "category": "Analgesic",
-    "moa": "Pure mu-opioid receptor agonist, inhibiting ascending pain pathways.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 2,
-      "is_new": true,
-      "week": 2
-    }
-  },
-  {
-    "generic": "Buprenorphine / Naloxone",
-    "brand": "Suboxone",
-    "class": "Opioid Partial Agonist / Antagonist",
-    "category": "Analgesic",
-    "moa": "Buprenorphine is a partial mu-opioid agonist; Naloxone is an opioid antagonist.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 2,
-      "is_new": true,
-      "week": 2
-    }
-  },
-  {
-    "generic": "Methadone",
-    "brand": "Dolophine",
-    "class": "Opioid Analgesic",
-    "category": "Analgesic",
-    "moa": "Binds to mu-opioid receptors in the CNS, inhibiting ascending pain pathways.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 2,
-      "is_new": true,
-      "week": 2
-    }
-  },
-  {
-    "generic": "Indomethacin",
-    "brand": "Indocin",
-    "class": "NSAID",
-    "category": "Analgesic",
-    "moa": "Inhibits cyclooxygenase (COX-1 and COX-2), decreasing prostaglandin precursors.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 2,
-      "is_new": true,
-      "week": 2
-    }
-  },
-  {
-    "generic": "Ketorolac",
-    "brand": "Toradol",
-    "class": "NSAID",
-    "category": "Analgesic",
-    "moa": "Inhibits cyclooxygenase (COX-1 and COX-2), decreasing prostaglandin precursors.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 2,
-      "is_new": true,
-      "week": 2
-    }
-  },
-  {
-    "generic": "Nabumetone",
-    "brand": "Relafen",
-    "class": "NSAID",
-    "category": "Analgesic",
-    "moa": "Inhibits cyclooxygenase (COX-1 and COX-2), decreasing prostaglandin precursors.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 2,
-      "is_new": true,
-      "week": 2
-    }
-=======
     "metadata": { "lab": 2, "week": 1, "is_new": true }
   },
   {
@@ -349,22 +102,10 @@
     "category": "Anti-inflammatory/analgesics",
     "moa": "Inhibits cyclooxygenase (COX-1 and COX-2), decreasing the formation of prostaglandins.",
     "metadata": { "lab": 2, "week": 2, "is_new": true }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Diclofenac",
     "brand": "Voltaren",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "class": "NSAID",
-    "category": "Analgesic",
-    "moa": "Inhibits cyclooxygenase (COX-1 and COX-2), decreasing prostaglandin precursors.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 2,
-      "is_new": true,
-      "week": 2
-    }
-=======
     "class": "Nonsteroidal Anti-inflammatory Drug (NSAID)",
     "category": "Anti-inflammatory/analgesics",
     "moa": "Inhibits cyclooxygenase (COX-1 and COX-2), decreasing the formation of prostaglandins.",
@@ -409,236 +150,19 @@
     "category": "Opioid Analgesics",
     "moa": "Binds to mu-opioid receptors in the CNS, altering the perception of and response to pain.",
     "metadata": { "lab": 2, "week": 3, "is_new": true }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Oxycodone",
     "brand": "OxyContin, Roxicodone",
     "class": "Opioid Analgesic",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "category": "Analgesic",
-    "moa": "Pure mu-opioid receptor agonist, inhibiting ascending pain pathways.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 2,
-      "is_new": true,
-      "week": 2
-    }
-=======
     "category": "Opioid Analgesics",
     "moa": "Binds to mu-opioid receptors in the CNS, altering the perception of and response to pain.",
     "metadata": { "lab": 2, "week": 3, "is_new": true }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Tramadol",
     "brand": "Ultram",
     "class": "Opioid Analgesic",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "category": "Analgesic",
-    "moa": "Binds to mu-opioid receptors and weakly inhibits reuptake of norepinephrine and serotonin.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 2,
-      "is_new": true,
-      "week": 2
-    }
-  },
-  {
-    "generic": "Pregabalin",
-    "brand": "Lyrica",
-    "class": "Gaba Analog",
-    "category": "Neurology",
-    "moa": "Binds to alpha-2-delta subunit of voltage-gated calcium channels in the CNS.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 3,
-      "is_new": true,
-      "week": 3
-    }
-  },
-  {
-    "generic": "Topiramate",
-    "brand": "Topamax",
-    "class": "Anticonvulsant",
-    "category": "Neurology",
-    "moa": "Blocks voltage-dependent sodium channels and enhances GABA activity.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 3,
-      "is_new": true,
-      "week": 3
-    }
-  },
-  {
-    "generic": "Levetiracetam",
-    "brand": "Keppra",
-    "class": "Anticonvulsant",
-    "category": "Neurology",
-    "moa": "Binds to synaptic vesicle protein SV2A, modulating neurotransmitter release.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 3,
-      "is_new": true,
-      "week": 3
-    }
-  },
-  {
-    "generic": "Sumatriptan",
-    "brand": "Imitrex",
-    "class": "5-HT 1B/1D Receptor Agonist",
-    "category": "Neurology",
-    "moa": "Causes vasoconstriction of cranial arteries by binding to serotonin receptors.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 3,
-      "is_new": true,
-      "week": 3
-    }
-  },
-  {
-    "generic": "Sertraline",
-    "brand": "Zoloft",
-    "class": "SSRI",
-    "category": "Psychiatry",
-    "moa": "Inhibits the CNS neuronal reuptake of serotonin.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 4,
-      "is_new": true,
-      "week": 4
-    }
-  },
-  {
-    "generic": "Fluoxetine",
-    "brand": "Prozac",
-    "class": "SSRI",
-    "category": "Psychiatry",
-    "moa": "Inhibits the CNS neuronal reuptake of serotonin.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 4,
-      "is_new": true,
-      "week": 4
-    }
-  },
-  {
-    "generic": "Duloxetine",
-    "brand": "Cymbalta",
-    "class": "SNRI",
-    "category": "Psychiatry",
-    "moa": "Inhibits neuronal serotonin and norepinephrine reuptake.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 4,
-      "is_new": true,
-      "week": 4
-    }
-  },
-  {
-    "generic": "Venlafaxine",
-    "brand": "Effexor",
-    "class": "SNRI",
-    "category": "Psychiatry",
-    "moa": "Inhibits neuronal serotonin and norepinephrine reuptake.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 4,
-      "is_new": true,
-      "week": 4
-    }
-  },
-  {
-    "generic": "Bupropion",
-    "brand": "Wellbutrin",
-    "class": "DNRI",
-    "category": "Psychiatry",
-    "moa": "Inhibits the reuptake of norepinephrine and dopamine.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 4,
-      "is_new": true,
-      "week": 4
-    }
-  },
-  {
-    "generic": "Alprazolam",
-    "brand": "Xanax",
-    "class": "Benzodiazepine",
-    "category": "Psychiatry",
-    "moa": "Binds to stereospecific benzodiazepine receptors on the postsynaptic GABA neuron.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 4,
-      "is_new": true,
-      "week": 4
-    }
-  },
-  {
-    "generic": "Zolpidem",
-    "brand": "Ambien",
-    "class": "Non-benzodiazepine Hypnotic",
-    "category": "Psychiatry",
-    "moa": "Binds to GABA-A receptors, specifically the BZ1 receptor subunit.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 4,
-      "is_new": true,
-      "week": 4
-    }
-  },
-  {
-    "generic": "Lisdexamfetamine",
-    "brand": "Vyvanse",
-    "class": "CNS Stimulant",
-    "category": "Psychiatry",
-    "moa": "Prodrug of dextroamphetamine; blocks reuptake of norepinephrine and dopamine.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 5,
-      "is_new": true,
-      "week": 5
-    }
-  },
-  {
-    "generic": "Methylphenidate",
-    "brand": "Concerta",
-    "class": "CNS Stimulant",
-    "category": "Psychiatry",
-    "moa": "Blocks reuptake of norepinephrine and dopamine into the presynaptic neuron.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 5,
-      "is_new": true,
-      "week": 5
-    }
-  },
-  {
-    "generic": "Amoxicillin",
-    "brand": "Amoxil",
-    "class": "Penicillin Antibiotic",
-    "category": "Antibiotic",
-    "moa": "Inhibits bacterial cell wall synthesis by binding to penicillin-binding proteins (PBPs).",
-    "metadata": {
-      "lab": 2,
-      "quiz": 6,
-      "is_new": true,
-      "week": 6
-    }
-  },
-  {
-    "generic": "Azithromycin",
-    "brand": "Zithromax",
-    "class": "Macrolide Antibiotic",
-    "category": "Antibiotic",
-    "moa": "Inhibits RNA-dependent protein synthesis by binding to the 50S ribosomal subunit.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 6,
-      "is_new": true,
-      "week": 6
-    }
-=======
     "category": "Opioid Analgesics",
     "moa": "Binds to mu-opioid receptors in the CNS, altering the perception of and response to pain; inhibits the reuptake of norepinephrine and serotonin.",
     "metadata": { "lab": 2, "week": 3, "is_new": true }
@@ -730,22 +254,10 @@
     "category": "Antibiotics",
     "moa": "Disrupts DNA helical structure and inhibits nucleic acid synthesis.",
     "metadata": { "lab": 2, "week": 4, "is_new": true }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Ciprofloxacin",
     "brand": "Cipro",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "class": "Fluoroquinolone Antibiotic",
-    "category": "Antibiotic",
-    "moa": "Inhibits DNA-gyrase, inhibiting relaxation of supercoiled DNA and promoting breakage of double-stranded DNA.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 6,
-      "is_new": true,
-      "week": 6
-    }
-=======
     "class": "Fluoroquinolone",
     "category": "Antibiotics",
     "moa": "Inhibits DNA replication and transcription by inhibiting bacterial DNA gyrase and topoisomerase IV.",
@@ -790,48 +302,10 @@
     "category": "Antibiotics 2",
     "moa": "Inhibits bacterial cell wall synthesis by blocking glycopeptide polymerization.",
     "metadata": { "lab": 2, "week": 5, "is_new": true }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Doxycycline",
     "brand": "Vibramycin",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "class": "Tetracycline Antibiotic",
-    "category": "Antibiotic",
-    "moa": "Inhibits protein synthesis by binding with the 30S ribosomal subunit.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 6,
-      "is_new": true,
-      "week": 6
-    }
-  },
-  {
-    "generic": "Albuterol",
-    "brand": "ProAir; Ventolin",
-    "class": "SABA",
-    "category": "Respiratory",
-    "moa": "Relaxes bronchial smooth muscle by action on beta2-receptors.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 7,
-      "is_new": true,
-      "week": 7
-    }
-  },
-  {
-    "generic": "Fluticasone / Salmeterol",
-    "brand": "Advair",
-    "class": "ICS / LABA",
-    "category": "Respiratory",
-    "moa": "Fluticasone inhibits inflammation; Salmeterol relaxes bronchial smooth muscle by action on beta2-receptors.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 7,
-      "is_new": true,
-      "week": 7
-    }
-=======
     "class": "Tetracycline",
     "category": "Antibiotics 2",
     "moa": "Inhibits bacterial protein synthesis by binding to the 30S ribosomal subunit and preventing translation of mRNA to proteins.",
@@ -916,22 +390,11 @@
     "category": "Antivirals",
     "moa": "Inhibits DNA synthesis and viral replication",
     "metadata": { "lab": 2, "week": 6, "is_new": true }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Montelukast",
     "brand": "Singulair",
     "class": "Leukotriene Receptor Antagonist",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "category": "Respiratory",
-    "moa": "Selective leukotriene receptor antagonist that inhibits the cysteinyl leukotriene receptor.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 7,
-      "is_new": true,
-      "week": 7
-    }
-=======
     "category": "Asthma/COPD",
     "moa": "Blocks the action of leukotrienes, reducing inflammation, bronchoconstriction, and mucus production.",
     "metadata": { "lab": 2, "week": 7, "is_new": true }
@@ -951,347 +414,10 @@
     "category": "Asthma/COPD",
     "moa": "Acts as an anti-inflammatory agent by inhibiting inflammatory mediators.",
     "metadata": { "lab": 2, "week": 7, "is_new": true }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Tiotropium",
     "brand": "Spiriva",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "class": "Anticholinergic (LAMA)",
-    "category": "Respiratory",
-    "moa": "Inhibits the action of acetylcholine at M3 receptors in bronchial smooth muscle causing bronchodilation.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 7,
-      "is_new": true,
-      "week": 7
-    }
-  },
-  {
-    "generic": "Budesonide",
-    "brand": "Pulmicort",
-    "class": "Corticosteroid",
-    "category": "Respiratory",
-    "moa": "Utilizes a multi-pathway mechanism to inhibit multiple inflammatory cytokines.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 7,
-      "is_new": true,
-      "week": 7
-    }
-  },
-  {
-    "generic": "Ipratropium",
-    "brand": "Atrovent",
-    "class": "Anticholinergic",
-    "category": "Respiratory",
-    "moa": "Antagonizes the action of acetylcholine at muscarinic receptors in bronchial smooth muscle.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 7,
-      "is_new": true,
-      "week": 7
-    }
-  },
-  {
-    "generic": "Levothyroxine",
-    "brand": "Synthroid",
-    "class": "Thyroid Supplement",
-    "category": "Endocrine",
-    "moa": "Synthetic T4 that is converted to T3 in the body; regulates metabolic effects through DNA transcription.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 8,
-      "is_new": true,
-      "week": 8
-    }
-  },
-  {
-    "generic": "Methimazole",
-    "brand": "Tapazole",
-    "class": "Antithyroid Agent",
-    "category": "Endocrine",
-    "moa": "Inhibits the synthesis of thyroid hormones by blocking the oxidation of iodine in the thyroid gland.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 8,
-      "is_new": true,
-      "week": 8
-    }
-  },
-  {
-    "generic": "Estrogens (Conjugated)",
-    "brand": "Premarin",
-    "class": "Estrogen Hormone",
-    "category": "Endocrine",
-    "moa": "Modulates pituitary secretion of gonadotropins, LH, and FSH through a negative feedback system.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 8,
-      "is_new": true,
-      "week": 8
-    }
-  },
-  {
-    "generic": "Progesterone",
-    "brand": "Prometrium",
-    "class": "Progestin Hormone",
-    "category": "Endocrine",
-    "moa": "Transforms proliferative endometrium into secretory endometrium and inhibits pituitary gonadotropin secretion.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 8,
-      "is_new": true,
-      "week": 8
-    }
-  },
-  {
-    "generic": "Testosterone",
-    "brand": "AndroGel",
-    "class": "Androgen",
-    "category": "Endocrine",
-    "moa": "Promotes growth and development of male sex organs and maintains secondary sex characteristics.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 8,
-      "is_new": true,
-      "week": 8
-    }
-  },
-  {
-    "generic": "Finasteride",
-    "brand": "Proscar",
-    "class": "5-Alpha Reductase Inhibitor",
-    "category": "Genitourinary",
-    "moa": "Inhibits 5-alpha reductase enzyme, preventing the conversion of testosterone to dihydrotestosterone (DHT).",
-    "metadata": {
-      "lab": 2,
-      "quiz": 9,
-      "is_new": true,
-      "week": 9
-    }
-  },
-  {
-    "generic": "Tamsulosin",
-    "brand": "Flomax",
-    "class": "Alpha-1 Antagonist",
-    "category": "Genitourinary",
-    "moa": "Antagonist of alpha-1A adrenoreceptors in the prostate, causing smooth muscle relaxation.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 9,
-      "is_new": true,
-      "week": 9
-    }
-  },
-  {
-    "generic": "Sildenafil",
-    "brand": "Viagra",
-    "class": "PDE-5 Inhibitor",
-    "category": "Genitourinary",
-    "moa": "Inhibits phosphodiesterase type 5 (PDE-5), increasing cGMP levels and enhancing the effect of nitric oxide.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 9,
-      "is_new": true,
-      "week": 9
-    }
-  },
-  {
-    "generic": "Tadalafil",
-    "brand": "Cialis",
-    "class": "PDE-5 Inhibitor",
-    "category": "Genitourinary",
-    "moa": "Inhibits phosphodiesterase type 5 (PDE-5), increasing cGMP levels and enhancing the effect of nitric oxide.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 9,
-      "is_new": true,
-      "week": 9
-    }
-  },
-  {
-    "generic": "Oxybutynin",
-    "brand": "Ditropan",
-    "class": "Antispasmodic",
-    "category": "Genitourinary",
-    "moa": "Antagonizes acetylcholine at muscarinic receptors, relaxing bladder smooth muscle.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 9,
-      "is_new": true,
-      "week": 9
-    }
-  },
-  {
-    "generic": "Solifenacin",
-    "brand": "Vesicare",
-    "class": "Antispasmodic",
-    "category": "Genitourinary",
-    "moa": "Antagonizes acetylcholine at muscarinic receptors, relaxing bladder smooth muscle.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 9,
-      "is_new": true,
-      "week": 9
-    }
-  },
-  {
-    "generic": "Mirabegron",
-    "brand": "Myrbetriq",
-    "class": "Beta-3 Agonist",
-    "category": "Genitourinary",
-    "moa": "Activates beta-3 adrenergic receptors, relaxing the detrusor muscle during the storage phase.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 9,
-      "is_new": true,
-      "week": 9
-    }
-  },
-  {
-    "generic": "Tolterodine",
-    "brand": "Detrol",
-    "class": "Antispasmodic",
-    "category": "Genitourinary",
-    "moa": "Antagonizes acetylcholine at muscarinic receptors, relaxing bladder smooth muscle.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 9,
-      "is_new": true,
-      "week": 9
-    }
-  },
-  {
-    "generic": "Dutasteride",
-    "brand": "Avodart",
-    "class": "5-Alpha Reductase Inhibitor",
-    "category": "Genitourinary",
-    "moa": "Inhibits 5-alpha reductase enzyme, preventing the conversion of testosterone to DHT.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 9,
-      "is_new": true,
-      "week": 9
-    }
-  },
-  {
-    "generic": "Phenazopyridine",
-    "brand": "Pyridium",
-    "class": "Urinary Analgesic",
-    "category": "Genitourinary",
-    "moa": "Exerts a direct topical analgesic effect on the mucosa of the urinary tract.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 9,
-      "is_new": true,
-      "week": 9
-    }
-  },
-  {
-    "generic": "Vardenafil",
-    "brand": "Levitra",
-    "class": "PDE-5 Inhibitor",
-    "category": "Genitourinary",
-    "moa": "Inhibits phosphodiesterase type 5 (PDE-5), increasing cGMP levels.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 9,
-      "is_new": true,
-      "week": 9
-    }
-  },
-  {
-    "generic": "Folic Acid",
-    "brand": "Folacin",
-    "class": "Vitamin",
-    "category": "Nutritional",
-    "moa": "Required for nucleoprotein synthesis and maintenance of normal erythropoiesis.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 10,
-      "is_new": true,
-      "week": 10
-    }
-  },
-  {
-    "generic": "Cyanocobalamin",
-    "brand": "Nascobal",
-    "class": "Vitamin B12",
-    "category": "Nutritional",
-    "moa": "Coenzyme for various metabolic functions, including fat and carbohydrate metabolism and protein synthesis.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 10,
-      "is_new": true,
-      "week": 10
-    }
-  },
-  {
-    "generic": "Ergocalciferol",
-    "brand": "Drisdol",
-    "class": "Vitamin D2",
-    "category": "Nutritional",
-    "moa": "Stimulates calcium and phosphate absorption from the small intestine.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 10,
-      "is_new": true,
-      "week": 10
-    }
-  },
-  {
-    "generic": "Ferrous Sulfate",
-    "brand": "Feosol",
-    "class": "Iron Mineral",
-    "category": "Nutritional",
-    "moa": "Replaces iron stores found in hemoglobin, myoglobin, and other enzymes.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 10,
-      "is_new": true,
-      "week": 10
-    }
-  },
-  {
-    "generic": "Potassium Chloride",
-    "brand": "K-Dur; Klor-Con",
-    "class": "Electrolyte",
-    "category": "Nutritional",
-    "moa": "Major intracellular cation essential for the transmission of nerve impulses and contraction of cardiac, skeletal, and smooth muscle.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 10,
-      "is_new": true,
-      "week": 10
-    }
-  },
-  {
-    "generic": "Calcitriol",
-    "brand": "Rocaltrol",
-    "class": "Vitamin D Analog",
-    "category": "Endocrine",
-    "moa": "Stimulates calcium and phosphate absorption from the small intestine.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 10,
-      "is_new": true,
-      "week": 10
-    }
-  },
-  {
-    "generic": "Allopurinol",
-    "brand": "Zyloprim",
-    "class": "Xanthine Oxidase Inhibitor",
-    "category": "Musculoskeletal",
-    "moa": "Inhibits xanthine oxidase, the enzyme responsible for the conversion of hypoxanthine to xanthine to uric acid.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 11,
-      "is_new": true,
-      "week": 11
-    }
-=======
     "class": "Long-acting Muscarinic Antagonist",
     "category": "Asthma/COPD",
     "moa": "Inhibits the action of acetylcholine at M3 receptors in the bronchial smooth muscle, leading to bronchodilation and decreased mucus secretion.",
@@ -1320,245 +446,11 @@
     "category": "Asthma/COPD",
     "moa": "Inhibits the action of acetylcholine at M3 receptors in the bronchial smooth muscle, leading to bronchodilation and decreased mucus secretion.; Stimulates beta2-adrenergic receptors, resulting in bronchial smooth muscle relaxation.",
     "metadata": { "lab": 2, "week": 7, "is_new": true }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Alendronate",
     "brand": "Fosamax",
     "class": "Bisphosphonate",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "category": "Musculoskeletal",
-    "moa": "Inhibits osteoclast-mediated bone resorption.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 11,
-      "is_new": true,
-      "week": 11
-    }
-  },
-  {
-    "generic": "Latanoprost",
-    "brand": "Xalatan",
-    "class": "Prostaglandin Analog",
-    "category": "Ophthalmic",
-    "moa": "Reduces intraocular pressure by increasing the outflow of aqueous humor.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 12,
-      "is_new": true,
-      "week": 12
-    }
-  },
-  {
-    "generic": "Timolol",
-    "brand": "Timoptic",
-    "class": "Ophthalmic Beta-Blocker",
-    "category": "Ophthalmic",
-    "moa": "Reduces intraocular pressure by decreasing the production of aqueous humor.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 12,
-      "is_new": true,
-      "week": 12
-    }
-  },
-  {
-    "generic": "Brimonidine",
-    "brand": "Alphagan P",
-    "class": "Alpha-2 Adrenergic Agonist",
-    "category": "Ophthalmic",
-    "moa": "Reduces intraocular pressure by decreasing aqueous humor production and increasing uveoscleral outflow.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 12,
-      "is_new": true,
-      "week": 12
-    }
-  },
-  {
-    "generic": "Cyclosporine",
-    "brand": "Restasis",
-    "class": "Calcineurin Inhibitor",
-    "category": "Ophthalmic",
-    "moa": "Acts as a partial immunomodulator; thought to inhibit the production and release of interleukin-2.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 12,
-      "is_new": true,
-      "week": 12
-    }
-  },
-  {
-    "generic": "Moxifloxacin",
-    "brand": "Vigamox",
-    "class": "Fluoroquinolone Antibiotic",
-    "category": "Ophthalmic",
-    "moa": "Inhibits DNA-gyrase, inhibiting relaxation of supercoiled DNA and promoting breakage of double-stranded DNA.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 12,
-      "is_new": true,
-      "week": 12
-    }
-  },
-  {
-    "generic": "Olopatadine",
-    "brand": "Pataday",
-    "class": "Ophthalmic Antihistamine",
-    "category": "Ophthalmic",
-    "moa": "Selective H1 receptor antagonist and mast cell stabilizer.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 12,
-      "is_new": true,
-      "week": 12
-    }
-  },
-  {
-    "generic": "Clotrimazole / Betamethasone",
-    "brand": "Lotrisone",
-    "class": "Antifungal / Corticosteroid",
-    "category": "Dermatology",
-    "moa": "Clotrimazole inhibits fungal cell wall synthesis; Betamethasone utilizes a multi-pathway mechanism to inhibit inflammation.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 13,
-      "is_new": true,
-      "week": 13
-    }
-  },
-  {
-    "generic": "Mupirocin",
-    "brand": "Bactroban",
-    "class": "Topical Antibacterial",
-    "category": "Dermatology",
-    "moa": "Inhibits bacterial protein synthesis by reversibly and specifically binding to bacterial isoleucyl transfer-RNA synthetase.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 13,
-      "is_new": true,
-      "week": 13
-    }
-  },
-  {
-    "generic": "Nystatin",
-    "brand": "Mycostatin",
-    "class": "Antifungal",
-    "category": "Dermatology",
-    "moa": "Binds to sterols in fungal cell membrane, changing the membrane permeability and allowing leakage of intracellular components.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 13,
-      "is_new": true,
-      "week": 13
-    }
-  },
-  {
-    "generic": "Hydrocortisone",
-    "brand": "Cortizone",
-    "class": "Corticosteroid",
-    "category": "Dermatology",
-    "moa": "Utilizes a multi-pathway mechanism to inhibit multiple inflammatory cytokines.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 13,
-      "is_new": true,
-      "week": 13
-    }
-  },
-  {
-    "generic": "Triamcinolone",
-    "brand": "Kenalog",
-    "class": "Corticosteroid",
-    "category": "Dermatology",
-    "moa": "Utilizes a multi-pathway mechanism to inhibit multiple inflammatory cytokines.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 13,
-      "is_new": true,
-      "week": 13
-    }
-  },
-  {
-    "generic": "Adapalene",
-    "brand": "Differin",
-    "class": "Retinoid",
-    "category": "Dermatology",
-    "moa": "Binds to specific retinoic acid nuclear receptors, modulating cell differentiation and keratinization.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 13,
-      "is_new": true,
-      "week": 13
-    }
-  },
-  {
-    "generic": "Lidocaine",
-    "brand": "Lidoderm",
-    "class": "Local Anesthetic",
-    "category": "Dermatology",
-    "moa": "Stabilizes neuronal membranes by inhibiting the ionic fluxes required for the initiation and conduction of impulses.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 13,
-      "is_new": true,
-      "week": 13
-    }
-  },
-  {
-    "generic": "Permethrin",
-    "brand": "Elimite",
-    "class": "Topical Antiparasitic",
-    "category": "Dermatology",
-    "moa": "Inhibits sodium ion influx through nerve cell membrane channels in parasites, causing paralysis and death.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 13,
-      "is_new": true,
-      "week": 13
-    }
-  },
-  {
-    "generic": "Imiquimod",
-    "brand": "Aldara",
-    "class": "Immune Response Modifier",
-    "category": "Dermatology",
-    "moa": "Induces cytokines, including interferon-alpha, to stimulate an immune response.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 13,
-      "is_new": true,
-      "week": 13
-    }
-  },
-  {
-    "generic": "Tacrolimus",
-    "brand": "Protopic",
-    "class": "Calcineurin Inhibitor",
-    "category": "Dermatology",
-    "moa": "Inhibits T-lymphocyte activation by binding to intracellular proteins and inhibiting calcineurin.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 13,
-      "is_new": true,
-      "week": 13
-    }
-  },
-  {
-    "generic": "Clobetasol",
-    "brand": "Temovate",
-    "class": "Corticosteroid",
-    "category": "Dermatology",
-    "moa": "Utilizes a multi-pathway mechanism to inhibit multiple inflammatory cytokines.",
-    "metadata": {
-      "lab": 2,
-      "quiz": 13,
-      "is_new": true,
-      "week": 13
-    }
-  },
-  {
-=======
     "category": "Osteoporosis",
     "moa": "Inhibits osteoclast-mediated bone resorption, leading to increased bone mineral density.",
     "metadata": { "lab": 2, "week": 8, "is_new": true }
@@ -1763,23 +655,13 @@
     "moa": "Has a direct antispasmodic effect on smooth muscle and also inhibits the action of acetylcholine on smooth muscle",
     "metadata": { "lab": 2, "week": 11, "is_new": true }
   },
-{
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
+  {
     "generic": "Lisinopril",
     "brand": "Zestril",
     "class": "Angiotensin-Converting Enzyme (ACE) Inhibitor",
     "category": "Antihypertensive",
     "moa": "Inhibits the conversion of angiotensin I to angiotensin II, causing vasodilation and reduction in the release of aldosterone.",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 1
-    }
-=======
     "metadata": { "lab": 1, "week": 1, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Amlodipine",
@@ -1787,16 +669,7 @@
     "class": "Calcium Channel Blocker (Dihydropyridine)",
     "category": "Antihypertensive",
     "moa": "Inhibits the influx of calcium ions into vascular smooth muscle and cardiac muscle, resulting in decreased peripheral vascular resistance and reduced blood pressure.",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 1
-    }
-=======
     "metadata": { "lab": 1, "week": 1, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Losartan",
@@ -1804,16 +677,7 @@
     "class": "Angiotensin II Receptor Blocker (ARB)",
     "category": "Antihypertensive",
     "moa": "Selectively blocks the binding of angiotensin II to the AT1 receptor, preventing vasoconstriction and reducing the secretion of aldosterone.",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 1
-    }
-=======
     "metadata": { "lab": 1, "week": 1, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Hydrochlorothiazide",
@@ -1821,29 +685,7 @@
     "class": "Thiazide Diuretic",
     "category": "Antihypertensive",
     "moa": "Inhibits sodium reabsorption in the distal tubules causing increased excretion of sodium and water, as well as potassium and hydrogen ions.",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 1
-    }
-  },
-  {
-    "generic": "Nifedipine",
-    "brand": "Procardia",
-    "class": "CCB (Dihydropyridine)",
-    "category": "Antihypertensive",
-    "moa": "Inhibits the influx of calcium ions into vascular smooth muscle and cardiac muscle.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 1
-    }
-=======
     "metadata": { "lab": 1, "week": 1, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Furosemide",
@@ -1851,14 +693,6 @@
     "class": "Loop Diuretic",
     "category": "Antihypertensive",
     "moa": "Inhibits the reabsorption of sodium and chloride in the ascending loop of Henle and distal renal tubule.",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 2
-    }
-=======
     "metadata": { "lab": 1, "week": 1, "is_new": false }
   },
   {
@@ -1900,7 +734,6 @@
     "category": "Antihypertensive",
     "moa": "Inhibits the influx of calcium ions into vascular smooth muscle and cardiac muscle, resulting in decreased peripheral vascular resistance and reduced blood pressure.",
     "metadata": { "lab": 1, "week": 2, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Hydralazine",
@@ -1908,101 +741,21 @@
     "class": "Vasodilator",
     "category": "Antihypertensive",
     "moa": "Directly relaxes arteriolar smooth muscle, reducing peripheral vascular resistance.",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 2
-    }
-=======
     "metadata": { "lab": 1, "week": 2, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Valsartan",
     "brand": "Diovan",
     "class": "Angiotensin II Receptor Blocker (ARB)",
     "category": "Antihypertensive",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "moa": "Inhibits the conversion of angiotensin I to angiotensin II, causing vasodilation.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 2
-    }
-=======
     "moa": "Selectively blocks the binding of angiotensin II to the AT1 receptor, preventing vasoconstriction and reducing the secretion of aldosterone.",
     "metadata": { "lab": 1, "week": 2, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Olmesartan",
     "brand": "Benicar",
     "class": "Angiotensin II Receptor Blocker (ARB)",
     "category": "Antihypertensive",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "moa": "Selectively blocks the binding of angiotensin II to the AT1 receptor.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 2
-    }
-  },
-  {
-    "generic": "Doxazosin",
-    "brand": "Cardura",
-    "class": "Alpha-1 Antagonist",
-    "category": "Antihypertensive / BPH",
-    "moa": "Competitively inhibits postsynaptic alpha-1 adrenergic receptors which results in vasodilation.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 2
-    }
-  },
-  {
-    "generic": "Terazosin",
-    "brand": "Hytrin",
-    "class": "Alpha-1 Antagonist",
-    "category": "Antihypertensive / BPH",
-    "moa": "Competitively inhibits postsynaptic alpha-1 adrenergic receptors which results in vasodilation.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 2
-    }
-  },
-  {
-    "generic": "Quinapril",
-    "brand": "Accupril",
-    "class": "ACE Inhibitor",
-    "category": "Antihypertensive",
-    "moa": "Inhibits the conversion of angiotensin I to angiotensin II, causing vasodilation.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 2
-    }
-  },
-  {
-    "generic": "Candesartan",
-    "brand": "Atacand",
-    "class": "ARB",
-    "category": "Antihypertensive",
-    "moa": "Selectively blocks the binding of angiotensin II to the AT1 receptor.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 2
-    }
-=======
     "moa": "Selectively blocks the binding of angiotensin II to the AT1 receptor, preventing vasoconstriction and reducing the secretion of aldosterone.",
     "metadata": { "lab": 1, "week": 2, "is_new": false }
   },
@@ -2013,43 +766,22 @@
     "category": "Antihypertensive",
     "moa": "Inhibits the conversion of angiotensin I to angiotensin II, causing vasodilation and reduction in the release of aldosterone.",
     "metadata": { "lab": 1, "week": 2, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Clonidine",
     "brand": "Catapres",
     "class": "Alpha-2 Adrenergic Agonist",
     "category": "Antihypertensive",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "moa": "Stimulates alpha-2 adrenergic receptors in the brainstem, reducing sympathetic outflow.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 3
-    }
-=======
     "moa": "Stimulates alpha-2 adrenergic receptors in the brainstem, reducing sympathetic outflow and decreasing blood pressure.",
     "metadata": { "lab": 1, "week": 2, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Diltiazem",
     "brand": "Cardizem",
     "class": "Calcium Channel Blocker (Non-Dihydropyridine)",
     "category": "Antihypertensive",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "moa": "Inhibits calcium influx into vascular smooth muscle and cardiac muscle; reduces heart rate.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 3
-    }
-=======
     "moa": "Inhibits the influx of calcium ions into vascular smooth muscle, leading to vasodilation and reduced heart rate.",
     "metadata": { "lab": 1, "week": 2, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Verapamil",
@@ -2064,155 +796,22 @@
     "brand": "Lopressor (tartrate), Toprol XL (succinate)",
     "class": "Beta Blocker",
     "category": "Antihypertensive",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "moa": "Selectively blocks beta-1 receptors, decreasing heart rate and cardiac output.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 3
-    }
-  },
-  {
-    "generic": "Spironolactone",
-    "brand": "Aldactone",
-    "class": "Potassium-Sparing Diuretic / Aldosterone Antagonist",
-    "category": "Antihypertensive",
-    "moa": "Competes with aldosterone in the distal renal tubules, increasing sodium and water excretion while conserving potassium.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 3
-    }
-  },
-  {
-    "generic": "Carvedilol",
-    "brand": "Coreg",
-    "class": "Beta-Blocker (Alpha/Beta)",
-    "category": "Antihypertensive",
-    "moa": "Nonselective beta-adrenoreceptor and alpha-adrenoreceptor antagonist.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 3
-    }
-  },
-  {
-    "generic": "Nebivolol",
-    "brand": "Bystolic",
-    "class": "Beta-1 Selective Blocker",
-    "category": "Antihypertensive",
-    "moa": "Selectively blocks beta-1 receptors and induces nitric oxide-mediated vasodilation.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 3
-    }
-  },
-  {
-    "generic": "Atenolol",
-    "brand": "Tenormin",
-    "class": "Beta-1 Selective Blocker",
-    "category": "Antihypertensive",
-    "moa": "Selectively blocks beta-1 receptors.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 3
-    }
-  },
-  {
-    "generic": "Labetalol",
-    "brand": "Trandate",
-    "class": "Beta-Blocker (Alpha/Beta)",
-    "category": "Antihypertensive",
-    "moa": "Blocks beta-1, beta-2, and alpha-1 receptors.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 3
-    }
-  },
-  {
-    "generic": "Propranolol",
-    "brand": "Inderal",
-    "class": "Non-selective Beta Blocker",
-    "category": "Antihypertensive",
-    "moa": "Nonselectively blocks beta-1 and beta-2 receptors.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 3
-    }
-  },
-  {
-    "generic": "Metoprolol Tartrate",
-    "brand": "Lopressor",
-    "class": "Beta-1 Selective Blocker",
-    "category": "Antihypertensive",
-    "moa": "Selectively blocks beta-1 receptors.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 3
-    }
-=======
     "moa": "Selectively blocks beta1-adrenergic receptors in the heart and smooth muscle, decreasing heart rate and contractility.",
     "metadata": { "lab": 1, "week": 2, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Simvastatin",
     "brand": "Zocor",
     "class": "HMG-CoA Reductase Inhibitor (Statin)",
     "category": "Antilipemic",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "moa": "Inhibits HMG-CoA reductase, the rate-limiting enzyme in cholesterol synthesis.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 4
-    }
-  },
-  {
-    "generic": "Atorvastatin",
-    "brand": "Lipitor",
-    "class": "HMG-CoA Reductase Inhibitor",
-    "category": "Antilipemic",
-    "moa": "Inhibits HMG-CoA reductase, the rate-limiting enzyme in cholesterol synthesis.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 4
-    }
-=======
     "moa": "Inhibits HMG-CoA reductase, reducing cholesterol synthesis and increasing LDL uptake from the blood.",
     "metadata": { "lab": 1, "week": 3, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Rosuvastatin",
     "brand": "Crestor",
     "class": "HMG-CoA Reductase Inhibitor (Statin)",
     "category": "Antilipemic",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "moa": "Inhibits HMG-CoA reductase, the rate-limiting enzyme in cholesterol synthesis.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 4
-    }
-=======
     "moa": "Inhibits HMG-CoA reductase, reducing cholesterol synthesis and increasing LDL uptake from the blood.",
     "metadata": { "lab": 1, "week": 3, "is_new": false }
   },
@@ -2223,58 +822,28 @@
     "category": "Antilipemic",
     "moa": "Inhibits HMG-CoA reductase, reducing cholesterol synthesis and increasing LDL uptake from the blood.",
     "metadata": { "lab": 1, "week": 3, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Pravastatin",
     "brand": "Pravachol",
     "class": "HMG-CoA Reductase Inhibitor (Statin)",
     "category": "Antilipemic",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "moa": "Inhibits HMG-CoA reductase, the rate-limiting enzyme in cholesterol synthesis.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 4
-    }
-=======
     "moa": "Inhibits HMG-CoA reductase, reducing cholesterol synthesis and increasing LDL uptake from the blood.",
     "metadata": { "lab": 1, "week": 3, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Fenofibrate",
     "brand": "Tricor",
     "class": "Fibric Acid Derivative",
     "category": "Antilipemic",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "moa": "Activates PPAR-alpha, increasing lipolysis and elimination of triglyceride-rich particles.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 4
-    }
-=======
     "moa": "Activates peroxisome proliferator-activated receptor-alpha (PPAR-a), leading to lipolysis and elimination of triglyceride-rich particles.",
     "metadata": { "lab": 1, "week": 3, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Niacin",
     "brand": "Niaspan (DSC), Niacor",
     "class": "Nicotinic Acid",
     "category": "Antilipemic",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "moa": "Stimulates the activity of lipoprotein lipase to decrease VLDL and triglycerides.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 4
-    }
-=======
     "moa": "Inhibits lipolysis in adipose tissue, reduces hepatic VLDL synthesis, and increases HDL levels.",
     "metadata": { "lab": 1, "week": 3, "is_new": false }
   },
@@ -2285,7 +854,6 @@
     "category": "Antilipemic",
     "moa": "Reduces hepatic triglyceride synthesis and increases plasma lipoprotein lipase activity.",
     "metadata": { "lab": 1, "week": 3, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Ezetimibe",
@@ -2293,57 +861,13 @@
     "class": "Cholesterol Absorption Inhibitor",
     "category": "Antilipemic",
     "moa": "Inhibits the absorption of cholesterol at the brush border of the small intestine.",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 5
-    }
-  },
-  {
-    "generic": "Omega-3 Acid Ethyl Esters",
-    "brand": "Lovaza",
-    "class": "Omega-3 Fatty Acid",
-    "category": "Antilipemic",
-    "moa": "Reduces hepatic synthesis of triglycerides and increases clearance from plasma.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 5
-    }
-  },
-  {
-    "generic": "Niacin",
-    "brand": "Niaspan",
-    "class": "Water-soluble Vitamin",
-    "category": "Antilipemic",
-    "moa": "Inhibits lipolysis in adipose tissue and reduces hepatic VLDL synthesis.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 5
-    }
-=======
     "metadata": { "lab": 1, "week": 3, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Evolocumab",
     "brand": "Repatha",
     "class": "PCSK9 Inhibitor",
     "category": "Antilipemic",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "moa": "Binds to PCSK9, increasing the number of available LDL receptors to clear LDL from the blood.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 5
-    }
-=======
     "moa": "Inhibits proprotein convertase subtilisin/kexin type 9 (PCSK9) which degrades LDL receptors; Increases the number of LDL receptors available to clear LDL.",
     "metadata": { "lab": 1, "week": 3, "is_new": false }
   },
@@ -2362,7 +886,6 @@
     "category": "Antilipemic",
     "moa": "Inhibits PCSK9 synthesis via RNA interference. This decreases PCSK9 activity, leading to less LDL receptor breakdown, more LDL receptors, and lower LDL levels.",
     "metadata": { "lab": 1, "week": 3, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Warfarin",
@@ -2370,49 +893,21 @@
     "class": "Vitamin K Antagonist",
     "category": "Anticoagulant",
     "moa": "Inhibits the synthesis of vitamin K-dependent clotting factors II, VII, IX, and X.",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 6
-    }
-=======
     "metadata": { "lab": 1, "week": 4, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Rivaroxaban",
     "brand": "Xarelto",
     "class": "Direct Factor Xa Inhibitor",
     "category": "Anticoagulant",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "moa": "Selectively and reversibly inhibits factor Xa, preventing thrombin generation.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 6
-    }
-=======
     "moa": "Inhibits factor Xa, preventing the conversion of prothrombin to thrombin.",
     "metadata": { "lab": 1, "week": 4, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Apixaban",
     "brand": "Eliquis",
     "class": "Direct Factor Xa Inhibitor",
     "category": "Anticoagulant",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "moa": "Selectively and reversibly inhibits factor Xa, preventing thrombin generation.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 6
-    }
-=======
     "moa": "Inhibits factor Xa, preventing the conversion of prothrombin to thrombin.",
     "metadata": { "lab": 1, "week": 4, "is_new": false }
   },
@@ -2423,71 +918,28 @@
     "category": "Anticoagulant",
     "moa": "Enhances the activity of antithrombin III, inhibiting thrombin and factor Xa.",
     "metadata": { "lab": 1, "week": 4, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Enoxaparin",
     "brand": "Lovenox",
     "class": "Low Molecular Weight Heparin",
     "category": "Anticoagulant",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "moa": "Potentiates antithrombin III, inhibiting factor Xa and thrombin.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 6
-    }
-=======
     "moa": "Enhances the activity of antithrombin III, inhibiting thrombin and factor Xa.",
     "metadata": { "lab": 1, "week": 4, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Amiodarone",
     "brand": "Nexterone (soln), Pacerone (tab)",
     "class": "Class III Antiarrhythmic",
     "category": "Antiarrhythmic",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "moa": "Inhibits potassium channels, prolonging action potential and refractory period.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 6
-    }
-  },
-  {
-    "generic": "Digoxin",
-    "brand": "Lanoxin",
-    "class": "Cardiac Glycoside",
-    "category": "Antiarrhythmic",
-    "moa": "Inhibits Na+/K+ ATPase, increasing force of contraction and slowing heart rate.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 6
-    }
-=======
     "moa": "Inhibits potassium channels responsible for repolarizatin of the cardiac cell membrane; Prolongs the action potential and refractory period of cardiac cells.",
     "metadata": { "lab": 1, "week": 5, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Sotalol",
     "brand": "Betapace",
     "class": "Class III Antiarrhythmic",
     "category": "Antiarrhythmic",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "moa": "Nonselectively blocks beta-receptors and potassium channels to prolong the action potential.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 6
-    }
-=======
     "moa": "Nonselectively blocks beta-adrenergic receptors and potassium channels to prolong the action potential and refractory period of cardiac cells.",
     "metadata": { "lab": 1, "week": 5, "is_new": false }
   },
@@ -2514,40 +966,20 @@
     "category": "Antiarrhythmic",
     "moa": "Inhibits potassium channels responsible for repolarizatin of the cardiac cell membrane; Prolongs the action potential and refractory period of cardiac cells.",
     "metadata": { "lab": 1, "week": 5, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Metformin",
     "brand": "Glucophage",
     "class": "Biguanide",
     "category": "Antidiabetic",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "moa": "Decreases hepatic glucose production and improves insulin sensitivity.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 6
-    }
-=======
     "moa": "Decreases hepatic glucose production, decreases intestinal absorption of glucose, and improves insulin sensitivity by increasing peripheral glucose uptake.",
     "metadata": { "lab": 1, "week": 6, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Insulin Glargine",
     "brand": "Lantus, Basaglar, Toujeo, Semglee",
     "class": "Long-acting Insulin",
     "category": "Antidiabetic",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "moa": "Stimulates peripheral glucose uptake and inhibits hepatic glucose production.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 6
-    }
-=======
     "moa": "Functions as basal glycemic control by regulating glucose metabolism; stimulates glucose uptake in skeletal muscle and fat and inhibits hepatic glucose production.",
     "metadata": { "lab": 1, "week": 6, "is_new": false }
   },
@@ -2598,40 +1030,20 @@
     "category": "Antidiabetic",
     "moa": "Activates glucose-dependent insulinotropic polypeptide (GIP) and glucagon-like peptide 1 (GLP-1) receptors to increase glucose-dependent insulin secretion, decrease inappropriate glucagon secretion, slow gastric emptying and decrease food intake.",
     "metadata": { "lab": 1, "week": 7, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Sitagliptin",
     "brand": "Januvia",
     "class": "DPP-4 Inhibitor",
     "category": "Antidiabetic",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "moa": "Inhibits DPP-4 enzyme, increasing active incretin hormones.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 6
-    }
-=======
     "moa": "Inhibits dipeptidyl peptidase-4 (DPP-4), increasing incretin levels and enhancing glucose-dependent insulin secretion.",
     "metadata": { "lab": 1, "week": 7, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Linagliptin",
     "brand": "Tradjenta",
     "class": "DPP-4 Inhibitor",
     "category": "Antidiabetic",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "moa": "Inhibits SGLT2 in proximal tubules, reducing renal glucose reabsorption.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 6
-    }
-=======
     "moa": "Inhibits dipeptidyl peptidase-4 (DPP-4), increasing incretin levels and enhancing glucose-dependent insulin secretion.",
     "metadata": { "lab": 1, "week": 7, "is_new": false }
   },
@@ -2642,71 +1054,28 @@
     "category": "Antidiabetic",
     "moa": "Increases insulin sensitivity by binding to peroxisome proliferator-activated receptor-gamma (PPAR- ).",
     "metadata": { "lab": 1, "week": 7, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Glipizide",
     "brand": "Glucotrol XL",
     "class": "Sulfonylurea",
     "category": "Antidiabetic",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "moa": "Stimulates insulin release from pancreatic beta cells.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 6
-    }
-  },
-  {
-    "generic": "Liraglutide",
-    "brand": "Victoza",
-    "class": "GLP-1 Receptor Agonist",
-    "category": "Antidiabetic",
-    "moa": "An analog of human GLP-1 that increases glucose-dependent insulin secretion and slows gastric emptying.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 8
-    }
-=======
     "moa": "Stimulates insulin release from pancreatic beta cells by blocking ATP-sensitive potassium channels.",
     "metadata": { "lab": 1, "week": 7, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Glimepiride",
     "brand": "Amaryl",
     "class": "Sulfonylurea",
     "category": "Antidiabetic",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "moa": "Stimulates insulin release from pancreatic beta cells.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 8
-    }
-=======
     "moa": "Stimulates insulin release from pancreatic beta cells by blocking ATP-sensitive potassium channels.",
     "metadata": { "lab": 1, "week": 7, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Dapagliflozin",
     "brand": "Farxiga",
     "class": "SGLT2 Inhibitor",
     "category": "Antidiabetic",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "moa": "Stimulates insulin release from pancreatic beta cells.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 8
-    }
-=======
     "moa": "Inhibits sodium-glucose cotransporter 2 (SGLT2) in the proximal renal tubules, reducing glucose reabsorption.",
     "metadata": { "lab": 1, "week": 7, "is_new": false }
   },
@@ -2717,48 +1086,12 @@
     "category": "Antidiabetic",
     "moa": "Inhibits sodium-glucose cotransporter 2 (SGLT2) in the proximal renal tubules, reducing glucose reabsorption.",
     "metadata": { "lab": 1, "week": 7, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Canagliflozin",
     "brand": "Invokana",
     "class": "SGLT2 Inhibitor",
     "category": "Antidiabetic",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "moa": "Inhibits SGLT2 in proximal tubules, reducing renal glucose reabsorption.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 8
-    }
-  },
-  {
-    "generic": "Sertraline",
-    "brand": "Zoloft",
-    "class": "SSRI",
-    "category": "Psychiatry",
-    "moa": "Inhibits the CNS neuronal reuptake of serotonin.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 10
-    }
-  },
-  {
-    "generic": "Fluoxetine",
-    "brand": "Prozac",
-    "class": "SSRI",
-    "category": "Psychiatry",
-    "moa": "Inhibits the CNS neuronal reuptake of serotonin.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 10
-    }
-=======
     "moa": "Inhibits sodium-glucose cotransporter 2 (SGLT2) in the proximal renal tubules, reducing glucose reabsorption.",
     "metadata": { "lab": 1, "week": 7, "is_new": false }
   },
@@ -2801,74 +1134,10 @@
     "category": "Anticonvulsant",
     "moa": "Stabilizes neuronal membranes and decreases seizure activity by increasing efflux or decreasing influx of sodium ions across cell membranes in the motor cortex during generation of nerve impulses",
     "metadata": { "lab": 1, "week": 8, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Escitalopram",
     "brand": "Lexapro",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "class": "SSRI",
-    "category": "Psychiatry",
-    "moa": "Inhibits the CNS neuronal reuptake of serotonin.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 10
-    }
-  },
-  {
-    "generic": "Duloxetine",
-    "brand": "Cymbalta",
-    "class": "SNRI",
-    "category": "Psychiatry",
-    "moa": "Inhibits neuronal serotonin and norepinephrine reuptake.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 10
-    }
-  },
-  {
-    "generic": "Venlafaxine",
-    "brand": "Effexor",
-    "class": "SNRI",
-    "category": "Psychiatry",
-    "moa": "Inhibits neuronal serotonin and norepinephrine reuptake.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 10
-    }
-  },
-  {
-    "generic": "Bupropion",
-    "brand": "Wellbutrin",
-    "class": "DNRI",
-    "category": "Psychiatry",
-    "moa": "Inhibits the reuptake of norepinephrine and dopamine.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 10
-    }
-  },
-  {
-    "generic": "Trazodone",
-    "brand": "Desyrel",
-    "class": "Serotonin Reuptake Inhibitor / Antagonist",
-    "category": "Psychiatry",
-    "moa": "Inhibits serotonin reuptake and blocks 5-HT2 receptors.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 10
-    }
-=======
     "class": "Selective Serotonin Reuptake Inhibitor (SSRI)",
     "category": "Antidepressant",
     "moa": "Inhibits the reuptake of serotonin in the brain, increasing serotonin levels in the synaptic cleft.",
@@ -2881,35 +1150,10 @@
     "category": "Antidepressant",
     "moa": "Inhibits the reuptake of serotonin in the brain, increasing serotonin levels in the synaptic cleft.",
     "metadata": { "lab": 1, "week": 9, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Citalopram",
     "brand": "Celexa",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "class": "SSRI",
-    "category": "Psychiatry",
-    "moa": "Inhibits the CNS neuronal reuptake of serotonin.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 10
-    }
-  },
-  {
-    "generic": "Paroxetine",
-    "brand": "Paxil",
-    "class": "SSRI",
-    "category": "Psychiatry",
-    "moa": "Inhibits the CNS neuronal reuptake of serotonin.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 10
-    }
-=======
     "class": "Selective Serotonin Reuptake Inhibitor (SSRI)",
     "category": "Antidepressant",
     "moa": "Inhibits the reuptake of serotonin in the brain, increasing serotonin levels in the synaptic cleft.",
@@ -2922,22 +1166,11 @@
     "category": "Antidepressant",
     "moa": "Inhibits serotonin reuptake and blocks histamine and alpha-1-adrenergic receptors.",
     "metadata": { "lab": 1, "week": 9, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Amitriptyline",
     "brand": "Elavil",
     "class": "Tricyclic Antidepressant",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "category": "Psychiatry",
-    "moa": "Increases the synaptic concentration of serotonin and/or norepinephrine in the CNS by inhibition of their reuptake.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 10
-    }
-=======
     "category": "Antidepressant",
     "moa": "Inhibits the reuptake of norepinephrine and serotonin, increasing their levels in the synaptic cleft.",
     "metadata": { "lab": 1, "week": 9, "is_new": false }
@@ -2957,48 +1190,11 @@
     "category": "Antidepressant",
     "moa": "Inhibits the reuptake of serotonin in the brain, increasing serotonin levels in the synaptic cleft.",
     "metadata": { "lab": 1, "week": 9, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Mirtazapine",
     "brand": "Remeron",
     "class": "Alpha-2 Antagonist",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "category": "Psychiatry",
-    "moa": "Antagonizes central presynaptic alpha-2 adrenergic receptors which results in increased release of norepinephrine and serotonin.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 10
-    }
-  },
-  {
-    "generic": "Alprazolam",
-    "brand": "Xanax",
-    "class": "Benzodiazepine",
-    "category": "Psychiatry",
-    "moa": "Binds to stereospecific benzodiazepine receptors on the postsynaptic GABA neuron.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 11
-    }
-  },
-  {
-    "generic": "Zolpidem",
-    "brand": "Ambien",
-    "class": "Non-benzodiazepine Hypnotic",
-    "category": "Psychiatry",
-    "moa": "Binds to GABA-A receptors, specifically the BZ1 receptor subunit.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 11
-    }
-=======
     "category": "Antidepressant",
     "moa": "Increases dopamine release in the brain by blocking a2-adrenergic and 5-HT2C receptors.",
     "metadata": { "lab": 1, "week": 9, "is_new": false }
@@ -3026,79 +1222,34 @@
     "category": "Antidepressant",
     "moa": "Inhibits the reuptake of serotonin and norepinephrine, increasing their levels in the synaptic cleft.",
     "metadata": { "lab": 1, "week": 9, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Quetiapine",
     "brand": "Seroquel",
     "class": "Atypical Antipsychotic",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "category": "Psychiatry",
-    "moa": "Antagonist at multiple neurotransmitter receptors, including serotonin and dopamine.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 11
-    }
-=======
     "category": "Antipsychotic",
     "moa": "Antagonizes dopamine D2 receptors and serotonin 5-HT2 receptors, leading to antipsychotic effects.",
     "metadata": { "lab": 1, "week": 10, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Risperidone",
     "brand": "Risperdal",
     "class": "Atypical Antipsychotic",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "category": "Psychiatry",
-    "moa": "Antagonist at dopamine D2 and serotonin 5-HT2 receptors.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 11
-    }
-=======
     "category": "Antipsychotic",
     "moa": "Antagonizes dopamine D2 receptors and serotonin 5-HT2 receptors, leading to antipsychotic effects.",
     "metadata": { "lab": 1, "week": 10, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Aripiprazole",
     "brand": "Abilify",
     "class": "Atypical Antipsychotic",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "category": "Psychiatry",
-    "moa": "Antagonist at dopamine D1-4 and serotonin 5-HT2 receptors.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 11
-    }
-=======
     "category": "Antipsychotic",
     "moa": "Partial agonist at dopamine D2 and serotonin 5-HT1A receptors and antagonist at serotonin 5-HT2A receptors.",
     "metadata": { "lab": 1, "week": 10, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Haloperidol",
     "brand": "Haldol",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "class": "First-Generation Antipsychotic",
-    "category": "Psychiatry",
-    "moa": "Blocks postsynaptic mesolimbic dopaminergic D2 receptors in the brain.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 11
-    }
-=======
     "class": "Typical Antipsychotic (Butyrophenone)",
     "category": "Antipsychotic",
     "moa": "Nonselectively inhibits dopamine D2 receptors in the brain.",
@@ -3119,393 +1270,18 @@
     "category": "Benzodiazepine",
     "moa": "Enhances the effect of GABA by binding to its receptor in the CNS.",
     "metadata": { "lab": 1, "week": 11, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Diazepam",
     "brand": "Valium",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "class": "Benzodiazepine",
-    "category": "Psychiatry",
-    "moa": "Binds to stereospecific benzodiazepine receptors on the postsynaptic GABA neuron.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 11
-    }
-=======
     "class": "Benzodiazepine (Anxiolytic)",
     "category": "Benzodiazepine",
     "moa": "Enhances the effect of GABA by binding to its receptor in the CNS.",
     "metadata": { "lab": 1, "week": 11, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   },
   {
     "generic": "Lorazepam",
     "brand": "Ativan",
-<<<<<<< HEAD:assets/data/master_pool.json
-    "class": "Benzodiazepine",
-    "category": "Psychiatry",
-    "moa": "Binds to stereospecific benzodiazepine receptors on the postsynaptic GABA neuron.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 11
-    }
-  },
-  {
-    "generic": "Buspirone",
-    "brand": "Buspar",
-    "class": "Anxiolytic",
-    "category": "Psychiatry",
-    "moa": "High affinity for serotonin 5-HT1A and 5-HT2 receptors; moderate affinity for dopamine D2 receptors.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 11
-    }
-  },
-  {
-    "generic": "Lithium",
-    "brand": "Lithobid",
-    "class": "Antimanic Agent",
-    "category": "Psychiatry",
-    "moa": "Alters cation transport in nerve and muscle cells and influences reuptake of serotonin and norepinephrine.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 11
-    }
-  },
-  {
-    "generic": "Hydroxyzine",
-    "brand": "Atarax; Vistaril",
-    "class": "Antihistamine",
-    "category": "Psychiatry / Allergy",
-    "moa": "Competes with histamine for H1-receptor sites in the GI tract, blood vessels, and respiratory tract.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 11
-    }
-  },
-  {
-    "generic": "Donepezil",
-    "brand": "Aricept",
-    "class": "Cholinesterase Inhibitor",
-    "category": "Neurology",
-    "moa": "Reversibly inhibits acetylcholinesterase, increasing acetylcholine concentrations.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 12
-    }
-  },
-  {
-    "generic": "Memantine",
-    "brand": "Namenda",
-    "class": "NMDA Receptor Antagonist",
-    "category": "Neurology",
-    "moa": "Uncompetitive NMDA receptor antagonist that binds to NMDA receptor-operated cation channels.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 12
-    }
-  },
-  {
-    "generic": "Gabapentin",
-    "brand": "Neurontin",
-    "class": "Gaba Analog",
-    "category": "Neurology",
-    "moa": "Binds to voltage-gated calcium channels to modulate neurotransmitter release.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 12
-    }
-  },
-  {
-    "generic": "Valproic Acid",
-    "brand": "Depakote",
-    "class": "Anticonvulsant",
-    "category": "Neurology",
-    "moa": "Causes increased availability of GABA to brain neurons or may enhance the action of GABA.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 12
-    }
-  },
-  {
-    "generic": "Phenytoin",
-    "brand": "Dilantin",
-    "class": "Anticonvulsant",
-    "category": "Neurology",
-    "moa": "Stabilizes neuronal membranes and decreases seizure activity by increasing efflux or decreasing influx of sodium ions.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 12
-    }
-  },
-  {
-    "generic": "Carbamazepine",
-    "brand": "Tegretol",
-    "class": "Anticonvulsant",
-    "category": "Neurology",
-    "moa": "Decreases synaptic transmission by limiting the influx of sodium ions across cell membranes.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 12
-    }
-  },
-  {
-    "generic": "Ropinirole",
-    "brand": "Requip",
-    "class": "Dopamine Agonist",
-    "category": "Neurology",
-    "moa": "Stimulates dopamine receptors in the corpus striatum.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 12
-    }
-  },
-  {
-    "generic": "Pramipexole",
-    "brand": "Mirapex",
-    "class": "Dopamine Agonist",
-    "category": "Neurology",
-    "moa": "Stimulates dopamine receptors in the corpus striatum.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 12
-    }
-  },
-  {
-    "generic": "Baclofen",
-    "brand": "Lioresal",
-    "class": "Skeletal Muscle Relaxant",
-    "category": "Neurology",
-    "moa": "Inhibits monosynaptic and polysynaptic reflexes at the spinal level by hyperpolarization of afferent terminals.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 12
-    }
-  },
-  {
-    "generic": "Cyclobenzaprine",
-    "brand": "Flexeril",
-    "class": "Skeletal Muscle Relaxant",
-    "category": "Neurology",
-    "moa": "Reduces tonic somatic motor activity influencing both alpha and gamma motor neurons.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 12
-    }
-  },
-  {
-    "generic": "Tizanidine",
-    "brand": "Zanaflex",
-    "class": "Alpha-2 Adrenergic Agonist",
-    "category": "Neurology",
-    "moa": "Alpha-2 adrenergic agonist that decreases excitatory amino acid release from spinal interneurons.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 12
-    }
-  },
-  {
-    "generic": "Methocarbamol",
-    "brand": "Robaxin",
-    "class": "Skeletal Muscle Relaxant",
-    "category": "Neurology",
-    "moa": "Causes general CNS depression; has no direct action on the contractile mechanism of striated muscle.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 12
-    }
-  },
-  {
-    "generic": "Penicillin V Potassium",
-    "brand": "Pen-VK",
-    "class": "Penicillin Antibiotic",
-    "category": "Antibiotic",
-    "moa": "Inhibits bacterial cell wall synthesis by binding to penicillin-binding proteins (PBPs).",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 13
-    }
-  },
-  {
-    "generic": "Cephalexin",
-    "brand": "Keflex",
-    "class": "1st Generation Cephalosporin",
-    "category": "Antibiotic",
-    "moa": "Inhibits bacterial cell wall synthesis by binding to penicillin-binding proteins (PBPs).",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 13
-    }
-  },
-  {
-    "generic": "Cefdinir",
-    "brand": "Omnicef",
-    "class": "3rd Generation Cephalosporin",
-    "category": "Antibiotic",
-    "moa": "Inhibits bacterial cell wall synthesis by binding to penicillin-binding proteins (PBPs).",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 13
-    }
-  },
-  {
-    "generic": "Clarithromycin",
-    "brand": "Biaxin",
-    "class": "Macrolide Antibiotic",
-    "category": "Antibiotic",
-    "moa": "Inhibits RNA-dependent protein synthesis by binding to the 50S ribosomal subunit.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 13
-    }
-  },
-  {
-    "generic": "Levofloxacin",
-    "brand": "Levaquin",
-    "class": "Fluoroquinolone Antibiotic",
-    "category": "Antibiotic",
-    "moa": "Inhibits DNA-gyrase, inhibiting relaxation of supercoiled DNA and promoting breakage of double-stranded DNA.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 13
-    }
-  },
-  {
-    "generic": "Nitrofurantoin",
-    "brand": "Macrobid",
-    "class": "Nitrofuran Antibiotic",
-    "category": "Antibiotic",
-    "moa": "Inactivates or alters bacterial ribosomal proteins and other macromolecules.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 13
-    }
-  },
-  {
-    "generic": "Fluconazole",
-    "brand": "Diflucan",
-    "class": "Antifungal",
-    "category": "Antibiotic",
-    "moa": "Inhibits biosynthesis of ergosterol or other sterols, damaging the fungal cell wall membrane.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 14
-    }
-  },
-  {
-    "generic": "Acyclovir",
-    "brand": "Zovirax",
-    "class": "Antiviral",
-    "category": "Antibiotic",
-    "moa": "Inhibits DNA synthesis and viral replication by competing with deoxyguanosine triphosphate for viral DNA polymerase.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 14
-    }
-  },
-  {
-    "generic": "Valacyclovir",
-    "brand": "Valtrex",
-    "class": "Antiviral",
-    "category": "Antibiotic",
-    "moa": "Rapidly converted to acyclovir, which inhibits DNA synthesis and viral replication.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 14
-    }
-  },
-  {
-    "generic": "Oseltamivir",
-    "brand": "Tamiflu",
-    "class": "Neuraminidase Inhibitor",
-    "category": "Antibiotic",
-    "moa": "Inhibits influenza virus neuraminidase, preventing the release of viral particles from infected cells.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 14
-    }
-  },
-  {
-    "generic": "Fluticasone Propionate",
-    "brand": "Flonase",
-    "class": "Corticosteroid",
-    "category": "Respiratory",
-    "moa": "Utilizes a multi-pathway mechanism to inhibit multiple inflammatory cytokines.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 15
-    }
-  },
-  {
-    "generic": "Ipratropium / Albuterol",
-    "brand": "Combivent",
-    "class": "Anticholinergic / SABA",
-    "category": "Respiratory",
-    "moa": "Ipratropium blocks acetylcholine at muscarinic receptors; Albuterol relaxes bronchial smooth muscle via beta-2 receptors.",
-    "metadata": {
-      "lab": 1,
-      "quiz": 1,
-      "is_new": false,
-      "week": 15
-    }
-=======
     "class": "Benzodiazepine (Anticonvulsant)",
     "category": "Benzodiazepine",
     "moa": "Enhances the effect of GABA by binding to its receptor in the CNS.",
@@ -3518,6 +1294,5 @@
     "category": "Anxiolytic",
     "moa": "Largely unknown, but does have high affinity for serotonin 5-HT1A and 5-HT2 receptors without affecting benzodiazepine-GABA receptors.",
     "metadata": { "lab": 1, "week": 11, "is_new": false }
->>>>>>> quiz-engine-refactor-4885366974787880915:v2-generator/master_pool.json
   }
 ]
