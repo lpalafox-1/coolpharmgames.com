@@ -53,69 +53,45 @@ function runHome() {
   document.getElementById("start-now")?.addEventListener("click", handleStart);
   document.getElementById("skip")?.addEventListener("click", handleStart);
 
-  // 3) Progress Tracking: Lab II COP (Weeks 1-11)
+// 3) Progress Tracking: Lab II Mastery
   for (let w = 1; w <= 11; w++) {
     const scoreKey = `pharmlet.week${w}.easy`; 
     const savedData = localStorage.getItem(scoreKey);
     
     if (savedData) {
-      try {
-        const stats = JSON.parse(savedData);
-        const percent = Math.round((stats.score / stats.total) * 100);
-        
-        // Fill the mini progress bars if they exist (Featured Section)
-        const bar = document.getElementById(`prog-week-${w}`);
-        if (bar) {
-          bar.style.width = `${percent}%`;
-          if (percent === 100) bar.style.background = "#10b981";
-        }
+      const stats = JSON.parse(savedData);
+      const percent = Math.round((stats.score / stats.total) * 100);
+      
+      const bar = document.getElementById(`prog-week-${w}`);
+      if (bar) bar.style.width = `${percent}%`;
 
-        // Apply visual checkmarks and borders to the main grid
-        const gridBtn = document.querySelector(`a[href="quiz.html?week=${w}"]`);
-        if (gridBtn) {
-          gridBtn.style.borderColor = "#10b981";
-          gridBtn.classList.add("bg-green-500/5");
-          if (!gridBtn.innerHTML.includes("✓")) {
-            gridBtn.innerHTML += ` <span class="text-green-500 ml-1">✓</span>`;
+      // BADASS MASTERY LOGIC: Only show checkmark if score is 90% or higher
+      if (percent >= 90) {
+        const btns = document.querySelectorAll(`a[href="quiz.html?week=${w}"]`);
+        btns.forEach(btn => {
+          if (!btn.innerHTML.includes("✓")) {
+            btn.classList.add("border-green-500/50");
+            btn.innerHTML += ` <span class="text-green-500">✓</span>`;
           }
-        }
-      } catch (e) {
-        console.warn(`Failed to parse stats for week ${w}`, e);
+        });
       }
     }
   }
 
-  // 4) SMART RESUME LOGIC (Fixed for Week-based URLs)
-  const resumeWrap = document.getElementById("resume-wrap");
+  // 4) SMART RESUME
   const resumeLink = document.getElementById("resume-link");
-  if (resumeWrap && resumeLink) {
-    try {
-      let lastKey = null;
-      // Iterate backwards to find the most recent quiz state
-      for (let i = localStorage.length - 1; i >= 0; i--) {
-        const k = localStorage.key(i);
-        if (k && k.startsWith("pharmlet.") && k.split(".").length === 3) {
-          lastKey = k;
-          break; 
-        }
-      }
-
-      if (lastKey) {
-        const parts = lastKey.split("."); // pharmlet.ID.MODE
-        const quizId = parts[1];
-        const mode = parts[2] || "easy";
-
-        if (quizId.startsWith("week")) {
-          // Dynamic Lab II Week
-          resumeLink.href = `quiz.html?week=${quizId.replace("week", "")}`;
-        } else {
-          // Legacy Static Quiz
-          resumeLink.href = `quiz.html?id=${encodeURIComponent(quizId)}&mode=${encodeURIComponent(mode)}&limit=20`;
-        }
-        resumeWrap.style.display = "";
-      }
-    } catch (e) {
-      console.warn("Resume detection failed:", e);
+  if (resumeLink) {
+    let lastKey = null;
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i);
+      if (k?.startsWith("pharmlet.") && k.split(".").length === 3) { lastKey = k; break; }
+    }
+    if (lastKey) {
+      const parts = lastKey.split(".");
+      resumeLink.href = parts[1].startsWith("week") 
+        ? `quiz.html?week=${parts[1].replace("week","")}` 
+        : `quiz.html?id=${parts[1]}&mode=${parts[2]||'easy'}&limit=20`;
+      document.getElementById("resume-wrap").style.display = "";
     }
   }
 
