@@ -4,31 +4,34 @@ const quizId = params.get("id");
 const weekParam = parseInt(params.get("week") || "", 10);
 const limitParam = parseInt(params.get("limit") || "", 10);
 
+// SAFE ELEMENT LOADER: Prevents script crash if an ID is missing in HTML
+const getEl = (id) => document.getElementById(id) || console.warn(`Missing ID: ${id}`);
+
 const els = {
-  title: document.getElementById("quiz-title"),
-  qnum: document.getElementById("qnum"),
-  qtotal: document.getElementById("qtotal"),
-  score: document.getElementById("score"),
-  prompt: document.getElementById("prompt"),
-  options: document.getElementById("options"),
-  shortWrap: document.getElementById("short-wrap"),
-  shortInput: document.getElementById("short-input"),
-  explain: document.getElementById("explain"),
-  prev: document.getElementById("prev"),
-  next: document.getElementById("next"),
-  check: document.getElementById("check"),
-  restart: document.getElementById("restart"),
-  results: document.getElementById("results"),
-  final: document.getElementById("final-score"),
-  card: document.getElementById("question-card"),
-  navMap: document.getElementById("nav-map"), 
-  timerReadout: document.getElementById("timer-readout"),
-  mark: document.getElementById("mark"),
-  hintBtn: document.getElementById("hint-btn"),
-  revealBtn: document.getElementById("reveal-solution"),
-  themeToggle: document.getElementById("theme-toggle"),
-  helpShortcuts: document.getElementById("help-shortcuts"),
-  drugCtx: document.getElementById("drug-context")
+  title: getEl("quiz-title"),
+  qnum: getEl("qnum"),
+  qtotal: getEl("qtotal"),
+  score: getEl("score"),
+  prompt: getEl("prompt"),
+  options: getEl("options"),
+  shortWrap: getEl("short-wrap"),
+  shortInput: getEl("short-input"),
+  explain: getEl("explain"),
+  prev: getEl("prev"),
+  next: getEl("next"),
+  check: getEl("check"),
+  restart: getEl("restart"),
+  results: getEl("results"),
+  final: getEl("final-score"),
+  card: getEl("question-card"),
+  navMap: getEl("nav-map"), 
+  timerReadout: getEl("timer-readout"),
+  mark: getEl("mark"),
+  hintBtn: getEl("hint-btn"),
+  revealBtn: getEl("reveal-solution"),
+  themeToggle: getEl("theme-toggle"),
+  helpShortcuts: getEl("help-shortcuts"),
+  drugCtx: getEl("drug-context")
 };
 
 const state = { 
@@ -44,9 +47,7 @@ const GAME_PLAN = {
 
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
-  main().catch(err => {
-    console.error("Quiz failed to load:", err);
-  });
+  main().catch(err => console.error("Initialization Error:", err));
 });
 
 async function main() {
@@ -146,6 +147,7 @@ function wireEvents() {
   };
   if (els.restart) els.restart.onclick = () => location.reload();
 
+  // FONT SCALING (A+ / A-)
   const fontInc = document.getElementById("font-increase");
   const fontDec = document.getElementById("font-decrease");
   if (fontInc && fontDec) {
@@ -156,8 +158,10 @@ function wireEvents() {
     };
     fontDec.onclick = (e) => { 
       e.preventDefault();
-      if(state.currentScale > 0.7) state.currentScale -= 0.1; 
-      document.documentElement.style.setProperty('--quiz-size', `${state.currentScale}rem`); 
+      if(state.currentScale > 0.7) {
+        state.currentScale -= 0.1; 
+        document.documentElement.style.setProperty('--quiz-size', `${state.currentScale}rem`); 
+      }
     };
   }
 
@@ -165,10 +169,7 @@ function wireEvents() {
     els.helpShortcuts.onclick = (e) => {
       e.preventDefault();
       const modal = document.getElementById("shortcuts-modal");
-      if (modal) {
-        modal.style.display = "flex";
-        modal.classList.remove("hidden");
-      }
+      if (modal) { modal.style.display = "flex"; modal.classList.remove("hidden"); }
     };
   }
   const closeBtn = document.getElementById("close-shortcuts");
@@ -226,6 +227,7 @@ function render() {
   const q = state.questions[state.index];
   if (!q) return;
 
+  // NUCLEAR SPOILER FIX
   if (els.drugCtx) {
     const isSpoiler = q.prompt.toLowerCase().includes('class') || q.prompt.toLowerCase().includes('moa');
     els.drugCtx.textContent = isSpoiler ? "Drug Review" : (q.drugRef?.category || "");
@@ -281,7 +283,7 @@ function renderNavMap() {
 
 function scoreCurrent(val) {
   const q = state.questions[state.index];
-  const isCorrect = val.trim().toLowerCase() === q.answer.toLowerCase();
+  const isCorrect = (val === "Revealed") ? false : (val.trim().toLowerCase() === q.answer.toLowerCase());
   q._answered = true; q._user = val;
   q._correct = isCorrect;
   if (isCorrect) state.score++;
