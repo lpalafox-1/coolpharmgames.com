@@ -51,6 +51,27 @@ async function main() {
   if (els.title) els.title.textContent = state.title;
   if (els.qtotal) els.qtotal.textContent = state.questions.length;
   
+  // ... inside wireEvents() ...
+  window.onkeydown = (e) => {
+    if (document.activeElement.tagName === 'INPUT' && e.key !== 'Enter') return;
+    
+    // mastery navigation (1-9 and 0 for 10)
+    if (e.key >= '1' && e.key <= '9') {
+      const idx = parseInt(e.key) - 1;
+      if (state.questions[idx]) { state.index = idx; render(); }
+    } else if (e.key === '0') {
+      if (state.questions[9]) { state.index = 9; render(); }
+    }
+    
+    if (e.key === "ArrowRight") { if (state.index < state.questions.length - 1) { state.index++; render(); } } 
+    else if (e.key === "ArrowLeft") { if (state.index > 0) { state.index--; render(); } } 
+    else if (e.key.toLowerCase() === "t") { if (els.timerReadout) els.timerReadout.click(); } 
+    else if (e.key.toLowerCase() === "m") { if (els.mark) els.mark.click(); }
+    else if (e.key === "Enter") { 
+      if (!state.questions[state.index]._answered) els.check.click(); 
+      else if (state.index < state.questions.length - 1) els.next.click(); 
+    }
+  };
   startSmartTimer(); 
   wireEvents();
   render();
