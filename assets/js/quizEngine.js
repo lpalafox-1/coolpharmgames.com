@@ -11,6 +11,8 @@ const mode   = (params.get("mode") || "easy").toLowerCase();
 const limitParam = parseInt(params.get("limit") || "", 10);
 const seedParam  = parseInt(params.get("seed")  || "", 10);
 
+let masterPoolData = null;
+
 const els = {
   title: document.getElementById("quiz-title"),
   qnum: document.getElementById("qnum"),
@@ -42,6 +44,21 @@ const els = {
 
 const THEME_KEY = "quiz-theme";
 let masterPoolData = null; // Cache for dynamic restarts
+
+// --- STRICT SYLLABUS CONFIGURATION ---
+const QUIZ_CONFIG = {
+  'log-lab-2-quiz-1': { newWeek: 1, reviewWeeks: [1, 2, 3] },
+  'log-lab-2-quiz-2': { newWeek: 2, reviewWeeks: [4, 5, 6] },
+  'log-lab-2-quiz-3': { newWeek: 3, reviewWeeks: [6, 7] },
+  'log-lab-2-quiz-4': { newWeek: 4, reviewWeeks: [8] }, // Strict Constraint
+  'log-lab-2-quiz-5': { newWeek: 5, reviewWeeks: [9] },
+  'log-lab-2-quiz-6': { newWeek: 6, reviewWeeks: [10, 11] },
+  'log-lab-2-quiz-7': { newWeek: 7, reviewWeeks: 'ALL' },
+  'log-lab-2-quiz-8': { newWeek: 8, reviewWeeks: 'ALL' },
+  'log-lab-2-quiz-9': { newWeek: 9, reviewWeeks: 'ALL' },
+  'log-lab-2-quiz-10': { newWeek: 10, reviewWeeks: 'ALL' },
+  'log-lab-2-quiz-11': { newWeek: 11, reviewWeeks: 'ALL' }
+};
 
 // Wait for DOM to be ready before setting up theme
 if (document.readyState === 'loading') {
@@ -118,17 +135,59 @@ async function main() {
 
 async function loadDynamicQuiz() {
   if (!masterPoolData) {
+<<<<<<< HEAD
     const res = await fetch("assets/data/master_pool.json", { cache: "no-store" });
+=======
+    const res = await fetch("master_pool.json", { cache: "no-store" });
+>>>>>>> quiz-engine-refactor-4885366974787880915
     if (!res.ok) throw new Error(`Failed to load master pool: ${res.status}`);
     masterPoolData = await res.json();
   }
 
+<<<<<<< HEAD
   const generated = generateQuizFromPool(masterPoolData, weekParam);
   state.title = generated.title;
   state.questions = generated.questions.map((q, i) => ({
     ...q,
     _answered:false, _correct:false, _user:null,
     _choices: Array.isArray(q.choices) ? shuffledCopy(q.choices) : (q.type === "tf" ? ["True","False"] : null),
+=======
+  // If generation produced zero questions, attempt fallback to v2-generator master pool
+  if (!masterPoolData || masterPoolData.length === 0) {
+    try {
+      const altRes = await fetch("v2-generator/master_pool.json", { cache: "no-store" });
+      if (altRes.ok) {
+        const alt = await altRes.json();
+        // merge unique entries by generic+brand
+        const seen = new Set(masterPoolData.map(d => `${d.generic}||${d.brand}`));
+        const merged = masterPoolData.slice();
+        alt.forEach(d => {
+          const key = `${d.generic}||${d.brand}`;
+          if (!seen.has(key)) { seen.add(key); merged.push(d); }
+        });
+        masterPoolData = merged;
+      }
+    } catch (e) {
+      // swallow fallback errors; we'll surface empty quiz to user later
+    }
+  }
+
+  // Set global window.masterPool for generateQuiz function
+  window.masterPool = masterPoolData;
+
+  // Generate quiz using strict config
+  const dynamicQuizId = `log-lab-2-quiz-${weekParam}`;
+  const selectedDrugs = generateQuiz(dynamicQuizId);
+
+  // Convert drugs to questions
+  const questions = selectedDrugs.map(drug => createQuestion(drug, masterPoolData));
+
+  state.title = `Log Lab 2 Week ${QUIZ_CONFIG[dynamicQuizId]?.newWeek || weekParam}`;
+  state.questions = questions.map((q, i) => ({
+    ...q,
+    _answered:false, _correct:false, _user:null,
+    _choices: Array.isArray(q.choices) ? shuffledCopy(q.choices) : (q.type === "tf" ? ["True","false"] : null),
+>>>>>>> quiz-engine-refactor-4885366974787880915
     _id: i
   }));
 }
@@ -176,7 +235,7 @@ async function loadStaticQuiz() {
   state.questions = pool.map((q, i) => ({
     ...q,
     _answered:false, _correct:false, _user:null,
-    _choices: Array.isArray(q.choices) ? shuffledCopy(q.choices) : (q.type === "tf" ? ["True","False"] : null),
+    _choices: Array.isArray(q.choices) ? shuffledCopy(q.choices) : (q.type === "tf" ? ["True","false"] : null),
     _id: i
   }));
 }
@@ -200,6 +259,7 @@ function finalizeSetup() {
 
 /* ---------- DYNAMIC GENERATION LOGIC ---------- */
 
+<<<<<<< HEAD
 function generateQuizFromPool(masterPool, week) {
   // 1. Define Review Schedule (Lab 1)
   let lab1Filter;
@@ -232,6 +292,47 @@ function generateQuizFromPool(masterPool, week) {
     title: `Log Lab 2 Week ${week}`,
     questions: questions
   };
+=======
+function generateQuiz(quizId) {
+  // 1. Check if this is a strict Log Lab 2 quiz
+  const config = QUIZ_CONFIG[quizId];
+  if (!config) {
+    // Fallback for old legacy quizzes
+    console.log('Legacy quiz detected:', quizId);
+    return []; 
+  }
+
+  const pool = window.masterPool || [];
+  let selectedQuestions = [];
+
+  // 2. Fetch NEW Material (6 Questions)
+  // STRICTLY matching lab 2 and the specific new week
+  let newMaterial = pool.filter(d => Number(d.metadata?.lab) === 2 && Number(d.metadata?.week) === config.newWeek);
+  newMaterial = newMaterial.sort(() => 0.5 - Math.random()).slice(0, 6);
+  selectedQuestions.push(...newMaterial);
+
+  // 3. Fetch REVIEW Material (Fill to 10)
+  let reviewPool = [];
+  if (config.reviewWeeks === 'ALL') {
+    reviewPool = pool.filter(d => Number(d.metadata?.lab) === 1);
+  } else {
+    // STRICTLY matching lab 1 and the allowed review weeks array
+    reviewPool = pool.filter(d => Number(d.metadata?.lab) === 1 && config.reviewWeeks.includes(Number(d.metadata?.week)));
+  }
+
+  // Fill remaining slots
+  let needed = 10 - selectedQuestions.length;
+  let reviewQuestions = reviewPool.sort(() => 0.5 - Math.random()).slice(0, needed);
+  selectedQuestions.push(...reviewQuestions);
+
+  // 4. Emergency Backfill (Only from allowed review pool)
+  while (selectedQuestions.length < 10 && reviewPool.length > 0) {
+    let extra = reviewPool[Math.floor(Math.random() * reviewPool.length)];
+    if (!selectedQuestions.includes(extra)) selectedQuestions.push(extra);
+  }
+
+  return selectedQuestions;
+>>>>>>> quiz-engine-refactor-4885366974787880915
 }
 
 function createQuestion(drug, allDrugs) {
@@ -243,8 +344,12 @@ function createQuestion(drug, allDrugs) {
   if (drug.moa) { types.push("moa"); }
 
   if (types.length === 0) {
+<<<<<<< HEAD
       // Fallback
       return { type: "short", prompt: `Error: No data for ${drug.generic}`, answer: "error" };
+=======
+    return { type: "short", prompt: `Error: No data for ${drug.generic}`, answer: "error" };
+>>>>>>> quiz-engine-refactor-4885366974787880915
   }
 
   const type = types[Math.floor(Math.random() * types.length)];
@@ -254,7 +359,11 @@ function createQuestion(drug, allDrugs) {
     case "brand-generic":
       q = {
         type: "short",
+<<<<<<< HEAD
         prompt: `What is the generic name for <strong>${drug.brand}</strong>?`,
+=======
+        prompt: `What is the generic name for ${drug.brand}?`,
+>>>>>>> quiz-engine-refactor-4885366974787880915
         answerText: [drug.generic.toLowerCase()],
         mapping: { generic: drug.generic, brand: drug.brand }
       };
@@ -262,28 +371,44 @@ function createQuestion(drug, allDrugs) {
     case "generic-brand":
       q = {
         type: "short",
+<<<<<<< HEAD
         prompt: `What is the brand name for <strong>${drug.generic}</strong>?`,
+=======
+        prompt: `What is the brand name for ${drug.generic}?`,
+>>>>>>> quiz-engine-refactor-4885366974787880915
         answerText: [drug.brand.toLowerCase()],
         mapping: { generic: drug.generic, brand: drug.brand }
       };
       break;
     case "class":
       q = createMCQ(
+<<<<<<< HEAD
         `Which class does <strong>${drug.generic}</strong> belong to?`,
+=======
+        `Which class does ${drug.generic} belong to?`,
+>>>>>>> quiz-engine-refactor-4885366974787880915
         drug.class,
         getDistractors(drug.class, allDrugs, d => d.class, 3)
       );
       break;
     case "category":
       q = createMCQ(
+<<<<<<< HEAD
         `What is the category of <strong>${drug.generic}</strong>?`,
+=======
+        `What is the category of ${drug.generic}?`,
+>>>>>>> quiz-engine-refactor-4885366974787880915
         drug.category,
         getDistractors(drug.category, allDrugs, d => d.category, 3)
       );
       break;
     case "moa":
       q = createMCQ(
+<<<<<<< HEAD
         `What is the MOA of <strong>${drug.generic}</strong>?`,
+=======
+        `What is the MOA of ${drug.generic}?`,
+>>>>>>> quiz-engine-refactor-4885366974787880915
         drug.moa,
         getDistractors(drug.moa, allDrugs, d => d.moa, 3)
       );
@@ -311,9 +436,12 @@ function getDistractors(correct, allDrugs, extractor, count) {
   const list = Array.from(unique);
   return shuffledCopy(list).slice(0, count);
 }
+<<<<<<< HEAD
 
 
 /* ---------- events ---------- */
+=======
+>>>>>>> quiz-engine-refactor-4885366974787880915
 function wireEvents(){
   els.prev?.addEventListener("click", () => { if (state.index>0) { state.index--; render(); save(); } });
   els.next?.addEventListener("click", () => {
@@ -572,8 +700,16 @@ function restart(){
   
   if (weekParam && masterPoolData) {
     // --- DYNAMIC RESTART ---
+<<<<<<< HEAD
     const generated = generateQuizFromPool(masterPoolData, weekParam);
     state.questions = generated.questions.map((q, i) => ({
+=======
+    window.masterPool = masterPoolData;
+    const dynamicQuizId = `log-lab-2-quiz-${weekParam}`;
+    const selectedDrugs = generateQuiz(dynamicQuizId);
+    const questions = selectedDrugs.map(drug => createQuestion(drug, masterPoolData));
+    state.questions = questions.map((q, i) => ({
+>>>>>>> quiz-engine-refactor-4885366974787880915
       ...q,
       _answered:false, _correct:false, _user:null,
       _choices: Array.isArray(q.choices) ? shuffledCopy(q.choices) : (q.type === "tf" ? ["True","False"] : null),
