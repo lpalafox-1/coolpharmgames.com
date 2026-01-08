@@ -4,11 +4,11 @@
   "pools" : {
     "easy" : null,
     "lab1" : [ {
-      "type" : "mcq",
-      "prompt" : "What is the MOA of Liraglutide?",
-      "choices" : [ "An analog of human GLP-1 that increases glucose-dependent insulin secretion and slows gastric emptying.", "Inhibits conversion of angiotensin I to angiotensin II", "Competes with aldosterone in the distal tubule", "Blocks calcium channels in vascular smooth muscle" ],
-      "answer" : [ "An analog of human GLP-1 that increases glucose-dependent insulin secretion and slows gastric emptying." ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the brand name for Liraglutide?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "victoza" ],
       "mapping" : {
         "category" : "Antidiabetic",
         "brand" : "Victoza",
@@ -16,11 +16,11 @@
         "generic" : "Liraglutide"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the brand name for Glimepiride?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "amaryl" ],
+      "type" : "mcq",
+      "prompt" : "Which class does Glimepiride belong to?",
+      "choices" : [ "ACE inhibitor", "Calcium channel blocker (dihydropyridine)", "Sulfonylurea", "Fibric acid derivative" ],
+      "answer" : [ "Sulfonylurea" ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Antidiabetic",
         "brand" : "Amaryl",
@@ -29,9 +29,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "What is the MOA of Glyburide?",
-      "choices" : [ "Inhibits Na+/Cl- reabsorption in the distal tubule", "Stimulates insulin release from pancreatic beta cells.", "Blocks calcium channels in vascular smooth muscle", "Inhibits conversion of angiotensin I to angiotensin II" ],
-      "answer" : [ "Stimulates insulin release from pancreatic beta cells." ],
+      "prompt" : "What is the category of Glyburide?",
+      "choices" : [ "Antidiabetic", "Antiarrhythmic", "Antilipemic", "Antihypertensive" ],
+      "answer" : [ "Antidiabetic" ],
       "answerText" : null,
       "mapping" : {
         "category" : "Antidiabetic",
@@ -42,7 +42,7 @@
     }, {
       "type" : "mcq",
       "prompt" : "Which class does Canagliflozin belong to?",
-      "choices" : [ "Loop diuretic", "Thiazide diuretic", "Angiotensin II Receptor Blocker", "SGLT2 Inhibitor" ],
+      "choices" : [ "Loop diuretic", "HMG-CoA reductase inhibitor", "SGLT2 Inhibitor", "Aldosterone receptor antagonist" ],
       "answer" : [ "SGLT2 Inhibitor" ],
       "answerText" : null,
       "mapping" : {
@@ -53,11 +53,11 @@
       }
     } ],
     "lab2" : [ {
-      "type" : "mcq",
-      "prompt" : "What is the MOA of Sertraline?",
-      "choices" : [ "Blocks calcium channels in vascular smooth muscle", "Competes with aldosterone in the distal tubule", "Blocks angiotensin II from binding to its receptor", "Inhibits the CNS neuronal reuptake of serotonin." ],
-      "answer" : [ "Inhibits the CNS neuronal reuptake of serotonin." ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the brand name for Sertraline?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "zoloft" ],
       "mapping" : {
         "category" : "Psychiatry",
         "brand" : "Zoloft",
@@ -65,11 +65,11 @@
         "generic" : "Sertraline"
       }
     }, {
-      "type" : "mcq",
-      "prompt" : "Which class does Fluoxetine belong to?",
-      "choices" : [ "Aldosterone receptor antagonist", "SSRI", "Calcium channel blocker (non-dihydropyridine)", "Beta-1 selective blocker" ],
-      "answer" : [ "SSRI" ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the generic name for Prozac?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "fluoxetine" ],
       "mapping" : {
         "category" : "Psychiatry",
         "brand" : "Prozac",
@@ -77,11 +77,11 @@
         "generic" : "Fluoxetine"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the brand name for Duloxetine?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "cymbalta" ],
+      "type" : "mcq",
+      "prompt" : "What is the MOA of Duloxetine?",
+      "choices" : [ "Inhibits conversion of angiotensin I to angiotensin II", "Inhibits Na+/Cl- reabsorption in the distal tubule", "Inhibits neuronal serotonin and norepinephrine reuptake.", "Blocks calcium channels in vascular smooth muscle" ],
+      "answer" : [ "Inhibits neuronal serotonin and norepinephrine reuptake." ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Psychiatry",
         "brand" : "Cymbalta",
@@ -90,9 +90,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "Which class does Venlafaxine belong to?",
-      "choices" : [ "ACE inhibitor", "SNRI", "Calcium channel blocker (non-dihydropyridine)", "Aldosterone receptor antagonist" ],
-      "answer" : [ "SNRI" ],
+      "prompt" : "What is the MOA of Venlafaxine?",
+      "choices" : [ "Blocks calcium channels in vascular smooth muscle", "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle", "Inhibits neuronal serotonin and norepinephrine reuptake.", "Inhibits conversion of angiotensin I to angiotensin II" ],
+      "answer" : [ "Inhibits neuronal serotonin and norepinephrine reuptake." ],
       "answerText" : null,
       "mapping" : {
         "category" : "Psychiatry",
@@ -103,7 +103,7 @@
     }, {
       "type" : "mcq",
       "prompt" : "Which class does Bupropion belong to?",
-      "choices" : [ "Thiazide diuretic", "DNRI", "ACE inhibitor", "HMG-CoA reductase inhibitor" ],
+      "choices" : [ "Aldosterone receptor antagonist", "HMG-CoA reductase inhibitor", "Loop diuretic", "DNRI" ],
       "answer" : [ "DNRI" ],
       "answerText" : null,
       "mapping" : {
@@ -113,11 +113,11 @@
         "generic" : "Bupropion"
       }
     }, {
-      "type" : "mcq",
-      "prompt" : "What is the MOA of Alprazolam?",
-      "choices" : [ "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle", "Blocks calcium channels in vascular smooth muscle", "Inhibits conversion of angiotensin I to angiotensin II", "Binds to stereospecific benzodiazepine receptors on the postsynaptic GABA neuron." ],
-      "answer" : [ "Binds to stereospecific benzodiazepine receptors on the postsynaptic GABA neuron." ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the generic name for Xanax?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "alprazolam" ],
       "mapping" : {
         "category" : "Psychiatry",
         "brand" : "Xanax",
@@ -125,11 +125,11 @@
         "generic" : "Alprazolam"
       }
     }, {
-      "type" : "mcq",
-      "prompt" : "What is the category of Zolpidem?",
-      "choices" : [ "Anticoagulant", "Antiarrhythmic", "Psychiatry", "Antihypertensive" ],
-      "answer" : [ "Psychiatry" ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the generic name for Ambien?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "zolpidem" ],
       "mapping" : {
         "category" : "Psychiatry",
         "brand" : "Ambien",

@@ -5,7 +5,12 @@
     "class": "Thienopyridine P2Y12 Antagonist",
     "category": "Antiplatelet",
     "moa": "Inhibits platelet activation and aggregation by irreversibly binding to the P2Y12 class of ADP receptors on platelets.",
-    "metadata": { "lab": 2, "quiz": 1, "is_new": true, "week": 1 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 1,
+      "is_new": true,
+      "week": 1
+    }
   },
   {
     "generic": "Ticagrelor",
@@ -13,7 +18,12 @@
     "class": "P2Y12 Antagonist",
     "category": "Antiplatelet",
     "moa": "Reversibly binds to the P2Y12 ADP receptor on platelets, inhibiting platelet activation and aggregation.",
-    "metadata": { "lab": 2, "quiz": 1, "is_new": true, "week": 1 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 1,
+      "is_new": true,
+      "week": 1
+    }
   },
   {
     "generic": "Aspirin",
@@ -21,7 +31,12 @@
     "class": "Antiplatelet Agent",
     "category": "Antiplatelet",
     "moa": "Inhibits cyclooxygenase-1 (COX-1) and cyclooxygenase-2 (COX-2), reducing the formation of thromboxane A2 and inhibiting platelet aggregation.",
-    "metadata": { "lab": 2, "quiz": 1, "is_new": true, "week": 1 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 1,
+      "is_new": true,
+      "week": 1
+    }
   },
   {
     "generic": "Isosorbide Mononitrate",
@@ -29,7 +44,12 @@
     "class": "Nitrate",
     "category": "Antianginal",
     "moa": "Relaxes vascular smooth muscle by increasing nitric oxide, leading to vasodilation.",
-    "metadata": { "lab": 2, "quiz": 1, "is_new": true, "week": 1 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 1,
+      "is_new": true,
+      "week": 1
+    }
   },
   {
     "generic": "Valsartan/sacubitril",
@@ -37,7 +57,12 @@
     "class": "ARB & Neprilysin Inhibitor",
     "category": "Heart Failure",
     "moa": "Selectively blocks binding of angiotensin II to AT1 receptor, preventing vasoconstriction and reducing aldosterone secretion; inhibits neprilysin to induce vasodilation and natriuresis.",
-    "metadata": { "lab": 2, "quiz": 1, "is_new": true, "week": 1 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 1,
+      "is_new": true,
+      "week": 1
+    }
   },
   {
     "generic": "Alteplase",
@@ -45,7 +70,12 @@
     "class": "Thrombolytic Agent",
     "category": "Thrombolytic",
     "moa": "Converts plasminogen to plasmin, leading to the degradation of fibrin in thrombi.",
-    "metadata": { "lab": 2, "quiz": 1, "is_new": true, "week": 1 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 1,
+      "is_new": true,
+      "week": 1
+    }
   },
   {
     "generic": "Tenecteplase",
@@ -53,7 +83,12 @@
     "class": "Thrombolytic Agent",
     "category": "Thrombolytic",
     "moa": "Converts plasminogen to plasmin, leading to the degradation of fibrin in thrombi.",
-    "metadata": { "lab": 2, "quiz": 1, "is_new": true, "week": 1 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 1,
+      "is_new": true,
+      "week": 1
+    }
   },
   {
     "generic": "Pantoprazole",
@@ -61,7 +96,12 @@
     "class": "Proton Pump Inhibitor (PPI)",
     "category": "Gastrointestinal",
     "moa": "Suppresses gastric acid secretion by specific inhibition of the H+/K+-ATPase enzyme system at the secretory surface of the gastric parietal cell.",
-    "metadata": { "lab": 2, "quiz": 2, "is_new": true, "week": 2 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 2,
+      "is_new": true,
+      "week": 2
+    }
   },
   {
     "generic": "Metoclopramide",
@@ -69,7 +109,12 @@
     "class": "Dopamine Antagonist / Prokinetic",
     "category": "Gastrointestinal",
     "moa": "Blocks dopamine receptors and (at higher doses) serotonin receptors in the chemoreceptor trigger zone; enhances the response to acetylcholine in the upper GI tract.",
-    "metadata": { "lab": 2, "quiz": 2, "is_new": true, "week": 2 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 2,
+      "is_new": true,
+      "week": 2
+    }
   },
   {
     "generic": "Ondansetron",
@@ -77,7 +122,12 @@
     "class": "5-HT3 Receptor Antagonist",
     "category": "Gastrointestinal",
     "moa": "Blocks serotonin receptors peripherally on vagal nerve terminals and centrally in the chemoreceptor trigger zone.",
-    "metadata": { "lab": 2, "quiz": 2, "is_new": true, "week": 2 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 2,
+      "is_new": true,
+      "week": 2
+    }
   },
   {
     "generic": "Lansoprazole",
@@ -85,7 +135,12 @@
     "class": "PPI",
     "category": "Gastrointestinal",
     "moa": "Inhibits the H+/K+ ATPase enzyme system in gastric parietal cells.",
-    "metadata": { "lab": 2, "quiz": 2, "is_new": true, "week": 2 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 2,
+      "is_new": true,
+      "week": 2
+    }
   },
   {
     "generic": "Desloratadine",
@@ -93,7 +148,12 @@
     "class": "H1 Antagonist",
     "category": "Antihistamine",
     "moa": "Long-acting, non-sedating peripheral H1 receptor antagonist.",
-    "metadata": { "lab": 2, "quiz": 2, "is_new": true, "week": 2 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 2,
+      "is_new": true,
+      "week": 2
+    }
   },
   {
     "generic": "Levocetirizine",
@@ -101,7 +161,12 @@
     "class": "H1 Antagonist",
     "category": "Antihistamine",
     "moa": "Selectively inhibits peripheral H1 receptors.",
-    "metadata": { "lab": 2, "quiz": 2, "is_new": true, "week": 2 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 2,
+      "is_new": true,
+      "week": 2
+    }
   },
   {
     "generic": "Codeine / APAP",
@@ -109,7 +174,12 @@
     "class": "Opioid Combination",
     "category": "Analgesic",
     "moa": "Binds to mu-opioid receptors in the CNS and inhibits prostaglandin synthesis in the CNS.",
-    "metadata": { "lab": 2, "quiz": 2, "is_new": true, "week": 2 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 2,
+      "is_new": true,
+      "week": 2
+    }
   },
   {
     "generic": "Fentanyl",
@@ -117,7 +187,12 @@
     "class": "Opioid Analgesic",
     "category": "Analgesic",
     "moa": "Pure mu-opioid receptor agonist, inhibiting ascending pain pathways.",
-    "metadata": { "lab": 2, "quiz": 2, "is_new": true, "week": 2 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 2,
+      "is_new": true,
+      "week": 2
+    }
   },
   {
     "generic": "Hydromorphone",
@@ -125,7 +200,12 @@
     "class": "Opioid Analgesic",
     "category": "Analgesic",
     "moa": "Pure mu-opioid receptor agonist, inhibiting ascending pain pathways.",
-    "metadata": { "lab": 2, "quiz": 2, "is_new": true, "week": 2 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 2,
+      "is_new": true,
+      "week": 2
+    }
   },
   {
     "generic": "Buprenorphine / Naloxone",
@@ -133,7 +213,12 @@
     "class": "Opioid Partial Agonist / Antagonist",
     "category": "Analgesic",
     "moa": "Buprenorphine is a partial mu-opioid agonist; Naloxone is an opioid antagonist.",
-    "metadata": { "lab": 2, "quiz": 2, "is_new": true, "week": 2 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 2,
+      "is_new": true,
+      "week": 2
+    }
   },
   {
     "generic": "Methadone",
@@ -141,7 +226,12 @@
     "class": "Opioid Analgesic",
     "category": "Analgesic",
     "moa": "Binds to mu-opioid receptors in the CNS, inhibiting ascending pain pathways.",
-    "metadata": { "lab": 2, "quiz": 2, "is_new": true, "week": 2 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 2,
+      "is_new": true,
+      "week": 2
+    }
   },
   {
     "generic": "Indomethacin",
@@ -149,7 +239,12 @@
     "class": "NSAID",
     "category": "Analgesic",
     "moa": "Inhibits cyclooxygenase (COX-1 and COX-2), decreasing prostaglandin precursors.",
-    "metadata": { "lab": 2, "quiz": 2, "is_new": true, "week": 2 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 2,
+      "is_new": true,
+      "week": 2
+    }
   },
   {
     "generic": "Ketorolac",
@@ -157,7 +252,12 @@
     "class": "NSAID",
     "category": "Analgesic",
     "moa": "Inhibits cyclooxygenase (COX-1 and COX-2), decreasing prostaglandin precursors.",
-    "metadata": { "lab": 2, "quiz": 2, "is_new": true, "week": 2 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 2,
+      "is_new": true,
+      "week": 2
+    }
   },
   {
     "generic": "Nabumetone",
@@ -165,7 +265,12 @@
     "class": "NSAID",
     "category": "Analgesic",
     "moa": "Inhibits cyclooxygenase (COX-1 and COX-2), decreasing prostaglandin precursors.",
-    "metadata": { "lab": 2, "quiz": 2, "is_new": true, "week": 2 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 2,
+      "is_new": true,
+      "week": 2
+    }
   },
   {
     "generic": "Diclofenac",
@@ -173,7 +278,12 @@
     "class": "NSAID",
     "category": "Analgesic",
     "moa": "Inhibits cyclooxygenase (COX-1 and COX-2), decreasing prostaglandin precursors.",
-    "metadata": { "lab": 2, "quiz": 2, "is_new": true, "week": 2 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 2,
+      "is_new": true,
+      "week": 2
+    }
   },
   {
     "generic": "Oxycodone",
@@ -181,7 +291,12 @@
     "class": "Opioid Analgesic",
     "category": "Analgesic",
     "moa": "Pure mu-opioid receptor agonist, inhibiting ascending pain pathways.",
-    "metadata": { "lab": 2, "quiz": 2, "is_new": true, "week": 2 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 2,
+      "is_new": true,
+      "week": 2
+    }
   },
   {
     "generic": "Tramadol",
@@ -189,7 +304,12 @@
     "class": "Opioid Analgesic",
     "category": "Analgesic",
     "moa": "Binds to mu-opioid receptors and weakly inhibits reuptake of norepinephrine and serotonin.",
-    "metadata": { "lab": 2, "quiz": 2, "is_new": true, "week": 2 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 2,
+      "is_new": true,
+      "week": 2
+    }
   },
   {
     "generic": "Pregabalin",
@@ -197,7 +317,12 @@
     "class": "Gaba Analog",
     "category": "Neurology",
     "moa": "Binds to alpha-2-delta subunit of voltage-gated calcium channels in the CNS.",
-    "metadata": { "lab": 2, "quiz": 3, "is_new": true, "week": 3 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 3,
+      "is_new": true,
+      "week": 3
+    }
   },
   {
     "generic": "Topiramate",
@@ -205,7 +330,12 @@
     "class": "Anticonvulsant",
     "category": "Neurology",
     "moa": "Blocks voltage-dependent sodium channels and enhances GABA activity.",
-    "metadata": { "lab": 2, "quiz": 3, "is_new": true, "week": 3 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 3,
+      "is_new": true,
+      "week": 3
+    }
   },
   {
     "generic": "Levetiracetam",
@@ -213,7 +343,12 @@
     "class": "Anticonvulsant",
     "category": "Neurology",
     "moa": "Binds to synaptic vesicle protein SV2A, modulating neurotransmitter release.",
-    "metadata": { "lab": 2, "quiz": 3, "is_new": true, "week": 3 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 3,
+      "is_new": true,
+      "week": 3
+    }
   },
   {
     "generic": "Sumatriptan",
@@ -221,7 +356,12 @@
     "class": "5-HT 1B/1D Receptor Agonist",
     "category": "Neurology",
     "moa": "Causes vasoconstriction of cranial arteries by binding to serotonin receptors.",
-    "metadata": { "lab": 2, "quiz": 3, "is_new": true, "week": 3 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 3,
+      "is_new": true,
+      "week": 3
+    }
   },
   {
     "generic": "Sertraline",
@@ -229,7 +369,12 @@
     "class": "SSRI",
     "category": "Psychiatry",
     "moa": "Inhibits the CNS neuronal reuptake of serotonin.",
-    "metadata": { "lab": 2, "quiz": 4, "is_new": true, "week": 4 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 4,
+      "is_new": true,
+      "week": 4
+    }
   },
   {
     "generic": "Fluoxetine",
@@ -237,7 +382,12 @@
     "class": "SSRI",
     "category": "Psychiatry",
     "moa": "Inhibits the CNS neuronal reuptake of serotonin.",
-    "metadata": { "lab": 2, "quiz": 4, "is_new": true, "week": 4 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 4,
+      "is_new": true,
+      "week": 4
+    }
   },
   {
     "generic": "Duloxetine",
@@ -245,7 +395,12 @@
     "class": "SNRI",
     "category": "Psychiatry",
     "moa": "Inhibits neuronal serotonin and norepinephrine reuptake.",
-    "metadata": { "lab": 2, "quiz": 4, "is_new": true, "week": 4 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 4,
+      "is_new": true,
+      "week": 4
+    }
   },
   {
     "generic": "Venlafaxine",
@@ -253,7 +408,12 @@
     "class": "SNRI",
     "category": "Psychiatry",
     "moa": "Inhibits neuronal serotonin and norepinephrine reuptake.",
-    "metadata": { "lab": 2, "quiz": 4, "is_new": true, "week": 4 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 4,
+      "is_new": true,
+      "week": 4
+    }
   },
   {
     "generic": "Bupropion",
@@ -261,7 +421,12 @@
     "class": "DNRI",
     "category": "Psychiatry",
     "moa": "Inhibits the reuptake of norepinephrine and dopamine.",
-    "metadata": { "lab": 2, "quiz": 4, "is_new": true, "week": 4 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 4,
+      "is_new": true,
+      "week": 4
+    }
   },
   {
     "generic": "Alprazolam",
@@ -269,7 +434,12 @@
     "class": "Benzodiazepine",
     "category": "Psychiatry",
     "moa": "Binds to stereospecific benzodiazepine receptors on the postsynaptic GABA neuron.",
-    "metadata": { "lab": 2, "quiz": 4, "is_new": true, "week": 4 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 4,
+      "is_new": true,
+      "week": 4
+    }
   },
   {
     "generic": "Zolpidem",
@@ -277,7 +447,12 @@
     "class": "Non-benzodiazepine Hypnotic",
     "category": "Psychiatry",
     "moa": "Binds to GABA-A receptors, specifically the BZ1 receptor subunit.",
-    "metadata": { "lab": 2, "quiz": 4, "is_new": true, "week": 4 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 4,
+      "is_new": true,
+      "week": 4
+    }
   },
   {
     "generic": "Lisdexamfetamine",
@@ -285,7 +460,12 @@
     "class": "CNS Stimulant",
     "category": "Psychiatry",
     "moa": "Prodrug of dextroamphetamine; blocks reuptake of norepinephrine and dopamine.",
-    "metadata": { "lab": 2, "quiz": 5, "is_new": true, "week": 5 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 5,
+      "is_new": true,
+      "week": 5
+    }
   },
   {
     "generic": "Methylphenidate",
@@ -293,7 +473,12 @@
     "class": "CNS Stimulant",
     "category": "Psychiatry",
     "moa": "Blocks reuptake of norepinephrine and dopamine into the presynaptic neuron.",
-    "metadata": { "lab": 2, "quiz": 5, "is_new": true, "week": 5 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 5,
+      "is_new": true,
+      "week": 5
+    }
   },
   {
     "generic": "Amoxicillin",
@@ -301,7 +486,12 @@
     "class": "Penicillin Antibiotic",
     "category": "Antibiotic",
     "moa": "Inhibits bacterial cell wall synthesis by binding to penicillin-binding proteins (PBPs).",
-    "metadata": { "lab": 2, "quiz": 6, "is_new": true, "week": 6 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 6,
+      "is_new": true,
+      "week": 6
+    }
   },
   {
     "generic": "Azithromycin",
@@ -309,7 +499,12 @@
     "class": "Macrolide Antibiotic",
     "category": "Antibiotic",
     "moa": "Inhibits RNA-dependent protein synthesis by binding to the 50S ribosomal subunit.",
-    "metadata": { "lab": 2, "quiz": 6, "is_new": true, "week": 6 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 6,
+      "is_new": true,
+      "week": 6
+    }
   },
   {
     "generic": "Ciprofloxacin",
@@ -317,7 +512,12 @@
     "class": "Fluoroquinolone Antibiotic",
     "category": "Antibiotic",
     "moa": "Inhibits DNA-gyrase, inhibiting relaxation of supercoiled DNA and promoting breakage of double-stranded DNA.",
-    "metadata": { "lab": 2, "quiz": 6, "is_new": true, "week": 6 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 6,
+      "is_new": true,
+      "week": 6
+    }
   },
   {
     "generic": "Doxycycline",
@@ -325,7 +525,12 @@
     "class": "Tetracycline Antibiotic",
     "category": "Antibiotic",
     "moa": "Inhibits protein synthesis by binding with the 30S ribosomal subunit.",
-    "metadata": { "lab": 2, "quiz": 6, "is_new": true, "week": 6 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 6,
+      "is_new": true,
+      "week": 6
+    }
   },
   {
     "generic": "Albuterol",
@@ -333,7 +538,12 @@
     "class": "SABA",
     "category": "Respiratory",
     "moa": "Relaxes bronchial smooth muscle by action on beta2-receptors.",
-    "metadata": { "lab": 2, "quiz": 7, "is_new": true, "week": 7 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 7,
+      "is_new": true,
+      "week": 7
+    }
   },
   {
     "generic": "Fluticasone / Salmeterol",
@@ -341,7 +551,12 @@
     "class": "ICS / LABA",
     "category": "Respiratory",
     "moa": "Fluticasone inhibits inflammation; Salmeterol relaxes bronchial smooth muscle by action on beta2-receptors.",
-    "metadata": { "lab": 2, "quiz": 7, "is_new": true, "week": 7 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 7,
+      "is_new": true,
+      "week": 7
+    }
   },
   {
     "generic": "Montelukast",
@@ -349,7 +564,12 @@
     "class": "Leukotriene Receptor Antagonist",
     "category": "Respiratory",
     "moa": "Selective leukotriene receptor antagonist that inhibits the cysteinyl leukotriene receptor.",
-    "metadata": { "lab": 2, "quiz": 7, "is_new": true, "week": 7 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 7,
+      "is_new": true,
+      "week": 7
+    }
   },
   {
     "generic": "Tiotropium",
@@ -357,7 +577,12 @@
     "class": "Anticholinergic (LAMA)",
     "category": "Respiratory",
     "moa": "Inhibits the action of acetylcholine at M3 receptors in bronchial smooth muscle causing bronchodilation.",
-    "metadata": { "lab": 2, "quiz": 7, "is_new": true, "week": 7 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 7,
+      "is_new": true,
+      "week": 7
+    }
   },
   {
     "generic": "Budesonide",
@@ -365,7 +590,12 @@
     "class": "Corticosteroid",
     "category": "Respiratory",
     "moa": "Utilizes a multi-pathway mechanism to inhibit multiple inflammatory cytokines.",
-    "metadata": { "lab": 2, "quiz": 7, "is_new": true, "week": 7 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 7,
+      "is_new": true,
+      "week": 7
+    }
   },
   {
     "generic": "Ipratropium",
@@ -373,7 +603,12 @@
     "class": "Anticholinergic",
     "category": "Respiratory",
     "moa": "Antagonizes the action of acetylcholine at muscarinic receptors in bronchial smooth muscle.",
-    "metadata": { "lab": 2, "quiz": 7, "is_new": true, "week": 7 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 7,
+      "is_new": true,
+      "week": 7
+    }
   },
   {
     "generic": "Levothyroxine",
@@ -381,7 +616,12 @@
     "class": "Thyroid Supplement",
     "category": "Endocrine",
     "moa": "Synthetic T4 that is converted to T3 in the body; regulates metabolic effects through DNA transcription.",
-    "metadata": { "lab": 2, "quiz": 8, "is_new": true, "week": 8 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 8,
+      "is_new": true,
+      "week": 8
+    }
   },
   {
     "generic": "Methimazole",
@@ -389,7 +629,12 @@
     "class": "Antithyroid Agent",
     "category": "Endocrine",
     "moa": "Inhibits the synthesis of thyroid hormones by blocking the oxidation of iodine in the thyroid gland.",
-    "metadata": { "lab": 2, "quiz": 8, "is_new": true, "week": 8 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 8,
+      "is_new": true,
+      "week": 8
+    }
   },
   {
     "generic": "Estrogens (Conjugated)",
@@ -397,7 +642,12 @@
     "class": "Estrogen Hormone",
     "category": "Endocrine",
     "moa": "Modulates pituitary secretion of gonadotropins, LH, and FSH through a negative feedback system.",
-    "metadata": { "lab": 2, "quiz": 8, "is_new": true, "week": 8 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 8,
+      "is_new": true,
+      "week": 8
+    }
   },
   {
     "generic": "Progesterone",
@@ -405,7 +655,12 @@
     "class": "Progestin Hormone",
     "category": "Endocrine",
     "moa": "Transforms proliferative endometrium into secretory endometrium and inhibits pituitary gonadotropin secretion.",
-    "metadata": { "lab": 2, "quiz": 8, "is_new": true, "week": 8 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 8,
+      "is_new": true,
+      "week": 8
+    }
   },
   {
     "generic": "Testosterone",
@@ -413,7 +668,12 @@
     "class": "Androgen",
     "category": "Endocrine",
     "moa": "Promotes growth and development of male sex organs and maintains secondary sex characteristics.",
-    "metadata": { "lab": 2, "quiz": 8, "is_new": true, "week": 8 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 8,
+      "is_new": true,
+      "week": 8
+    }
   },
   {
     "generic": "Finasteride",
@@ -421,7 +681,12 @@
     "class": "5-Alpha Reductase Inhibitor",
     "category": "Genitourinary",
     "moa": "Inhibits 5-alpha reductase enzyme, preventing the conversion of testosterone to dihydrotestosterone (DHT).",
-    "metadata": { "lab": 2, "quiz": 9, "is_new": true, "week": 9 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 9,
+      "is_new": true,
+      "week": 9
+    }
   },
   {
     "generic": "Tamsulosin",
@@ -429,7 +694,12 @@
     "class": "Alpha-1 Antagonist",
     "category": "Genitourinary",
     "moa": "Antagonist of alpha-1A adrenoreceptors in the prostate, causing smooth muscle relaxation.",
-    "metadata": { "lab": 2, "quiz": 9, "is_new": true, "week": 9 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 9,
+      "is_new": true,
+      "week": 9
+    }
   },
   {
     "generic": "Sildenafil",
@@ -437,7 +707,12 @@
     "class": "PDE-5 Inhibitor",
     "category": "Genitourinary",
     "moa": "Inhibits phosphodiesterase type 5 (PDE-5), increasing cGMP levels and enhancing the effect of nitric oxide.",
-    "metadata": { "lab": 2, "quiz": 9, "is_new": true, "week": 9 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 9,
+      "is_new": true,
+      "week": 9
+    }
   },
   {
     "generic": "Tadalafil",
@@ -445,7 +720,12 @@
     "class": "PDE-5 Inhibitor",
     "category": "Genitourinary",
     "moa": "Inhibits phosphodiesterase type 5 (PDE-5), increasing cGMP levels and enhancing the effect of nitric oxide.",
-    "metadata": { "lab": 2, "quiz": 9, "is_new": true, "week": 9 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 9,
+      "is_new": true,
+      "week": 9
+    }
   },
   {
     "generic": "Oxybutynin",
@@ -453,7 +733,12 @@
     "class": "Antispasmodic",
     "category": "Genitourinary",
     "moa": "Antagonizes acetylcholine at muscarinic receptors, relaxing bladder smooth muscle.",
-    "metadata": { "lab": 2, "quiz": 9, "is_new": true, "week": 9 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 9,
+      "is_new": true,
+      "week": 9
+    }
   },
   {
     "generic": "Solifenacin",
@@ -461,7 +746,12 @@
     "class": "Antispasmodic",
     "category": "Genitourinary",
     "moa": "Antagonizes acetylcholine at muscarinic receptors, relaxing bladder smooth muscle.",
-    "metadata": { "lab": 2, "quiz": 9, "is_new": true, "week": 9 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 9,
+      "is_new": true,
+      "week": 9
+    }
   },
   {
     "generic": "Mirabegron",
@@ -469,7 +759,12 @@
     "class": "Beta-3 Agonist",
     "category": "Genitourinary",
     "moa": "Activates beta-3 adrenergic receptors, relaxing the detrusor muscle during the storage phase.",
-    "metadata": { "lab": 2, "quiz": 9, "is_new": true, "week": 9 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 9,
+      "is_new": true,
+      "week": 9
+    }
   },
   {
     "generic": "Tolterodine",
@@ -477,7 +772,12 @@
     "class": "Antispasmodic",
     "category": "Genitourinary",
     "moa": "Antagonizes acetylcholine at muscarinic receptors, relaxing bladder smooth muscle.",
-    "metadata": { "lab": 2, "quiz": 9, "is_new": true, "week": 9 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 9,
+      "is_new": true,
+      "week": 9
+    }
   },
   {
     "generic": "Dutasteride",
@@ -485,7 +785,12 @@
     "class": "5-Alpha Reductase Inhibitor",
     "category": "Genitourinary",
     "moa": "Inhibits 5-alpha reductase enzyme, preventing the conversion of testosterone to DHT.",
-    "metadata": { "lab": 2, "quiz": 9, "is_new": true, "week": 9 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 9,
+      "is_new": true,
+      "week": 9
+    }
   },
   {
     "generic": "Phenazopyridine",
@@ -493,7 +798,12 @@
     "class": "Urinary Analgesic",
     "category": "Genitourinary",
     "moa": "Exerts a direct topical analgesic effect on the mucosa of the urinary tract.",
-    "metadata": { "lab": 2, "quiz": 9, "is_new": true, "week": 9 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 9,
+      "is_new": true,
+      "week": 9
+    }
   },
   {
     "generic": "Vardenafil",
@@ -501,7 +811,12 @@
     "class": "PDE-5 Inhibitor",
     "category": "Genitourinary",
     "moa": "Inhibits phosphodiesterase type 5 (PDE-5), increasing cGMP levels.",
-    "metadata": { "lab": 2, "quiz": 9, "is_new": true, "week": 9 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 9,
+      "is_new": true,
+      "week": 9
+    }
   },
   {
     "generic": "Folic Acid",
@@ -509,7 +824,12 @@
     "class": "Vitamin",
     "category": "Nutritional",
     "moa": "Required for nucleoprotein synthesis and maintenance of normal erythropoiesis.",
-    "metadata": { "lab": 2, "quiz": 10, "is_new": true, "week": 10 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 10,
+      "is_new": true,
+      "week": 10
+    }
   },
   {
     "generic": "Cyanocobalamin",
@@ -517,7 +837,12 @@
     "class": "Vitamin B12",
     "category": "Nutritional",
     "moa": "Coenzyme for various metabolic functions, including fat and carbohydrate metabolism and protein synthesis.",
-    "metadata": { "lab": 2, "quiz": 10, "is_new": true, "week": 10 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 10,
+      "is_new": true,
+      "week": 10
+    }
   },
   {
     "generic": "Ergocalciferol",
@@ -525,7 +850,12 @@
     "class": "Vitamin D2",
     "category": "Nutritional",
     "moa": "Stimulates calcium and phosphate absorption from the small intestine.",
-    "metadata": { "lab": 2, "quiz": 10, "is_new": true, "week": 10 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 10,
+      "is_new": true,
+      "week": 10
+    }
   },
   {
     "generic": "Ferrous Sulfate",
@@ -533,7 +863,12 @@
     "class": "Iron Mineral",
     "category": "Nutritional",
     "moa": "Replaces iron stores found in hemoglobin, myoglobin, and other enzymes.",
-    "metadata": { "lab": 2, "quiz": 10, "is_new": true, "week": 10 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 10,
+      "is_new": true,
+      "week": 10
+    }
   },
   {
     "generic": "Potassium Chloride",
@@ -541,7 +876,12 @@
     "class": "Electrolyte",
     "category": "Nutritional",
     "moa": "Major intracellular cation essential for the transmission of nerve impulses and contraction of cardiac, skeletal, and smooth muscle.",
-    "metadata": { "lab": 2, "quiz": 10, "is_new": true, "week": 10 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 10,
+      "is_new": true,
+      "week": 10
+    }
   },
   {
     "generic": "Calcitriol",
@@ -549,7 +889,12 @@
     "class": "Vitamin D Analog",
     "category": "Endocrine",
     "moa": "Stimulates calcium and phosphate absorption from the small intestine.",
-    "metadata": { "lab": 2, "quiz": 10, "is_new": true, "week": 10 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 10,
+      "is_new": true,
+      "week": 10
+    }
   },
   {
     "generic": "Allopurinol",
@@ -557,7 +902,12 @@
     "class": "Xanthine Oxidase Inhibitor",
     "category": "Musculoskeletal",
     "moa": "Inhibits xanthine oxidase, the enzyme responsible for the conversion of hypoxanthine to xanthine to uric acid.",
-    "metadata": { "lab": 2, "quiz": 11, "is_new": true, "week": 11 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 11,
+      "is_new": true,
+      "week": 11
+    }
   },
   {
     "generic": "Alendronate",
@@ -565,7 +915,12 @@
     "class": "Bisphosphonate",
     "category": "Musculoskeletal",
     "moa": "Inhibits osteoclast-mediated bone resorption.",
-    "metadata": { "lab": 2, "quiz": 11, "is_new": true, "week": 11 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 11,
+      "is_new": true,
+      "week": 11
+    }
   },
   {
     "generic": "Latanoprost",
@@ -573,7 +928,12 @@
     "class": "Prostaglandin Analog",
     "category": "Ophthalmic",
     "moa": "Reduces intraocular pressure by increasing the outflow of aqueous humor.",
-    "metadata": { "lab": 2, "quiz": 12, "is_new": true, "week": 12 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 12,
+      "is_new": true,
+      "week": 12
+    }
   },
   {
     "generic": "Timolol",
@@ -581,7 +941,12 @@
     "class": "Ophthalmic Beta-Blocker",
     "category": "Ophthalmic",
     "moa": "Reduces intraocular pressure by decreasing the production of aqueous humor.",
-    "metadata": { "lab": 2, "quiz": 12, "is_new": true, "week": 12 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 12,
+      "is_new": true,
+      "week": 12
+    }
   },
   {
     "generic": "Brimonidine",
@@ -589,7 +954,12 @@
     "class": "Alpha-2 Adrenergic Agonist",
     "category": "Ophthalmic",
     "moa": "Reduces intraocular pressure by decreasing aqueous humor production and increasing uveoscleral outflow.",
-    "metadata": { "lab": 2, "quiz": 12, "is_new": true, "week": 12 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 12,
+      "is_new": true,
+      "week": 12
+    }
   },
   {
     "generic": "Cyclosporine",
@@ -597,7 +967,12 @@
     "class": "Calcineurin Inhibitor",
     "category": "Ophthalmic",
     "moa": "Acts as a partial immunomodulator; thought to inhibit the production and release of interleukin-2.",
-    "metadata": { "lab": 2, "quiz": 12, "is_new": true, "week": 12 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 12,
+      "is_new": true,
+      "week": 12
+    }
   },
   {
     "generic": "Moxifloxacin",
@@ -605,7 +980,12 @@
     "class": "Fluoroquinolone Antibiotic",
     "category": "Ophthalmic",
     "moa": "Inhibits DNA-gyrase, inhibiting relaxation of supercoiled DNA and promoting breakage of double-stranded DNA.",
-    "metadata": { "lab": 2, "quiz": 12, "is_new": true, "week": 12 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 12,
+      "is_new": true,
+      "week": 12
+    }
   },
   {
     "generic": "Olopatadine",
@@ -613,7 +993,12 @@
     "class": "Ophthalmic Antihistamine",
     "category": "Ophthalmic",
     "moa": "Selective H1 receptor antagonist and mast cell stabilizer.",
-    "metadata": { "lab": 2, "quiz": 12, "is_new": true, "week": 12 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 12,
+      "is_new": true,
+      "week": 12
+    }
   },
   {
     "generic": "Clotrimazole / Betamethasone",
@@ -621,7 +1006,12 @@
     "class": "Antifungal / Corticosteroid",
     "category": "Dermatology",
     "moa": "Clotrimazole inhibits fungal cell wall synthesis; Betamethasone utilizes a multi-pathway mechanism to inhibit inflammation.",
-    "metadata": { "lab": 2, "quiz": 13, "is_new": true, "week": 13 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 13,
+      "is_new": true,
+      "week": 13
+    }
   },
   {
     "generic": "Mupirocin",
@@ -629,7 +1019,12 @@
     "class": "Topical Antibacterial",
     "category": "Dermatology",
     "moa": "Inhibits bacterial protein synthesis by reversibly and specifically binding to bacterial isoleucyl transfer-RNA synthetase.",
-    "metadata": { "lab": 2, "quiz": 13, "is_new": true, "week": 13 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 13,
+      "is_new": true,
+      "week": 13
+    }
   },
   {
     "generic": "Nystatin",
@@ -637,7 +1032,12 @@
     "class": "Antifungal",
     "category": "Dermatology",
     "moa": "Binds to sterols in fungal cell membrane, changing the membrane permeability and allowing leakage of intracellular components.",
-    "metadata": { "lab": 2, "quiz": 13, "is_new": true, "week": 13 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 13,
+      "is_new": true,
+      "week": 13
+    }
   },
   {
     "generic": "Hydrocortisone",
@@ -645,7 +1045,12 @@
     "class": "Corticosteroid",
     "category": "Dermatology",
     "moa": "Utilizes a multi-pathway mechanism to inhibit multiple inflammatory cytokines.",
-    "metadata": { "lab": 2, "quiz": 13, "is_new": true, "week": 13 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 13,
+      "is_new": true,
+      "week": 13
+    }
   },
   {
     "generic": "Triamcinolone",
@@ -653,7 +1058,12 @@
     "class": "Corticosteroid",
     "category": "Dermatology",
     "moa": "Utilizes a multi-pathway mechanism to inhibit multiple inflammatory cytokines.",
-    "metadata": { "lab": 2, "quiz": 13, "is_new": true, "week": 13 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 13,
+      "is_new": true,
+      "week": 13
+    }
   },
   {
     "generic": "Adapalene",
@@ -661,7 +1071,12 @@
     "class": "Retinoid",
     "category": "Dermatology",
     "moa": "Binds to specific retinoic acid nuclear receptors, modulating cell differentiation and keratinization.",
-    "metadata": { "lab": 2, "quiz": 13, "is_new": true, "week": 13 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 13,
+      "is_new": true,
+      "week": 13
+    }
   },
   {
     "generic": "Lidocaine",
@@ -669,7 +1084,12 @@
     "class": "Local Anesthetic",
     "category": "Dermatology",
     "moa": "Stabilizes neuronal membranes by inhibiting the ionic fluxes required for the initiation and conduction of impulses.",
-    "metadata": { "lab": 2, "quiz": 13, "is_new": true, "week": 13 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 13,
+      "is_new": true,
+      "week": 13
+    }
   },
   {
     "generic": "Permethrin",
@@ -677,7 +1097,12 @@
     "class": "Topical Antiparasitic",
     "category": "Dermatology",
     "moa": "Inhibits sodium ion influx through nerve cell membrane channels in parasites, causing paralysis and death.",
-    "metadata": { "lab": 2, "quiz": 13, "is_new": true, "week": 13 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 13,
+      "is_new": true,
+      "week": 13
+    }
   },
   {
     "generic": "Imiquimod",
@@ -685,7 +1110,12 @@
     "class": "Immune Response Modifier",
     "category": "Dermatology",
     "moa": "Induces cytokines, including interferon-alpha, to stimulate an immune response.",
-    "metadata": { "lab": 2, "quiz": 13, "is_new": true, "week": 13 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 13,
+      "is_new": true,
+      "week": 13
+    }
   },
   {
     "generic": "Tacrolimus",
@@ -693,7 +1123,12 @@
     "class": "Calcineurin Inhibitor",
     "category": "Dermatology",
     "moa": "Inhibits T-lymphocyte activation by binding to intracellular proteins and inhibiting calcineurin.",
-    "metadata": { "lab": 2, "quiz": 13, "is_new": true, "week": 13 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 13,
+      "is_new": true,
+      "week": 13
+    }
   },
   {
     "generic": "Clobetasol",
@@ -701,7 +1136,12 @@
     "class": "Corticosteroid",
     "category": "Dermatology",
     "moa": "Utilizes a multi-pathway mechanism to inhibit multiple inflammatory cytokines.",
-    "metadata": { "lab": 2, "quiz": 13, "is_new": true, "week": 13 }
+    "metadata": {
+      "lab": 2,
+      "quiz": 13,
+      "is_new": true,
+      "week": 13
+    }
   },
   {
     "generic": "Lisinopril",
@@ -709,7 +1149,12 @@
     "class": "ACE Inhibitor",
     "category": "Antihypertensive",
     "moa": "Inhibits the conversion of angiotensin I to angiotensin II, causing vasodilation and reduction in the release of aldosterone.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 1 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 1
+    }
   },
   {
     "generic": "Amlodipine",
@@ -717,7 +1162,12 @@
     "class": "CCB (Dihydropyridine)",
     "category": "Antihypertensive",
     "moa": "Inhibits the influx of calcium ions into vascular smooth muscle and cardiac muscle, resulting in decreased peripheral vascular resistance and reduced blood pressure.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 1 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 1
+    }
   },
   {
     "generic": "Losartan",
@@ -725,7 +1175,12 @@
     "class": "ARB",
     "category": "Antihypertensive",
     "moa": "Selectively blocks the binding of angiotensin II to the AT1 receptor, preventing vasoconstriction and reducing the secretion of aldosterone.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 1 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 1
+    }
   },
   {
     "generic": "Hydrochlorothiazide",
@@ -733,7 +1188,12 @@
     "class": "Thiazide Diuretic",
     "category": "Antihypertensive",
     "moa": "Inhibits sodium reabsorption in the distal tubules causing increased excretion of sodium and water, as well as potassium and hydrogen ions.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 1 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 1
+    }
   },
   {
     "generic": "Nifedipine",
@@ -741,7 +1201,12 @@
     "class": "CCB (Dihydropyridine)",
     "category": "Antihypertensive",
     "moa": "Inhibits the influx of calcium ions into vascular smooth muscle and cardiac muscle.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 1 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 1
+    }
   },
   {
     "generic": "Furosemide",
@@ -749,7 +1214,12 @@
     "class": "Loop Diuretic",
     "category": "Antihypertensive",
     "moa": "Inhibits the reabsorption of sodium and chloride in the ascending loop of Henle and distal renal tubule.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 2 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 2
+    }
   },
   {
     "generic": "Hydralazine",
@@ -757,7 +1227,12 @@
     "class": "Vasodilator",
     "category": "Antihypertensive",
     "moa": "Directly relaxes arteriolar smooth muscle, reducing peripheral vascular resistance.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 2 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 2
+    }
   },
   {
     "generic": "Ramipril",
@@ -765,7 +1240,12 @@
     "class": "ACE Inhibitor",
     "category": "Antihypertensive",
     "moa": "Inhibits the conversion of angiotensin I to angiotensin II, causing vasodilation.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 2 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 2
+    }
   },
   {
     "generic": "Irbesartan",
@@ -773,7 +1253,12 @@
     "class": "ARB",
     "category": "Antihypertensive",
     "moa": "Selectively blocks the binding of angiotensin II to the AT1 receptor.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 2 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 2
+    }
   },
   {
     "generic": "Doxazosin",
@@ -781,7 +1266,12 @@
     "class": "Alpha-1 Antagonist",
     "category": "Antihypertensive / BPH",
     "moa": "Competitively inhibits postsynaptic alpha-1 adrenergic receptors which results in vasodilation.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 2 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 2
+    }
   },
   {
     "generic": "Terazosin",
@@ -789,7 +1279,12 @@
     "class": "Alpha-1 Antagonist",
     "category": "Antihypertensive / BPH",
     "moa": "Competitively inhibits postsynaptic alpha-1 adrenergic receptors which results in vasodilation.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 2 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 2
+    }
   },
   {
     "generic": "Quinapril",
@@ -797,7 +1292,12 @@
     "class": "ACE Inhibitor",
     "category": "Antihypertensive",
     "moa": "Inhibits the conversion of angiotensin I to angiotensin II, causing vasodilation.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 2 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 2
+    }
   },
   {
     "generic": "Candesartan",
@@ -805,7 +1305,12 @@
     "class": "ARB",
     "category": "Antihypertensive",
     "moa": "Selectively blocks the binding of angiotensin II to the AT1 receptor.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 2 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 2
+    }
   },
   {
     "generic": "Clonidine",
@@ -813,7 +1318,12 @@
     "class": "Alpha-2 Adrenergic Agonist",
     "category": "Antihypertensive",
     "moa": "Stimulates alpha-2 adrenergic receptors in the brainstem, reducing sympathetic outflow.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 3 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 3
+    }
   },
   {
     "generic": "Diltiazem",
@@ -821,7 +1331,12 @@
     "class": "CCB (Non-Dihydropyridine)",
     "category": "Antihypertensive",
     "moa": "Inhibits calcium influx into vascular smooth muscle and cardiac muscle; reduces heart rate.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 3 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 3
+    }
   },
   {
     "generic": "Metoprolol Succinate",
@@ -829,15 +1344,25 @@
     "class": "Beta Blocker",
     "category": "Antihypertensive",
     "moa": "Selectively blocks beta-1 receptors, decreasing heart rate and cardiac output.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 3 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 3
+    }
   },
   {
     "generic": "Spironolactone",
     "brand": "Aldactone",
-    "class": "Potassium Sparing Diuretic",
+    "class": "Potassium-Sparing Diuretic / Aldosterone Antagonist",
     "category": "Antihypertensive",
-    "moa": "Competetes with aldosterone in the distal renal tubules, increasing sodium and water excretion while conserving potassium.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 3 }
+    "moa": "Competes with aldosterone in the distal renal tubules, increasing sodium and water excretion while conserving potassium.",
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 3
+    }
   },
   {
     "generic": "Carvedilol",
@@ -845,7 +1370,12 @@
     "class": "Beta-Blocker (Alpha/Beta)",
     "category": "Antihypertensive",
     "moa": "Nonselective beta-adrenoreceptor and alpha-adrenoreceptor antagonist.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 3 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 3
+    }
   },
   {
     "generic": "Nebivolol",
@@ -853,7 +1383,12 @@
     "class": "Beta-1 Selective Blocker",
     "category": "Antihypertensive",
     "moa": "Selectively blocks beta-1 receptors and induces nitric oxide-mediated vasodilation.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 3 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 3
+    }
   },
   {
     "generic": "Atenolol",
@@ -861,7 +1396,12 @@
     "class": "Beta-1 Selective Blocker",
     "category": "Antihypertensive",
     "moa": "Selectively blocks beta-1 receptors.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 3 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 3
+    }
   },
   {
     "generic": "Labetalol",
@@ -869,7 +1409,12 @@
     "class": "Beta-Blocker (Alpha/Beta)",
     "category": "Antihypertensive",
     "moa": "Blocks beta-1, beta-2, and alpha-1 receptors.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 3 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 3
+    }
   },
   {
     "generic": "Propranolol",
@@ -877,7 +1422,12 @@
     "class": "Non-selective Beta Blocker",
     "category": "Antihypertensive",
     "moa": "Nonselectively blocks beta-1 and beta-2 receptors.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 3 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 3
+    }
   },
   {
     "generic": "Metoprolol Tartrate",
@@ -885,7 +1435,12 @@
     "class": "Beta-1 Selective Blocker",
     "category": "Antihypertensive",
     "moa": "Selectively blocks beta-1 receptors.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 3 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 3
+    }
   },
   {
     "generic": "Simvastatin",
@@ -893,7 +1448,12 @@
     "class": "HMG-CoA Reductase Inhibitor",
     "category": "Antilipemic",
     "moa": "Inhibits HMG-CoA reductase, the rate-limiting enzyme in cholesterol synthesis.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 4 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 4
+    }
   },
   {
     "generic": "Atorvastatin",
@@ -901,7 +1461,12 @@
     "class": "HMG-CoA Reductase Inhibitor",
     "category": "Antilipemic",
     "moa": "Inhibits HMG-CoA reductase, the rate-limiting enzyme in cholesterol synthesis.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 4 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 4
+    }
   },
   {
     "generic": "Rosuvastatin",
@@ -909,7 +1474,12 @@
     "class": "HMG-CoA Reductase Inhibitor",
     "category": "Antilipemic",
     "moa": "Inhibits HMG-CoA reductase, the rate-limiting enzyme in cholesterol synthesis.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 4 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 4
+    }
   },
   {
     "generic": "Pravastatin",
@@ -917,7 +1487,12 @@
     "class": "HMG-CoA Reductase Inhibitor",
     "category": "Antilipemic",
     "moa": "Inhibits HMG-CoA reductase, the rate-limiting enzyme in cholesterol synthesis.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 4 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 4
+    }
   },
   {
     "generic": "Fenofibrate",
@@ -925,7 +1500,12 @@
     "class": "Fibrate",
     "category": "Antilipemic",
     "moa": "Activates PPAR-alpha, increasing lipolysis and elimination of triglyceride-rich particles.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 4 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 4
+    }
   },
   {
     "generic": "Gemfibrozil",
@@ -933,7 +1513,12 @@
     "class": "Fibrate",
     "category": "Antilipemic",
     "moa": "Stimulates the activity of lipoprotein lipase to decrease VLDL and triglycerides.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 4 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 4
+    }
   },
   {
     "generic": "Ezetimibe",
@@ -941,7 +1526,12 @@
     "class": "Cholesterol Absorption Inhibitor",
     "category": "Antilipemic",
     "moa": "Inhibits the absorption of cholesterol at the brush border of the small intestine.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 5 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 5
+    }
   },
   {
     "generic": "Omega-3 Acid Ethyl Esters",
@@ -949,7 +1539,12 @@
     "class": "Omega-3 Fatty Acid",
     "category": "Antilipemic",
     "moa": "Reduces hepatic synthesis of triglycerides and increases clearance from plasma.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 5 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 5
+    }
   },
   {
     "generic": "Niacin",
@@ -957,7 +1552,12 @@
     "class": "Water-soluble Vitamin",
     "category": "Antilipemic",
     "moa": "Inhibits lipolysis in adipose tissue and reduces hepatic VLDL synthesis.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 5 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 5
+    }
   },
   {
     "generic": "Evolocumab",
@@ -965,7 +1565,12 @@
     "class": "PCSK9 Inhibitor",
     "category": "Antilipemic",
     "moa": "Binds to PCSK9, increasing the number of available LDL receptors to clear LDL from the blood.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 5 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 5
+    }
   },
   {
     "generic": "Warfarin",
@@ -973,7 +1578,12 @@
     "class": "Vitamin K Antagonist",
     "category": "Anticoagulant",
     "moa": "Inhibits the synthesis of vitamin K-dependent clotting factors II, VII, IX, and X.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 6 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 6
+    }
   },
   {
     "generic": "Rivaroxaban",
@@ -981,7 +1591,12 @@
     "class": "Factor Xa Inhibitor",
     "category": "Anticoagulant",
     "moa": "Selectively and reversibly inhibits factor Xa, preventing thrombin generation.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 6 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 6
+    }
   },
   {
     "generic": "Apixaban",
@@ -989,7 +1604,12 @@
     "class": "Factor Xa Inhibitor",
     "category": "Anticoagulant",
     "moa": "Selectively and reversibly inhibits factor Xa, preventing thrombin generation.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 6 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 6
+    }
   },
   {
     "generic": "Enoxaparin",
@@ -997,7 +1617,12 @@
     "class": "LMWH",
     "category": "Anticoagulant",
     "moa": "Potentiates antithrombin III, inhibiting factor Xa and thrombin.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 6 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 6
+    }
   },
   {
     "generic": "Amiodarone",
@@ -1005,7 +1630,12 @@
     "class": "Class III Antiarrhythmic",
     "category": "Antiarrhythmic",
     "moa": "Inhibits potassium channels, prolonging action potential and refractory period.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 6 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 6
+    }
   },
   {
     "generic": "Digoxin",
@@ -1013,7 +1643,12 @@
     "class": "Cardiac Glycoside",
     "category": "Antiarrhythmic",
     "moa": "Inhibits Na+/K+ ATPase, increasing force of contraction and slowing heart rate.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 6 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 6
+    }
   },
   {
     "generic": "Sotalol",
@@ -1021,7 +1656,12 @@
     "class": "Class III Antiarrhythmic",
     "category": "Antiarrhythmic",
     "moa": "Nonselectively blocks beta-receptors and potassium channels to prolong the action potential.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 6 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 6
+    }
   },
   {
     "generic": "Metformin",
@@ -1029,7 +1669,12 @@
     "class": "Biguanide",
     "category": "Antidiabetic",
     "moa": "Decreases hepatic glucose production and improves insulin sensitivity.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 6 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 6
+    }
   },
   {
     "generic": "Insulin Glargine",
@@ -1037,7 +1682,12 @@
     "class": "Long-acting Insulin",
     "category": "Antidiabetic",
     "moa": "Stimulates peripheral glucose uptake and inhibits hepatic glucose production.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 6 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 6
+    }
   },
   {
     "generic": "Sitagliptin",
@@ -1045,7 +1695,12 @@
     "class": "DPP-4 Inhibitor",
     "category": "Antidiabetic",
     "moa": "Inhibits DPP-4 enzyme, increasing active incretin hormones.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 6 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 6
+    }
   },
   {
     "generic": "Empagliflozin",
@@ -1053,7 +1708,12 @@
     "class": "SGLT2 Inhibitor",
     "category": "Antidiabetic",
     "moa": "Inhibits SGLT2 in proximal tubules, reducing renal glucose reabsorption.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 6 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 6
+    }
   },
   {
     "generic": "Glipizide",
@@ -1061,7 +1721,12 @@
     "class": "Sulfonylurea",
     "category": "Antidiabetic",
     "moa": "Stimulates insulin release from pancreatic beta cells.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 6 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 6
+    }
   },
   {
     "generic": "Liraglutide",
@@ -1069,7 +1734,12 @@
     "class": "GLP-1 Receptor Agonist",
     "category": "Antidiabetic",
     "moa": "An analog of human GLP-1 that increases glucose-dependent insulin secretion and slows gastric emptying.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 8 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 8
+    }
   },
   {
     "generic": "Glimepiride",
@@ -1077,7 +1747,12 @@
     "class": "Sulfonylurea",
     "category": "Antidiabetic",
     "moa": "Stimulates insulin release from pancreatic beta cells.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 8 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 8
+    }
   },
   {
     "generic": "Glyburide",
@@ -1085,7 +1760,12 @@
     "class": "Sulfonylurea",
     "category": "Antidiabetic",
     "moa": "Stimulates insulin release from pancreatic beta cells.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 8 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 8
+    }
   },
   {
     "generic": "Canagliflozin",
@@ -1093,7 +1773,12 @@
     "class": "SGLT2 Inhibitor",
     "category": "Antidiabetic",
     "moa": "Inhibits SGLT2 in proximal tubules, reducing renal glucose reabsorption.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 8 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 8
+    }
   },
   {
     "generic": "Sertraline",
@@ -1101,7 +1786,12 @@
     "class": "SSRI",
     "category": "Psychiatry",
     "moa": "Inhibits the CNS neuronal reuptake of serotonin.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 10 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 10
+    }
   },
   {
     "generic": "Fluoxetine",
@@ -1109,7 +1799,12 @@
     "class": "SSRI",
     "category": "Psychiatry",
     "moa": "Inhibits the CNS neuronal reuptake of serotonin.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 10 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 10
+    }
   },
   {
     "generic": "Escitalopram",
@@ -1117,7 +1812,12 @@
     "class": "SSRI",
     "category": "Psychiatry",
     "moa": "Inhibits the CNS neuronal reuptake of serotonin.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 10 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 10
+    }
   },
   {
     "generic": "Duloxetine",
@@ -1125,7 +1825,12 @@
     "class": "SNRI",
     "category": "Psychiatry",
     "moa": "Inhibits neuronal serotonin and norepinephrine reuptake.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 10 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 10
+    }
   },
   {
     "generic": "Venlafaxine",
@@ -1133,7 +1838,12 @@
     "class": "SNRI",
     "category": "Psychiatry",
     "moa": "Inhibits neuronal serotonin and norepinephrine reuptake.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 10 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 10
+    }
   },
   {
     "generic": "Bupropion",
@@ -1141,7 +1851,12 @@
     "class": "DNRI",
     "category": "Psychiatry",
     "moa": "Inhibits the reuptake of norepinephrine and dopamine.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 10 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 10
+    }
   },
   {
     "generic": "Trazodone",
@@ -1149,7 +1864,12 @@
     "class": "Serotonin Reuptake Inhibitor / Antagonist",
     "category": "Psychiatry",
     "moa": "Inhibits serotonin reuptake and blocks 5-HT2 receptors.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 10 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 10
+    }
   },
   {
     "generic": "Citalopram",
@@ -1157,7 +1877,12 @@
     "class": "SSRI",
     "category": "Psychiatry",
     "moa": "Inhibits the CNS neuronal reuptake of serotonin.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 10 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 10
+    }
   },
   {
     "generic": "Paroxetine",
@@ -1165,7 +1890,12 @@
     "class": "SSRI",
     "category": "Psychiatry",
     "moa": "Inhibits the CNS neuronal reuptake of serotonin.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 10 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 10
+    }
   },
   {
     "generic": "Amitriptyline",
@@ -1173,7 +1903,12 @@
     "class": "Tricyclic Antidepressant",
     "category": "Psychiatry",
     "moa": "Increases the synaptic concentration of serotonin and/or norepinephrine in the CNS by inhibition of their reuptake.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 10 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 10
+    }
   },
   {
     "generic": "Mirtazapine",
@@ -1181,7 +1916,12 @@
     "class": "Alpha-2 Antagonist",
     "category": "Psychiatry",
     "moa": "Antagonizes central presynaptic alpha-2 adrenergic receptors which results in increased release of norepinephrine and serotonin.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 10 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 10
+    }
   },
   {
     "generic": "Alprazolam",
@@ -1189,7 +1929,12 @@
     "class": "Benzodiazepine",
     "category": "Psychiatry",
     "moa": "Binds to stereospecific benzodiazepine receptors on the postsynaptic GABA neuron.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 11 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 11
+    }
   },
   {
     "generic": "Zolpidem",
@@ -1197,7 +1942,12 @@
     "class": "Non-benzodiazepine Hypnotic",
     "category": "Psychiatry",
     "moa": "Binds to GABA-A receptors, specifically the BZ1 receptor subunit.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 11 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 11
+    }
   },
   {
     "generic": "Quetiapine",
@@ -1205,7 +1955,12 @@
     "class": "Atypical Antipsychotic",
     "category": "Psychiatry",
     "moa": "Antagonist at multiple neurotransmitter receptors, including serotonin and dopamine.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 11 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 11
+    }
   },
   {
     "generic": "Risperidone",
@@ -1213,7 +1968,12 @@
     "class": "Atypical Antipsychotic",
     "category": "Psychiatry",
     "moa": "Antagonist at dopamine D2 and serotonin 5-HT2 receptors.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 11 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 11
+    }
   },
   {
     "generic": "Olanzapine",
@@ -1221,7 +1981,12 @@
     "class": "Atypical Antipsychotic",
     "category": "Psychiatry",
     "moa": "Antagonist at dopamine D1-4 and serotonin 5-HT2 receptors.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 11 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 11
+    }
   },
   {
     "generic": "Haloperidol",
@@ -1229,7 +1994,12 @@
     "class": "First-Generation Antipsychotic",
     "category": "Psychiatry",
     "moa": "Blocks postsynaptic mesolimbic dopaminergic D2 receptors in the brain.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 11 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 11
+    }
   },
   {
     "generic": "Diazepam",
@@ -1237,7 +2007,12 @@
     "class": "Benzodiazepine",
     "category": "Psychiatry",
     "moa": "Binds to stereospecific benzodiazepine receptors on the postsynaptic GABA neuron.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 11 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 11
+    }
   },
   {
     "generic": "Lorazepam",
@@ -1245,7 +2020,12 @@
     "class": "Benzodiazepine",
     "category": "Psychiatry",
     "moa": "Binds to stereospecific benzodiazepine receptors on the postsynaptic GABA neuron.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 11 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 11
+    }
   },
   {
     "generic": "Buspirone",
@@ -1253,7 +2033,12 @@
     "class": "Anxiolytic",
     "category": "Psychiatry",
     "moa": "High affinity for serotonin 5-HT1A and 5-HT2 receptors; moderate affinity for dopamine D2 receptors.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 11 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 11
+    }
   },
   {
     "generic": "Lithium",
@@ -1261,7 +2046,12 @@
     "class": "Antimanic Agent",
     "category": "Psychiatry",
     "moa": "Alters cation transport in nerve and muscle cells and influences reuptake of serotonin and norepinephrine.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 11 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 11
+    }
   },
   {
     "generic": "Hydroxyzine",
@@ -1269,7 +2059,12 @@
     "class": "Antihistamine",
     "category": "Psychiatry / Allergy",
     "moa": "Competes with histamine for H1-receptor sites in the GI tract, blood vessels, and respiratory tract.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 11 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 11
+    }
   },
   {
     "generic": "Donepezil",
@@ -1277,7 +2072,12 @@
     "class": "Cholinesterase Inhibitor",
     "category": "Neurology",
     "moa": "Reversibly inhibits acetylcholinesterase, increasing acetylcholine concentrations.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 12 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 12
+    }
   },
   {
     "generic": "Memantine",
@@ -1285,7 +2085,12 @@
     "class": "NMDA Receptor Antagonist",
     "category": "Neurology",
     "moa": "Uncompetitive NMDA receptor antagonist that binds to NMDA receptor-operated cation channels.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 12 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 12
+    }
   },
   {
     "generic": "Gabapentin",
@@ -1293,7 +2098,12 @@
     "class": "Gaba Analog",
     "category": "Neurology",
     "moa": "Binds to voltage-gated calcium channels to modulate neurotransmitter release.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 12 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 12
+    }
   },
   {
     "generic": "Valproic Acid",
@@ -1301,7 +2111,12 @@
     "class": "Anticonvulsant",
     "category": "Neurology",
     "moa": "Causes increased availability of GABA to brain neurons or may enhance the action of GABA.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 12 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 12
+    }
   },
   {
     "generic": "Phenytoin",
@@ -1309,7 +2124,12 @@
     "class": "Anticonvulsant",
     "category": "Neurology",
     "moa": "Stabilizes neuronal membranes and decreases seizure activity by increasing efflux or decreasing influx of sodium ions.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 12 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 12
+    }
   },
   {
     "generic": "Carbamazepine",
@@ -1317,7 +2137,12 @@
     "class": "Anticonvulsant",
     "category": "Neurology",
     "moa": "Decreases synaptic transmission by limiting the influx of sodium ions across cell membranes.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 12 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 12
+    }
   },
   {
     "generic": "Ropinirole",
@@ -1325,7 +2150,12 @@
     "class": "Dopamine Agonist",
     "category": "Neurology",
     "moa": "Stimulates dopamine receptors in the corpus striatum.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 12 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 12
+    }
   },
   {
     "generic": "Pramipexole",
@@ -1333,7 +2163,12 @@
     "class": "Dopamine Agonist",
     "category": "Neurology",
     "moa": "Stimulates dopamine receptors in the corpus striatum.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 12 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 12
+    }
   },
   {
     "generic": "Baclofen",
@@ -1341,7 +2176,12 @@
     "class": "Skeletal Muscle Relaxant",
     "category": "Neurology",
     "moa": "Inhibits monosynaptic and polysynaptic reflexes at the spinal level by hyperpolarization of afferent terminals.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 12 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 12
+    }
   },
   {
     "generic": "Cyclobenzaprine",
@@ -1349,7 +2189,12 @@
     "class": "Skeletal Muscle Relaxant",
     "category": "Neurology",
     "moa": "Reduces tonic somatic motor activity influencing both alpha and gamma motor neurons.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 12 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 12
+    }
   },
   {
     "generic": "Tizanidine",
@@ -1357,7 +2202,12 @@
     "class": "Alpha-2 Adrenergic Agonist",
     "category": "Neurology",
     "moa": "Alpha-2 adrenergic agonist that decreases excitatory amino acid release from spinal interneurons.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 12 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 12
+    }
   },
   {
     "generic": "Methocarbamol",
@@ -1365,7 +2215,12 @@
     "class": "Skeletal Muscle Relaxant",
     "category": "Neurology",
     "moa": "Causes general CNS depression; has no direct action on the contractile mechanism of striated muscle.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 12 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 12
+    }
   },
   {
     "generic": "Penicillin V Potassium",
@@ -1373,7 +2228,12 @@
     "class": "Penicillin Antibiotic",
     "category": "Antibiotic",
     "moa": "Inhibits bacterial cell wall synthesis by binding to penicillin-binding proteins (PBPs).",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 13 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 13
+    }
   },
   {
     "generic": "Cephalexin",
@@ -1381,7 +2241,12 @@
     "class": "1st Generation Cephalosporin",
     "category": "Antibiotic",
     "moa": "Inhibits bacterial cell wall synthesis by binding to penicillin-binding proteins (PBPs).",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 13 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 13
+    }
   },
   {
     "generic": "Cefdinir",
@@ -1389,7 +2254,12 @@
     "class": "3rd Generation Cephalosporin",
     "category": "Antibiotic",
     "moa": "Inhibits bacterial cell wall synthesis by binding to penicillin-binding proteins (PBPs).",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 13 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 13
+    }
   },
   {
     "generic": "Clarithromycin",
@@ -1397,7 +2267,12 @@
     "class": "Macrolide Antibiotic",
     "category": "Antibiotic",
     "moa": "Inhibits RNA-dependent protein synthesis by binding to the 50S ribosomal subunit.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 13 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 13
+    }
   },
   {
     "generic": "Levofloxacin",
@@ -1405,7 +2280,12 @@
     "class": "Fluoroquinolone Antibiotic",
     "category": "Antibiotic",
     "moa": "Inhibits DNA-gyrase, inhibiting relaxation of supercoiled DNA and promoting breakage of double-stranded DNA.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 13 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 13
+    }
   },
   {
     "generic": "Nitrofurantoin",
@@ -1413,7 +2293,12 @@
     "class": "Nitrofuran Antibiotic",
     "category": "Antibiotic",
     "moa": "Inactivates or alters bacterial ribosomal proteins and other macromolecules.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 13 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 13
+    }
   },
   {
     "generic": "Fluconazole",
@@ -1421,7 +2306,12 @@
     "class": "Antifungal",
     "category": "Antibiotic",
     "moa": "Inhibits biosynthesis of ergosterol or other sterols, damaging the fungal cell wall membrane.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 14 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 14
+    }
   },
   {
     "generic": "Acyclovir",
@@ -1429,7 +2319,12 @@
     "class": "Antiviral",
     "category": "Antibiotic",
     "moa": "Inhibits DNA synthesis and viral replication by competing with deoxyguanosine triphosphate for viral DNA polymerase.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 14 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 14
+    }
   },
   {
     "generic": "Valacyclovir",
@@ -1437,7 +2332,12 @@
     "class": "Antiviral",
     "category": "Antibiotic",
     "moa": "Rapidly converted to acyclovir, which inhibits DNA synthesis and viral replication.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 14 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 14
+    }
   },
   {
     "generic": "Oseltamivir",
@@ -1445,7 +2345,12 @@
     "class": "Neuraminidase Inhibitor",
     "category": "Antibiotic",
     "moa": "Inhibits influenza virus neuraminidase, preventing the release of viral particles from infected cells.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 14 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 14
+    }
   },
   {
     "generic": "Fluticasone Propionate",
@@ -1453,7 +2358,12 @@
     "class": "Corticosteroid",
     "category": "Respiratory",
     "moa": "Utilizes a multi-pathway mechanism to inhibit multiple inflammatory cytokines.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 15 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 15
+    }
   },
   {
     "generic": "Ipratropium / Albuterol",
@@ -1461,6 +2371,11 @@
     "class": "Anticholinergic / SABA",
     "category": "Respiratory",
     "moa": "Ipratropium blocks acetylcholine at muscarinic receptors; Albuterol relaxes bronchial smooth muscle via beta-2 receptors.",
-    "metadata": { "lab": 1, "quiz": 1, "is_new": false, "week": 15 }
+    "metadata": {
+      "lab": 1,
+      "quiz": 1,
+      "is_new": false,
+      "week": 15
+    }
   }
 ]

@@ -5,9 +5,9 @@
     "easy" : null,
     "lab1" : [ {
       "type" : "mcq",
-      "prompt" : "Which class does Lisinopril belong to?",
-      "choices" : [ "ACE inhibitor", "ACE Inhibitor", "Angiotensin II Receptor Blocker", "Loop diuretic" ],
-      "answer" : [ "ACE Inhibitor" ],
+      "prompt" : "What is the category of Lisinopril?",
+      "choices" : [ "Antihypertensive", "Antiarrhythmic", "Antilipemic", "Anticoagulant" ],
+      "answer" : [ "Antihypertensive" ],
       "answerText" : null,
       "mapping" : {
         "category" : "Antihypertensive",
@@ -16,11 +16,11 @@
         "generic" : "Lisinopril"
       }
     }, {
-      "type" : "mcq",
-      "prompt" : "What is the MOA of Amlodipine?",
-      "choices" : [ "Blocks calcium channels in vascular smooth muscle", "Competes with aldosterone in the distal tubule", "Inhibits conversion of angiotensin I to angiotensin II", "Inhibits the influx of calcium ions into vascular smooth muscle and cardiac muscle, resulting in decreased peripheral vascular resistance and reduced blood pressure." ],
-      "answer" : [ "Inhibits the influx of calcium ions into vascular smooth muscle and cardiac muscle, resulting in decreased peripheral vascular resistance and reduced blood pressure." ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the brand name for Amlodipine?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "norvasc" ],
       "mapping" : {
         "category" : "Antihypertensive",
         "brand" : "Norvasc",
@@ -28,11 +28,11 @@
         "generic" : "Amlodipine"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the brand name for Losartan?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "cozaar" ],
+      "type" : "mcq",
+      "prompt" : "What is the MOA of Losartan?",
+      "choices" : [ "Selectively blocks the binding of angiotensin II to the AT1 receptor, preventing vasoconstriction and reducing the secretion of aldosterone.", "Competes with aldosterone in the distal tubule", "Inhibits conversion of angiotensin I to angiotensin II", "Blocks calcium channels in vascular smooth muscle" ],
+      "answer" : [ "Selectively blocks the binding of angiotensin II to the AT1 receptor, preventing vasoconstriction and reducing the secretion of aldosterone." ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Antihypertensive",
         "brand" : "Cozaar",
@@ -41,10 +41,10 @@
       }
     }, {
       "type" : "short",
-      "prompt" : "What is the generic name for Microzide?",
+      "prompt" : "What is the brand name for Hydrochlorothiazide?",
       "choices" : null,
       "answer" : null,
-      "answerText" : [ "hydrochlorothiazide" ],
+      "answerText" : [ "microzide" ],
       "mapping" : {
         "category" : "Antihypertensive",
         "brand" : "Microzide",
@@ -52,11 +52,11 @@
         "generic" : "Hydrochlorothiazide"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the brand name for Nifedipine?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "procardia" ],
+      "type" : "mcq",
+      "prompt" : "Which class does Nifedipine belong to?",
+      "choices" : [ "CCB (Dihydropyridine)", "Calcium channel blocker (dihydropyridine)", "Loop diuretic", "Calcium channel blocker (non-dihydropyridine)" ],
+      "answer" : [ "CCB (Dihydropyridine)" ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Antihypertensive",
         "brand" : "Procardia",
@@ -64,11 +64,11 @@
         "generic" : "Nifedipine"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the generic name for Lasix?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "furosemide" ],
+      "type" : "mcq",
+      "prompt" : "What is the MOA of Furosemide?",
+      "choices" : [ "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle", "Blocks angiotensin II from binding to its receptor", "Competes with aldosterone in the distal tubule", "Inhibits the reabsorption of sodium and chloride in the ascending loop of Henle and distal renal tubule." ],
+      "answer" : [ "Inhibits the reabsorption of sodium and chloride in the ascending loop of Henle and distal renal tubule." ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Antihypertensive",
         "brand" : "Lasix",
@@ -76,11 +76,11 @@
         "generic" : "Furosemide"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the generic name for Apresoline?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "hydralazine" ],
+      "type" : "mcq",
+      "prompt" : "What is the category of Hydralazine?",
+      "choices" : [ "Antilipemic", "Antiarrhythmic", "Anticoagulant", "Antihypertensive" ],
+      "answer" : [ "Antihypertensive" ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Antihypertensive",
         "brand" : "Apresoline",
@@ -88,11 +88,11 @@
         "generic" : "Hydralazine"
       }
     }, {
-      "type" : "mcq",
-      "prompt" : "What is the category of Ramipril?",
-      "choices" : [ "Antilipemic", "Antihypertensive", "Anticoagulant", "Antiarrhythmic" ],
-      "answer" : [ "Antihypertensive" ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the brand name for Ramipril?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "altace" ],
       "mapping" : {
         "category" : "Antihypertensive",
         "brand" : "Altace",
@@ -101,9 +101,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "Which class does Irbesartan belong to?",
-      "choices" : [ "Angiotensin II Receptor Blocker", "Calcium channel blocker (dihydropyridine)", "ARB", "Thiazide diuretic" ],
-      "answer" : [ "ARB" ],
+      "prompt" : "What is the category of Irbesartan?",
+      "choices" : [ "Antihypertensive", "Antilipemic", "Antiarrhythmic", "Anticoagulant" ],
+      "answer" : [ "Antihypertensive" ],
       "answerText" : null,
       "mapping" : {
         "category" : "Antihypertensive",
@@ -112,11 +112,11 @@
         "generic" : "Irbesartan"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the generic name for Cardura?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "doxazosin" ],
+      "type" : "mcq",
+      "prompt" : "What is the category of Doxazosin?",
+      "choices" : [ "Antilipemic", "Anticoagulant", "Antiarrhythmic", "Antihypertensive / BPH" ],
+      "answer" : [ "Antihypertensive / BPH" ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Antihypertensive / BPH",
         "brand" : "Cardura",
@@ -124,11 +124,11 @@
         "generic" : "Doxazosin"
       }
     }, {
-      "type" : "mcq",
-      "prompt" : "Which class does Terazosin belong to?",
-      "choices" : [ "Alpha-1 Antagonist", "Aldosterone receptor antagonist", "Beta-1 selective blocker", "Thiazide diuretic" ],
-      "answer" : [ "Alpha-1 Antagonist" ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the brand name for Terazosin?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "hytrin" ],
       "mapping" : {
         "category" : "Antihypertensive / BPH",
         "brand" : "Hytrin",
@@ -136,11 +136,11 @@
         "generic" : "Terazosin"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the brand name for Quinapril?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "accupril" ],
+      "type" : "mcq",
+      "prompt" : "What is the MOA of Quinapril?",
+      "choices" : [ "Blocks calcium channels in vascular smooth muscle", "Competes with aldosterone in the distal tubule", "Inhibits the conversion of angiotensin I to angiotensin II, causing vasodilation.", "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle" ],
+      "answer" : [ "Inhibits the conversion of angiotensin I to angiotensin II, causing vasodilation." ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Antihypertensive",
         "brand" : "Accupril",
@@ -148,11 +148,11 @@
         "generic" : "Quinapril"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the brand name for Candesartan?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "atacand" ],
+      "type" : "mcq",
+      "prompt" : "Which class does Candesartan belong to?",
+      "choices" : [ "Calcium channel blocker (dihydropyridine)", "Aldosterone receptor antagonist", "Thiazide diuretic", "ARB" ],
+      "answer" : [ "ARB" ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Antihypertensive",
         "brand" : "Atacand",
@@ -161,10 +161,10 @@
       }
     }, {
       "type" : "short",
-      "prompt" : "What is the brand name for Clonidine?",
+      "prompt" : "What is the generic name for Catapres?",
       "choices" : null,
       "answer" : null,
-      "answerText" : [ "catapres" ],
+      "answerText" : [ "clonidine" ],
       "mapping" : {
         "category" : "Antihypertensive",
         "brand" : "Catapres",
@@ -173,10 +173,10 @@
       }
     }, {
       "type" : "short",
-      "prompt" : "What is the generic name for Cardizem?",
+      "prompt" : "What is the brand name for Diltiazem?",
       "choices" : null,
       "answer" : null,
-      "answerText" : [ "diltiazem" ],
+      "answerText" : [ "cardizem" ],
       "mapping" : {
         "category" : "Antihypertensive",
         "brand" : "Cardizem",
@@ -184,11 +184,11 @@
         "generic" : "Diltiazem"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the generic name for Toprol XL?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "metoprolol succinate" ],
+      "type" : "mcq",
+      "prompt" : "Which class does Metoprolol Succinate belong to?",
+      "choices" : [ "Fibric acid derivative", "Aldosterone receptor antagonist", "Beta Blocker", "HMG-CoA reductase inhibitor" ],
+      "answer" : [ "Beta Blocker" ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Antihypertensive",
         "brand" : "Toprol XL",
@@ -197,21 +197,21 @@
       }
     }, {
       "type" : "short",
-      "prompt" : "What is the brand name for Spironolactone?",
+      "prompt" : "What is the generic name for Aldactone?",
       "choices" : null,
       "answer" : null,
-      "answerText" : [ "aldactone" ],
+      "answerText" : [ "spironolactone" ],
       "mapping" : {
         "category" : "Antihypertensive",
         "brand" : "Aldactone",
-        "class" : "Potassium Sparing Diuretic",
+        "class" : "Potassium-Sparing Diuretic / Aldosterone Antagonist",
         "generic" : "Spironolactone"
       }
     }, {
       "type" : "mcq",
-      "prompt" : "What is the category of Carvedilol?",
-      "choices" : [ "Antilipemic", "Anticoagulant", "Antiarrhythmic", "Antihypertensive" ],
-      "answer" : [ "Antihypertensive" ],
+      "prompt" : "What is the MOA of Carvedilol?",
+      "choices" : [ "Inhibits Na+/Cl- reabsorption in the distal tubule", "Inhibits conversion of angiotensin I to angiotensin II", "Blocks calcium channels in vascular smooth muscle", "Nonselective beta-adrenoreceptor and alpha-adrenoreceptor antagonist." ],
+      "answer" : [ "Nonselective beta-adrenoreceptor and alpha-adrenoreceptor antagonist." ],
       "answerText" : null,
       "mapping" : {
         "category" : "Antihypertensive",
@@ -220,11 +220,11 @@
         "generic" : "Carvedilol"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the generic name for Bystolic?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "nebivolol" ],
+      "type" : "mcq",
+      "prompt" : "What is the category of Nebivolol?",
+      "choices" : [ "Antihypertensive", "Antiarrhythmic", "Antilipemic", "Anticoagulant" ],
+      "answer" : [ "Antihypertensive" ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Antihypertensive",
         "brand" : "Bystolic",
@@ -232,11 +232,11 @@
         "generic" : "Nebivolol"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the generic name for Tenormin?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "atenolol" ],
+      "type" : "mcq",
+      "prompt" : "What is the MOA of Atenolol?",
+      "choices" : [ "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle", "Blocks angiotensin II from binding to its receptor", "Competes with aldosterone in the distal tubule", "Selectively blocks beta-1 receptors." ],
+      "answer" : [ "Selectively blocks beta-1 receptors." ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Antihypertensive",
         "brand" : "Tenormin",
@@ -244,11 +244,11 @@
         "generic" : "Atenolol"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the generic name for Trandate?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "labetalol" ],
+      "type" : "mcq",
+      "prompt" : "What is the category of Labetalol?",
+      "choices" : [ "Antihypertensive", "Antilipemic", "Anticoagulant", "Antiarrhythmic" ],
+      "answer" : [ "Antihypertensive" ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Antihypertensive",
         "brand" : "Trandate",
@@ -257,9 +257,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "What is the category of Propranolol?",
-      "choices" : [ "Antiarrhythmic", "Anticoagulant", "Antilipemic", "Antihypertensive" ],
-      "answer" : [ "Antihypertensive" ],
+      "prompt" : "Which class does Propranolol belong to?",
+      "choices" : [ "Angiotensin II Receptor Blocker", "Loop diuretic", "HMG-CoA reductase inhibitor", "Non-selective Beta Blocker" ],
+      "answer" : [ "Non-selective Beta Blocker" ],
       "answerText" : null,
       "mapping" : {
         "category" : "Antihypertensive",
@@ -270,7 +270,7 @@
     }, {
       "type" : "mcq",
       "prompt" : "What is the category of Metoprolol Tartrate?",
-      "choices" : [ "Anticoagulant", "Antihypertensive", "Antilipemic", "Antiarrhythmic" ],
+      "choices" : [ "Anticoagulant", "Antihypertensive", "Antiarrhythmic", "Antilipemic" ],
       "answer" : [ "Antihypertensive" ],
       "answerText" : null,
       "mapping" : {
@@ -281,9 +281,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "What is the MOA of Simvastatin?",
-      "choices" : [ "Blocks angiotensin II from binding to its receptor", "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle", "Inhibits Na+/Cl- reabsorption in the distal tubule", "Inhibits HMG-CoA reductase, the rate-limiting enzyme in cholesterol synthesis." ],
-      "answer" : [ "Inhibits HMG-CoA reductase, the rate-limiting enzyme in cholesterol synthesis." ],
+      "prompt" : "What is the category of Simvastatin?",
+      "choices" : [ "Antihypertensive", "Anticoagulant", "Antilipemic", "Antiarrhythmic" ],
+      "answer" : [ "Antilipemic" ],
       "answerText" : null,
       "mapping" : {
         "category" : "Antilipemic",
@@ -292,11 +292,11 @@
         "generic" : "Simvastatin"
       }
     }, {
-      "type" : "mcq",
-      "prompt" : "Which class does Atorvastatin belong to?",
-      "choices" : [ "ACE inhibitor", "HMG-CoA Reductase Inhibitor", "Angiotensin II Receptor Blocker", "Thiazide diuretic" ],
-      "answer" : [ "HMG-CoA Reductase Inhibitor" ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the brand name for Atorvastatin?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "lipitor" ],
       "mapping" : {
         "category" : "Antilipemic",
         "brand" : "Lipitor",
@@ -304,11 +304,11 @@
         "generic" : "Atorvastatin"
       }
     }, {
-      "type" : "mcq",
-      "prompt" : "What is the category of Rosuvastatin?",
-      "choices" : [ "Antihypertensive", "Anticoagulant", "Antilipemic", "Antiarrhythmic" ],
-      "answer" : [ "Antilipemic" ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the brand name for Rosuvastatin?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "crestor" ],
       "mapping" : {
         "category" : "Antilipemic",
         "brand" : "Crestor",
@@ -316,11 +316,11 @@
         "generic" : "Rosuvastatin"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the generic name for Pravachol?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "pravastatin" ],
+      "type" : "mcq",
+      "prompt" : "What is the MOA of Pravastatin?",
+      "choices" : [ "Competes with aldosterone in the distal tubule", "Blocks calcium channels in vascular smooth muscle", "Inhibits conversion of angiotensin I to angiotensin II", "Inhibits HMG-CoA reductase, the rate-limiting enzyme in cholesterol synthesis." ],
+      "answer" : [ "Inhibits HMG-CoA reductase, the rate-limiting enzyme in cholesterol synthesis." ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Antilipemic",
         "brand" : "Pravachol",
@@ -328,11 +328,11 @@
         "generic" : "Pravastatin"
       }
     }, {
-      "type" : "mcq",
-      "prompt" : "What is the MOA of Fenofibrate?",
-      "choices" : [ "Competes with aldosterone in the distal tubule", "Blocks calcium channels in vascular smooth muscle", "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle", "Activates PPAR-alpha, increasing lipolysis and elimination of triglyceride-rich particles." ],
-      "answer" : [ "Activates PPAR-alpha, increasing lipolysis and elimination of triglyceride-rich particles." ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the generic name for Tricor?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "fenofibrate" ],
       "mapping" : {
         "category" : "Antilipemic",
         "brand" : "Tricor",
@@ -341,9 +341,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "Which class does Gemfibrozil belong to?",
-      "choices" : [ "Angiotensin II Receptor Blocker", "Loop diuretic", "Fibrate", "Aldosterone receptor antagonist" ],
-      "answer" : [ "Fibrate" ],
+      "prompt" : "What is the category of Gemfibrozil?",
+      "choices" : [ "Anticoagulant", "Antihypertensive", "Antiarrhythmic", "Antilipemic" ],
+      "answer" : [ "Antilipemic" ],
       "answerText" : null,
       "mapping" : {
         "category" : "Antilipemic",
@@ -352,11 +352,11 @@
         "generic" : "Gemfibrozil"
       }
     }, {
-      "type" : "mcq",
-      "prompt" : "Which class does Ezetimibe belong to?",
-      "choices" : [ "Thiazide diuretic", "Aldosterone receptor antagonist", "Cholesterol Absorption Inhibitor", "ACE inhibitor" ],
-      "answer" : [ "Cholesterol Absorption Inhibitor" ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the generic name for Zetia?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "ezetimibe" ],
       "mapping" : {
         "category" : "Antilipemic",
         "brand" : "Zetia",
@@ -365,9 +365,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "What is the category of Omega-3 Acid Ethyl Esters?",
-      "choices" : [ "Antihypertensive", "Antilipemic", "Antiarrhythmic", "Anticoagulant" ],
-      "answer" : [ "Antilipemic" ],
+      "prompt" : "What is the MOA of Omega-3 Acid Ethyl Esters?",
+      "choices" : [ "Reduces hepatic synthesis of triglycerides and increases clearance from plasma.", "Blocks angiotensin II from binding to its receptor", "Blocks calcium channels in vascular smooth muscle", "Inhibits conversion of angiotensin I to angiotensin II" ],
+      "answer" : [ "Reduces hepatic synthesis of triglycerides and increases clearance from plasma." ],
       "answerText" : null,
       "mapping" : {
         "category" : "Antilipemic",
@@ -376,11 +376,11 @@
         "generic" : "Omega-3 Acid Ethyl Esters"
       }
     }, {
-      "type" : "mcq",
-      "prompt" : "What is the category of Niacin?",
-      "choices" : [ "Antiarrhythmic", "Antihypertensive", "Anticoagulant", "Antilipemic" ],
-      "answer" : [ "Antilipemic" ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the generic name for Niaspan?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "niacin" ],
       "mapping" : {
         "category" : "Antilipemic",
         "brand" : "Niaspan",
@@ -388,11 +388,11 @@
         "generic" : "Niacin"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the brand name for Evolocumab?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "repatha" ],
+      "type" : "mcq",
+      "prompt" : "What is the MOA of Evolocumab?",
+      "choices" : [ "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle", "Binds to PCSK9, increasing the number of available LDL receptors to clear LDL from the blood.", "Blocks calcium channels in vascular smooth muscle", "Blocks angiotensin II from binding to its receptor" ],
+      "answer" : [ "Binds to PCSK9, increasing the number of available LDL receptors to clear LDL from the blood." ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Antilipemic",
         "brand" : "Repatha",
@@ -400,11 +400,11 @@
         "generic" : "Evolocumab"
       }
     }, {
-      "type" : "mcq",
-      "prompt" : "Which class does Warfarin belong to?",
-      "choices" : [ "Loop diuretic", "Aldosterone receptor antagonist", "Calcium channel blocker (non-dihydropyridine)", "Vitamin K Antagonist" ],
-      "answer" : [ "Vitamin K Antagonist" ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the brand name for Warfarin?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "coumadin" ],
       "mapping" : {
         "category" : "Anticoagulant",
         "brand" : "Coumadin",
@@ -414,7 +414,7 @@
     }, {
       "type" : "mcq",
       "prompt" : "What is the MOA of Rivaroxaban?",
-      "choices" : [ "Competes with aldosterone in the distal tubule", "Blocks angiotensin II from binding to its receptor", "Inhibits Na+/Cl- reabsorption in the distal tubule", "Selectively and reversibly inhibits factor Xa, preventing thrombin generation." ],
+      "choices" : [ "Competes with aldosterone in the distal tubule", "Inhibits conversion of angiotensin I to angiotensin II", "Selectively and reversibly inhibits factor Xa, preventing thrombin generation.", "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle" ],
       "answer" : [ "Selectively and reversibly inhibits factor Xa, preventing thrombin generation." ],
       "answerText" : null,
       "mapping" : {
@@ -425,9 +425,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "Which class does Apixaban belong to?",
-      "choices" : [ "Aldosterone receptor antagonist", "Angiotensin II Receptor Blocker", "Thiazide diuretic", "Factor Xa Inhibitor" ],
-      "answer" : [ "Factor Xa Inhibitor" ],
+      "prompt" : "What is the MOA of Apixaban?",
+      "choices" : [ "Inhibits conversion of angiotensin I to angiotensin II", "Selectively and reversibly inhibits factor Xa, preventing thrombin generation.", "Blocks angiotensin II from binding to its receptor", "Blocks calcium channels in vascular smooth muscle" ],
+      "answer" : [ "Selectively and reversibly inhibits factor Xa, preventing thrombin generation." ],
       "answerText" : null,
       "mapping" : {
         "category" : "Anticoagulant",
@@ -437,9 +437,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "What is the MOA of Enoxaparin?",
-      "choices" : [ "Inhibits conversion of angiotensin I to angiotensin II", "Potentiates antithrombin III, inhibiting factor Xa and thrombin.", "Inhibits Na+/Cl- reabsorption in the distal tubule", "Competes with aldosterone in the distal tubule" ],
-      "answer" : [ "Potentiates antithrombin III, inhibiting factor Xa and thrombin." ],
+      "prompt" : "What is the category of Enoxaparin?",
+      "choices" : [ "Antihypertensive", "Antilipemic", "Anticoagulant", "Antiarrhythmic" ],
+      "answer" : [ "Anticoagulant" ],
       "answerText" : null,
       "mapping" : {
         "category" : "Anticoagulant",
@@ -449,9 +449,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "What is the category of Amiodarone?",
-      "choices" : [ "Anticoagulant", "Antilipemic", "Antiarrhythmic", "Antihypertensive" ],
-      "answer" : [ "Antiarrhythmic" ],
+      "prompt" : "What is the MOA of Amiodarone?",
+      "choices" : [ "Inhibits potassium channels, prolonging action potential and refractory period.", "Inhibits Na+/Cl- reabsorption in the distal tubule", "Blocks angiotensin II from binding to its receptor", "Competes with aldosterone in the distal tubule" ],
+      "answer" : [ "Inhibits potassium channels, prolonging action potential and refractory period." ],
       "answerText" : null,
       "mapping" : {
         "category" : "Antiarrhythmic",
@@ -460,11 +460,11 @@
         "generic" : "Amiodarone"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the brand name for Digoxin?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "lanoxin" ],
+      "type" : "mcq",
+      "prompt" : "What is the category of Digoxin?",
+      "choices" : [ "Antihypertensive", "Anticoagulant", "Antiarrhythmic", "Antilipemic" ],
+      "answer" : [ "Antiarrhythmic" ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Antiarrhythmic",
         "brand" : "Lanoxin",
@@ -472,11 +472,11 @@
         "generic" : "Digoxin"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the generic name for Betapace?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "sotalol" ],
+      "type" : "mcq",
+      "prompt" : "What is the category of Sotalol?",
+      "choices" : [ "Antilipemic", "Antihypertensive", "Antiarrhythmic", "Anticoagulant" ],
+      "answer" : [ "Antiarrhythmic" ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Antiarrhythmic",
         "brand" : "Betapace",
@@ -484,11 +484,11 @@
         "generic" : "Sotalol"
       }
     }, {
-      "type" : "mcq",
-      "prompt" : "What is the category of Metformin?",
-      "choices" : [ "Antihypertensive", "Anticoagulant", "Antilipemic", "Antidiabetic" ],
-      "answer" : [ "Antidiabetic" ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the brand name for Metformin?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "glucophage" ],
       "mapping" : {
         "category" : "Antidiabetic",
         "brand" : "Glucophage",
@@ -496,11 +496,11 @@
         "generic" : "Metformin"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the generic name for Lantus?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "insulin glargine" ],
+      "type" : "mcq",
+      "prompt" : "What is the category of Insulin Glargine?",
+      "choices" : [ "Antiarrhythmic", "Antihypertensive", "Anticoagulant", "Antidiabetic" ],
+      "answer" : [ "Antidiabetic" ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Antidiabetic",
         "brand" : "Lantus",
@@ -510,7 +510,7 @@
     }, {
       "type" : "mcq",
       "prompt" : "What is the category of Sitagliptin?",
-      "choices" : [ "Antiarrhythmic", "Antilipemic", "Antidiabetic", "Anticoagulant" ],
+      "choices" : [ "Antidiabetic", "Antiarrhythmic", "Antihypertensive", "Antilipemic" ],
       "answer" : [ "Antidiabetic" ],
       "answerText" : null,
       "mapping" : {
@@ -521,9 +521,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "Which class does Empagliflozin belong to?",
-      "choices" : [ "SGLT2 Inhibitor", "ACE inhibitor", "Angiotensin II Receptor Blocker", "Calcium channel blocker (non-dihydropyridine)" ],
-      "answer" : [ "SGLT2 Inhibitor" ],
+      "prompt" : "What is the category of Empagliflozin?",
+      "choices" : [ "Antihypertensive", "Anticoagulant", "Antiarrhythmic", "Antidiabetic" ],
+      "answer" : [ "Antidiabetic" ],
       "answerText" : null,
       "mapping" : {
         "category" : "Antidiabetic",
@@ -545,10 +545,10 @@
       }
     }, {
       "type" : "short",
-      "prompt" : "What is the generic name for Victoza?",
+      "prompt" : "What is the brand name for Liraglutide?",
       "choices" : null,
       "answer" : null,
-      "answerText" : [ "liraglutide" ],
+      "answerText" : [ "victoza" ],
       "mapping" : {
         "category" : "Antidiabetic",
         "brand" : "Victoza",
@@ -556,11 +556,11 @@
         "generic" : "Liraglutide"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the generic name for Amaryl?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "glimepiride" ],
+      "type" : "mcq",
+      "prompt" : "What is the category of Glimepiride?",
+      "choices" : [ "Antilipemic", "Antihypertensive", "Antidiabetic", "Anticoagulant" ],
+      "answer" : [ "Antidiabetic" ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Antidiabetic",
         "brand" : "Amaryl",
@@ -569,10 +569,10 @@
       }
     }, {
       "type" : "short",
-      "prompt" : "What is the brand name for Glyburide?",
+      "prompt" : "What is the generic name for Micronase?",
       "choices" : null,
       "answer" : null,
-      "answerText" : [ "micronase" ],
+      "answerText" : [ "glyburide" ],
       "mapping" : {
         "category" : "Antidiabetic",
         "brand" : "Micronase",
@@ -580,11 +580,11 @@
         "generic" : "Glyburide"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the generic name for Invokana?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "canagliflozin" ],
+      "type" : "mcq",
+      "prompt" : "What is the category of Canagliflozin?",
+      "choices" : [ "Anticoagulant", "Antidiabetic", "Antilipemic", "Antihypertensive" ],
+      "answer" : [ "Antidiabetic" ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Antidiabetic",
         "brand" : "Invokana",
@@ -592,11 +592,11 @@
         "generic" : "Canagliflozin"
       }
     }, {
-      "type" : "mcq",
-      "prompt" : "Which class does Sertraline belong to?",
-      "choices" : [ "SSRI", "Calcium channel blocker (dihydropyridine)", "Loop diuretic", "Fibric acid derivative" ],
-      "answer" : [ "SSRI" ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the brand name for Sertraline?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "zoloft" ],
       "mapping" : {
         "category" : "Psychiatry",
         "brand" : "Zoloft",
@@ -604,11 +604,11 @@
         "generic" : "Sertraline"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the generic name for Prozac?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "fluoxetine" ],
+      "type" : "mcq",
+      "prompt" : "What is the MOA of Fluoxetine?",
+      "choices" : [ "Inhibits conversion of angiotensin I to angiotensin II", "Inhibits the CNS neuronal reuptake of serotonin.", "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle", "Blocks calcium channels in vascular smooth muscle" ],
+      "answer" : [ "Inhibits the CNS neuronal reuptake of serotonin." ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Psychiatry",
         "brand" : "Prozac",
@@ -616,11 +616,11 @@
         "generic" : "Fluoxetine"
       }
     }, {
-      "type" : "mcq",
-      "prompt" : "Which class does Escitalopram belong to?",
-      "choices" : [ "HMG-CoA reductase inhibitor", "SSRI", "Angiotensin II Receptor Blocker", "Beta-1 selective blocker" ],
-      "answer" : [ "SSRI" ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the generic name for Lexapro?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "escitalopram" ],
       "mapping" : {
         "category" : "Psychiatry",
         "brand" : "Lexapro",
@@ -630,7 +630,7 @@
     }, {
       "type" : "mcq",
       "prompt" : "What is the category of Duloxetine?",
-      "choices" : [ "Antihypertensive", "Psychiatry", "Anticoagulant", "Antiarrhythmic" ],
+      "choices" : [ "Antihypertensive", "Anticoagulant", "Antilipemic", "Psychiatry" ],
       "answer" : [ "Psychiatry" ],
       "answerText" : null,
       "mapping" : {
@@ -641,9 +641,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "What is the MOA of Venlafaxine?",
-      "choices" : [ "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle", "Inhibits Na+/Cl- reabsorption in the distal tubule", "Inhibits neuronal serotonin and norepinephrine reuptake.", "Competes with aldosterone in the distal tubule" ],
-      "answer" : [ "Inhibits neuronal serotonin and norepinephrine reuptake." ],
+      "prompt" : "Which class does Venlafaxine belong to?",
+      "choices" : [ "Beta-1 selective blocker", "SNRI", "HMG-CoA reductase inhibitor", "ACE inhibitor" ],
+      "answer" : [ "SNRI" ],
       "answerText" : null,
       "mapping" : {
         "category" : "Psychiatry",
@@ -653,9 +653,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "Which class does Bupropion belong to?",
-      "choices" : [ "HMG-CoA reductase inhibitor", "Fibric acid derivative", "DNRI", "Loop diuretic" ],
-      "answer" : [ "DNRI" ],
+      "prompt" : "What is the category of Bupropion?",
+      "choices" : [ "Psychiatry", "Anticoagulant", "Antihypertensive", "Antiarrhythmic" ],
+      "answer" : [ "Psychiatry" ],
       "answerText" : null,
       "mapping" : {
         "category" : "Psychiatry",
@@ -665,9 +665,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "Which class does Trazodone belong to?",
-      "choices" : [ "Calcium channel blocker (dihydropyridine)", "Serotonin Reuptake Inhibitor / Antagonist", "Angiotensin II Receptor Blocker", "Fibric acid derivative" ],
-      "answer" : [ "Serotonin Reuptake Inhibitor / Antagonist" ],
+      "prompt" : "What is the category of Trazodone?",
+      "choices" : [ "Antilipemic", "Anticoagulant", "Antiarrhythmic", "Psychiatry" ],
+      "answer" : [ "Psychiatry" ],
       "answerText" : null,
       "mapping" : {
         "category" : "Psychiatry",
@@ -676,11 +676,11 @@
         "generic" : "Trazodone"
       }
     }, {
-      "type" : "mcq",
-      "prompt" : "Which class does Citalopram belong to?",
-      "choices" : [ "Angiotensin II Receptor Blocker", "SSRI", "Fibric acid derivative", "Calcium channel blocker (dihydropyridine)" ],
-      "answer" : [ "SSRI" ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the brand name for Citalopram?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "celexa" ],
       "mapping" : {
         "category" : "Psychiatry",
         "brand" : "Celexa",
@@ -689,9 +689,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "What is the category of Paroxetine?",
-      "choices" : [ "Antilipemic", "Anticoagulant", "Psychiatry", "Antihypertensive" ],
-      "answer" : [ "Psychiatry" ],
+      "prompt" : "Which class does Paroxetine belong to?",
+      "choices" : [ "Loop diuretic", "Angiotensin II Receptor Blocker", "Beta-1 selective blocker", "SSRI" ],
+      "answer" : [ "SSRI" ],
       "answerText" : null,
       "mapping" : {
         "category" : "Psychiatry",
@@ -700,11 +700,11 @@
         "generic" : "Paroxetine"
       }
     }, {
-      "type" : "mcq",
-      "prompt" : "What is the MOA of Amitriptyline?",
-      "choices" : [ "Increases the synaptic concentration of serotonin and/or norepinephrine in the CNS by inhibition of their reuptake.", "Blocks calcium channels in vascular smooth muscle", "Inhibits conversion of angiotensin I to angiotensin II", "Inhibits Na+/Cl- reabsorption in the distal tubule" ],
-      "answer" : [ "Increases the synaptic concentration of serotonin and/or norepinephrine in the CNS by inhibition of their reuptake." ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the brand name for Amitriptyline?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "elavil" ],
       "mapping" : {
         "category" : "Psychiatry",
         "brand" : "Elavil",
@@ -713,9 +713,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "Which class does Mirtazapine belong to?",
-      "choices" : [ "ACE inhibitor", "Alpha-2 Antagonist", "Calcium channel blocker (dihydropyridine)", "Calcium channel blocker (non-dihydropyridine)" ],
-      "answer" : [ "Alpha-2 Antagonist" ],
+      "prompt" : "What is the MOA of Mirtazapine?",
+      "choices" : [ "Inhibits Na+/Cl- reabsorption in the distal tubule", "Blocks calcium channels in vascular smooth muscle", "Inhibits conversion of angiotensin I to angiotensin II", "Antagonizes central presynaptic alpha-2 adrenergic receptors which results in increased release of norepinephrine and serotonin." ],
+      "answer" : [ "Antagonizes central presynaptic alpha-2 adrenergic receptors which results in increased release of norepinephrine and serotonin." ],
       "answerText" : null,
       "mapping" : {
         "category" : "Psychiatry",
@@ -725,9 +725,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "What is the category of Alprazolam?",
-      "choices" : [ "Antilipemic", "Anticoagulant", "Antiarrhythmic", "Psychiatry" ],
-      "answer" : [ "Psychiatry" ],
+      "prompt" : "Which class does Alprazolam belong to?",
+      "choices" : [ "HMG-CoA reductase inhibitor", "Benzodiazepine", "Loop diuretic", "Angiotensin II Receptor Blocker" ],
+      "answer" : [ "Benzodiazepine" ],
       "answerText" : null,
       "mapping" : {
         "category" : "Psychiatry",
@@ -737,9 +737,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "Which class does Zolpidem belong to?",
-      "choices" : [ "Angiotensin II Receptor Blocker", "Calcium channel blocker (non-dihydropyridine)", "Non-benzodiazepine Hypnotic", "Loop diuretic" ],
-      "answer" : [ "Non-benzodiazepine Hypnotic" ],
+      "prompt" : "What is the category of Zolpidem?",
+      "choices" : [ "Antilipemic", "Antihypertensive", "Psychiatry", "Anticoagulant" ],
+      "answer" : [ "Psychiatry" ],
       "answerText" : null,
       "mapping" : {
         "category" : "Psychiatry",
@@ -749,9 +749,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "Which class does Quetiapine belong to?",
-      "choices" : [ "Atypical Antipsychotic", "Thiazide diuretic", "Loop diuretic", "Beta-1 selective blocker" ],
-      "answer" : [ "Atypical Antipsychotic" ],
+      "prompt" : "What is the MOA of Quetiapine?",
+      "choices" : [ "Blocks angiotensin II from binding to its receptor", "Antagonist at multiple neurotransmitter receptors, including serotonin and dopamine.", "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle", "Competes with aldosterone in the distal tubule" ],
+      "answer" : [ "Antagonist at multiple neurotransmitter receptors, including serotonin and dopamine." ],
       "answerText" : null,
       "mapping" : {
         "category" : "Psychiatry",
@@ -760,11 +760,11 @@
         "generic" : "Quetiapine"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the brand name for Risperidone?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "risperdal" ],
+      "type" : "mcq",
+      "prompt" : "Which class does Risperidone belong to?",
+      "choices" : [ "Aldosterone receptor antagonist", "Calcium channel blocker (dihydropyridine)", "Beta-1 selective blocker", "Atypical Antipsychotic" ],
+      "answer" : [ "Atypical Antipsychotic" ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Psychiatry",
         "brand" : "Risperdal",
@@ -772,11 +772,11 @@
         "generic" : "Risperidone"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the generic name for Zyprexa?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "olanzapine" ],
+      "type" : "mcq",
+      "prompt" : "What is the category of Olanzapine?",
+      "choices" : [ "Antiarrhythmic", "Psychiatry", "Antilipemic", "Antihypertensive" ],
+      "answer" : [ "Psychiatry" ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Psychiatry",
         "brand" : "Zyprexa",
@@ -798,7 +798,7 @@
     }, {
       "type" : "mcq",
       "prompt" : "What is the category of Diazepam?",
-      "choices" : [ "Anticoagulant", "Psychiatry", "Antilipemic", "Antiarrhythmic" ],
+      "choices" : [ "Psychiatry", "Antihypertensive", "Antilipemic", "Anticoagulant" ],
       "answer" : [ "Psychiatry" ],
       "answerText" : null,
       "mapping" : {
@@ -809,10 +809,10 @@
       }
     }, {
       "type" : "short",
-      "prompt" : "What is the generic name for Ativan?",
+      "prompt" : "What is the brand name for Lorazepam?",
       "choices" : null,
       "answer" : null,
-      "answerText" : [ "lorazepam" ],
+      "answerText" : [ "ativan" ],
       "mapping" : {
         "category" : "Psychiatry",
         "brand" : "Ativan",
@@ -822,7 +822,7 @@
     }, {
       "type" : "mcq",
       "prompt" : "Which class does Buspirone belong to?",
-      "choices" : [ "Aldosterone receptor antagonist", "Fibric acid derivative", "Anxiolytic", "ACE inhibitor" ],
+      "choices" : [ "Calcium channel blocker (non-dihydropyridine)", "Angiotensin II Receptor Blocker", "Anxiolytic", "Calcium channel blocker (dihydropyridine)" ],
       "answer" : [ "Anxiolytic" ],
       "answerText" : null,
       "mapping" : {
@@ -833,9 +833,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "What is the MOA of Lithium?",
-      "choices" : [ "Competes with aldosterone in the distal tubule", "Blocks calcium channels in vascular smooth muscle", "Blocks angiotensin II from binding to its receptor", "Alters cation transport in nerve and muscle cells and influences reuptake of serotonin and norepinephrine." ],
-      "answer" : [ "Alters cation transport in nerve and muscle cells and influences reuptake of serotonin and norepinephrine." ],
+      "prompt" : "What is the category of Lithium?",
+      "choices" : [ "Psychiatry", "Antiarrhythmic", "Antilipemic", "Anticoagulant" ],
+      "answer" : [ "Psychiatry" ],
       "answerText" : null,
       "mapping" : {
         "category" : "Psychiatry",
@@ -844,11 +844,11 @@
         "generic" : "Lithium"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the generic name for Atarax; Vistaril?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "hydroxyzine" ],
+      "type" : "mcq",
+      "prompt" : "What is the category of Hydroxyzine?",
+      "choices" : [ "Antihypertensive", "Anticoagulant", "Psychiatry / Allergy", "Antilipemic" ],
+      "answer" : [ "Psychiatry / Allergy" ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Psychiatry / Allergy",
         "brand" : "Atarax; Vistaril",
@@ -857,9 +857,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "What is the MOA of Donepezil?",
-      "choices" : [ "Blocks calcium channels in vascular smooth muscle", "Inhibits conversion of angiotensin I to angiotensin II", "Competes with aldosterone in the distal tubule", "Reversibly inhibits acetylcholinesterase, increasing acetylcholine concentrations." ],
-      "answer" : [ "Reversibly inhibits acetylcholinesterase, increasing acetylcholine concentrations." ],
+      "prompt" : "What is the category of Donepezil?",
+      "choices" : [ "Neurology", "Anticoagulant", "Antiarrhythmic", "Antilipemic" ],
+      "answer" : [ "Neurology" ],
       "answerText" : null,
       "mapping" : {
         "category" : "Neurology",
@@ -880,11 +880,11 @@
         "generic" : "Memantine"
       }
     }, {
-      "type" : "mcq",
-      "prompt" : "What is the category of Gabapentin?",
-      "choices" : [ "Antiarrhythmic", "Anticoagulant", "Neurology", "Antihypertensive" ],
-      "answer" : [ "Neurology" ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the generic name for Neurontin?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "gabapentin" ],
       "mapping" : {
         "category" : "Neurology",
         "brand" : "Neurontin",
@@ -892,11 +892,11 @@
         "generic" : "Gabapentin"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the generic name for Depakote?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "valproic acid" ],
+      "type" : "mcq",
+      "prompt" : "What is the category of Valproic Acid?",
+      "choices" : [ "Antilipemic", "Neurology", "Antiarrhythmic", "Antihypertensive" ],
+      "answer" : [ "Neurology" ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Neurology",
         "brand" : "Depakote",
@@ -904,11 +904,11 @@
         "generic" : "Valproic Acid"
       }
     }, {
-      "type" : "mcq",
-      "prompt" : "What is the MOA of Phenytoin?",
-      "choices" : [ "Stabilizes neuronal membranes and decreases seizure activity by increasing efflux or decreasing influx of sodium ions.", "Blocks calcium channels in vascular smooth muscle", "Inhibits Na+/Cl- reabsorption in the distal tubule", "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle" ],
-      "answer" : [ "Stabilizes neuronal membranes and decreases seizure activity by increasing efflux or decreasing influx of sodium ions." ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the generic name for Dilantin?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "phenytoin" ],
       "mapping" : {
         "category" : "Neurology",
         "brand" : "Dilantin",
@@ -917,9 +917,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "Which class does Carbamazepine belong to?",
-      "choices" : [ "Angiotensin II Receptor Blocker", "HMG-CoA reductase inhibitor", "Aldosterone receptor antagonist", "Anticonvulsant" ],
-      "answer" : [ "Anticonvulsant" ],
+      "prompt" : "What is the MOA of Carbamazepine?",
+      "choices" : [ "Blocks angiotensin II from binding to its receptor", "Inhibits conversion of angiotensin I to angiotensin II", "Blocks calcium channels in vascular smooth muscle", "Decreases synaptic transmission by limiting the influx of sodium ions across cell membranes." ],
+      "answer" : [ "Decreases synaptic transmission by limiting the influx of sodium ions across cell membranes." ],
       "answerText" : null,
       "mapping" : {
         "category" : "Neurology",
@@ -929,9 +929,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "What is the MOA of Ropinirole?",
-      "choices" : [ "Competes with aldosterone in the distal tubule", "Stimulates dopamine receptors in the corpus striatum.", "Inhibits conversion of angiotensin I to angiotensin II", "Blocks calcium channels in vascular smooth muscle" ],
-      "answer" : [ "Stimulates dopamine receptors in the corpus striatum." ],
+      "prompt" : "What is the category of Ropinirole?",
+      "choices" : [ "Neurology", "Antihypertensive", "Anticoagulant", "Antiarrhythmic" ],
+      "answer" : [ "Neurology" ],
       "answerText" : null,
       "mapping" : {
         "category" : "Neurology",
@@ -940,11 +940,11 @@
         "generic" : "Ropinirole"
       }
     }, {
-      "type" : "mcq",
-      "prompt" : "Which class does Pramipexole belong to?",
-      "choices" : [ "Beta-1 selective blocker", "Calcium channel blocker (dihydropyridine)", "Angiotensin II Receptor Blocker", "Dopamine Agonist" ],
-      "answer" : [ "Dopamine Agonist" ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the generic name for Mirapex?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "pramipexole" ],
       "mapping" : {
         "category" : "Neurology",
         "brand" : "Mirapex",
@@ -953,9 +953,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "What is the MOA of Baclofen?",
-      "choices" : [ "Blocks angiotensin II from binding to its receptor", "Inhibits monosynaptic and polysynaptic reflexes at the spinal level by hyperpolarization of afferent terminals.", "Inhibits Na+/Cl- reabsorption in the distal tubule", "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle" ],
-      "answer" : [ "Inhibits monosynaptic and polysynaptic reflexes at the spinal level by hyperpolarization of afferent terminals." ],
+      "prompt" : "Which class does Baclofen belong to?",
+      "choices" : [ "Skeletal Muscle Relaxant", "Fibric acid derivative", "Loop diuretic", "Thiazide diuretic" ],
+      "answer" : [ "Skeletal Muscle Relaxant" ],
       "answerText" : null,
       "mapping" : {
         "category" : "Neurology",
@@ -964,11 +964,11 @@
         "generic" : "Baclofen"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the brand name for Cyclobenzaprine?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "flexeril" ],
+      "type" : "mcq",
+      "prompt" : "What is the category of Cyclobenzaprine?",
+      "choices" : [ "Antiarrhythmic", "Antilipemic", "Anticoagulant", "Neurology" ],
+      "answer" : [ "Neurology" ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Neurology",
         "brand" : "Flexeril",
@@ -977,9 +977,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "Which class does Tizanidine belong to?",
-      "choices" : [ "Loop diuretic", "Fibric acid derivative", "Alpha-2 Adrenergic Agonist", "Calcium channel blocker (dihydropyridine)" ],
-      "answer" : [ "Alpha-2 Adrenergic Agonist" ],
+      "prompt" : "What is the category of Tizanidine?",
+      "choices" : [ "Neurology", "Antihypertensive", "Anticoagulant", "Antilipemic" ],
+      "answer" : [ "Neurology" ],
       "answerText" : null,
       "mapping" : {
         "category" : "Neurology",
@@ -988,11 +988,11 @@
         "generic" : "Tizanidine"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the generic name for Robaxin?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "methocarbamol" ],
+      "type" : "mcq",
+      "prompt" : "Which class does Methocarbamol belong to?",
+      "choices" : [ "Thiazide diuretic", "Skeletal Muscle Relaxant", "ACE inhibitor", "Calcium channel blocker (non-dihydropyridine)" ],
+      "answer" : [ "Skeletal Muscle Relaxant" ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Neurology",
         "brand" : "Robaxin",
@@ -1000,11 +1000,11 @@
         "generic" : "Methocarbamol"
       }
     }, {
-      "type" : "mcq",
-      "prompt" : "Which class does Penicillin V Potassium belong to?",
-      "choices" : [ "Aldosterone receptor antagonist", "Angiotensin II Receptor Blocker", "ACE inhibitor", "Penicillin Antibiotic" ],
-      "answer" : [ "Penicillin Antibiotic" ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the generic name for Pen-VK?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "penicillin v potassium" ],
       "mapping" : {
         "category" : "Antibiotic",
         "brand" : "Pen-VK",
@@ -1013,9 +1013,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "What is the category of Cephalexin?",
-      "choices" : [ "Antilipemic", "Antibiotic", "Antiarrhythmic", "Anticoagulant" ],
-      "answer" : [ "Antibiotic" ],
+      "prompt" : "What is the MOA of Cephalexin?",
+      "choices" : [ "Blocks calcium channels in vascular smooth muscle", "Inhibits bacterial cell wall synthesis by binding to penicillin-binding proteins (PBPs).", "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle", "Competes with aldosterone in the distal tubule" ],
+      "answer" : [ "Inhibits bacterial cell wall synthesis by binding to penicillin-binding proteins (PBPs)." ],
       "answerText" : null,
       "mapping" : {
         "category" : "Antibiotic",
@@ -1025,9 +1025,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "What is the MOA of Cefdinir?",
-      "choices" : [ "Blocks calcium channels in vascular smooth muscle", "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle", "Competes with aldosterone in the distal tubule", "Inhibits bacterial cell wall synthesis by binding to penicillin-binding proteins (PBPs)." ],
-      "answer" : [ "Inhibits bacterial cell wall synthesis by binding to penicillin-binding proteins (PBPs)." ],
+      "prompt" : "Which class does Cefdinir belong to?",
+      "choices" : [ "3rd Generation Cephalosporin", "Beta-1 selective blocker", "Angiotensin II Receptor Blocker", "Loop diuretic" ],
+      "answer" : [ "3rd Generation Cephalosporin" ],
       "answerText" : null,
       "mapping" : {
         "category" : "Antibiotic",
@@ -1036,11 +1036,11 @@
         "generic" : "Cefdinir"
       }
     }, {
-      "type" : "mcq",
-      "prompt" : "Which class does Clarithromycin belong to?",
-      "choices" : [ "Macrolide Antibiotic", "Aldosterone receptor antagonist", "Loop diuretic", "Angiotensin II Receptor Blocker" ],
-      "answer" : [ "Macrolide Antibiotic" ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the generic name for Biaxin?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "clarithromycin" ],
       "mapping" : {
         "category" : "Antibiotic",
         "brand" : "Biaxin",
@@ -1048,11 +1048,11 @@
         "generic" : "Clarithromycin"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the brand name for Levofloxacin?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "levaquin" ],
+      "type" : "mcq",
+      "prompt" : "Which class does Levofloxacin belong to?",
+      "choices" : [ "HMG-CoA reductase inhibitor", "Calcium channel blocker (non-dihydropyridine)", "Loop diuretic", "Fluoroquinolone Antibiotic" ],
+      "answer" : [ "Fluoroquinolone Antibiotic" ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Antibiotic",
         "brand" : "Levaquin",
@@ -1060,11 +1060,11 @@
         "generic" : "Levofloxacin"
       }
     }, {
-      "type" : "mcq",
-      "prompt" : "Which class does Nitrofurantoin belong to?",
-      "choices" : [ "Angiotensin II Receptor Blocker", "Aldosterone receptor antagonist", "Nitrofuran Antibiotic", "Loop diuretic" ],
-      "answer" : [ "Nitrofuran Antibiotic" ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the brand name for Nitrofurantoin?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "macrobid" ],
       "mapping" : {
         "category" : "Antibiotic",
         "brand" : "Macrobid",
@@ -1073,9 +1073,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "What is the category of Fluconazole?",
-      "choices" : [ "Antihypertensive", "Antibiotic", "Anticoagulant", "Antilipemic" ],
-      "answer" : [ "Antibiotic" ],
+      "prompt" : "Which class does Fluconazole belong to?",
+      "choices" : [ "HMG-CoA reductase inhibitor", "Calcium channel blocker (non-dihydropyridine)", "Antifungal", "ACE inhibitor" ],
+      "answer" : [ "Antifungal" ],
       "answerText" : null,
       "mapping" : {
         "category" : "Antibiotic",
@@ -1085,10 +1085,10 @@
       }
     }, {
       "type" : "short",
-      "prompt" : "What is the generic name for Zovirax?",
+      "prompt" : "What is the brand name for Acyclovir?",
       "choices" : null,
       "answer" : null,
-      "answerText" : [ "acyclovir" ],
+      "answerText" : [ "zovirax" ],
       "mapping" : {
         "category" : "Antibiotic",
         "brand" : "Zovirax",
@@ -1096,11 +1096,11 @@
         "generic" : "Acyclovir"
       }
     }, {
-      "type" : "mcq",
-      "prompt" : "Which class does Valacyclovir belong to?",
-      "choices" : [ "Angiotensin II Receptor Blocker", "Antiviral", "Thiazide diuretic", "HMG-CoA reductase inhibitor" ],
-      "answer" : [ "Antiviral" ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the brand name for Valacyclovir?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "valtrex" ],
       "mapping" : {
         "category" : "Antibiotic",
         "brand" : "Valtrex",
@@ -1108,11 +1108,11 @@
         "generic" : "Valacyclovir"
       }
     }, {
-      "type" : "mcq",
-      "prompt" : "What is the category of Oseltamivir?",
-      "choices" : [ "Anticoagulant", "Antibiotic", "Antilipemic", "Antiarrhythmic" ],
-      "answer" : [ "Antibiotic" ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the generic name for Tamiflu?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "oseltamivir" ],
       "mapping" : {
         "category" : "Antibiotic",
         "brand" : "Tamiflu",
@@ -1120,11 +1120,11 @@
         "generic" : "Oseltamivir"
       }
     }, {
-      "type" : "mcq",
-      "prompt" : "What is the category of Fluticasone Propionate?",
-      "choices" : [ "Antiarrhythmic", "Antilipemic", "Antihypertensive", "Respiratory" ],
-      "answer" : [ "Respiratory" ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the brand name for Fluticasone Propionate?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "flonase" ],
       "mapping" : {
         "category" : "Respiratory",
         "brand" : "Flonase",
@@ -1133,9 +1133,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "What is the category of Ipratropium / Albuterol?",
-      "choices" : [ "Anticoagulant", "Antilipemic", "Antiarrhythmic", "Respiratory" ],
-      "answer" : [ "Respiratory" ],
+      "prompt" : "Which class does Ipratropium / Albuterol belong to?",
+      "choices" : [ "Calcium channel blocker (non-dihydropyridine)", "Anticholinergic / SABA", "ACE inhibitor", "Loop diuretic" ],
+      "answer" : [ "Anticholinergic / SABA" ],
       "answerText" : null,
       "mapping" : {
         "category" : "Respiratory",
@@ -1145,11 +1145,11 @@
       }
     } ],
     "lab2" : [ {
-      "type" : "mcq",
-      "prompt" : "Which class does Finasteride belong to?",
-      "choices" : [ "HMG-CoA reductase inhibitor", "Fibric acid derivative", "5-Alpha Reductase Inhibitor", "Beta-1 selective blocker" ],
-      "answer" : [ "5-Alpha Reductase Inhibitor" ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the generic name for Proscar?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "finasteride" ],
       "mapping" : {
         "category" : "Genitourinary",
         "brand" : "Proscar",
@@ -1158,9 +1158,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "What is the category of Tamsulosin?",
-      "choices" : [ "Anticoagulant", "Antihypertensive", "Genitourinary", "Antiarrhythmic" ],
-      "answer" : [ "Genitourinary" ],
+      "prompt" : "What is the MOA of Tamsulosin?",
+      "choices" : [ "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle", "Blocks calcium channels in vascular smooth muscle", "Inhibits Na+/Cl- reabsorption in the distal tubule", "Antagonist of alpha-1A adrenoreceptors in the prostate, causing smooth muscle relaxation." ],
+      "answer" : [ "Antagonist of alpha-1A adrenoreceptors in the prostate, causing smooth muscle relaxation." ],
       "answerText" : null,
       "mapping" : {
         "category" : "Genitourinary",
@@ -1169,11 +1169,11 @@
         "generic" : "Tamsulosin"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the generic name for Viagra?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "sildenafil" ],
+      "type" : "mcq",
+      "prompt" : "What is the category of Sildenafil?",
+      "choices" : [ "Antihypertensive", "Genitourinary", "Anticoagulant", "Antiarrhythmic" ],
+      "answer" : [ "Genitourinary" ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Genitourinary",
         "brand" : "Viagra",
@@ -1181,11 +1181,11 @@
         "generic" : "Sildenafil"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the brand name for Tadalafil?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "cialis" ],
+      "type" : "mcq",
+      "prompt" : "What is the category of Tadalafil?",
+      "choices" : [ "Antilipemic", "Antiarrhythmic", "Antihypertensive", "Genitourinary" ],
+      "answer" : [ "Genitourinary" ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Genitourinary",
         "brand" : "Cialis",
@@ -1193,11 +1193,11 @@
         "generic" : "Tadalafil"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the generic name for Ditropan?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "oxybutynin" ],
+      "type" : "mcq",
+      "prompt" : "What is the MOA of Oxybutynin?",
+      "choices" : [ "Competes with aldosterone in the distal tubule", "Inhibits Na+/Cl- reabsorption in the distal tubule", "Blocks angiotensin II from binding to its receptor", "Antagonizes acetylcholine at muscarinic receptors, relaxing bladder smooth muscle." ],
+      "answer" : [ "Antagonizes acetylcholine at muscarinic receptors, relaxing bladder smooth muscle." ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Genitourinary",
         "brand" : "Ditropan",
@@ -1206,9 +1206,9 @@
       }
     }, {
       "type" : "mcq",
-      "prompt" : "Which class does Solifenacin belong to?",
-      "choices" : [ "Antispasmodic", "Calcium channel blocker (non-dihydropyridine)", "Thiazide diuretic", "Beta-1 selective blocker" ],
-      "answer" : [ "Antispasmodic" ],
+      "prompt" : "What is the MOA of Solifenacin?",
+      "choices" : [ "Blocks calcium channels in vascular smooth muscle", "Competes with aldosterone in the distal tubule", "Blocks angiotensin II from binding to its receptor", "Antagonizes acetylcholine at muscarinic receptors, relaxing bladder smooth muscle." ],
+      "answer" : [ "Antagonizes acetylcholine at muscarinic receptors, relaxing bladder smooth muscle." ],
       "answerText" : null,
       "mapping" : {
         "category" : "Genitourinary",
@@ -1217,11 +1217,11 @@
         "generic" : "Solifenacin"
       }
     }, {
-      "type" : "mcq",
-      "prompt" : "Which class does Mirabegron belong to?",
-      "choices" : [ "HMG-CoA reductase inhibitor", "Beta-3 Agonist", "Angiotensin II Receptor Blocker", "Calcium channel blocker (non-dihydropyridine)" ],
-      "answer" : [ "Beta-3 Agonist" ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the generic name for Myrbetriq?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "mirabegron" ],
       "mapping" : {
         "category" : "Genitourinary",
         "brand" : "Myrbetriq",
@@ -1229,11 +1229,11 @@
         "generic" : "Mirabegron"
       }
     }, {
-      "type" : "mcq",
-      "prompt" : "Which class does Tolterodine belong to?",
-      "choices" : [ "Thiazide diuretic", "Loop diuretic", "Calcium channel blocker (dihydropyridine)", "Antispasmodic" ],
-      "answer" : [ "Antispasmodic" ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the generic name for Detrol?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "tolterodine" ],
       "mapping" : {
         "category" : "Genitourinary",
         "brand" : "Detrol",
@@ -1241,11 +1241,11 @@
         "generic" : "Tolterodine"
       }
     }, {
-      "type" : "mcq",
-      "prompt" : "What is the MOA of Dutasteride?",
-      "choices" : [ "Inhibits 5-alpha reductase enzyme, preventing the conversion of testosterone to DHT.", "Blocks calcium channels in vascular smooth muscle", "Inhibits Na+/Cl-/K+ reabsorption in the loop of Henle", "Competes with aldosterone in the distal tubule" ],
-      "answer" : [ "Inhibits 5-alpha reductase enzyme, preventing the conversion of testosterone to DHT." ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the brand name for Dutasteride?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "avodart" ],
       "mapping" : {
         "category" : "Genitourinary",
         "brand" : "Avodart",
@@ -1265,11 +1265,11 @@
         "generic" : "Phenazopyridine"
       }
     }, {
-      "type" : "short",
-      "prompt" : "What is the generic name for Levitra?",
-      "choices" : null,
-      "answer" : null,
-      "answerText" : [ "vardenafil" ],
+      "type" : "mcq",
+      "prompt" : "Which class does Vardenafil belong to?",
+      "choices" : [ "PDE-5 Inhibitor", "Fibric acid derivative", "Loop diuretic", "Angiotensin II Receptor Blocker" ],
+      "answer" : [ "PDE-5 Inhibitor" ],
+      "answerText" : null,
       "mapping" : {
         "category" : "Genitourinary",
         "brand" : "Levitra",

@@ -17,11 +17,11 @@
         "generic" : "Lisdexamfetamine"
       }
     }, {
-      "type" : "mcq",
-      "prompt" : "What is the MOA of Methylphenidate?",
-      "choices" : [ "Blocks calcium channels in vascular smooth muscle", "Blocks reuptake of norepinephrine and dopamine into the presynaptic neuron.", "Inhibits Na+/Cl- reabsorption in the distal tubule", "Blocks angiotensin II from binding to its receptor" ],
-      "answer" : [ "Blocks reuptake of norepinephrine and dopamine into the presynaptic neuron." ],
-      "answerText" : null,
+      "type" : "short",
+      "prompt" : "What is the brand name for Methylphenidate?",
+      "choices" : null,
+      "answer" : null,
+      "answerText" : [ "concerta" ],
       "mapping" : {
         "category" : "Psychiatry",
         "brand" : "Concerta",
