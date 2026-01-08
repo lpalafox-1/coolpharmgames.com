@@ -53,10 +53,9 @@ function runHome() {
   document.getElementById("start-now")?.addEventListener("click", handleStart);
   document.getElementById("skip")?.addEventListener("click", handleStart);
 
-  // 3) New: Track Progress for Lab II COP (Weeks 1-11)
-  // This looks for saved results and updates the UI
+  // 3) Progress Tracking: Lab II COP (Weeks 1-11)
   for (let w = 1; w <= 11; w++) {
-    const scoreKey = `pharmlet.week${w}.easy`; // Key based on quizEngine.js
+    const scoreKey = `pharmlet.week${w}.easy`; 
     const savedData = localStorage.getItem(scoreKey);
     
     if (savedData) {
@@ -64,18 +63,21 @@ function runHome() {
         const stats = JSON.parse(savedData);
         const percent = Math.round((stats.score / stats.total) * 100);
         
-        // Update the Progress Mini bars in the Featured Section
+        // Fill the mini progress bars if they exist (Featured Section)
         const bar = document.getElementById(`prog-week-${w}`);
         if (bar) {
           bar.style.width = `${percent}%`;
-          if (percent === 100) bar.style.background = "#10b981"; // Green for perfect score
+          if (percent === 100) bar.style.background = "#10b981";
         }
 
-        // Add a visual "Completed" ring to the Grid Buttons
+        // Apply visual checkmarks and borders to the main grid
         const gridBtn = document.querySelector(`a[href="quiz.html?week=${w}"]`);
         if (gridBtn) {
-          gridBtn.classList.add("border-green-500", "bg-green-50/10");
-          gridBtn.innerHTML += ` <span class="text-[10px] text-green-500 ml-1">✓</span>`;
+          gridBtn.style.borderColor = "#10b981";
+          gridBtn.classList.add("bg-green-500/5");
+          if (!gridBtn.innerHTML.includes("✓")) {
+            gridBtn.innerHTML += ` <span class="text-green-500 ml-1">✓</span>`;
+          }
         }
       } catch (e) {
         console.warn(`Failed to parse stats for week ${w}`, e);
@@ -83,27 +85,41 @@ function runHome() {
     }
   }
 
-  // 4) Resume last quiz logic (Updated to detect Lab II weeks)
+  // 4) SMART RESUME LOGIC (Fixed for Week-based URLs)
   const resumeWrap = document.getElementById("resume-wrap");
   const resumeLink = document.getElementById("resume-link");
   if (resumeWrap && resumeLink) {
-    let lastKey = null;
-    for (let i = 0; i < localStorage.length; i++) {
-      const k = localStorage.key(i);
-      if (k && k.startsWith("pharmlet.")) lastKey = k;
-    }
-    if (lastKey) {
-      const parts = lastKey.split(".");
-      if (parts[1].startsWith("week")) {
-        resumeLink.href = `quiz.html?week=${parts[1].replace("week", "")}`;
-      } else {
-        resumeLink.href = `quiz.html?id=${parts[1]}&mode=${parts[2] || 'easy'}&limit=20`;
+    try {
+      let lastKey = null;
+      // Iterate backwards to find the most recent quiz state
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith("pharmlet.") && k.split(".").length === 3) {
+          lastKey = k;
+          break; 
+        }
       }
-      resumeWrap.style.display = "";
+
+      if (lastKey) {
+        const parts = lastKey.split("."); // pharmlet.ID.MODE
+        const quizId = parts[1];
+        const mode = parts[2] || "easy";
+
+        if (quizId.startsWith("week")) {
+          // Dynamic Lab II Week
+          resumeLink.href = `quiz.html?week=${quizId.replace("week", "")}`;
+        } else {
+          // Legacy Static Quiz
+          resumeLink.href = `quiz.html?id=${encodeURIComponent(quizId)}&mode=${encodeURIComponent(mode)}&limit=20`;
+        }
+        resumeWrap.style.display = "";
+      }
+    } catch (e) {
+      console.warn("Resume detection failed:", e);
     }
   }
 
-  // 5) Filter & Sort (Existing logic preserved)
+  // 5) Filter & Sort
   const filter = document.getElementById("class-filter");
   if (filter) {
     filter.addEventListener("input", () => {
@@ -120,6 +136,5 @@ function runHome() {
     if ((new Date() - addedDate) / 86400000 > 7) banner.style.display = 'none';
   });
 
-  // Final check to show menu
   if (menu && menu.style.display === "none" && !showWelcome) menu.style.display = "";
 }
