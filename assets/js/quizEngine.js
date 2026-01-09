@@ -224,6 +224,7 @@ function wireEvents() {
             alert(hint);
         },
         "reveal-solution-mobile": () => scoreCurrent("Revealed"),
+        "restart-mobile": () => location.reload(),
     };
 
     Object.entries(handlers).forEach(([id, fn]) => {
