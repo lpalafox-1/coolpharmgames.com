@@ -269,10 +269,55 @@ function startSmartTimer() {
 
 function scoreCurrent(val) {
     const q = state.questions[state.index];
-    const isCorrect = (val === "Revealed") ? false : (val.trim().toLowerCase() === q.answer.toLowerCase());
+    // Special-case reveal
+    if (val === "Revealed") {
+        q._answered = true;
+        q._user = val;
+        q._correct = false;
+        render();
+        return;
+    }
+
+    const normalizeWhitespace = s => s.replace(/\s+/g, ' ').trim().toLowerCase();
+    const splitBySeparators = s => {
+        // split on hyphen, slash, or the word 'and' (as a word)
+        return s.split(/(?:\s*(?:-|\/)\s*|\s+\band\b\s+)/i).map(p => normalizeWhitespace(p)).filter(Boolean);
+    };
+
+    const userRaw = String(val);
+    const canonRaw = String(q.answer || "");
+
+    const userNorm = normalizeWhitespace(userRaw);
+    const canonNorm = normalizeWhitespace(canonRaw);
+
+    let isCorrect = false;
+
+    // If canonical answer has any of the separators, allow order-insensitive matching of parts
+    const separatorPresent = /-|\/|\band\b/i.test(canonRaw);
+
+    if (separatorPresent) {
+        const canonParts = splitBySeparators(canonRaw);
+        const userParts = splitBySeparators(userRaw);
+
+        // If user provided a single chunk that exactly matches the canonical string after normalization
+        if (userParts.length === 1 && userNorm === canonNorm) {
+            isCorrect = true;
+        } else {
+            // Compare parts as multisets (order-insensitive)
+            const sortParts = arr => arr.map(p => p.replace(/\s+/g, ' ').trim()).sort();
+            const c = sortParts(canonParts);
+            const u = sortParts(userParts);
+
+            if (c.length === u.length && c.every((v, i) => v === u[i])) isCorrect = true;
+        }
+    } else {
+        // Simple normalized string compare (ignore case + extra spaces)
+        isCorrect = (userNorm === canonNorm);
+    }
+
     q._answered = true;
     q._user = val;
-    q._correct = isCorrect;
+    q._correct = !!isCorrect;
     if (isCorrect) state.score++;
     const scoreEl = getEl("score");
     if (scoreEl) scoreEl.textContent = state.score;
