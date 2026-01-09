@@ -4,7 +4,6 @@ const quizId = params.get("id");
 const weekParam = parseInt(params.get("week") || "", 10);
 const limitParam = parseInt(params.get("limit") || "", 10);
 
-// SAFE ELEMENT LOADER: Prevents "White Page" if an ID is missing or misspelled
 const getEl = (id) => document.getElementById(id) || { 
     textContent: "", innerHTML: "", style: {}, 
     classList: { add:()=>{}, remove:()=>{}, toggle:()=>{} }, 
@@ -50,15 +49,14 @@ document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     main().catch(err => {
         console.error("Initialization Error:", err);
-        // If data fails to load, show it on the card so the user knows why
-        els.prompt.innerHTML = `<span style="color:#ef4444">Error: ${err.message}. Check if your data files are in assets/data/</span>`;
+        els.prompt.innerHTML = `<span style="color:#ef4444">Error: ${err.message}</span>`;
     });
 });
 
 async function main() {
     if (weekParam) await loadDynamicQuiz();
     else if (quizId) await loadStaticQuiz();
-    else throw new Error("No Quiz ID or Week specified in URL.");
+    else throw new Error("No Quiz ID or Week specified.");
 
     els.title.textContent = state.title;
     els.qtotal.textContent = state.questions.length;
@@ -80,14 +78,8 @@ function initTheme() {
     }
 }
 
-// PATH-PROOF FETCH: Tries multiple folder structures automatically
 async function smartFetch(fileName) {
-    const paths = [
-        `assets/data/${fileName}`, 
-        `data/${fileName}`, 
-        `../assets/data/${fileName}`,
-        `./assets/data/${fileName}`
-    ];
+    const paths = [`assets/data/${fileName}`, `data/${fileName}`, `../assets/data/${fileName}`, `./assets/data/${fileName}`];
     for (let path of paths) {
         try {
             const res = await fetch(path, { cache: "no-store" });
@@ -102,7 +94,6 @@ async function loadDynamicQuiz() {
     const reviewWeeks = GAME_PLAN[weekParam] || 'ALL';
     const newPool = pool.filter(d => Number(d.metadata?.lab) === 2 && Number(d.metadata?.week) === weekParam);
     const revPool = (reviewWeeks === 'ALL') ? pool.filter(d => Number(d.metadata?.lab) === 1) : pool.filter(d => Number(d.metadata?.lab) === 1 && reviewWeeks.includes(Number(d.metadata?.week)));
-    
     const combined = [...shuffled(newPool).slice(0, 6), ...shuffled(revPool).slice(0, 4)];
     state.title = `Lab II — Week ${weekParam}`;
     state.questions = shuffled(combined).map((d, i) => ({ ...createQuestion(d, pool), _id: i, drugRef: d }));
@@ -127,7 +118,7 @@ function createQuestion(drug, all) {
     }
     if (r < 0.6) return { type: "short", prompt: `Generic for <b>${singleBrand}</b>?`, answer: drug.generic, drugRef: drug };
     
-    const mcqTypes = [{l:'Classification', k:'class'}, {l:'MOA', k:'moa'}].filter(x => drug[x.k]);
+    const mcqTypes = [{l:'Classification', k:'class'}, {l:'Category', k:'category'}, {l:'MOA', k:'moa'}].filter(x => drug[x.k]);
     const t = mcqTypes[Math.floor(Math.random() * mcqTypes.length)];
     return { type: "mcq", prompt: `<b>${t.l}</b> for <b>${drug.generic}</b>?`, choices: shuffled([...distract(drug[t.k], t.k), drug[t.k]]), answer: drug[t.k], drugRef: drug };
 }
@@ -146,11 +137,22 @@ function wireEvents() {
         if (val) scoreCurrent(val);
     };
 
+    // HARD FONT SCALE FIX: Direct Body Injection
     const fInc = document.getElementById("font-increase");
     const fDec = document.getElementById("font-decrease");
     if (fInc && fDec) {
-        fInc.onclick = (e) => { e.preventDefault(); state.currentScale += 0.1; document.documentElement.style.setProperty('--quiz-size', `${state.currentScale}rem`); };
-        fDec.onclick = (e) => { e.preventDefault(); if(state.currentScale > 0.7) state.currentScale -= 0.1; document.documentElement.style.setProperty('--quiz-size', `${state.currentScale}rem`); };
+        fInc.onclick = (e) => { 
+            e.preventDefault(); 
+            state.currentScale += 0.1; 
+            document.body.style.fontSize = `${state.currentScale}rem`;
+            document.documentElement.style.setProperty('--quiz-size', `${state.currentScale}rem`); 
+        };
+        fDec.onclick = (e) => { 
+            e.preventDefault(); 
+            if(state.currentScale > 0.7) state.currentScale -= 0.1; 
+            document.body.style.fontSize = `${state.currentScale}rem`;
+            document.documentElement.style.setProperty('--quiz-size', `${state.currentScale}rem`); 
+        };
     }
 
     if (els.mark) els.mark.onclick = () => {
@@ -165,9 +167,8 @@ function render() {
     const q = state.questions[state.index];
     if (!q) return;
 
-    // NUCLEAR SPOILER FIX
-    const isSpoiler = q.prompt.toLowerCase().includes('class') || q.prompt.toLowerCase().includes('moa');
-    els.drugCtx.textContent = isSpoiler ? "Drug Review" : (q.drugRef?.category || "Pharmacology");
+    // TOTAL SILENCE FIX: No drug class, no category, no spoiler.
+    els.drugCtx.textContent = "Drug Practice"; 
 
     els.qnum.textContent = state.index + 1;
     els.prompt.innerHTML = q.prompt;
@@ -175,7 +176,6 @@ function render() {
     els.shortWrap.classList.add("hidden");
     els.explain.classList.remove("show");
     
-    // UI Button Toggles
     const checkBtn = document.getElementById("check");
     const nextBtn = document.getElementById("next");
     if(checkBtn) checkBtn.classList.toggle("hidden", !!q._answered);
@@ -184,7 +184,7 @@ function render() {
     if (q.type === "mcq") {
         q.choices.forEach(c => {
             const lbl = document.createElement("label");
-            lbl.className = `flex items-center gap-3 p-4 border rounded-xl cursor-pointer transition-all active:scale-[0.98] mb-2 ${q._user === c ? 'ring-2 ring-maroon bg-maroon/5' : 'border-[var(--ring)]'}`;
+            lbl.className = `flex items-center gap-3 p-4 border rounded-xl cursor-pointer transition-all mb-2 ${q._user === c ? 'ring-2 ring-maroon bg-maroon/5' : 'border-[var(--ring)]'}`;
             lbl.innerHTML = `<input type="radio" name="opt" value="${c}" class="w-5 h-5 accent-maroon" ${q._user === c ? 'checked' : ''} ${q._answered ? 'disabled' : ''}> <span class="flex-1 text-base leading-tight">${c}</span>`;
             lbl.onclick = () => { if (!q._answered) lbl.querySelector('input').checked = true; };
             els.options.appendChild(lbl);
@@ -215,7 +215,7 @@ function renderNavMap() {
 
 function scoreCurrent(val) {
     const q = state.questions[state.index];
-    const isCorrect = val.trim().toLowerCase() === q.answer.toLowerCase();
+    const isCorrect = (val === "Revealed") ? false : (val.trim().toLowerCase() === q.answer.toLowerCase());
     q._answered = true; q._user = val;
     q._correct = isCorrect;
     if (isCorrect) state.score++;
