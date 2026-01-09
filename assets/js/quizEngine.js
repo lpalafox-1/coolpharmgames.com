@@ -15,6 +15,9 @@ const getEl = (id) => document.getElementById(id);
 const savedTheme = localStorage.getItem("quiz-theme");
 if (savedTheme === "dark") {
     document.documentElement.classList.add("dark");
+    // Ensure help button is black if starting in dark mode
+    const helpBtn = document.getElementById("help-shortcuts");
+    if (helpBtn) helpBtn.style.color = "black";
 }
 
 // --- 1. CORE ACTIONS ---
@@ -206,10 +209,20 @@ function wireEvents() {
             if (val) scoreCurrent(val);
         },
         "reveal-solution": () => scoreCurrent("Revealed"),
-        "theme-toggle": () => {
-            const d = document.documentElement.classList.toggle("dark");
-            localStorage.setItem("quiz-theme", d ? "dark" : "light");
-        },
+   "theme-toggle": () => {
+    const isDark = document.documentElement.classList.toggle("dark");
+    localStorage.setItem("quiz-theme", isDark ? "dark" : "light");
+    
+    // FORCE BLACK TEXT ON HELP BUTTON IN DARK MODE
+    const helpBtn = getEl("help-shortcuts");
+    if (helpBtn) {
+        if (isDark) {
+            helpBtn.style.color = "black";
+        } else {
+            helpBtn.style.color = ""; // Resets to default CSS
+        }
+    }
+},
         "hint-btn": () => {
             const q = state.questions[state.index];
             if (!q) return;
