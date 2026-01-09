@@ -159,8 +159,7 @@ function renderNavMap() {
     nav.innerHTML = "";
     state.questions.forEach((q, i) => {
         const btn = document.createElement("button");
-        // FIXED COLORS: Forces black text for un-answered boxes in dark mode for visibility
-        let colorClass = "bg-white text-black border border-gray-300"; // Default
+        let colorClass = "bg-white text-black border border-gray-300";
         if (q._answered) {
             colorClass = q._correct ? "bg-green-500 text-white" : "bg-red-500 text-white";
         } else if (state.marked.has(i)) {
@@ -298,10 +297,12 @@ async function main() {
         if (getEl("qtotal")) getEl("qtotal").textContent = state.questions.length;
         startSmartTimer();
         wireEvents();
-        // Track last quiz for resume functionality
         localStorage.setItem("last-quiz", weekParam ? `?week=${weekParam}` : `?id=${quizId}`);
         render();
     } catch (err) {
         console.error("Quiz Error:", err);
-        const card = getEl("question-card");
-        if
+       const card = getEl("question-card");
+       if (card) card.innerHTML = `<div class="p-4 text-red-600"><p><b>Error:</b> ${err.message}</p></div>`;
+    }
+}
+        document.addEventListener('DOMContentLoaded', main);
