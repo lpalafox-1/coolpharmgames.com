@@ -282,7 +282,3 @@ async function main() {
 }
 
 document.addEventListener('DOMContentLoaded', main);
-
-console.log('weekParam:', weekParam);
-console.log('quizId:', quizId);
-console.log('state.questions.length:', state.questions.length);
