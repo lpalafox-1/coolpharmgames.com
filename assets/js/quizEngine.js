@@ -88,10 +88,6 @@ function render() {
     if (getEl("qnum")) getEl("qnum").textContent = state.index + 1;
     if (getEl("prompt")) getEl("prompt").innerHTML = q.prompt;
     
-    // Update score display
-    const scoreEl = getEl("score");
-    if (scoreEl) scoreEl.textContent = state.score;
-    
     // Reset all
     const optCont = getEl("options");
     if (optCont) optCont.innerHTML = "";
@@ -273,9 +269,10 @@ function startSmartTimer() {
 function scoreCurrent(val) {
     const q = state.questions[state.index];
     const isCorrect = (val === "Revealed") ? false : (val.trim().toLowerCase() === q.answer.toLowerCase());
-    q._answered = true; q._user = val; q._correct = isCorrect;
+    q._answered = true;
+    q._user = val;
+    q._correct = isCorrect;
     if (isCorrect) state.score++;
-    // Update score display immediately
     const scoreEl = getEl("score");
     if (scoreEl) scoreEl.textContent = state.score;
     render();
@@ -316,8 +313,9 @@ async function main() {
         render();
     } catch (err) {
         console.error("Quiz Error:", err);
-       const card = getEl("question-card");
-       if (card) card.innerHTML = `<div class="p-4 text-red-600"><p><b>Error:</b> ${err.message}</p></div>`;
+        const card = getEl("question-card");
+        if (card) card.innerHTML = `<div class="p-4 text-red-600"><p><b>Error:</b> ${err.message}</p></div>`;
     }
 }
-        document.addEventListener('DOMContentLoaded', main);
+
+document.addEventListener('DOMContentLoaded', main);
