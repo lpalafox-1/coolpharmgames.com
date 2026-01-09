@@ -103,7 +103,6 @@ function render() {
             lbl.className = `flex items-center gap-3 p-4 border rounded-xl cursor-pointer mb-2 transition-colors ${q._user === c ? 'ring-2 ring-maroon bg-maroon/5 border-maroon' : 'border-gray-200 dark:border-gray-700'}`;
             lbl.innerHTML = `<input type="radio" name="opt" value="${c}" class="w-5 h-5 accent-maroon" ${q._user === c ? 'checked' : ''} ${q._answered ? 'disabled' : ''}> <span class="flex-1 text-base leading-tight text-[var(--text)]">${c}</span>`;
             
-            // Mobile-safe: Use both click and touchstart
             const selectOption = () => {
                 if (!q._answered) {
                     const rad = lbl.querySelector('input');
@@ -114,12 +113,7 @@ function render() {
                 }
             };
             
-            lbl.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                selectOption();
-            }, { passive: false });
             lbl.addEventListener('click', selectOption, false);
-            
             optCont.appendChild(lbl);
         });
     } else if (q.type === "short") {
@@ -198,6 +192,14 @@ function wireEvents() {
             const hint = q.hint || "No hint available for this question.";
             alert(hint);
         },
+        "mark-mobile": toggleMark,
+        "hint-btn-mobile": () => {
+            const q = state.questions[state.index];
+            if (!q) return;
+            const hint = q.hint || "No hint available for this question.";
+            alert(hint);
+        },
+        "reveal-solution-mobile": () => scoreCurrent("Revealed"),
     };
 
     Object.entries(handlers).forEach(([id, fn]) => {
