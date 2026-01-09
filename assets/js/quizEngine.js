@@ -282,6 +282,11 @@ function startSmartTimer() {
 
 function scoreCurrent(val) {
     const q = state.questions[state.index];
+    if (!q) return;
+
+    // Fix for legacy quizzes: Check multiple keys for the correct answer
+    const correctAnswer = q.answer || q.correct || q.ans || "";
+
     // Special-case reveal
     if (val === "Revealed") {
         q._answered = true;
@@ -291,40 +296,37 @@ function scoreCurrent(val) {
         return;
     }
 
-    const normalizeWhitespace = s => s.replace(/\s+/g, ' ').trim().toLowerCase();
+    const normalizeWhitespace = s => String(s).replace(/\s+/g, ' ').trim().toLowerCase();
     const splitBySeparators = s => {
+        const str = normalizeWhitespace(s);
+        if (!str) return [];
         // split on hyphen, slash, or the word 'and' (as a word)
-        return s.split(/(?:\s*(?:-|\/)\s*|\s+\band\b\s+)/i).map(p => normalizeWhitespace(p)).filter(Boolean);
+        return str.split(/(?:\s*(?:-|\/)\s*|\s+\band\b\s+)/i).map(p => p.trim()).filter(Boolean);
     };
 
     const userRaw = String(val);
-    const canonRaw = String(q.answer || "");
-
     const userNorm = normalizeWhitespace(userRaw);
-    const canonNorm = normalizeWhitespace(canonRaw);
+    const canonNorm = normalizeWhitespace(correctAnswer);
 
     let isCorrect = false;
 
-    // If canonical answer has any of the separators, allow order-insensitive matching of parts
-    const separatorPresent = /-|\/|\band\b/i.test(canonRaw);
+    // Check if separators are present in the actual correct answer found
+    const separatorPresent = /-|\/|\band\b/i.test(String(correctAnswer));
 
     if (separatorPresent) {
-        const canonParts = splitBySeparators(canonRaw);
+        const canonParts = splitBySeparators(correctAnswer);
         const userParts = splitBySeparators(userRaw);
 
-        // If user provided a single chunk that exactly matches the canonical string after normalization
         if (userParts.length === 1 && userNorm === canonNorm) {
             isCorrect = true;
         } else {
-            // Compare parts as multisets (order-insensitive)
-            const sortParts = arr => arr.map(p => p.replace(/\s+/g, ' ').trim()).sort();
+            const sortParts = arr => arr.sort();
             const c = sortParts(canonParts);
             const u = sortParts(userParts);
 
             if (c.length === u.length && c.every((v, i) => v === u[i])) isCorrect = true;
         }
     } else {
-        // Simple normalized string compare (ignore case + extra spaces)
         isCorrect = (userNorm === canonNorm);
     }
 
