@@ -138,29 +138,31 @@ function wireEvents() {
         }
     };
 
-    // MOBILE/DESKTOP TIMER CLICK FIX
-    if (els.timerReadout) {
-        els.timerReadout.onclick = toggleTimer;
-        els.timerReadout.style.cursor = "pointer";
-    }
+    const toggleMark = () => {
+        if (state.marked.has(state.index)) state.marked.delete(state.index);
+        else state.marked.add(state.index);
+        renderNavMap();
+    };
 
+    if (els.timerReadout) els.timerReadout.onclick = toggleTimer;
     if (els.helpShortcuts) {
-        els.helpShortcuts.onclick = () => {
+        els.helpShortcuts.onclick = (e) => {
+            e.preventDefault();
             const m = document.getElementById("shortcuts-modal");
             if (m) { m.style.display = "flex"; m.classList.remove("hidden"); }
         };
     }
-    if (els.restart) els.restart.onclick = () => location.reload();
-    if (els.hintBtn) els.hintBtn.onclick = () => alert(`Hint: Starts with "${state.questions[state.index].answer[0]}".`);
-    
-    // MARK BUTTON FIX
-    if (els.mark) {
-        els.mark.onclick = () => {
-            if (state.marked.has(state.index)) state.marked.delete(state.index);
-            else state.marked.add(state.index);
-            renderNavMap();
+    const closeShortcuts = document.getElementById("close-shortcuts");
+    if (closeShortcuts) {
+        closeShortcuts.onclick = () => {
+            const m = document.getElementById("shortcuts-modal");
+            if (m) { m.style.display = "none"; m.classList.add("hidden"); }
         };
     }
+
+    if (els.restart) els.restart.onclick = () => location.reload();
+    if (els.hintBtn) els.hintBtn.onclick = () => alert(`Hint: Starts with "${state.questions[state.index].answer[0]}".`);
+    if (els.mark) els.mark.onclick = toggleMark;
 
     if (els.next) els.next.onclick = () => { if (state.index < state.questions.length - 1) { state.index++; render(); } else showResults(); };
     if (els.prev) els.prev.onclick = () => { if (state.index > 0) { state.index--; render(); } };
@@ -171,19 +173,16 @@ function wireEvents() {
         if (val) scoreCurrent(val);
     };
 
-    // FONT +/- SLEDGEHAMMER
     const fInc = document.getElementById("font-increase");
     const fDec = document.getElementById("font-decrease");
     if (fInc) fInc.onclick = () => { 
         state.currentScale += 0.1; 
-        document.body.style.fontSize = `${state.currentScale}rem`;
-        if (els.card) els.card.style.fontSize = `${state.currentScale}rem`;
+        document.documentElement.style.fontSize = `${state.currentScale * 16}px`;
     };
     if (fDec) fDec.onclick = () => { 
         if(state.currentScale > 0.7) {
             state.currentScale -= 0.1; 
-            document.body.style.fontSize = `${state.currentScale}rem`;
-            if (els.card) els.card.style.fontSize = `${state.currentScale}rem`;
+            document.documentElement.style.fontSize = `${state.currentScale * 16}px`;
         }
     };
 
@@ -193,6 +192,7 @@ function wireEvents() {
         if (document.activeElement.tagName === 'INPUT' && e.key !== 'Enter') return;
         const key = e.key.toLowerCase();
         if (key === "t") toggleTimer();
+        if (key === "m") toggleMark();
         if (key >= '1' && key <= '9') {
             const idx = parseInt(key) - 1;
             if (state.questions[idx]) { state.index = idx; render(); }
@@ -215,8 +215,6 @@ function render() {
     els.prompt.innerHTML = q.prompt;
     els.options.innerHTML = "";
     els.shortWrap.classList.add("hidden");
-    
-    // THE SPOILER LOOP FIX: Force hide explain unless question is answered for REAL
     els.explain.classList.remove("show");
     els.explain.innerHTML = "";
 
