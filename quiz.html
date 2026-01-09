@@ -22,8 +22,8 @@
     :root { --quiz-size: 1rem; }
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
     
-    /* Variable-based font scaling */
-    #question-card { font-size: var(--quiz-size) !important; transition: font-size 0.2s ease; }
+    /* REMOVED !important to allow JS Scaling to work */
+    #question-card { font-size: var(--quiz-size); transition: font-size 0.2s ease; }
     
     .mastery-header { 
       position: sticky; top: 0; z-index: 50; 
@@ -31,6 +31,8 @@
       background: color-mix(in oklab, var(--bg) 85%, transparent); 
       border-bottom: 1px solid var(--ring); 
     }
+
+    #shortcuts-modal { z-index: 100; }
 
     @media (min-width: 1024px) {
       .action-btn { max-width: 250px; padding: 1rem 1.5rem !important; font-size: 0.875rem !important; border-radius: 12px !important; }
@@ -49,7 +51,7 @@
           <button id="font-increase" class="p-1 px-2 hover:bg-black/5 rounded text-xs font-bold border border-[var(--ring)]">A+</button>
         </div>
       </div>
-      <div id="timer-readout" class="bg-[#8b1e3f]/10 text-[#8b1e3f] px-5 py-2 rounded-full border border-[#8b1e3f]/20 font-black text-xl">00:00</div>
+      <div id="timer-readout" class="bg-[#8b1e3f]/10 text-[#8b1e3f] px-5 py-2 rounded-full border border-[#8b1e3f]/20 font-black text-xl cursor-pointer">00:00</div>
       <div class="flex-1 flex justify-end gap-2">
         <button id="theme-toggle" class="p-2 text-xl">🌓</button>
         <button id="help-shortcuts" class="p-2 text-xl">❓</button>
@@ -68,7 +70,6 @@
     <div class="grid lg:grid-cols-[1fr_350px] gap-8 items-start">
       <section id="question-card" class="bg-[var(--card)] rounded-3xl p-6 border border-[var(--ring)] shadow-xl">
         <div id="drug-context" class="text-[10px] uppercase tracking-widest text-[#8b1e3f] font-black mb-3 opacity-60 h-4"></div>
-        
         <h2 id="prompt" class="text-xl sm:text-2xl lg:text-3xl font-bold leading-tight mb-8">Loading Quiz...</h2>
         <div id="options" class="space-y-4"></div>
         <div id="short-wrap" class="mt-8 hidden">
@@ -81,7 +82,7 @@
         <div class="card p-6 border border-[var(--ring)] bg-[var(--bg)]/50 rounded-2xl">
           <h3 class="text-[10px] font-black uppercase opacity-40 mb-5 tracking-widest">Mastery Controls</h3>
           <div class="grid grid-cols-1 gap-3">
-            <button id="mark" class="p-4 bg-[var(--card)] border border-[var(--ring)] rounded-2xl text-xs font-bold hover:bg-[#8b1e3f] hover:text-white transition-all">🚩 Mark</button>
+            <button id="mark" class="p-4 bg-[var(--card)] border border-[var(--ring)] rounded-2xl text-xs font-bold hover:bg-[#8b1e3f] hover:text-white transition-all">🚩 Mark (M)</button>
             <button id="hint-btn" class="p-4 bg-[var(--card)] border border-[var(--ring)] rounded-2xl text-xs font-bold hover:bg-[#8b1e3f] hover:text-white transition-all">💡 Hint</button>
             <button id="reveal-solution" class="p-4 bg-[var(--card)] border border-[var(--ring)] rounded-2xl text-xs font-bold hover:bg-[#8b1e3f] hover:text-white transition-all">👁️ Reveal Answer</button>
             <button id="restart" class="p-4 bg-red-500/5 text-red-600 border border-red-500/10 rounded-2xl text-xs font-bold hover:bg-red-500 hover:text-white transition-all">🔄 Reset</button>
@@ -96,6 +97,20 @@
       <button id="next" class="hidden action-btn flex-[2] py-4 rounded-2xl font-black text-white bg-green-600">Next →</button>
     </footer>
   </main>
+
+  <div id="shortcuts-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-[var(--card)] border border-[var(--ring)] rounded-3xl p-8 max-w-md w-full shadow-2xl">
+      <h2 class="text-2xl font-black mb-6">Keyboard Shortcuts</h2>
+      <div class="space-y-4 text-sm">
+        <div class="flex justify-between"><span>Next / Check</span><kbd class="bg-gray-100 px-2 py-1 rounded border">Enter</kbd></div>
+        <div class="flex justify-between"><span>Pause Timer</span><kbd class="bg-gray-100 px-2 py-1 rounded border">T</kbd></div>
+        <div class="flex justify-between"><span>Mark Question</span><kbd class="bg-gray-100 px-2 py-1 rounded border">M</kbd></div>
+        <div class="flex justify-between"><span>Navigate</span><kbd class="bg-gray-100 px-2 py-1 rounded border">← / →</kbd></div>
+        <div class="flex justify-between"><span>Jump to Question</span><kbd class="bg-gray-100 px-2 py-1 rounded border">1 - 9</kbd></div>
+      </div>
+      <button id="close-shortcuts" class="w-full mt-8 py-4 bg-[#8b1e3f] text-white font-bold rounded-2xl">Got it</button>
+    </div>
+  </div>
 
   <script src="assets/js/quizEngine.js"></script>
 </body>
