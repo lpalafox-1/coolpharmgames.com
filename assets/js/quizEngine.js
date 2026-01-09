@@ -81,33 +81,31 @@ function render() {
     if (getEl("drug-context")) getEl("drug-context").textContent = "Drug Practice";
     if (getEl("qnum")) getEl("qnum").textContent = state.index + 1;
     if (getEl("prompt")) getEl("prompt").innerHTML = q.prompt;
+    
+    // Reset all
     const optCont = getEl("options");
-    if (optCont) {
-        optCont.innerHTML = "";
-        q.choices.forEach(c => {
-            const lbl = document.createElement("label");
-            // TOUCH-SAFE STYLING: Removed active:scale to prevent mobile click block
-            lbl.className = `flex items-center gap-3 p-4 border rounded-xl cursor-pointer mb-2 transition-colors ${q._user === c ? 'ring-2 ring-maroon bg-maroon/5 border-maroon' : 'border-gray-200 dark:border-gray-700'}`;
-            lbl.innerHTML = `<input type="radio" name="opt" value="${c}" class="w-5 h-5 accent-maroon" ${q._user === c ? 'checked' : ''} ${q._answered ? 'disabled' : ''}> <span class="flex-1 text-base leading-tight text-[var(--text)]">${c}</span>`;
-            
-            // Standard click for all devices
-            lbl.onclick = () => {
-                if (!q._answered) {
-                    const rad = lbl.querySelector('input');
-                    if (rad) rad.checked = true;
-                    q._user = c; // Save selection immediately for mobile
-                }
-            };
-            optCont.appendChild(lbl);
-        });
-    }
-
+    if (optCont) optCont.innerHTML = "";
     if (getEl("short-wrap")) getEl("short-wrap").classList.add("hidden");
     if (getEl("explain")) { getEl("explain").classList.remove("show"); getEl("explain").innerHTML = ""; }
     if (getEl("check")) getEl("check").classList.toggle("hidden", !!q._answered);
     if (getEl("next")) getEl("next").classList.toggle("hidden", !q._answered);
 
-    if (q.type === "short") {
+    // Render based on type
+    if (q.type === "mcq" && q.choices && optCont) {
+        q.choices.forEach(c => {
+            const lbl = document.createElement("label");
+            lbl.className = `flex items-center gap-3 p-4 border rounded-xl cursor-pointer mb-2 transition-colors ${q._user === c ? 'ring-2 ring-maroon bg-maroon/5 border-maroon' : 'border-gray-200 dark:border-gray-700'}`;
+            lbl.innerHTML = `<input type="radio" name="opt" value="${c}" class="w-5 h-5 accent-maroon" ${q._user === c ? 'checked' : ''} ${q._answered ? 'disabled' : ''}> <span class="flex-1 text-base leading-tight text-[var(--text)]">${c}</span>`;
+            lbl.onclick = () => {
+                if (!q._answered) {
+                    const rad = lbl.querySelector('input');
+                    if (rad) rad.checked = true;
+                    q._user = c;
+                }
+            };
+            optCont.appendChild(lbl);
+        });
+    } else if (q.type === "short") {
         if (getEl("short-wrap")) getEl("short-wrap").classList.remove("hidden");
         const input = getEl("short-input");
         if (input) {
