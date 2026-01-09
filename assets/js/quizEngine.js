@@ -67,12 +67,10 @@ function initTheme() {
     const isDark = localStorage.getItem("quiz-theme") === "dark";
     document.documentElement.classList.toggle("dark", isDark);
     const themeBtn = document.getElementById("theme-toggle");
-    if (themeBtn) {
-        themeBtn.onclick = (e) => {
-            const d = document.documentElement.classList.toggle("dark");
-            localStorage.setItem("quiz-theme", d ? "dark" : "light");
-        };
-    }
+    if (themeBtn) themeBtn.onclick = () => {
+        const d = document.documentElement.classList.toggle("dark");
+        localStorage.setItem("quiz-theme", d ? "dark" : "light");
+    };
 }
 
 async function smartFetch(fileName) {
@@ -110,7 +108,6 @@ function createQuestion(drug, all) {
     const singleBrand = brandList[Math.floor(Math.random() * brandList.length)];
     const r = Math.random();
 
-    // 4 CHOICES ALWAYS
     if (r < 0.25 && drug.class) {
         const correct = `${singleBrand} / ${drug.class}`;
         const w1 = `${singleBrand} / ${all.find(d => d.class && d.class !== drug.class)?.class || 'Inhibitor'}`;
@@ -129,7 +126,8 @@ function createQuestion(drug, all) {
 }
 
 function wireEvents() {
-    const toggleTimer = () => {
+    const toggleTimer = (e) => {
+        if (e) e.preventDefault();
         if (state.timerHandle) {
             clearInterval(state.timerHandle);
             state.timerHandle = null;
@@ -140,7 +138,12 @@ function wireEvents() {
         }
     };
 
-    if (els.timerReadout) els.timerReadout.onclick = toggleTimer;
+    // MOBILE/DESKTOP TIMER CLICK FIX
+    if (els.timerReadout) {
+        els.timerReadout.onclick = toggleTimer;
+        els.timerReadout.style.cursor = "pointer";
+    }
+
     if (els.helpShortcuts) {
         els.helpShortcuts.onclick = () => {
             const m = document.getElementById("shortcuts-modal");
@@ -148,10 +151,16 @@ function wireEvents() {
         };
     }
     if (els.restart) els.restart.onclick = () => location.reload();
-    if (els.hintBtn) els.hintBtn.onclick = () => {
-        const q = state.questions[state.index];
-        alert(`Hint: Starts with "${q.answer[0]}".`);
-    };
+    if (els.hintBtn) els.hintBtn.onclick = () => alert(`Hint: Starts with "${state.questions[state.index].answer[0]}".`);
+    
+    // MARK BUTTON FIX
+    if (els.mark) {
+        els.mark.onclick = () => {
+            if (state.marked.has(state.index)) state.marked.delete(state.index);
+            else state.marked.add(state.index);
+            renderNavMap();
+        };
+    }
 
     if (els.next) els.next.onclick = () => { if (state.index < state.questions.length - 1) { state.index++; render(); } else showResults(); };
     if (els.prev) els.prev.onclick = () => { if (state.index > 0) { state.index--; render(); } };
@@ -162,10 +171,21 @@ function wireEvents() {
         if (val) scoreCurrent(val);
     };
 
+    // FONT +/- SLEDGEHAMMER
     const fInc = document.getElementById("font-increase");
     const fDec = document.getElementById("font-decrease");
-    if (fInc) fInc.onclick = () => { state.currentScale += 0.1; document.body.style.fontSize = `${state.currentScale}rem`; };
-    if (fDec) fDec.onclick = () => { if(state.currentScale > 0.7) state.currentScale -= 0.1; document.body.style.fontSize = `${state.currentScale}rem`; };
+    if (fInc) fInc.onclick = () => { 
+        state.currentScale += 0.1; 
+        document.body.style.fontSize = `${state.currentScale}rem`;
+        if (els.card) els.card.style.fontSize = `${state.currentScale}rem`;
+    };
+    if (fDec) fDec.onclick = () => { 
+        if(state.currentScale > 0.7) {
+            state.currentScale -= 0.1; 
+            document.body.style.fontSize = `${state.currentScale}rem`;
+            if (els.card) els.card.style.fontSize = `${state.currentScale}rem`;
+        }
+    };
 
     if (els.revealBtn) els.revealBtn.onclick = () => scoreCurrent("Revealed");
 
@@ -195,9 +215,11 @@ function render() {
     els.prompt.innerHTML = q.prompt;
     els.options.innerHTML = "";
     els.shortWrap.classList.add("hidden");
-    els.explain.classList.remove("show");
     
-    // RESET BUTTON VISIBILITY
+    // THE SPOILER LOOP FIX: Force hide explain unless question is answered for REAL
+    els.explain.classList.remove("show");
+    els.explain.innerHTML = "";
+
     els.check.classList.toggle("hidden", !!q._answered);
     els.next.classList.toggle("hidden", !q._answered);
 
@@ -236,7 +258,8 @@ function renderNavMap() {
 function scoreCurrent(val) {
     const q = state.questions[state.index];
     const isCorrect = (val === "Revealed") ? false : (val.trim().toLowerCase() === q.answer.toLowerCase());
-    q._answered = true; q._user = val;
+    q._answered = true; 
+    q._user = val;
     q._correct = isCorrect;
     if (isCorrect) state.score++;
     render();
