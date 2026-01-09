@@ -134,7 +134,6 @@ function render() {
                 }
             };
             
-            // Use both pointerdown and click for maximum compatibility
             lbl.addEventListener('pointerdown', selectOption, { passive: false });
             lbl.addEventListener('click', selectOption, { passive: false });
             
@@ -150,14 +149,20 @@ function render() {
         }
     }
     
+    // DISPLAY LOGIC: Fixes the "undefined" answer display for legacy quizzes
     if (q._answered) {
         const exp = getEl("explain");
         if (exp) {
-            exp.innerHTML = `<div class="p-3 rounded-lg ${q._correct ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}"><b>${q._correct ? 'Correct!' : 'Answer:'}</b> <b>${q.answer}</b></div>`;
+            const displayAnswer = q.answer || q.correct || q.ans || "N/A";
+            exp.innerHTML = `<div class="p-3 rounded-lg ${q._correct ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}"><b>${q._correct ? 'Correct!' : 'Answer:'}</b> <b>${displayAnswer}</b></div>`;
             exp.classList.add("show");
         }
     }
+
     renderNavMap(); 
+    const scoreEl = getEl("score");
+    if (scoreEl) scoreEl.textContent = state.score;
+}
     
     // Update score display
     const scoreEl = getEl("score");
