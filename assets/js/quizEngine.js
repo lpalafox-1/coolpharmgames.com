@@ -284,6 +284,13 @@ function showResults() {
     if (card) card.innerHTML = `<div class="text-center py-10"><h2 class="text-4xl font-black mb-4">Quiz Complete!</h2><p class="text-2xl">Final Score: ${state.score} / ${state.questions.length}</p><button onclick="location.reload()" class="mt-8 px-8 py-4 bg-maroon text-white rounded-2xl font-bold">Restart Quiz</button></div>`;
 }
 
+// Track last quiz for resume functionality (format compatible with home.js)
+if (weekParam) {
+    localStorage.setItem(`pharmlet.week${weekParam}.easy`, JSON.stringify({ score: 0, total: state.questions.length }));
+} else if (quizId) {
+    localStorage.setItem(`pharmlet.${quizId}.easy`, JSON.stringify({ score: 0, total: state.questions.length }));
+}
+
 function shuffled(a) { return [...a].sort(() => 0.5 - Math.random()); }
 
 async function main() {
