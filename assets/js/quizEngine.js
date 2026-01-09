@@ -15,7 +15,6 @@ const getEl = (id) => document.getElementById(id);
 const savedTheme = localStorage.getItem("quiz-theme");
 if (savedTheme === "dark") {
     document.documentElement.classList.add("dark");
-    // Ensure help button is black if starting in dark mode
     const helpBtn = document.getElementById("help-shortcuts");
     if (helpBtn) helpBtn.style.color = "black";
 }
@@ -91,7 +90,6 @@ function render() {
     if (getEl("qnum")) getEl("qnum").textContent = state.index + 1;
     if (getEl("prompt")) getEl("prompt").innerHTML = q.prompt;
     
-    // Reset all
     const optCont = getEl("options");
     if (optCont) optCont.innerHTML = "";
     if (getEl("short-wrap")) getEl("short-wrap").classList.add("hidden");
@@ -99,16 +97,12 @@ function render() {
     if (getEl("check")) getEl("check").classList.toggle("hidden", !!q._answered);
     if (getEl("next")) getEl("next").classList.toggle("hidden", !q._answered);
 
-    // Render based on type
     if (q.type === "mcq" && q.choices && optCont) {
         optCont.style.touchAction = 'manipulation';
         
         q.choices.forEach(c => {
             const lbl = document.createElement("label");
             lbl.className = `flex items-center gap-3 p-4 border rounded-xl cursor-pointer mb-2 transition-colors ${q._user === c ? 'ring-2 ring-maroon bg-maroon/5 border-maroon' : 'border-gray-200 dark:border-gray-700'}`;
-            lbl.style.userSelect = 'none';
-            lbl.style.WebkitUserSelect = 'none';
-            lbl.style.touchAction = 'manipulation';
             
             const rad = document.createElement("input");
             rad.type = "radio";
@@ -136,7 +130,6 @@ function render() {
             
             lbl.addEventListener('pointerdown', selectOption, { passive: false });
             lbl.addEventListener('click', selectOption, { passive: false });
-            
             optCont.appendChild(lbl);
         });
     } else if (q.type === "short") {
@@ -144,12 +137,10 @@ function render() {
         const input = getEl("short-input");
         if (input) {
             input.value = q._user || "";
-            input.focus();
             q._answered ? input.setAttribute("disabled", "true") : input.removeAttribute("disabled");
         }
     }
     
-    // DISPLAY LOGIC: Fixes the "undefined" answer display for legacy quizzes
     if (q._answered) {
         const exp = getEl("explain");
         if (exp) {
@@ -160,11 +151,6 @@ function render() {
     }
 
     renderNavMap(); 
-    const scoreEl = getEl("score");
-    if (scoreEl) scoreEl.textContent = state.score;
-}
-    
-    // Update score display
     const scoreEl = getEl("score");
     if (scoreEl) scoreEl.textContent = state.score;
 }
@@ -205,41 +191,26 @@ function wireEvents() {
         "check": () => {
             const q = state.questions[state.index];
             if (!q) return;
-            let val = "";
-            if (q.type === "mcq") {
-                val = document.querySelector("#options input:checked")?.value;
-            } else {
-                val = getEl("short-input")?.value;
-            }
+            let val = (q.type === "mcq") ? document.querySelector("#options input:checked")?.value : getEl("short-input")?.value;
             if (val) scoreCurrent(val);
         },
         "reveal-solution": () => scoreCurrent("Revealed"),
-   "theme-toggle": () => {
-    const isDark = document.documentElement.classList.toggle("dark");
-    localStorage.setItem("quiz-theme", isDark ? "dark" : "light");
-    
-    // FORCE BLACK TEXT ON HELP BUTTON IN DARK MODE
-    const helpBtn = getEl("help-shortcuts");
-    if (helpBtn) {
-        if (isDark) {
-            helpBtn.style.color = "black";
-        } else {
-            helpBtn.style.color = ""; // Resets to default CSS
-        }
-    }
-},
+        "theme-toggle": () => {
+            const isDark = document.documentElement.classList.toggle("dark");
+            localStorage.setItem("quiz-theme", isDark ? "dark" : "light");
+            const helpBtn = getEl("help-shortcuts");
+            if (helpBtn) helpBtn.style.color = isDark ? "black" : "";
+        },
         "hint-btn": () => {
             const q = state.questions[state.index];
             if (!q) return;
-            const hint = q.hint || "No hint available for this question.";
-            alert(hint);
+            alert(q.hint || "No hint available for this question.");
         },
         "mark-mobile": toggleMark,
         "hint-btn-mobile": () => {
             const q = state.questions[state.index];
             if (!q) return;
-            const hint = q.hint || "No hint available for this question.";
-            alert(hint);
+            alert(q.hint || "No hint available for this question.");
         },
         "reveal-solution-mobile": () => scoreCurrent("Revealed"),
         "restart-mobile": () => location.reload(),
@@ -289,10 +260,8 @@ function scoreCurrent(val) {
     const q = state.questions[state.index];
     if (!q) return;
 
-    // Fix for legacy quizzes: Check multiple keys for the correct answer
     const correctAnswer = q.answer || q.correct || q.ans || "";
 
-    // Special-case reveal
     if (val === "Revealed") {
         q._answered = true;
         q._user = val;
@@ -305,22 +274,18 @@ function scoreCurrent(val) {
     const splitBySeparators = s => {
         const str = normalizeWhitespace(s);
         if (!str) return [];
-        // split on hyphen, slash, or the word 'and' (as a word)
         return str.split(/(?:\s*(?:-|\/)\s*|\s+\band\b\s+)/i).map(p => p.trim()).filter(Boolean);
     };
 
-    const userRaw = String(val);
-    const userNorm = normalizeWhitespace(userRaw);
+    const userNorm = normalizeWhitespace(val);
     const canonNorm = normalizeWhitespace(correctAnswer);
 
     let isCorrect = false;
-
-    // Check if separators are present in the actual correct answer found
     const separatorPresent = /-|\/|\band\b/i.test(String(correctAnswer));
 
     if (separatorPresent) {
         const canonParts = splitBySeparators(correctAnswer);
-        const userParts = splitBySeparators(userRaw);
+        const userParts = splitBySeparators(val);
 
         if (userParts.length === 1 && userNorm === canonNorm) {
             isCorrect = true;
@@ -328,7 +293,6 @@ function scoreCurrent(val) {
             const sortParts = arr => arr.sort();
             const c = sortParts(canonParts);
             const u = sortParts(userParts);
-
             if (c.length === u.length && c.every((v, i) => v === u[i])) isCorrect = true;
         }
     } else {
@@ -339,8 +303,6 @@ function scoreCurrent(val) {
     q._user = val;
     q._correct = !!isCorrect;
     if (isCorrect) state.score++;
-    const scoreEl = getEl("score");
-    if (scoreEl) scoreEl.textContent = state.score;
     render();
 }
 
@@ -349,7 +311,6 @@ function showResults() {
     if (card) card.innerHTML = `<div class="text-center py-10"><h2 class="text-4xl font-black mb-4">Quiz Complete!</h2><p class="text-2xl">Final Score: ${state.score} / ${state.questions.length}</p><button onclick="location.reload()" class="mt-8 px-8 py-4 bg-maroon text-white rounded-2xl font-bold">Restart Quiz</button></div>`;
 }
 
-// Track last quiz for resume functionality (format compatible with home.js)
 if (weekParam) {
     localStorage.setItem(`pharmlet.week${weekParam}.easy`, JSON.stringify({ score: 0, total: state.questions.length }));
 } else if (quizId) {
