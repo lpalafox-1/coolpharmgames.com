@@ -1,39 +1,7 @@
 // assets/js/quizEngine.js
 const params = new URLSearchParams(location.search);
-const quizId = params.get("id");
 const weekParam = parseInt(params.get("week") || "", 10);
-const limitParam = parseInt(params.get("limit") || "", 10);
-
-const getEl = (id) => document.getElementById(id) || { 
-    textContent: "", innerHTML: "", style: {}, 
-    classList: { add:()=>{}, remove:()=>{}, toggle:()=>{} }, 
-    setAttribute:()=>{}, removeAttribute:()=>{} 
-};
-
-const els = {
-    title: getEl("quiz-title"),
-    qnum: getEl("qnum"),
-    qtotal: getEl("qtotal"),
-    score: getEl("score"),
-    prompt: getEl("prompt"),
-    options: getEl("options"),
-    shortWrap: getEl("short-wrap"),
-    shortInput: getEl("short-input"),
-    explain: getEl("explain"),
-    prev: getEl("prev"),
-    next: getEl("next"),
-    check: getEl("check"),
-    restart: getEl("restart"),
-    card: getEl("question-card"),
-    navMap: getEl("nav-map"), 
-    timerReadout: getEl("timer-readout"),
-    mark: getEl("mark"),
-    hintBtn: getEl("hint-btn"),
-    revealBtn: getEl("reveal-solution"),
-    themeToggle: getEl("theme-toggle"),
-    helpShortcuts: getEl("help-shortcuts"),
-    drugCtx: getEl("drug-context")
-};
+const quizId = params.get("id");
 
 const state = { 
     questions: [], index: 0, score: 0, title: "",
@@ -41,37 +9,41 @@ const state = {
     currentScale: 1.0 
 };
 
-const GAME_PLAN = {
-    1: [1, 2, 3], 2: [4, 5, 6], 3: [6, 7], 4: [8],
-    5: [9], 6: [10, 11], 7: 'ALL', 8: 'ALL', 9: 'ALL', 10: 'ALL', 11: 'ALL'
-};
+// HELPER: Aggressive ID Finder
+const getEl = (id) => document.getElementById(id);
 
-document.addEventListener('DOMContentLoaded', () => {
-    initTheme();
-    main().catch(err => console.error("Init Error:", err));
-});
+// --- 1. CORE LOGIC ---
 
-async function main() {
-    if (weekParam) await loadDynamicQuiz();
-    else if (quizId) await loadStaticQuiz();
-    
-    els.title.textContent = state.title;
-    els.qtotal.textContent = state.questions.length;
-    
-    startSmartTimer(); 
-    wireEvents();
-    render();
+function toggleMark() {
+    if (state.marked.has(state.index)) state.marked.delete(state.index);
+    else state.marked.add(state.index);
+    renderNavMap();
 }
 
-function initTheme() {
-    const isDark = localStorage.getItem("quiz-theme") === "dark";
-    document.documentElement.classList.toggle("dark", isDark);
-    const themeBtn = document.getElementById("theme-toggle");
-    if (themeBtn) themeBtn.onclick = () => {
-        const d = document.documentElement.classList.toggle("dark");
-        localStorage.setItem("quiz-theme", d ? "dark" : "light");
-    };
+function toggleTimer() {
+    if (state.timerHandle) {
+        clearInterval(state.timerHandle);
+        state.timerHandle = null;
+        if (getEl("timer-readout")) getEl("timer-readout").classList.add("opacity-30", "animate-pulse");
+    } else {
+        state.timerHandle = setInterval(timerTick, 1000);
+        if (getEl("timer-readout")) getEl("timer-readout").classList.remove("opacity-30", "animate-pulse");
+    }
 }
+
+function changeZoom(dir) {
+    state.currentScale += (dir === 'in' ? 0.1 : -0.1);
+    if (state.currentScale < 0.6) state.currentScale = 0.6;
+    if (state.currentScale > 2.0) state.currentScale = 2.0;
+    
+    // THE SLEDGEHAMMER: Target the root and the card
+    document.documentElement.style.fontSize = (state.currentScale * 16) + 'px';
+    const card = getEl("question-card");
+    if (card) card.style.transform = `scale(${state.currentScale})`;
+    if (card) card.style.transformOrigin = "top center";
+}
+
+// --- 2. ENGINE PIPELINE ---
 
 async function smartFetch(fileName) {
     const paths = [`assets/data/${fileName}`, `data/${fileName}`, `../assets/data/${fileName}`, `./assets/data/${fileName}`];
@@ -81,29 +53,11 @@ async function smartFetch(fileName) {
             if (res.ok) return await res.json();
         } catch (e) { continue; }
     }
-    throw new Error(`Missing: ${fileName}`);
-}
-
-async function loadDynamicQuiz() {
-    const pool = await smartFetch("master_pool.json");
-    const reviewWeeks = GAME_PLAN[weekParam] || 'ALL';
-    const newPool = pool.filter(d => Number(d.metadata?.lab) === 2 && Number(d.metadata?.week) === weekParam);
-    const revPool = (reviewWeeks === 'ALL') ? pool.filter(d => Number(d.metadata?.lab) === 1) : pool.filter(d => Number(d.metadata?.lab) === 1 && reviewWeeks.includes(Number(d.metadata?.week)));
-    const combined = [...shuffled(newPool).slice(0, 6), ...shuffled(revPool).slice(0, 4)];
-    state.title = `Top Drug Quiz ${weekParam}`;
-    state.questions = shuffled(combined).map((d, i) => ({ ...createQuestion(d, pool), _id: i, drugRef: d }));
-}
-
-async function loadStaticQuiz() {
-    const data = await smartFetch(`${quizId}.json`);
-    const pool = data.pools ? Object.values(data.pools).flat() : (data.questions || []);
-    const limit = limitParam > 0 ? Math.min(limitParam, pool.length) : pool.length;
-    state.title = data.title || "Quiz";
-    state.questions = shuffled(pool).slice(0, limit).map((q, i) => ({ ...q, _id: i }));
+    throw new Error(`File not found: ${fileName}`);
 }
 
 function createQuestion(drug, all) {
-    const distract = (val, key) => shuffled([...new Set(all.map(d => d[key]).filter(v => v && v !== val))]).slice(0, 3);
+    const distract = (val, key) => [...new Set(all.map(d => d[key]).filter(v => v && v !== val))].sort(() => 0.5 - Math.random()).slice(0, 3);
     const brandList = drug.brand ? drug.brand.split(/[,/]/).map(b => b.trim()) : ["N/A"];
     const singleBrand = brandList[Math.floor(Math.random() * brandList.length)];
     const r = Math.random();
@@ -125,142 +79,148 @@ function createQuestion(drug, all) {
     return { type: "mcq", prompt: `<b>${t.l}</b> for <b>${drug.generic}</b>?`, choices: shuffled([correctAns, ...distractors]), answer: correctAns, drugRef: drug };
 }
 
-function wireEvents() {
-    const toggleTimer = (e) => {
-        if (e) e.preventDefault();
-        if (state.timerHandle) {
-            clearInterval(state.timerHandle);
-            state.timerHandle = null;
-            els.timerReadout.classList.add("opacity-30", "animate-pulse");
-        } else {
-            state.timerHandle = setInterval(timerTick, 1000);
-            els.timerReadout.classList.remove("opacity-30", "animate-pulse");
-        }
-    };
-
-    const toggleMark = () => {
-        if (state.marked.has(state.index)) state.marked.delete(state.index);
-        else state.marked.add(state.index);
-        renderNavMap();
-    };
-
-    if (els.timerReadout) els.timerReadout.onclick = toggleTimer;
-    if (els.helpShortcuts) {
-        els.helpShortcuts.onclick = (e) => {
-            e.preventDefault();
-            const m = document.getElementById("shortcuts-modal");
-            if (m) { m.style.display = "flex"; m.classList.remove("hidden"); }
-        };
-    }
-    const closeShortcuts = document.getElementById("close-shortcuts");
-    if (closeShortcuts) {
-        closeShortcuts.onclick = () => {
-            const m = document.getElementById("shortcuts-modal");
-            if (m) { m.style.display = "none"; m.classList.add("hidden"); }
-        };
-    }
-
-    if (els.restart) els.restart.onclick = () => location.reload();
-    if (els.hintBtn) els.hintBtn.onclick = () => alert(`Hint: Starts with "${state.questions[state.index].answer[0]}".`);
-    if (els.mark) els.mark.onclick = toggleMark;
-
-    if (els.next) els.next.onclick = () => { if (state.index < state.questions.length - 1) { state.index++; render(); } else showResults(); };
-    if (els.prev) els.prev.onclick = () => { if (state.index > 0) { state.index--; render(); } };
-    if (els.check) els.check.onclick = () => {
-        const q = state.questions[state.index];
-        const sel = els.options.querySelector("input:checked");
-        let val = (q.type === "mcq") ? sel?.value : els.shortInput.value;
-        if (val) scoreCurrent(val);
-    };
-
-    const fInc = document.getElementById("font-increase");
-    const fDec = document.getElementById("font-decrease");
-    if (fInc) fInc.onclick = () => { 
-        state.currentScale += 0.1; 
-        document.documentElement.style.fontSize = `${state.currentScale * 16}px`;
-    };
-    if (fDec) fDec.onclick = () => { 
-        if(state.currentScale > 0.7) {
-            state.currentScale -= 0.1; 
-            document.documentElement.style.fontSize = `${state.currentScale * 16}px`;
-        }
-    };
-
-    if (els.revealBtn) els.revealBtn.onclick = () => scoreCurrent("Revealed");
-
-    window.onkeydown = (e) => {
-        if (document.activeElement.tagName === 'INPUT' && e.key !== 'Enter') return;
-        const key = e.key.toLowerCase();
-        if (key === "t") toggleTimer();
-        if (key === "m") toggleMark();
-        if (key >= '1' && key <= '9') {
-            const idx = parseInt(key) - 1;
-            if (state.questions[idx]) { state.index = idx; render(); }
-        }
-        if (key === "arrowright") { if (state.index < state.questions.length - 1) { state.index++; render(); } } 
-        else if (key === "arrowleft") { if (state.index > 0) { state.index--; render(); } } 
-        else if (key === "enter") { 
-            if (!state.questions[state.index]?._answered) els.check.click(); 
-            else if (state.index < state.questions.length - 1) els.next.click(); 
-        }
-    };
+async function loadDynamicQuiz() {
+    const pool = await smartFetch("master_pool.json");
+    const GAME_PLAN = { 1: [1, 2, 3], 2: [4, 5, 6], 3: [6, 7], 4: [8], 5: [9], 6: [10, 11] };
+    const reviewWeeks = GAME_PLAN[weekParam] || 'ALL';
+    const newPool = pool.filter(d => Number(d.metadata?.lab) === 2 && Number(d.metadata?.week) === weekParam);
+    const revPool = (reviewWeeks === 'ALL') ? pool.filter(d => Number(d.metadata?.lab) === 1) : pool.filter(d => Number(d.metadata?.lab) === 1 && reviewWeeks.includes(Number(d.metadata?.week)));
+    const combined = [...shuffled(newPool).slice(0, 6), ...shuffled(revPool).slice(0, 4)];
+    state.title = `Top Drug Quiz ${weekParam}`;
+    state.questions = shuffled(combined).map((d, i) => ({ ...createQuestion(d, pool), _id: i, drugRef: d }));
 }
+
+async function loadStaticQuiz() {
+    const data = await smartFetch(`${quizId}.json`);
+    const pool = data.pools ? Object.values(data.pools).flat() : (data.questions || []);
+    state.title = data.title || "Quiz";
+    state.questions = shuffled(pool).map((q, i) => ({ ...q, _id: i }));
+}
+
+// --- 3. UI RENDERERS ---
 
 function render() {
     const q = state.questions[state.index];
     if (!q) return;
 
-    els.drugCtx.textContent = "Drug Practice"; 
-    els.qnum.textContent = state.index + 1;
-    els.prompt.innerHTML = q.prompt;
-    els.options.innerHTML = "";
-    els.shortWrap.classList.add("hidden");
-    els.explain.classList.remove("show");
-    els.explain.innerHTML = "";
+    if (getEl("drug-context")) getEl("drug-context").textContent = "Drug Practice";
+    if (getEl("qnum")) getEl("qnum").textContent = state.index + 1;
+    if (getEl("prompt")) getEl("prompt").innerHTML = q.prompt;
+    if (getEl("options")) getEl("options").innerHTML = "";
+    if (getEl("short-wrap")) getEl("short-wrap").classList.add("hidden");
+    if (getEl("explain")) {
+        getEl("explain").classList.remove("show");
+        getEl("explain").innerHTML = "";
+    }
 
-    els.check.classList.toggle("hidden", !!q._answered);
-    els.next.classList.toggle("hidden", !q._answered);
+    if (getEl("check")) getEl("check").classList.toggle("hidden", !!q._answered);
+    if (getEl("next")) getEl("next").classList.toggle("hidden", !q._answered);
 
     if (q.type === "mcq") {
         q.choices.forEach(c => {
             const lbl = document.createElement("label");
             lbl.className = `flex items-center gap-3 p-4 border rounded-xl cursor-pointer mb-2 ${q._user === c ? 'ring-2 ring-maroon bg-maroon/5' : 'border-[var(--ring)]'}`;
             lbl.innerHTML = `<input type="radio" name="opt" value="${c}" class="w-5 h-5 accent-maroon" ${q._user === c ? 'checked' : ''} ${q._answered ? 'disabled' : ''}> <span class="flex-1 text-base leading-tight">${c}</span>`;
-            lbl.onclick = () => { if (!q._answered) lbl.querySelector('input').checked = true; };
-            els.options.appendChild(lbl);
+            lbl.onclick = () => { if (!q._answered) { const rad = lbl.querySelector('input'); if(rad) rad.checked = true; } };
+            getEl("options").appendChild(lbl);
         });
     } else {
-        els.shortWrap.classList.remove("hidden");
-        els.shortInput.value = q._user || "";
-        q._answered ? els.shortInput.setAttribute("disabled", "true") : els.shortInput.removeAttribute("disabled");
+        if (getEl("short-wrap")) getEl("short-wrap").classList.remove("hidden");
+        const input = getEl("short-input");
+        if (input) {
+            input.value = q._user || "";
+            q._answered ? input.setAttribute("disabled", "true") : input.removeAttribute("disabled");
+        }
     }
     
     if (q._answered) {
-        els.explain.innerHTML = `<div class="p-3 rounded-lg ${q._correct ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}"><b>${q._correct ? 'Correct!' : 'Answer:'}</b> <b>${q.answer}</b></div>`;
-        els.explain.classList.add("show");
+        const exp = getEl("explain");
+        if (exp) {
+            exp.innerHTML = `<div class="p-3 rounded-lg ${q._correct ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}"><b>${q._correct ? 'Correct!' : 'Answer:'}</b> <b>${q.answer}</b></div>`;
+            exp.classList.add("show");
+        }
     }
     renderNavMap(); 
 }
 
 function renderNavMap() {
-    els.navMap.innerHTML = "";
+    const nav = getEl("nav-map");
+    if (!nav) return;
+    nav.innerHTML = "";
     state.questions.forEach((q, i) => {
         const btn = document.createElement("button");
         btn.className = `w-8 h-8 rounded-lg text-xs font-bold transition-all ${i === state.index ? 'ring-2 ring-blue-500' : ''} ${q._answered ? (q._correct ? 'bg-green-500 text-white' : 'bg-red-500 text-white') : (state.marked.has(i) ? 'bg-yellow-400 text-black' : 'bg-gray-200')}`;
         btn.textContent = i + 1;
         btn.onclick = () => { state.index = i; render(); };
-        els.navMap.appendChild(btn);
+        nav.appendChild(btn);
     });
 }
 
 function scoreCurrent(val) {
     const q = state.questions[state.index];
     const isCorrect = (val === "Revealed") ? false : (val.trim().toLowerCase() === q.answer.toLowerCase());
-    q._answered = true; 
-    q._user = val;
-    q._correct = isCorrect;
+    q._answered = true; q._user = val; q._correct = isCorrect;
     if (isCorrect) state.score++;
     render();
+}
+
+// --- 4. SYSTEM INITIALIZATION ---
+
+function wireEvents() {
+    const clickMap = {
+        "timer-readout": toggleTimer,
+        "mark": toggleMark,
+        "help-shortcuts": () => { const m = getEl("shortcuts-modal"); if(m){ m.style.display="flex"; m.classList.remove("hidden"); }},
+        "close-shortcuts": () => { const m = getEl("shortcuts-modal"); if(m){ m.style.display="none"; m.classList.add("hidden"); }},
+        "font-increase": () => changeZoom('in'),
+        "font-decrease": () => changeZoom('out'),
+        "restart": () => location.reload(),
+        "next": () => { if (state.index < state.questions.length - 1) { state.index++; render(); } else showResults(); },
+        "prev": () => { if (state.index > 0) { state.index--; render(); } },
+        "check": () => {
+            const q = state.questions[state.index];
+            const sel = document.querySelector("#options input:checked");
+            let val = (q.type === "mcq") ? sel?.value : getEl("short-input")?.value;
+            if (val) scoreCurrent(val);
+        },
+        "reveal-solution": () => scoreCurrent("Revealed"),
+        "theme-toggle": () => {
+            const d = document.documentElement.classList.toggle("dark");
+            localStorage.setItem("quiz-theme", d ? "dark" : "light");
+        }
+    };
+
+    Object.entries(clickMap).forEach(([id, fn]) => {
+        const el = getEl(id);
+        if (el) el.onclick = fn;
+    });
+
+    window.onkeydown = (e) => {
+        if (document.activeElement.tagName === 'INPUT' && e.key !== 'Enter') return;
+        const key = e.key.toLowerCase();
+        if (key === "t") toggleTimer();
+        if (key === "m") toggleMark();
+        if (key === "arrowright") { if (state.index < state.questions.length - 1) { state.index++; render(); } }
+        if (key === "arrowleft") { if (state.index > 0) { state.index--; render(); } }
+        if (key >= '1' && key <= '9') {
+            const idx = parseInt(key) - 1;
+            if (state.questions[idx]) { state.index = idx; render(); }
+        }
+        if (key === "enter") {
+            const q = state.questions[state.index];
+            if (!q || !q._answered) getEl("check")?.click();
+            else getEl("next")?.click();
+        }
+    };
+}
+
+function timerTick() {
+    if (state.timerSeconds <= 0) { clearInterval(state.timerHandle); return; }
+    state.timerSeconds--;
+    const mins = Math.floor(state.timerSeconds / 60);
+    const secs = state.timerSeconds % 60;
+    const readout = getEl("timer-readout");
+    if (readout) readout.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
 function startSmartTimer() {
@@ -270,20 +230,23 @@ function startSmartTimer() {
     state.timerHandle = setInterval(timerTick, 1000);
 }
 
-function timerTick() {
-    if (state.timerSeconds <= 0) {
-        clearInterval(state.timerHandle);
-        els.timerReadout.classList.add("text-red-500", "font-bold");
-        return;
-    }
-    state.timerSeconds--;
-    const mins = Math.floor(state.timerSeconds / 60);
-    const secs = state.timerSeconds % 60;
-    els.timerReadout.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
-}
-
 function showResults() {
-    els.card.innerHTML = `<div class="text-center py-10"><h2 class="text-4xl font-black mb-4">Quiz Complete!</h2><p class="text-2xl">Final Score: ${state.score} / ${state.questions.length}</p><button onclick="location.reload()" class="mt-8 px-8 py-4 bg-maroon text-white rounded-2xl font-bold">Restart Quiz</button></div>`;
+    const card = getEl("question-card");
+    if (card) card.innerHTML = `<div class="text-center py-10"><h2 class="text-4xl font-black mb-4">Quiz Complete!</h2><p class="text-2xl">Final Score: ${state.score} / ${state.questions.length}</p><button onclick="location.reload()" class="mt-8 px-8 py-4 bg-maroon text-white rounded-2xl font-bold">Restart Quiz</button></div>`;
 }
 
 function shuffled(a) { return [...a].sort(() => 0.5 - Math.random()); }
+
+async function main() {
+    try {
+        if (weekParam) await loadDynamicQuiz();
+        else if (quizId) await loadStaticQuiz();
+        if (getEl("quiz-title")) getEl("quiz-title").textContent = state.title;
+        if (getEl("qtotal")) getEl("qtotal").textContent = state.questions.length;
+        startSmartTimer();
+        wireEvents();
+        render();
+    } catch (e) { console.error(e); }
+}
+
+document.addEventListener('DOMContentLoaded', main);
