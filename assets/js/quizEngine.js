@@ -4,6 +4,7 @@ const quizId = params.get("id");
 const weekParam = parseInt(params.get("week") || "", 10);
 const limitParam = parseInt(params.get("limit") || "", 10);
 
+// SAFE ELEMENT LOADER
 const getEl = (id) => document.getElementById(id) || { 
     textContent: "", innerHTML: "", style: {}, 
     classList: { add:()=>{}, remove:()=>{}, toggle:()=>{} }, 
@@ -31,6 +32,7 @@ const els = {
     hintBtn: getEl("hint-btn"),
     revealBtn: getEl("reveal-solution"),
     themeToggle: getEl("theme-toggle"),
+    helpShortcuts: getEl("help-shortcuts"),
     drugCtx: getEl("drug-context")
 };
 
@@ -48,8 +50,8 @@ const GAME_PLAN = {
 document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     main().catch(err => {
-        console.error("Initialization Error:", err);
-        els.prompt.innerHTML = `<span style="color:#ef4444">Error: ${err.message}</span>`;
+        console.error("Critical Load Error:", err);
+        els.prompt.innerHTML = `<span style="color:#ef4444">Load Error: ${err.message}</span>`;
     });
 });
 
@@ -69,9 +71,10 @@ async function main() {
 function initTheme() {
     const isDark = localStorage.getItem("quiz-theme") === "dark";
     document.documentElement.classList.toggle("dark", isDark);
-    const toggle = document.getElementById("theme-toggle");
-    if (toggle) {
-        toggle.onclick = () => {
+    const themeBtn = document.getElementById("theme-toggle");
+    if (themeBtn) {
+        themeBtn.onclick = (e) => {
+            e.preventDefault();
             const d = document.documentElement.classList.toggle("dark");
             localStorage.setItem("quiz-theme", d ? "dark" : "light");
         };
@@ -86,7 +89,7 @@ async function smartFetch(fileName) {
             if (res.ok) return await res.json();
         } catch (e) { continue; }
     }
-    throw new Error(`Could not find ${fileName}`);
+    throw new Error(`File not found: ${fileName}`);
 }
 
 async function loadDynamicQuiz() {
@@ -95,7 +98,7 @@ async function loadDynamicQuiz() {
     const newPool = pool.filter(d => Number(d.metadata?.lab) === 2 && Number(d.metadata?.week) === weekParam);
     const revPool = (reviewWeeks === 'ALL') ? pool.filter(d => Number(d.metadata?.lab) === 1) : pool.filter(d => Number(d.metadata?.lab) === 1 && reviewWeeks.includes(Number(d.metadata?.week)));
     const combined = [...shuffled(newPool).slice(0, 6), ...shuffled(revPool).slice(0, 4)];
-    state.title = `Lab II — Week ${weekParam}`;
+    state.title = `Top Drug Quiz ${weekParam}`;
     state.questions = shuffled(combined).map((d, i) => ({ ...createQuestion(d, pool), _id: i, drugRef: d }));
 }
 
@@ -103,83 +106,113 @@ async function loadStaticQuiz() {
     const data = await smartFetch(`${quizId}.json`);
     const pool = data.pools ? Object.values(data.pools).flat() : (data.questions || []);
     const limit = limitParam > 0 ? Math.min(limitParam, pool.length) : pool.length;
-    state.title = data.title || "Static Quiz";
+    state.title = data.title || "Quiz";
     state.questions = shuffled(pool).slice(0, limit).map((q, i) => ({ ...q, _id: i }));
 }
 
 function createQuestion(drug, all) {
-    const distract = (val, key) => [...new Set(all.map(d => d[key]).filter(v => v && v !== val))].sort(() => 0.5 - Math.random()).slice(0, 3);
+    const distract = (val, key) => shuffled([...new Set(all.map(d => d[key]).filter(v => v && v !== val))]).slice(0, 3);
     const brandList = drug.brand ? drug.brand.split(/[,/]/).map(b => b.trim()) : ["N/A"];
     const singleBrand = brandList[Math.floor(Math.random() * brandList.length)];
     const r = Math.random();
 
-    if (r < 0.3 && drug.class) {
-        return { type: "mcq", prompt: `Identify <b>Brand & Class</b> for <b>${drug.generic}</b>?`, choices: shuffled([`${singleBrand} / ${drug.class}`, `${singleBrand} / Antihypertensive`, `Generic / ${drug.class}`]), answer: `${singleBrand} / ${drug.class}`, drugRef: drug };
+    if (r < 0.25 && drug.class) {
+        const correct = `${singleBrand} / ${drug.class}`;
+        const w1 = `${singleBrand} / ${all.find(d => d.class && d.class !== drug.class).class}`;
+        const w2 = `${all.find(d => d.brand && d.brand !== drug.brand).brand.split(/[,/]/)[0]} / ${drug.class}`;
+        const w3 = `${all.find(d => d.brand && d.brand !== drug.brand).brand.split(/[,/]/)[0]} / ${all.find(d => d.class && d.class !== drug.class).class}`;
+        return { type: "mcq", prompt: `Identify <b>Brand & Class</b> for <b>${drug.generic}</b>?`, choices: shuffled([correct, w1, w2, w3]), answer: correct, drugRef: drug };
     }
-    if (r < 0.6) return { type: "short", prompt: `Generic for <b>${singleBrand}</b>?`, answer: drug.generic, drugRef: drug };
-    
-    const mcqTypes = [{l:'Classification', k:'class'}, {l:'Category', k:'category'}, {l:'MOA', k:'moa'}].filter(x => drug[x.k]);
-    const t = mcqTypes[Math.floor(Math.random() * mcqTypes.length)];
-    return { type: "mcq", prompt: `<b>${t.l}</b> for <b>${drug.generic}</b>?`, choices: shuffled([...distract(drug[t.k], t.k), drug[t.k]]), answer: drug[t.k], drugRef: drug };
+    if (r < 0.55) return { type: "short", prompt: `Generic for <b>${singleBrand}</b>?`, answer: drug.generic, drugRef: drug };
+    if (r < 0.80) return { type: "short", prompt: `Brand for <b>${drug.generic}</b>?`, answer: singleBrand, drugRef: drug };
+
+    const mcqTypes = [{l:'Classification', k:'class'}, {l:'MOA', k:'moa'}].filter(x => drug[x.k]);
+    const t = mcqTypes.length > 0 ? mcqTypes[Math.floor(Math.random() * mcqTypes.length)] : {l:'Classification', k:'class'};
+    const correctAns = drug[t.k] || "N/A";
+    const distractors = distract(correctAns, t.k);
+    return { type: "mcq", prompt: `<b>${t.l}</b> for <b>${drug.generic}</b>?`, choices: shuffled([correctAns, ...distractors]), answer: correctAns, drugRef: drug };
 }
 
 function wireEvents() {
-    const nextBtn = document.getElementById("next");
-    const prevBtn = document.getElementById("prev");
-    const checkBtn = document.getElementById("check");
-    
-    if (nextBtn) nextBtn.onclick = () => { if (state.index < state.questions.length - 1) { state.index++; render(); } else showResults(); };
-    if (prevBtn) prevBtn.onclick = () => { if (state.index > 0) { state.index--; render(); } };
-    if (checkBtn) checkBtn.onclick = () => {
+    // 1. TIMER BUTTON & KEY LOGIC
+    const toggleTimer = (e) => {
+        if (e) e.preventDefault();
+        if (state.timerHandle) {
+            clearInterval(state.timerHandle);
+            state.timerHandle = null;
+            els.timerReadout.classList.add("opacity-30", "animate-pulse");
+        } else {
+            state.timerHandle = setInterval(timerTick, 1000);
+            els.timerReadout.classList.remove("opacity-30", "animate-pulse");
+        }
+    };
+    const timerBtn = document.getElementById("timer-readout");
+    if (timerBtn) timerBtn.onclick = toggleTimer;
+
+    // 2. SHORTCUTS & RESET
+    const helpBtn = document.getElementById("help-shortcuts");
+    if (helpBtn) {
+        helpBtn.onclick = (e) => {
+            e.preventDefault();
+            const modal = document.getElementById("shortcuts-modal");
+            if (modal) { modal.style.display = "flex"; modal.classList.remove("hidden"); }
+        };
+    }
+    const resetBtn = document.getElementById("restart");
+    if (resetBtn) resetBtn.onclick = (e) => { e.preventDefault(); location.reload(); };
+
+    // 3. NAVIGATION
+    if (els.next) els.next.onclick = () => { if (state.index < state.questions.length - 1) { state.index++; render(); } else showResults(); };
+    if (els.prev) els.prev.onclick = () => { if (state.index > 0) { state.index--; render(); } };
+    if (els.check) els.check.onclick = () => {
         const q = state.questions[state.index];
-        const sel = els.options.querySelector("input:checked");
-        let val = (q.type === "mcq") ? sel?.value : els.shortInput.value;
+        const selected = els.options.querySelector("input:checked");
+        let val = (q.type === "mcq") ? selected?.value : els.shortInput.value;
         if (val) scoreCurrent(val);
     };
 
-    // HARD FONT SCALE FIX: Direct Body Injection
+    // 4. HARD FONT SCALE FIX
     const fInc = document.getElementById("font-increase");
     const fDec = document.getElementById("font-decrease");
     if (fInc && fDec) {
-        fInc.onclick = (e) => { 
-            e.preventDefault(); 
-            state.currentScale += 0.1; 
-            document.body.style.fontSize = `${state.currentScale}rem`;
-            document.documentElement.style.setProperty('--quiz-size', `${state.currentScale}rem`); 
-        };
-        fDec.onclick = (e) => { 
-            e.preventDefault(); 
-            if(state.currentScale > 0.7) state.currentScale -= 0.1; 
-            document.body.style.fontSize = `${state.currentScale}rem`;
-            document.documentElement.style.setProperty('--quiz-size', `${state.currentScale}rem`); 
-        };
+        fInc.onclick = (e) => { e.preventDefault(); state.currentScale += 0.1; document.body.style.fontSize = `${state.currentScale}rem`; };
+        fDec.onclick = (e) => { e.preventDefault(); if(state.currentScale > 0.7) state.currentScale -= 0.1; document.body.style.fontSize = `${state.currentScale}rem`; };
     }
 
+    // 5. UTILITIES
     if (els.mark) els.mark.onclick = () => {
         state.marked.has(state.index) ? state.marked.delete(state.index) : state.marked.add(state.index);
         renderNavMap();
     };
-
     if (els.revealBtn) els.revealBtn.onclick = () => scoreCurrent("Revealed");
+
+    // 6. GLOBAL KEYBOARD
+    window.onkeydown = (e) => {
+        if (document.activeElement.tagName === 'INPUT' && e.key !== 'Enter') return;
+        const key = e.key.toLowerCase();
+        if (key === "t") toggleTimer();
+        if (key === "arrowright") { if (state.index < state.questions.length - 1) { state.index++; render(); } } 
+        else if (key === "arrowleft") { if (state.index > 0) { state.index--; render(); } } 
+        else if (key === "enter") { 
+            if (!state.questions[state.index]?._answered) { if(els.check) els.check.click(); } 
+            else if (state.index < state.questions.length - 1) { if(els.next) els.next.click(); } 
+        }
+    };
 }
 
 function render() {
     const q = state.questions[state.index];
     if (!q) return;
 
-    // TOTAL SILENCE FIX: No drug class, no category, no spoiler.
     els.drugCtx.textContent = "Drug Practice"; 
-
     els.qnum.textContent = state.index + 1;
     els.prompt.innerHTML = q.prompt;
     els.options.innerHTML = "";
     els.shortWrap.classList.add("hidden");
     els.explain.classList.remove("show");
     
-    const checkBtn = document.getElementById("check");
-    const nextBtn = document.getElementById("next");
-    if(checkBtn) checkBtn.classList.toggle("hidden", !!q._answered);
-    if(nextBtn) nextBtn.classList.toggle("hidden", !q._answered);
+    if (els.check) els.check.classList.toggle("hidden", !!q._answered);
+    if (els.next) els.next.classList.toggle("hidden", !q._answered);
 
     if (q.type === "mcq") {
         q.choices.forEach(c => {
@@ -224,14 +257,21 @@ function scoreCurrent(val) {
 
 function startSmartTimer() {
     if (state.timerHandle) clearInterval(state.timerHandle);
-    state.timerSeconds = 600;
-    state.timerHandle = setInterval(() => {
-        if (state.timerSeconds <= 0) { clearInterval(state.timerHandle); return; }
-        state.timerSeconds--;
-        const mins = Math.floor(state.timerSeconds / 60);
-        const secs = state.timerSeconds % 60;
-        els.timerReadout.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
-    }, 1000);
+    const count = state.questions.length;
+    state.timerSeconds = weekParam ? 600 : (count <= 20 ? 900 : (count <= 50 ? 2700 : 7200));
+    state.timerHandle = setInterval(timerTick, 1000);
+}
+
+function timerTick() {
+    if (state.timerSeconds <= 0) {
+        clearInterval(state.timerHandle);
+        els.timerReadout.classList.add("text-red-500", "font-bold");
+        return;
+    }
+    state.timerSeconds--;
+    const mins = Math.floor(state.timerSeconds / 60);
+    const secs = state.timerSeconds % 60;
+    els.timerReadout.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
 function showResults() {
