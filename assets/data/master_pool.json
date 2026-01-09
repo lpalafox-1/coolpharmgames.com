@@ -145,7 +145,7 @@
   },
   {
     "generic": "Hydrocodone",
-    "brand": "Zohydro ER (cap), Hysingla ER (tab), Norco (with APAP)",
+    "brand": "Zohydro ER, Hysingla ER, Norco",
     "class": "Opioid Analgesic",
     "category": "Opioid Analgesics",
     "moa": "Binds to mu-opioid receptors in the CNS, altering the perception of and response to pain.",
@@ -232,7 +232,7 @@
     "metadata": { "lab": 2, "week": 4, "is_new": true }
   },
   {
-    "generic": "Amoxicillin-Clavulanate",
+    "generic": "Amoxicillin/Clavulanate",
     "brand": "Augmentin",
     "class": "Beta-Lactam, Beta-Lactamase Inhibitor Antibiotic combination",
     "category": "Antibiotics",
@@ -336,7 +336,7 @@
     "metadata": { "lab": 2, "week": 5, "is_new": true }
   },
   {
-    "generic": "Piperacillin-Tazobactam",
+    "generic": "Piperacillin/Tazobactam",
     "brand": "Zosyn",
     "class": "Beta-Lactam, Beta-Lactamase Inhibitor combination",
     "category": "Antibiotics",
@@ -344,7 +344,7 @@
     "metadata": { "lab": 2, "week": 6, "is_new": true }
   },
   {
-    "generic": "Ampicillin-sulbactam",
+    "generic": "Ampicillin/Sulbactam",
     "brand": "Unasyn",
     "class": "Beta-Lactam, Beta-Lactamase Inhibitor combination",
     "category": "Antibiotics",
@@ -424,7 +424,7 @@
     "metadata": { "lab": 2, "week": 7, "is_new": true }
   },
   {
-    "generic": "Fluticasone + Salmeterol",
+    "generic": "Fluticasone/Salmeterol",
     "brand": "Advair",
     "class": "Inhaled Corticosteroid and Long-Acting Beta-2 Agonist",
     "category": "Asthma/COPD",
@@ -432,7 +432,7 @@
     "metadata": { "lab": 2, "week": 7, "is_new": true }
   },
   {
-    "generic": "Budesonide + Formoterol",
+    "generic": "Budesonide/Formoterol",
     "brand": "Symbicort, Brenya",
     "class": "Inhaled Corticosteroid and Long-Acting Beta-2 Agonist",
     "category": "Asthma/COPD",
@@ -440,7 +440,7 @@
     "metadata": { "lab": 2, "week": 7, "is_new": true }
   },
   {
-    "generic": "ipratropium-albuterol",
+    "generic": "Ipratropium/Albuterol",
     "brand": "Combivent",
     "class": "Short-Acting Muscarinic Antagonist and Short-Acting Beta-2 Agonist",
     "category": "Asthma/COPD",
@@ -665,7 +665,7 @@
   },
   {
     "generic": "Amlodipine",
-    "brand": "Norvasc (tab), Norliqva (soln), Katerzia (susp)",
+    "brand": "Norvasc, Norliqva, Katerzia",
     "class": "Calcium Channel Blocker (Dihydropyridine)",
     "category": "Antihypertensive",
     "moa": "Inhibits the influx of calcium ions into vascular smooth muscle and cardiac muscle, resulting in decreased peripheral vascular resistance and reduced blood pressure.",
@@ -841,7 +841,7 @@
   },
   {
     "generic": "Niacin",
-    "brand": "Niaspan (DSC), Niacor",
+    "brand": "Niaspan, Niacor",
     "class": "Nicotinic Acid",
     "category": "Antilipemic",
     "moa": "Inhibits lipolysis in adipose tissue, reduces hepatic VLDL synthesis, and increases HDL levels.",
@@ -929,7 +929,7 @@
   },
   {
     "generic": "Amiodarone",
-    "brand": "Nexterone (soln), Pacerone (tab)",
+    "brand": "Nexterone, Pacerone",
     "class": "Class III Antiarrhythmic",
     "category": "Antiarrhythmic",
     "moa": "Inhibits potassium channels responsible for repolarizatin of the cardiac cell membrane; Prolongs the action potential and refractory period of cardiac cells.",
