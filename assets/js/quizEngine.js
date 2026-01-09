@@ -11,7 +11,7 @@ const state = {
 
 const getEl = (id) => document.getElementById(id);
 
-// Initialize dark mode from localStorage at startup
+// Initialize dark mode
 const savedTheme = localStorage.getItem("quiz-theme");
 if (savedTheme === "dark") {
     document.documentElement.classList.add("dark");
@@ -20,7 +20,6 @@ if (savedTheme === "dark") {
 }
 
 // --- 1. CORE ACTIONS ---
-
 function toggleMark() {
     if (state.marked.has(state.index)) state.marked.delete(state.index);
     else state.marked.add(state.index);
@@ -46,7 +45,6 @@ function changeZoom(dir) {
 }
 
 // --- 2. DATA PIPELINE ---
-
 async function smartFetch(fileName) {
     const paths = [`assets/data/${fileName}`, `data/${fileName}`, `quizzes/${fileName}`, `../assets/data/${fileName}`];
     for (let path of paths) {
@@ -81,7 +79,6 @@ function createQuestion(drug, all) {
 }
 
 // --- 3. UI RENDERING ---
-
 function render() {
     const q = state.questions[state.index];
     if (!q) return;
@@ -99,11 +96,9 @@ function render() {
 
     if (q.type === "mcq" && q.choices && optCont) {
         optCont.style.touchAction = 'manipulation';
-        
         q.choices.forEach(c => {
             const lbl = document.createElement("label");
             lbl.className = `flex items-center gap-3 p-4 border rounded-xl cursor-pointer mb-2 transition-colors ${q._user === c ? 'ring-2 ring-maroon bg-maroon/5 border-maroon' : 'border-gray-200 dark:border-gray-700'}`;
-            
             const rad = document.createElement("input");
             rad.type = "radio";
             rad.name = "opt";
@@ -111,14 +106,11 @@ function render() {
             rad.className = "w-5 h-5 accent-maroon";
             rad.checked = q._user === c;
             if (q._answered) rad.disabled = true;
-            
             const span = document.createElement("span");
             span.className = "flex-1 text-base leading-tight text-[var(--text)]";
             span.innerHTML = c;
-            
             lbl.appendChild(rad);
             lbl.appendChild(span);
-            
             const selectOption = (e) => {
                 e.preventDefault();
                 if (!q._answered) {
@@ -127,7 +119,6 @@ function render() {
                     render();
                 }
             };
-            
             lbl.addEventListener('pointerdown', selectOption, { passive: false });
             lbl.addEventListener('click', selectOption, { passive: false });
             optCont.appendChild(lbl);
@@ -144,15 +135,14 @@ function render() {
     if (q._answered) {
         const exp = getEl("explain");
         if (exp) {
-            const displayAnswer = q.answerText || q.answer || q.correct || q.ans || "N/A";
+            const raw = q.answerText || q.answer || q.correct || q.ans || "N/A";
+            const displayAnswer = Array.isArray(raw) ? raw.join(", ") : raw;
             exp.innerHTML = `<div class="p-3 rounded-lg ${q._correct ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}"><b>${q._correct ? 'Correct!' : 'Answer:'}</b> <b>${displayAnswer}</b></div>`;
             exp.classList.add("show");
         }
     }
-
     renderNavMap(); 
-    const scoreEl = getEl("score");
-    if (scoreEl) scoreEl.textContent = state.score;
+    if (getEl("score")) getEl("score").textContent = state.score;
 }
 
 function renderNavMap() {
@@ -167,7 +157,6 @@ function renderNavMap() {
         } else if (state.marked.has(i)) {
             colorClass = "bg-yellow-400 text-black ring-2 ring-yellow-600";
         }
-
         btn.className = `w-8 h-8 rounded-lg text-xs font-bold transition-all ${i === state.index ? 'ring-2 ring-blue-500 scale-110' : ''} ${colorClass}`;
         btn.textContent = i + 1;
         btn.onclick = () => { state.index = i; render(); };
@@ -176,7 +165,6 @@ function renderNavMap() {
 }
 
 // --- 4. SYSTEM WIRING ---
-
 function wireEvents() {
     const handlers = {
         "timer-readout": toggleTimer,
@@ -260,7 +248,8 @@ function scoreCurrent(val) {
     const q = state.questions[state.index];
     if (!q) return;
 
-    const correctAnswer = q.answerText || q.answer || q.correct || q.ans || "";
+    const raw = q.answerText || q.answer || q.correct || q.ans || "";
+    const correctAnswer = Array.isArray(raw) ? raw[0] : raw;
 
     if (val === "Revealed") {
         q._answered = true;
@@ -286,7 +275,6 @@ function scoreCurrent(val) {
     if (separatorPresent) {
         const canonParts = splitBySeparators(correctAnswer);
         const userParts = splitBySeparators(val);
-
         if (userParts.length === 1 && userNorm === canonNorm) {
             isCorrect = true;
         } else {
