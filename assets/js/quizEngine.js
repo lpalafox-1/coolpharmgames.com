@@ -110,7 +110,11 @@ function render() {
     if (q.type === "short") {
         if (getEl("short-wrap")) getEl("short-wrap").classList.remove("hidden");
         const input = getEl("short-input");
-        if (input) { input.value = q._user || ""; q._answered ? input.setAttribute("disabled", "true") : input.removeAttribute("disabled"); }
+        if (input) {
+            input.value = q._user || "";
+            input.focus();
+            q._answered ? input.setAttribute("disabled", "true") : input.removeAttribute("disabled");
+        }
     }
     
     if (q._answered) {
@@ -172,7 +176,13 @@ function wireEvents() {
         "theme-toggle": () => {
             const d = document.documentElement.classList.toggle("dark");
             localStorage.setItem("quiz-theme", d ? "dark" : "light");
-        }
+        },
+        "hint-btn": () => {
+            const q = state.questions[state.index];
+            if (!q) return;
+            const hint = q.hint || "No hint available for this question.";
+            alert(hint);
+        },
     };
 
     Object.entries(handlers).forEach(([id, fn]) => {
