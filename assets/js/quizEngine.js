@@ -96,13 +96,24 @@ function render() {
             const lbl = document.createElement("label");
             lbl.className = `flex items-center gap-3 p-4 border rounded-xl cursor-pointer mb-2 transition-colors ${q._user === c ? 'ring-2 ring-maroon bg-maroon/5 border-maroon' : 'border-gray-200 dark:border-gray-700'}`;
             lbl.innerHTML = `<input type="radio" name="opt" value="${c}" class="w-5 h-5 accent-maroon" ${q._user === c ? 'checked' : ''} ${q._answered ? 'disabled' : ''}> <span class="flex-1 text-base leading-tight text-[var(--text)]">${c}</span>`;
-            lbl.onclick = () => {
+            
+            // Mobile-safe: Use both click and touchend
+            const selectOption = () => {
                 if (!q._answered) {
                     const rad = lbl.querySelector('input');
-                    if (rad) rad.checked = true;
-                    q._user = c;
+                    if (rad) {
+                        rad.checked = true;
+                        q._user = c;
+                    }
                 }
             };
+            
+            lbl.addEventListener('click', selectOption, false);
+            lbl.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                selectOption();
+            }, false);
+            
             optCont.appendChild(lbl);
         });
     } else if (q.type === "short") {
@@ -239,28 +250,39 @@ function showResults() {
 function shuffled(a) { return [...a].sort(() => 0.5 - Math.random()); }
 
 async function main() {
-    // FIX: Allow legacy quizzes to load even if weekParam is missing
-    if (weekParam) {
-        const pool = await smartFetch("master_pool.json");
-        const GAME_PLAN = { 1:[1,2,3], 2:[4,5,6], 3:[6,7], 4:[8], 5:[9], 6:[10,11] };
-        const weeks = GAME_PLAN[weekParam] || 'ALL';
-        const newP = pool.filter(d => Number(d.metadata?.lab) === 2 && Number(d.metadata?.week) === weekParam);
-        const revP = (weeks === 'ALL') ? pool.filter(d => Number(d.metadata?.lab) === 1) : pool.filter(d => Number(d.metadata?.lab) === 1 && weeks.includes(Number(d.metadata?.week)));
-        const combined = [...shuffled(newP).slice(0, 6), ...shuffled(revP).slice(0, 4)];
-        state.title = `Top Drug Quiz ${weekParam}`;
-        state.questions = shuffled(combined).map((d, i) => ({ ...createQuestion(d, pool), _id: i, drugRef: d }));
-    } else if (quizId) {
-        const data = await smartFetch(`${quizId}.json`);
-        const pool = data.pools ? Object.values(data.pools).flat() : (data.questions || []);
-        state.title = data.title || "Quiz";
-        state.questions = shuffled(pool).map((q, i) => ({ ...q, _id: i }));
-    }
+    try {
+        if (weekParam) {
+            const pool = await smartFetch("master_pool.json");
+            const GAME_PLAN = { 1:[1,2,3], 2:[4,5,6], 3:[6,7], 4:[8], 5:[9], 6:[10,11] };
+            const weeks = GAME_PLAN[weekParam] || 'ALL';
+            const newP = pool.filter(d => Number(d.metadata?.lab) === 2 && Number(d.metadata?.week) === weekParam);
+            const revP = (weeks === 'ALL') ? pool.filter(d => Number(d.metadata?.lab) === 1) : pool.filter(d => Number(d.metadata?.lab) === 1 && weeks.includes(Number(d.metadata?.week)));
+            const combined = [...shuffled(newP).slice(0, 6), ...shuffled(revP).slice(0, 4)];
+            state.title = `Top Drug Quiz ${weekParam}`;
+            state.questions = shuffled(combined).map((d, i) => ({ ...createQuestion(d, pool), _id: i, drugRef: d }));
+        } else if (quizId) {
+            const data = await smartFetch(`${quizId}.json`);
+            const pool = data.pools ? Object.values(data.pools).flat() : (data.questions || []);
+            state.title = data.title || "Quiz";
+            state.questions = shuffled(pool).map((q, i) => ({ ...q, _id: i }));
+        } else {
+            throw new Error("Missing ?id=quiz-name or ?week=N parameter");
+        }
 
-    if (getEl("quiz-title")) getEl("quiz-title").textContent = state.title;
-    if (getEl("qtotal")) getEl("qtotal").textContent = state.questions.length;
-    startSmartTimer();
-    wireEvents();
-    render();
+        if (getEl("quiz-title")) getEl("quiz-title").textContent = state.title;
+        if (getEl("qtotal")) getEl("qtotal").textContent = state.questions.length;
+        startSmartTimer();
+        wireEvents();
+        render();
+    } catch (err) {
+        console.error("Quiz Error:", err);
+        const card = getEl("question-card");
+        if (card) card.innerHTML = `<div class="p-4 text-red-600"><p><b>Error:</b> ${err.message}</p></div>`;
+    }
 }
 
 document.addEventListener('DOMContentLoaded', main);
+
+console.log('weekParam:', weekParam);
+console.log('quizId:', quizId);
+console.log('state.questions.length:', state.questions.length);
