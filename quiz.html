@@ -91,6 +91,13 @@
       </aside>
     </div>
 
+    <!-- Mobile Controls (visible only on small screens) -->
+    <div class="lg:hidden flex gap-2 justify-center mt-6 flex-wrap">
+      <button id="mark" class="px-4 py-2 bg-[var(--card)] border border-[var(--ring)] rounded-xl text-xs font-bold">🚩 Mark</button>
+      <button id="hint-btn" class="px-4 py-2 bg-[var(--card)] border border-[var(--ring)] rounded-xl text-xs font-bold">💡 Hint</button>
+      <button id="reveal-solution" class="px-4 py-2 bg-[var(--card)] border border-[var(--ring)] rounded-xl text-xs font-bold">👁️ Reveal</button>
+    </div>
+
     <footer class="mt-10 flex gap-4 w-full justify-center max-w-2xl mx-auto">
       <button id="prev" class="action-btn flex-1 py-4 rounded-2xl font-bold bg-gray-100 dark:bg-white/5">← Prev</button>
       <button id="check" class="action-btn flex-[2] py-4 rounded-2xl font-black text-white bg-[#8b1e3f]">Check Answer</button>

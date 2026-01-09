@@ -11,6 +11,12 @@ const state = {
 
 const getEl = (id) => document.getElementById(id);
 
+// Initialize dark mode from localStorage at startup
+const savedTheme = localStorage.getItem("quiz-theme");
+if (savedTheme === "dark") {
+    document.documentElement.classList.add("dark");
+}
+
 // --- 1. CORE ACTIONS ---
 
 function toggleMark() {
@@ -97,7 +103,7 @@ function render() {
             lbl.className = `flex items-center gap-3 p-4 border rounded-xl cursor-pointer mb-2 transition-colors ${q._user === c ? 'ring-2 ring-maroon bg-maroon/5 border-maroon' : 'border-gray-200 dark:border-gray-700'}`;
             lbl.innerHTML = `<input type="radio" name="opt" value="${c}" class="w-5 h-5 accent-maroon" ${q._user === c ? 'checked' : ''} ${q._answered ? 'disabled' : ''}> <span class="flex-1 text-base leading-tight text-[var(--text)]">${c}</span>`;
             
-            // Mobile-safe: Use both click and touchend
+            // Mobile-safe: Use both click and touchstart
             const selectOption = () => {
                 if (!q._answered) {
                     const rad = lbl.querySelector('input');
@@ -108,11 +114,11 @@ function render() {
                 }
             };
             
-            lbl.addEventListener('click', selectOption, false);
-            lbl.addEventListener('touchend', (e) => {
+            lbl.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 selectOption();
-            }, false);
+            }, { passive: false });
+            lbl.addEventListener('click', selectOption, false);
             
             optCont.appendChild(lbl);
         });
@@ -273,6 +279,8 @@ async function main() {
         if (getEl("qtotal")) getEl("qtotal").textContent = state.questions.length;
         startSmartTimer();
         wireEvents();
+        // Track last quiz for resume functionality
+        localStorage.setItem("last-quiz", weekParam ? `?week=${weekParam}` : `?id=${quizId}`);
         render();
     } catch (err) {
         console.error("Quiz Error:", err);

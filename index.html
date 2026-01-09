@@ -209,5 +209,11 @@
   </section>
 
   <script src="assets/js/home.js" defer></script>
+  <script>
+    const lastQuiz = localStorage.getItem("last-quiz");
+    if (lastQuiz) {
+        document.getElementById("resume-btn").href = `quiz.html${lastQuiz}`;
+    }
+  </script>
 </body>
 </html>
