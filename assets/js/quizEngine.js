@@ -88,6 +88,10 @@ function render() {
     if (getEl("qnum")) getEl("qnum").textContent = state.index + 1;
     if (getEl("prompt")) getEl("prompt").innerHTML = q.prompt;
     
+    // Update score display
+    const scoreEl = getEl("score");
+    if (scoreEl) scoreEl.textContent = state.score;
+    
     // Reset all
     const optCont = getEl("options");
     if (optCont) optCont.innerHTML = "";
@@ -155,6 +159,10 @@ function render() {
         }
     }
     renderNavMap(); 
+    
+    // Update score display
+    const scoreEl = getEl("score");
+    if (scoreEl) scoreEl.textContent = state.score;
 }
 
 function renderNavMap() {
@@ -267,6 +275,9 @@ function scoreCurrent(val) {
     const isCorrect = (val === "Revealed") ? false : (val.trim().toLowerCase() === q.answer.toLowerCase());
     q._answered = true; q._user = val; q._correct = isCorrect;
     if (isCorrect) state.score++;
+    // Update score display immediately
+    const scoreEl = getEl("score");
+    if (scoreEl) scoreEl.textContent = state.score;
     render();
 }
 
