@@ -105,6 +105,7 @@ function render() {
             lbl.className = `flex items-center gap-3 p-4 border rounded-xl cursor-pointer mb-2 transition-colors ${q._user === c ? 'ring-2 ring-maroon bg-maroon/5 border-maroon' : 'border-gray-200 dark:border-gray-700'}`;
             lbl.style.userSelect = 'none';
             lbl.style.WebkitUserSelect = 'none';
+            lbl.style.touchAction = 'manipulation';
             
             const rad = document.createElement("input");
             rad.type = "radio";
@@ -121,15 +122,18 @@ function render() {
             lbl.appendChild(rad);
             lbl.appendChild(span);
             
-            const selectOption = () => {
+            const selectOption = (e) => {
+                e.preventDefault();
                 if (!q._answered) {
                     rad.checked = true;
                     q._user = c;
+                    render();
                 }
             };
             
-            // Use pointerdown for immediate response across all devices
-            lbl.addEventListener('pointerdown', selectOption, false);
+            // Use both pointerdown and click for maximum compatibility
+            lbl.addEventListener('pointerdown', selectOption, { passive: false });
+            lbl.addEventListener('click', selectOption, { passive: false });
             
             optCont.appendChild(lbl);
         });
