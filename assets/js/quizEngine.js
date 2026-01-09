@@ -98,27 +98,39 @@ function render() {
 
     // Render based on type
     if (q.type === "mcq" && q.choices && optCont) {
+        optCont.style.touchAction = 'manipulation';
+        
         q.choices.forEach(c => {
             const lbl = document.createElement("label");
             lbl.className = `flex items-center gap-3 p-4 border rounded-xl cursor-pointer mb-2 transition-colors ${q._user === c ? 'ring-2 ring-maroon bg-maroon/5 border-maroon' : 'border-gray-200 dark:border-gray-700'}`;
-            lbl.innerHTML = `<input type="radio" name="opt" value="${c}" class="w-5 h-5 accent-maroon" ${q._user === c ? 'checked' : ''} ${q._answered ? 'disabled' : ''}> <span class="flex-1 text-base leading-tight text-[var(--text)]">${c}</span>`;
+            lbl.style.userSelect = 'none';
+            lbl.style.WebkitUserSelect = 'none';
+            
+            const rad = document.createElement("input");
+            rad.type = "radio";
+            rad.name = "opt";
+            rad.value = c;
+            rad.className = "w-5 h-5 accent-maroon";
+            rad.checked = q._user === c;
+            if (q._answered) rad.disabled = true;
+            
+            const span = document.createElement("span");
+            span.className = "flex-1 text-base leading-tight text-[var(--text)]";
+            span.innerHTML = c;
+            
+            lbl.appendChild(rad);
+            lbl.appendChild(span);
             
             const selectOption = () => {
                 if (!q._answered) {
-                    const rad = lbl.querySelector('input');
-                    if (rad) {
-                        rad.checked = true;
-                        q._user = c;
-                    }
+                    rad.checked = true;
+                    q._user = c;
                 }
             };
             
-            // Handle both touch and click for mobile/desktop compatibility
-            lbl.addEventListener('touchend', (e) => {
-                e.preventDefault();
-                selectOption();
-            }, { passive: false });
-            lbl.addEventListener('click', selectOption, false);
+            // Use pointerdown for immediate response across all devices
+            lbl.addEventListener('pointerdown', selectOption, false);
+            
             optCont.appendChild(lbl);
         });
     } else if (q.type === "short") {
@@ -257,4 +269,39 @@ function scoreCurrent(val) {
 
 function showResults() {
     const card = getEl("question-card");
-    if
+    if (card) card.innerHTML = `<div class="text-center py-10"><h2 class="text-4xl font-black mb-4">Quiz Complete!</h2><p class="text-2xl">Final Score: ${state.score} / ${state.questions.length}</p><button onclick="location.reload()" class="mt-8 px-8 py-4 bg-maroon text-white rounded-2xl font-bold">Restart Quiz</button></div>`;
+}
+
+function shuffled(a) { return [...a].sort(() => 0.5 - Math.random()); }
+
+async function main() {
+    try {
+        if (weekParam) {
+            const pool = await smartFetch("master_pool.json");
+            const GAME_PLAN = { 1:[1,2,3], 2:[4,5,6], 3:[6,7], 4:[8], 5:[9], 6:[10,11] };
+            const weeks = GAME_PLAN[weekParam] || 'ALL';
+            const newP = pool.filter(d => Number(d.metadata?.lab) === 2 && Number(d.metadata?.week) === weekParam);
+            const revP = (weeks === 'ALL') ? pool.filter(d => Number(d.metadata?.lab) === 1) : pool.filter(d => Number(d.metadata?.lab) === 1 && weeks.includes(Number(d.metadata?.week)));
+            const combined = [...shuffled(newP).slice(0, 6), ...shuffled(revP).slice(0, 4)];
+            state.title = `Top Drug Quiz ${weekParam}`;
+            state.questions = shuffled(combined).map((d, i) => ({ ...createQuestion(d, pool), _id: i, drugRef: d }));
+        } else if (quizId) {
+            const data = await smartFetch(`${quizId}.json`);
+            const pool = data.pools ? Object.values(data.pools).flat() : (data.questions || []);
+            state.title = data.title || "Quiz";
+            state.questions = shuffled(pool).map((q, i) => ({ ...q, _id: i }));
+        } else {
+            throw new Error("Missing ?id=quiz-name or ?week=N parameter");
+        }
+
+        if (getEl("quiz-title")) getEl("quiz-title").textContent = state.title;
+        if (getEl("qtotal")) getEl("qtotal").textContent = state.questions.length;
+        startSmartTimer();
+        wireEvents();
+        // Track last quiz for resume functionality
+        localStorage.setItem("last-quiz", weekParam ? `?week=${weekParam}` : `?id=${quizId}`);
+        render();
+    } catch (err) {
+        console.error("Quiz Error:", err);
+        const card = getEl("question-card");
+        if
