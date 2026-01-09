@@ -144,7 +144,7 @@ function render() {
     if (q._answered) {
         const exp = getEl("explain");
         if (exp) {
-            const displayAnswer = q.answer || q.correct || q.ans || "N/A";
+            const displayAnswer = q.answerText || q.answer || q.correct || q.ans || "N/A";
             exp.innerHTML = `<div class="p-3 rounded-lg ${q._correct ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}"><b>${q._correct ? 'Correct!' : 'Answer:'}</b> <b>${displayAnswer}</b></div>`;
             exp.classList.add("show");
         }
@@ -260,7 +260,7 @@ function scoreCurrent(val) {
     const q = state.questions[state.index];
     if (!q) return;
 
-    const correctAnswer = q.answer || q.correct || q.ans || "";
+    const correctAnswer = q.answerText || q.answer || q.correct || q.ans || "";
 
     if (val === "Revealed") {
         q._answered = true;
