@@ -260,31 +260,43 @@ function scoreCurrent(val) {
     }
 
     const normalizeWhitespace = s => String(s).replace(/\s+/g, ' ').trim().toLowerCase();
-    const splitBySeparators = s => {
-        const str = normalizeWhitespace(s);
-        if (!str) return [];
-        return str.split(/(?:\s*(?:-|\/)\s*|\s+\band\b\s+)/i).map(p => p.trim()).filter(Boolean);
-    };
-
     const userNorm = normalizeWhitespace(val);
     const canonNorm = normalizeWhitespace(correctAnswer);
 
     let isCorrect = false;
-    const separatorPresent = /-|\/|\band\b/i.test(String(correctAnswer));
 
-    if (separatorPresent) {
-        const canonParts = splitBySeparators(correctAnswer);
-        const userParts = splitBySeparators(val);
-        if (userParts.length === 1 && userNorm === canonNorm) {
+    // --- SMART ALIAS MATCHING ---
+    // If we have a drug reference and the user is being asked for a Brand
+    if (q.drugRef && q.drugRef.brand && q.prompt.includes("Brand")) {
+        const allBrands = q.drugRef.brand.split(/[,/]/).map(b => normalizeWhitespace(b));
+        if (allBrands.includes(userNorm)) {
             isCorrect = true;
-        } else {
-            const sortParts = arr => arr.sort();
-            const c = sortParts(canonParts);
-            const u = sortParts(userParts);
-            if (c.length === u.length && c.every((v, i) => v === u[i])) isCorrect = true;
         }
-    } else {
-        isCorrect = (userNorm === canonNorm);
+    }
+
+    if (!isCorrect) {
+        const splitBySeparators = s => {
+            const str = normalizeWhitespace(s);
+            if (!str) return [];
+            return str.split(/(?:\s*(?:-|\/)\s*|\s+\band\b\s+)/i).map(p => p.trim()).filter(Boolean);
+        };
+
+        const separatorPresent = /-|\/|\band\b/i.test(String(correctAnswer));
+
+        if (separatorPresent) {
+            const canonParts = splitBySeparators(correctAnswer);
+            const userParts = splitBySeparators(val);
+            if (userParts.length === 1 && userNorm === canonNorm) {
+                isCorrect = true;
+            } else {
+                const sortParts = arr => arr.sort();
+                const c = sortParts(canonParts);
+                const u = sortParts(userParts);
+                if (c.length === u.length && c.every((v, i) => v === u[i])) isCorrect = true;
+            }
+        } else {
+            isCorrect = (userNorm === canonNorm);
+        }
     }
 
     q._answered = true;
