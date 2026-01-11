@@ -1,7 +1,7 @@
 // assets/js/favorites.js
 // Favorites/Bookmarks page
 
-const THEME_KEY = "quiz-theme";
+const THEME_KEY = "pharmlet.theme";
 const FAVORITES_KEY = "pharmlet.favorites";
 
 // Quiz metadata mapping (id -> {title, category})

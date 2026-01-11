@@ -1,7 +1,7 @@
 // assets/js/study-timer.js
 // Study session timer with Pomodoro mode
 
-const THEME_KEY = "quiz-theme";
+const THEME_KEY = "pharmlet.theme";
 const SESSIONS_KEY = "pharmlet.sessions";
 const SETTINGS_KEY = "pharmlet.timer-settings";
 

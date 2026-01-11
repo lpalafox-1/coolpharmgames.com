@@ -17,7 +17,7 @@ function forceShowMenu() {
 
 function runHome() {
   // 1) Theme toggle
-  const THEME_KEY = "quiz-theme";
+  const THEME_KEY = "pharmlet.theme";
   const t = document.getElementById("theme-toggle");
   const tLabel = document.getElementById("theme-label");
   if (t && tLabel) {

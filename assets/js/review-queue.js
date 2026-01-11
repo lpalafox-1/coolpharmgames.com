@@ -1,7 +1,7 @@
 // assets/js/review-queue.js
 // Smart review queue for wrong answers
 
-const THEME_KEY = "quiz-theme";
+const THEME_KEY = "pharmlet.theme";
 const REVIEW_KEY = "pharmlet.review-queue";
 
 const QUIZ_TITLES = {

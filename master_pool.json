@@ -10,7 +10,7 @@
   {
     "generic": "Ticagrelor",
     "brand": "Brilinta",
-    "class": "P2Y12 Antagonist",
+    "class": "Thienopyridine P2Y12 Antagonist",
     "category": "Antiplatelet",
     "moa": "Reversibly binds to the P2Y12 ADP receptor on platelets, inhibiting platelet activation and aggregation.",
     "metadata": { "lab": 2, "week": 1, "is_new": true }
@@ -18,8 +18,8 @@
   {
     "generic": "Aspirin",
     "brand": "Bayer",
-    "class": "Antiplatelet Agent",
-    "category": "Antiplatelet",
+    "class": "Analgesic; Antiplatelet",
+    "category": "Antiplatelet Agent",
     "moa": "Inhibits cyclooxygenase-1 (COX-1) and cyclooxygenase-2 (COX-2), reducing the formation of thromboxane A2 and inhibiting platelet aggregation.",
     "metadata": { "lab": 2, "week": 1, "is_new": true }
   },
@@ -27,7 +27,7 @@
     "generic": "Isosorbide Mononitrate",
     "brand": "Imdur",
     "class": "Nitrate",
-    "category": "Heart Failure/Antianginal",
+    "category": "Cardiovascular Agent; Antianginal",
     "moa": "Relaxes vascular smooth muscle by increasing nitric oxide, leading to vasodilation.",
     "metadata": { "lab": 2, "week": 1, "is_new": true }
   },
@@ -35,7 +35,7 @@
     "generic": "Valsartan/sacubitril",
     "brand": "Entresto",
     "class": "Angiotensin II Receptor Blocker (ARB) and Neprilysin Inhibitor",
-    "category": "Heart Failure/Antianginal",
+    "category": "Cardiovascular Agent; Antianginal",
     "moa": "Selectively blocks the binding of angiotensin II to the AT1 receptor, preventing vasoconstriction and reducing the secretion of aldosterone; inhibits neprilysin to induce vasodilation and natriuresis",
     "metadata": { "lab": 2, "week": 1, "is_new": true }
   },
@@ -43,7 +43,7 @@
     "generic": "Alteplase",
     "brand": "Activase",
     "class": "Thrombolytic Agent",
-    "category": "Antithrombolytics/ACS",
+    "category": "Thrombolytic Agent",
     "moa": "Converts plasminogen to plasmin, leading to the degradation of fibrin in thrombi.",
     "metadata": { "lab": 2, "week": 1, "is_new": true }
   },
@@ -51,7 +51,7 @@
     "generic": "Tenecteplase",
     "brand": "TNKase",
     "class": "Thrombolytic Agent",
-    "category": "Antithrombolytics/ACS",
+    "category": "Thrombolytic Agent",
     "moa": "Converts plasminogen to plasmin, leading to the degradation of fibrin in thrombi.",
     "metadata": { "lab": 2, "week": 1, "is_new": true }
   },
@@ -59,7 +59,7 @@
     "generic": "Cetirizine",
     "brand": "Zyrtec",
     "class": "H1 Antagonist, 2nd Generation",
-    "category": "Antihistamines",
+    "category": "Antihistamine",
     "moa": "Selectively inhibits peripheral Histamine-1 (H1) receptors.",
     "metadata": { "lab": 2, "week": 2, "is_new": true }
   },
@@ -67,7 +67,7 @@
     "generic": "Loratadine",
     "brand": "Claritin",
     "class": "H1 Antagonist, 2nd Generation",
-    "category": "Antihistamines",
+    "category": "Antihistamine",
     "moa": "Selectively inhibits peripheral Histamine-1 (H1) receptors.",
     "metadata": { "lab": 2, "week": 2, "is_new": true }
   },
@@ -75,7 +75,7 @@
     "generic": "Diphenhydramine",
     "brand": "Benadryl",
     "class": "H1 Antagonist, 1st Generation",
-    "category": "Antihistamines",
+    "category": "Antihistamine",
     "moa": "Inhibits Histamine -1(H1) receptors peripherally and centrally.",
     "metadata": { "lab": 2, "week": 2, "is_new": true }
   },
@@ -83,7 +83,7 @@
     "generic": "Hydroxyzine",
     "brand": "Atarax; Vistaril",
     "class": "H1 Antagonist, 1st Generation",
-    "category": "Antihistamines",
+    "category": "Antihistamine",
     "moa": "Inhibits Histamine -1(H1) receptors peripherally and centrally.",
     "metadata": { "lab": 2, "week": 2, "is_new": true }
   },
@@ -91,7 +91,7 @@
     "generic": "Fexofenadine",
     "brand": "Allegra",
     "class": "H1 Antagonist, 2nd Generation",
-    "category": "Antihistamines",
+    "category": "Antihistamine",
     "moa": "Selectively inhibits peripheral Histamine-1 (H1) receptors.",
     "metadata": { "lab": 2, "week": 2, "is_new": true }
   },
@@ -99,7 +99,7 @@
     "generic": "Meloxicam",
     "brand": "Mobic",
     "class": "Nonsteroidal Anti-inflammatory Drug (NSAID)",
-    "category": "Anti-inflammatory/analgesics",
+    "category": "Analgesic",
     "moa": "Inhibits cyclooxygenase (COX-1 and COX-2), decreasing the formation of prostaglandins.",
     "metadata": { "lab": 2, "week": 2, "is_new": true }
   },
@@ -107,7 +107,7 @@
     "generic": "Diclofenac",
     "brand": "Voltaren",
     "class": "Nonsteroidal Anti-inflammatory Drug (NSAID)",
-    "category": "Anti-inflammatory/analgesics",
+    "category": "Analgesic",
     "moa": "Inhibits cyclooxygenase (COX-1 and COX-2), decreasing the formation of prostaglandins.",
     "metadata": { "lab": 2, "week": 2, "is_new": true }
   },
@@ -115,7 +115,7 @@
     "generic": "Ibuprofen",
     "brand": "Advil, Motrin",
     "class": "Nonsteroidal Anti-inflammatory Drug (NSAID)",
-    "category": "Anti-inflammatory/analgesics",
+    "category": "Analgesic",
     "moa": "Inhibits cyclooxygenase (COX-1 and COX-2), decreasing the formation of prostaglandins.",
     "metadata": { "lab": 2, "week": 2, "is_new": true }
   },
@@ -123,7 +123,7 @@
     "generic": "Naproxen",
     "brand": "Aleve",
     "class": "Nonsteroidal Anti-inflammatory Drug (NSAID)",
-    "category": "Anti-inflammatory/analgesics",
+    "category": "Analgesic",
     "moa": "Inhibits cyclooxygenase (COX-1 and COX-2), decreasing the formation of prostaglandins.",
     "metadata": { "lab": 2, "week": 2, "is_new": true }
   },
@@ -131,7 +131,7 @@
     "generic": "Ketorolac",
     "brand": "Toradol",
     "class": "Nonsteroidal Anti-inflammatory Drug (NSAID)",
-    "category": "Anti-inflammatory/analgesics",
+    "category": "Analgesic",
     "moa": "Inhibits cyclooxygenase (COX-1 and COX-2), decreasing the formation of prostaglandins.",
     "metadata": { "lab": 2, "week": 2, "is_new": true }
   },
@@ -139,15 +139,15 @@
     "generic": "Celecoxib",
     "brand": "Celebrex, Elyxyb",
     "class": "COX-2 Selective Nonsteroidal Anti-inflammatory Drug (NSAID)",
-    "category": "Anti-inflammatory/analgesics",
+    "category": "Analgesic",
     "moa": "Inhibits cyclooxygenase (COX-2), decreasing the formation of prostaglandins.",
     "metadata": { "lab": 2, "week": 2, "is_new": true }
   },
   {
     "generic": "Hydrocodone",
-    "brand": "Zohydro ER (cap), Hysingla ER (tab), Norco (with APAP)",
+    "brand": "Zohydro ER, Hysingla ER, Norco",
     "class": "Opioid Analgesic",
-    "category": "Opioid Analgesics",
+    "category": "Analgesic; Opioid",
     "moa": "Binds to mu-opioid receptors in the CNS, altering the perception of and response to pain.",
     "metadata": { "lab": 2, "week": 3, "is_new": true }
   },
@@ -155,7 +155,7 @@
     "generic": "Oxycodone",
     "brand": "OxyContin, Roxicodone",
     "class": "Opioid Analgesic",
-    "category": "Opioid Analgesics",
+    "category": "Analgesic; Opioid",
     "moa": "Binds to mu-opioid receptors in the CNS, altering the perception of and response to pain.",
     "metadata": { "lab": 2, "week": 3, "is_new": true }
   },
@@ -163,7 +163,7 @@
     "generic": "Tramadol",
     "brand": "Ultram",
     "class": "Opioid Analgesic",
-    "category": "Opioid Analgesics",
+    "category": "Analgesic; Opioid",
     "moa": "Binds to mu-opioid receptors in the CNS, altering the perception of and response to pain; inhibits the reuptake of norepinephrine and serotonin.",
     "metadata": { "lab": 2, "week": 3, "is_new": true }
   },
@@ -171,7 +171,7 @@
     "generic": "Acetaminophen",
     "brand": "Tylenol",
     "class": "Analgesic; Antipyretic",
-    "category": "Analgesics, Antipyretics",
+    "category": "Analgesic; Antipyretic",
     "moa": "Inhibits the synthesis of prostaglandins in the CNS and acts on the hypothalamic heat-regulating center.",
     "metadata": { "lab": 2, "week": 3, "is_new": true }
   },
@@ -179,7 +179,7 @@
     "generic": "Omeprazole",
     "brand": "Prilosec",
     "class": "Proton Pump Inhibitor (PPI)",
-    "category": "GI",
+    "category": "Antacid",
     "moa": "Inhibits the H+/K+ ATPase enzyme system in the gastric parietal cells, reducing the production of gastric acid.",
     "metadata": { "lab": 2, "week": 3, "is_new": true }
   },
@@ -187,7 +187,7 @@
     "generic": "Pantoprazole",
     "brand": "Protonix",
     "class": "Proton Pump Inhibitor (PPI)",
-    "category": "GI",
+    "category": "Antacid",
     "moa": "Inhibits the H+/K+ ATPase enzyme system in the gastric parietal cells, reducing the production of gastric acid.",
     "metadata": { "lab": 2, "week": 3, "is_new": true }
   },
@@ -195,7 +195,7 @@
     "generic": "Esomeprazole",
     "brand": "Nexium",
     "class": "Proton Pump Inhibitor (PPI)",
-    "category": "GI",
+    "category": "Antacid",
     "moa": "Inhibits the H+/K+ ATPase enzyme system in the gastric parietal cells, reducing the production of gastric acid.",
     "metadata": { "lab": 2, "week": 3, "is_new": true }
   },
@@ -203,7 +203,7 @@
     "generic": "Famotidine",
     "brand": "Pepcid",
     "class": "Histamine H2 Receptor Antagonist",
-    "category": "GI",
+    "category": "Antacid",
     "moa": "Inhibits histamine at H2 receptors of the gastric parietal cells, reducing gastric acid secretion.",
     "metadata": { "lab": 2, "week": 3, "is_new": true }
   },
@@ -211,39 +211,39 @@
     "generic": "Ondansetron",
     "brand": "Zofran",
     "class": "Selective 5-HT3 Receptor Antagonist",
-    "category": "GI",
+    "category": "Antiemetic",
     "moa": "Selectively inhibits 5-HT3 receptors which blocks serotonin, both peripherally on vagal nerve terminals and centrally in the chemoreceptor trigger zone",
     "metadata": { "lab": 2, "week": 3, "is_new": true }
   },
   {
     "generic": "Azithromycin",
     "brand": "Zithromax, Z-Pak",
-    "class": "Antibiotic Macrolide",
-    "category": "Antibiotics",
+    "class": "Macrolide",
+    "category": "Antibiotic",
     "moa": "Inhibits bacterial protein synthesis by binding to the 50S ribosomal subunit and preventing translation of mRNA to proteins.",
     "metadata": { "lab": 2, "week": 4, "is_new": true }
   },
   {
     "generic": "Amoxicillin",
     "brand": "Amoxil, Trimox",
-    "class": "Antibiotic Beta-Lactam",
-    "category": "Antibiotics",
+    "class": "Beta-Lactam",
+    "category": "Antibiotic",
     "moa": "Inhibits the synthesis of bacterial cell walls by binding to penicillin-binding proteins, leading to lysis and death of bacteria.",
     "metadata": { "lab": 2, "week": 4, "is_new": true }
   },
   {
-    "generic": "Amoxicillin-Clavulanate",
+    "generic": "Amoxicillin/Clavulanate",
     "brand": "Augmentin",
     "class": "Beta-Lactam, Beta-Lactamase Inhibitor Antibiotic combination",
-    "category": "Antibiotics",
+    "category": "Antibiotic",
     "moa": "Amoxicillin inhibits the synthesis of bacterial cell walls by binding to penicillin-binding proteins, leading to lysis and death of bacteria; clavulanic acid inhibits beta-lactamases from breaking amoxicillin down.",
     "metadata": { "lab": 2, "week": 4, "is_new": true }
   },
   {
     "generic": "Clindamycin",
     "brand": "Cleocin",
-    "class": "Antibiotic Lincosamide",
-    "category": "Antibiotics",
+    "class": "Lincosamide",
+    "category": "Antibiotic",
     "moa": "Inhibits bacterial protein synthesis by binding to the 50S ribosomal subunit and preventing translation of mRNA to proteins.",
     "metadata": { "lab": 2, "week": 4, "is_new": true }
   },
@@ -251,7 +251,7 @@
     "generic": "Metronidazole",
     "brand": "Flagyl",
     "class": "Nitroimidazole",
-    "category": "Antibiotics",
+    "category": "Antibiotic",
     "moa": "Disrupts DNA helical structure and inhibits nucleic acid synthesis.",
     "metadata": { "lab": 2, "week": 4, "is_new": true }
   },
@@ -259,7 +259,7 @@
     "generic": "Ciprofloxacin",
     "brand": "Cipro",
     "class": "Fluoroquinolone",
-    "category": "Antibiotics",
+    "category": "Antibiotic",
     "moa": "Inhibits DNA replication and transcription by inhibiting bacterial DNA gyrase and topoisomerase IV.",
     "metadata": { "lab": 2, "week": 4, "is_new": true }
   },
@@ -267,7 +267,7 @@
     "generic": "Levofloxacin",
     "brand": "Levaquin",
     "class": "Fluoroquinolone",
-    "category": "Antibiotics",
+    "category": "Antibiotic",
     "moa": "Inhibits DNA replication and transcription by inhibiting bacterial DNA gyrase and topoisomerase IV.",
     "metadata": { "lab": 2, "week": 4, "is_new": true }
   },
@@ -275,7 +275,7 @@
     "generic": "Penicillin",
     "brand": "Pen-VK",
     "class": "Beta-Lactam",
-    "category": "Antibiotics",
+    "category": "Antibiotic",
     "moa": "Inhibits the synthesis of bacterial cell walls by binding to penicillin-binding proteins, leading to lysis and death of bacteria.",
     "metadata": { "lab": 2, "week": 4, "is_new": true }
   },
@@ -283,7 +283,7 @@
     "generic": "Nitrofurantoin",
     "brand": "Macrobid",
     "class": "Nitrofuran",
-    "category": "Antibiotics 2",
+    "category": "Antibiotic",
     "moa": "Converts to reactive metabolites that inhibit bacterial ribosomes and disrupts synthesis.",
     "metadata": { "lab": 2, "week": 5, "is_new": true }
   },
@@ -291,7 +291,7 @@
     "generic": "Sulfamethoxazole/Trimethoprim",
     "brand": "Bactrim",
     "class": "Sulfonamide",
-    "category": "Antibiotics 2",
+    "category": "Antibiotic",
     "moa": "Inhibits bacterial synthesis of dihydrofolic acid, a crucial component of DNA replication.",
     "metadata": { "lab": 2, "week": 5, "is_new": true }
   },
@@ -299,7 +299,7 @@
     "generic": "Vancomycin",
     "brand": "Firvanq, Vancocin",
     "class": "Glycopeptide",
-    "category": "Antibiotics 2",
+    "category": "Antibiotic",
     "moa": "Inhibits bacterial cell wall synthesis by blocking glycopeptide polymerization.",
     "metadata": { "lab": 2, "week": 5, "is_new": true }
   },
@@ -307,7 +307,7 @@
     "generic": "Doxycycline",
     "brand": "Vibramycin",
     "class": "Tetracycline",
-    "category": "Antibiotics 2",
+    "category": "Antibiotic",
     "moa": "Inhibits bacterial protein synthesis by binding to the 30S ribosomal subunit and preventing translation of mRNA to proteins.",
     "metadata": { "lab": 2, "week": 5, "is_new": true }
   },
@@ -315,7 +315,7 @@
     "generic": "Ceftriaxone",
     "brand": "Rocephin",
     "class": "Cephalosporin",
-    "category": "Antibiotics 2",
+    "category": "Antibiotic",
     "moa": "Inhibits the synthesis of bacterial cell walls by binding to penicillin-binding proteins, leading to lysis and death of bacteria.",
     "metadata": { "lab": 2, "week": 5, "is_new": true }
   },
@@ -323,7 +323,7 @@
     "generic": "Cephalexin",
     "brand": "Keflex",
     "class": "Cephalosporin",
-    "category": "Antibiotics 2",
+    "category": "Antibiotic",
     "moa": "Inhibits the synthesis of bacterial cell walls by binding to penicillin-binding proteins, leading to lysis and death of bacteria.",
     "metadata": { "lab": 2, "week": 5, "is_new": true }
   },
@@ -331,23 +331,23 @@
     "generic": "Cefdinir",
     "brand": "Omnicef",
     "class": "Cephalosporin",
-    "category": "Antibiotics 2",
+    "category": "Antibiotic",
     "moa": "Inhibits the synthesis of bacterial cell walls by binding to penicillin-binding proteins, leading to lysis and death of bacteria.",
     "metadata": { "lab": 2, "week": 5, "is_new": true }
   },
   {
-    "generic": "Piperacillin-Tazobactam",
+    "generic": "Piperacillin/Tazobactam",
     "brand": "Zosyn",
     "class": "Beta-Lactam, Beta-Lactamase Inhibitor combination",
-    "category": "Antibiotics",
+    "category": "Antibiotic",
     "moa": "Piperacillin inhibits the synthesis of bacterial cell walls by binding to penicillin-binding proteins, leading to lysis and death of bacteria; tazobactam inhibits beta-lactamases from breaking piperacillin down.",
     "metadata": { "lab": 2, "week": 6, "is_new": true }
   },
   {
-    "generic": "Ampicillin-sulbactam",
+    "generic": "Ampicillin/Sulbactam",
     "brand": "Unasyn",
     "class": "Beta-Lactam, Beta-Lactamase Inhibitor combination",
-    "category": "Antibiotics",
+    "category": "Antibiotic",
     "moa": "Ampicillin inhibits the synthesis of bacterial cell walls by binding to penicillin-binding proteins, leading to lysis and death of bacteria; sulbactam inhibits beta-lactamases from breaking ampicillin down.",
     "metadata": { "lab": 2, "week": 6, "is_new": true }
   },
@@ -355,7 +355,7 @@
     "generic": "Cefepime",
     "brand": "Maxipime",
     "class": "Cephalosporin",
-    "category": "Antibiotics",
+    "category": "Antibiotic",
     "moa": "Inhibits the synthesis of bacterial cell walls by binding to penicillin-binding proteins, leading to lysis and death of bacteria.",
     "metadata": { "lab": 2, "week": 6, "is_new": true }
   },
@@ -363,7 +363,7 @@
     "generic": "Fluconazole",
     "brand": "Diflucan",
     "class": "Azole",
-    "category": "Antifungals",
+    "category": "Antifungal",
     "moa": "Inhibits the synthesis of ergosterol, a critical component of fungal cell membranes.",
     "metadata": { "lab": 2, "week": 6, "is_new": true }
   },
@@ -371,7 +371,7 @@
     "generic": "Oseltamivir",
     "brand": "Tamiflu",
     "class": "Neuraminidase Inhibitor",
-    "category": "Antivirals",
+    "category": "Antiviral",
     "moa": "Prodrug that inhibits influenza virus neuraminidase, an enzyme that cleaves the cellular envelope just prior to release",
     "metadata": { "lab": 2, "week": 6, "is_new": true }
   },
@@ -379,7 +379,7 @@
     "generic": "Acyclovir",
     "brand": "Zovirax",
     "class": "Synthetic Nucleoside Analog",
-    "category": "Antivirals",
+    "category": "Antiviral",
     "moa": "Inhibits DNA synthesis and viral replication",
     "metadata": { "lab": 2, "week": 6, "is_new": true }
   },
@@ -387,7 +387,7 @@
     "generic": "Valacyclovir",
     "brand": "Valtrex",
     "class": "Synthetic Nucleoside Analog",
-    "category": "Antivirals",
+    "category": "Antiviral",
     "moa": "Inhibits DNA synthesis and viral replication",
     "metadata": { "lab": 2, "week": 6, "is_new": true }
   },
@@ -395,7 +395,7 @@
     "generic": "Montelukast",
     "brand": "Singulair",
     "class": "Leukotriene Receptor Antagonist",
-    "category": "Asthma/COPD",
+    "category": "Pulmonary",
     "moa": "Blocks the action of leukotrienes, reducing inflammation, bronchoconstriction, and mucus production.",
     "metadata": { "lab": 2, "week": 7, "is_new": true }
   },
@@ -403,7 +403,7 @@
     "generic": "Albuterol",
     "brand": "ProAir, Ventolin",
     "class": "Short-Acting Beta-2 Agonist",
-    "category": "Asthma/COPD",
+    "category": "Pulmonary",
     "moa": "Stimulates beta2-adrenergic receptors, resulting in bronchial smooth muscle relaxation.",
     "metadata": { "lab": 2, "week": 7, "is_new": true }
   },
@@ -411,7 +411,7 @@
     "generic": "Fluticasone",
     "brand": "Flovent",
     "class": "Inhaled Corticosteroid",
-    "category": "Asthma/COPD",
+    "category": "Pulmonary",
     "moa": "Acts as an anti-inflammatory agent by inhibiting inflammatory mediators.",
     "metadata": { "lab": 2, "week": 7, "is_new": true }
   },
@@ -419,31 +419,31 @@
     "generic": "Tiotropium",
     "brand": "Spiriva",
     "class": "Long-acting Muscarinic Antagonist",
-    "category": "Asthma/COPD",
+    "category": "Pulmonary",
     "moa": "Inhibits the action of acetylcholine at M3 receptors in the bronchial smooth muscle, leading to bronchodilation and decreased mucus secretion.",
     "metadata": { "lab": 2, "week": 7, "is_new": true }
   },
   {
-    "generic": "Fluticasone + Salmeterol",
+    "generic": "Fluticasone/Salmeterol",
     "brand": "Advair",
     "class": "Inhaled Corticosteroid and Long-Acting Beta-2 Agonist",
-    "category": "Asthma/COPD",
+    "category": "Pulmonary",
     "moa": "Inhibits inflammatory mediators and stimulates beta2-adrenergic receptors, resulting in decreased inflammation and bronchial smooth muscle relaxation.",
     "metadata": { "lab": 2, "week": 7, "is_new": true }
   },
   {
-    "generic": "Budesonide + Formoterol",
+    "generic": "Budesonide/Formoterol",
     "brand": "Symbicort, Brenya",
     "class": "Inhaled Corticosteroid and Long-Acting Beta-2 Agonist",
-    "category": "Asthma/COPD",
+    "category": "Pulmonary",
     "moa": "Inhibits inflammatory mediators and stimulates beta2-adrenergic receptors, resulting in decreased inflammation and bronchial smooth muscle relaxation.",
     "metadata": { "lab": 2, "week": 7, "is_new": true }
   },
   {
-    "generic": "ipratropium-albuterol",
+    "generic": "Ipratropium/Albuterol",
     "brand": "Combivent",
     "class": "Short-Acting Muscarinic Antagonist and Short-Acting Beta-2 Agonist",
-    "category": "Asthma/COPD",
+    "category": "Pulmonary",
     "moa": "Inhibits the action of acetylcholine at M3 receptors in the bronchial smooth muscle, leading to bronchodilation and decreased mucus secretion.; Stimulates beta2-adrenergic receptors, resulting in bronchial smooth muscle relaxation.",
     "metadata": { "lab": 2, "week": 7, "is_new": true }
   },
@@ -451,7 +451,7 @@
     "generic": "Alendronate",
     "brand": "Fosamax",
     "class": "Bisphosphonate",
-    "category": "Osteoporosis",
+    "category": "Bisphosphonate",
     "moa": "Inhibits osteoclast-mediated bone resorption, leading to increased bone mineral density.",
     "metadata": { "lab": 2, "week": 8, "is_new": true }
   },
@@ -459,7 +459,7 @@
     "generic": "Prednisone",
     "brand": "Deltasone",
     "class": "Corticosteroid",
-    "category": "Steroids",
+    "category": "Corticosteroid",
     "moa": "Bind to the glucocorticoid receptor leading to inhibition of pro-inflammatory signals and decreasing immune response",
     "metadata": { "lab": 2, "week": 8, "is_new": true }
   },
@@ -467,7 +467,7 @@
     "generic": "Methylprednisolone",
     "brand": "Medrol",
     "class": "Corticosteroid",
-    "category": "Steroids",
+    "category": "Corticosteroid",
     "moa": "Bind to the glucocorticoid receptor leading to inhibition of pro-inflammatory signals and decreasing immune response",
     "metadata": { "lab": 2, "week": 8, "is_new": true }
   },
@@ -475,7 +475,7 @@
     "generic": "Dexamethasone",
     "brand": "TopiDex",
     "class": "Corticosteroid",
-    "category": "Steroids",
+    "category": "Corticosteroid",
     "moa": "Bind to the glucocorticoid receptor leading to inhibition of pro-inflammatory signals and decreasing immune response",
     "metadata": { "lab": 2, "week": 8, "is_new": true }
   },
@@ -506,7 +506,7 @@
   {
     "generic": "Tizanidine",
     "brand": "Zanaflex",
-    "class": "Alpha-2 Agonist Muscle Relaxant",
+    "class": "Alpha-2 Agonist",
     "category": "Muscle Relaxant",
     "moa": "Relieves skeletal muscle spasms by modulating neurotransmission in the brain and spinal cord.",
     "metadata": { "lab": 2, "week": 9, "is_new": true }
@@ -530,120 +530,120 @@
   {
     "generic": "Sildenafil",
     "brand": "Viagra",
-    "class": "Erectile Dysfunction Agent Phosphodiesterase-5 Inhibitor",
-    "category": "Men's Health",
+    "class": "Phosphodiesterase-5 Inhibitor",
+    "category": "Erectile Dysfunction Agent",
     "moa": "Inhibits the enzyme phosphodiesterase-5 to prevent the degredation of cGMP leading to smooth muscle relaxation and increased blood flow to the corpus cavernosum.",
     "metadata": { "lab": 2, "week": 9, "is_new": true }
   },
   {
     "generic": "Tadalafil",
     "brand": "Cialis",
-    "class": "Erectile Dysfunction Agent Phosphodiesterase-5 Inhibitor",
-    "category": "Men's Health",
+    "class": "Phosphodiesterase-5 Inhibitor",
+    "category": "Erectile Dysfunction Agent",
     "moa": "Inhibits the enzyme phosphodiesterase-5 to prevent the degredation of cGMP leading to smooth muscle relaxation and increased blood flow to the corpus cavernosum.",
     "metadata": { "lab": 2, "week": 9, "is_new": true }
   },
   {
     "generic": "Tamsulosin",
     "brand": "Flomax",
-    "class": "BPH Agent Alpha-1 Antagonist",
-    "category": "Men's Health",
+    "class": "Agent Alpha-1 Antagonist",
+    "category": "BPH Agent",
     "moa": "Inhibits alpha-1 receptors in the prostate to cause smooth muscle relaxation in the bladder neck and prostate",
     "metadata": { "lab": 2, "week": 9, "is_new": true }
   },
   {
     "generic": "Finasteride",
     "brand": "Propecia; Proscar",
-    "class": "5-Alpha Reductase Inhibitor BPH Agent",
-    "category": "Men's Health",
+    "class": "5-Alpha Reductase Inhibitor",
+    "category": "BPH Agent",
     "moa": "inhibits type II 5-alpha reductase to stop the conversion of testosterone to its active form",
     "metadata": { "lab": 2, "week": 9, "is_new": true }
   },
   {
     "generic": "Estradiol",
     "brand": "Alora; Climara; Evamist; Femring; Minivelle; Vivelle-Dot",
-    "class": "Hormone Replacement Estrogen Derivative",
-    "category": "Women's Health",
+    "class": "Estrogen Derivative",
+    "category": "Horomone Replacement",
     "moa": "Modulates the pituitary secretion of gonadotropins, luteinizing hormone, and follicle-stimulating hormone through a negative feedback system",
     "metadata": { "lab": 2, "week": 10, "is_new": true }
   },
   {
     "generic": "Progesterone",
     "brand": "Crinone; Endometrin; Prometrium",
-    "class": "Hormone Replacement Progestin",
-    "category": "Women's Health",
+    "class": "Progestin",
+    "category": "Horomone Replacement",
     "moa": "Induces secretory changes in the endometrium, promotes mammary gland development, relaxes uterine smooth muscle, blocks follicular maturation and ovulation, and maintains pregnancy",
     "metadata": { "lab": 2, "week": 10, "is_new": true }
   },
   {
     "generic": "Norgestimate-ethinyl estradiol",
     "brand": "Sprintec; Estarylla; VyLibra; Mili",
-    "class": "Estrogen and Progestin Combination Contraceptive",
-    "category": "Women's Health",
+    "class": "Estrogen and Progestin Combination",
+    "category": "Contraceptive",
     "moa": "Inhibit ovulation via a negative feedback mechanism on the hypothalamus, which alters the normal pattern of gonadotropin secretion of a follicle-stimulating hormone (FSH) and luteinizing hormone by the anterior pituitary",
     "metadata": { "lab": 2, "week": 10, "is_new": true }
   },
   {
     "generic": "Norethindrone-ethinyl estradiol",
     "brand": "Blisovi; Cemlyv; Larin; Microgestin; Vyfemla",
-    "class": "Estrogen and Progestin Combination Contraceptive",
-    "category": "Women's Health",
+    "class": "Estrogen and Progestin Combination",
+    "category": "Contraceptive",
     "moa": "Inhibit ovulation via a negative feedback mechanism on the hypothalamus, which alters the normal pattern of gonadotropin secretion of a follicle-stimulating hormone (FSH) and luteinizing hormone by the anterior pituitary",
     "metadata": { "lab": 2, "week": 10, "is_new": true }
   },
   {
     "generic": "Sumatriptan",
     "brand": "Imitrex; Tosymra",
-    "class": "Serotonin 5-HT1B, 2D Receptor Agonist Antimigraine",
-    "category": "Migraine Medication Potpourri",
+    "class": "Serotonin 5-HT1B, 2D Receptor Agonist ",
+    "category": "Antimigraine",
     "moa": "Selective agonist for serotonin on intracranial blood vessels to cause vasoconstriction and reduce inflammation",
     "metadata": { "lab": 2, "week": 11, "is_new": true }
   },
   {
     "generic": "Rizatriptan",
     "brand": "Maxalt; Maxalt-MLT",
-    "class": "Serotonin 5-HT1B,2D Receptor Agonist Antimigraine",
-    "category": "Migraine Medication Potpourri",
+    "class": "Serotonin 5-HT1B,2D Receptor Agonist",
+    "category": "Antimigraine",
     "moa": "Selective agonist for serotonin on intracranial blood vessels to cause vasoconstriction and reduce inflammation",
     "metadata": { "lab": 2, "week": 11, "is_new": true }
   },
   {
     "generic": "Adalimumab",
     "brand": "Humira",
-    "class": "Tumor Necrosis Factor Blocking Agent Monoclonal Antibody",
-    "category": "Migraine Medication Potpourri",
+    "class": "Tumor Necrosis Factor Blocking Agent",
+    "category": "Monoclonal Antibody",
     "moa": "Recombinant monoclonal antibody that binds to TNF-alpha to inhibit cytokine-driven inflammatory processes",
     "metadata": { "lab": 2, "week": 11, "is_new": true }
   },
   {
     "generic": "Latanoprost",
     "brand": "Xelpros; Xalatan",
-    "class": "Antiglaucoma Prostaglandin Agent",
-    "category": "Migraine Medication Potpourri",
+    "class": "Prostaglandin",
+    "category": "Antiglaucoma",
     "moa": "Prostaglandin F2-alpha analog believed to reduce intraocular pressure by increasing the outflow of the aqueous humor",
     "metadata": { "lab": 2, "week": 11, "is_new": true }
   },
   {
     "generic": "Phenylephrine IV",
     "brand": "Biorphen",
-    "class": "Adrenergic Alpha-Adrenergic Agent",
-    "category": "Migraine Medication Potpourri",
+    "class": "Alpha-Adrenergic Agent",
+    "category": "Adrenergic Agent",
     "moa": "Direct-acting alpha adrenergic agonist producing systemic arterial vasoconstricton",
     "metadata": { "lab": 2, "week": 11, "is_new": true }
   },
   {
     "generic": "Rocuronium",
     "brand": "",
-    "class": "Nondepolarizing Neuromuscular Blocker",
-    "category": "Migraine Medication Potpourri",
+    "class": "Nondepolarizing Neuromuscular Blocker Agent",
+    "category": "Neuromuscular Blocker",
     "moa": "Blocks acetylcholine from binding to receptors on the motor endplate to inhibit depolarization",
     "metadata": { "lab": 2, "week": 11, "is_new": true }
   },
   {
     "generic": "Propofol",
     "brand": "Diprivan",
-    "class": "Anesthetic General Anesthetic",
-    "category": "Migraine Medication Potpourri",
+    "class": "General Anesthetic",
+    "category": "Anesthetic",
     "moa": "Short acting agonist of GABAa receptors and blocker of NMDA receptors to cause anesthesia",
     "metadata": { "lab": 2, "week": 11, "is_new": true }
   },
@@ -651,7 +651,7 @@
     "generic": "Oxybutynin",
     "brand": "Oxytrol",
     "class": "Urinary Antispasmodic Agent",
-    "category": "Migraine Medication Potpourri",
+    "category": "Antispasmodic",
     "moa": "Has a direct antispasmodic effect on smooth muscle and also inhibits the action of acetylcholine on smooth muscle",
     "metadata": { "lab": 2, "week": 11, "is_new": true }
   },
@@ -665,7 +665,7 @@
   },
   {
     "generic": "Amlodipine",
-    "brand": "Norvasc (tab), Norliqva (soln), Katerzia (susp)",
+    "brand": "Norvasc, Norliqva, Katerzia",
     "class": "Calcium Channel Blocker (Dihydropyridine)",
     "category": "Antihypertensive",
     "moa": "Inhibits the influx of calcium ions into vascular smooth muscle and cardiac muscle, resulting in decreased peripheral vascular resistance and reduced blood pressure.",
@@ -802,7 +802,7 @@
   {
     "generic": "Simvastatin",
     "brand": "Zocor",
-    "class": "HMG-CoA Reductase Inhibitor (Statin)",
+    "class": "HMG-CoA Reductase Inhibitor",
     "category": "Antilipemic",
     "moa": "Inhibits HMG-CoA reductase, reducing cholesterol synthesis and increasing LDL uptake from the blood.",
     "metadata": { "lab": 1, "week": 3, "is_new": false }
@@ -810,7 +810,7 @@
   {
     "generic": "Rosuvastatin",
     "brand": "Crestor",
-    "class": "HMG-CoA Reductase Inhibitor (Statin)",
+    "class": "HMG-CoA Reductase Inhibitor",
     "category": "Antilipemic",
     "moa": "Inhibits HMG-CoA reductase, reducing cholesterol synthesis and increasing LDL uptake from the blood.",
     "metadata": { "lab": 1, "week": 3, "is_new": false }
@@ -818,7 +818,7 @@
   {
     "generic": "Atorvastatin",
     "brand": "Lipitor",
-    "class": "HMG-CoA Reductase Inhibitor (Statin)",
+    "class": "HMG-CoA Reductase Inhibitor",
     "category": "Antilipemic",
     "moa": "Inhibits HMG-CoA reductase, reducing cholesterol synthesis and increasing LDL uptake from the blood.",
     "metadata": { "lab": 1, "week": 3, "is_new": false }
@@ -826,7 +826,7 @@
   {
     "generic": "Pravastatin",
     "brand": "Pravachol",
-    "class": "HMG-CoA Reductase Inhibitor (Statin)",
+    "class": "HMG-CoA Reductase Inhibitor",
     "category": "Antilipemic",
     "moa": "Inhibits HMG-CoA reductase, reducing cholesterol synthesis and increasing LDL uptake from the blood.",
     "metadata": { "lab": 1, "week": 3, "is_new": false }
@@ -841,7 +841,7 @@
   },
   {
     "generic": "Niacin",
-    "brand": "Niaspan (DSC), Niacor",
+    "brand": "Niaspan, Niacor",
     "class": "Nicotinic Acid",
     "category": "Antilipemic",
     "moa": "Inhibits lipolysis in adipose tissue, reduces hepatic VLDL synthesis, and increases HDL levels.",
@@ -929,7 +929,7 @@
   },
   {
     "generic": "Amiodarone",
-    "brand": "Nexterone (soln), Pacerone (tab)",
+    "brand": "Nexterone, Pacerone",
     "class": "Class III Antiarrhythmic",
     "category": "Antiarrhythmic",
     "moa": "Inhibits potassium channels responsible for repolarizatin of the cardiac cell membrane; Prolongs the action potential and refractory period of cardiac cells.",
