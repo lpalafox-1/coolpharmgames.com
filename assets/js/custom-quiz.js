@@ -1,7 +1,7 @@
 // assets/js/custom-quiz.js
 // Custom quiz builder - combine questions from multiple quizzes
 
-const THEME_KEY = "quiz-theme";
+const THEME_KEY = "pharmlet.theme";
 const CUSTOM_QUIZ_KEY = "pharmlet.custom-quiz";
 
 const state = {

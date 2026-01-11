@@ -36,7 +36,7 @@ a.quiz-link:hover{ text-decoration:none; }
 /* Input, textarea, and select styling */
 input, select, textarea {
   background-color: var(--card);
-  color: #000000;
+  color: var(--text);
   border: 1px solid var(--ring);
   border-radius: 0.5rem;
   padding: 0.5rem;
@@ -52,33 +52,33 @@ input:focus, select:focus, textarea:focus {
 
 /* Specific override for short answer input */
 #short-input {
-  color: #000000 !important;
+  color: var(--text) !important;
   background-color: var(--card) !important;
 }
 
 #short-input:focus {
-  color: #000000 !important;
+  color: var(--text) !important;
   background-color: var(--card) !important;
 }
 
-/* Dark mode specific: ensure readable text in inputs */
+/* Dark mode input styling (inherits from vars above) */
 .dark input, .dark select, .dark textarea {
-  background-color: #ffffff;
-  color: #000000;
+  background-color: var(--card);
+  color: var(--text);
 }
 
 .dark input:focus, .dark select:focus, .dark textarea:focus {
-  background-color: #ffffff;
-  color: #000000;
+  background-color: var(--card);
+  color: var(--text);
 }
 
 .dark #short-input {
-  background-color: #ffffff !important;
-  color: #000000 !important;
+  background-color: var(--card) !important;
+  color: var(--text) !important;
 }
 
 .dark #short-input:focus {
-  background-color: #ffffff !important;
+  background-color: var(--card) !important;
   color: #000000 !important;
 }
 

@@ -12,7 +12,7 @@ const state = {
 const getEl = (id) => document.getElementById(id);
 
 // Initialize dark mode from localStorage at startup
-const savedTheme = localStorage.getItem("quiz-theme");
+const savedTheme = localStorage.getItem("pharmlet.theme");
 if (savedTheme === "dark") {
     document.documentElement.classList.add("dark");
     // Ensure help button is black if starting in dark mode
@@ -52,33 +52,161 @@ async function smartFetch(fileName) {
     const paths = [`assets/data/${fileName}`, `data/${fileName}`, `quizzes/${fileName}`, `../assets/data/${fileName}`];
     for (let path of paths) {
         try {
-            const res = await fetch(path, { cache: "no-store" });
+            const res = await fetch(path);
             if (res.ok) return await res.json();
         } catch (e) { continue; }
     }
+    console.warn(`Warning: Unable to fetch ${fileName} from any path`);
     throw new Error(`File not found: ${fileName}`);
 }
 
 function createQuestion(drug, all) {
-    const distract = (val, key) => shuffled([...new Set(all.map(d => d[key]).filter(v => v && v !== val))]).slice(0, 3);
-    const brandList = drug.brand ? drug.brand.split(/[,/]/).map(b => b.trim()) : ["N/A"];
-    const singleBrand = brandList[Math.floor(Math.random() * brandList.length)];
-    const r = Math.random();
-
-    if (r < 0.25 && drug.class) {
-        const correct = `${singleBrand} / ${drug.class}`;
-        const w1 = `${singleBrand} / ${all.find(d => d.class && d.class !== drug.class)?.class || 'Inhibitor'}`;
-        const w2 = `${all.find(d => d.brand && d.brand !== drug.brand)?.brand.split(/[,/]/)[0] || 'Drug'} / ${drug.class}`;
-        const w3 = `${all.find(d => d.brand && d.brand !== drug.brand)?.brand.split(/[,/]/)[0] || 'Drug'} / ${all.find(d => d.class && d.class !== drug.class)?.class || 'Antagonist'}`;
-        return { type: "mcq", prompt: `Identify <b>Brand & Class</b> for <b>${drug.generic}</b>?`, choices: shuffled([correct, w1, w2, w3]), answer: correct, drugRef: drug };
+    // Smart Distractor Helper - Prioritizes same class, then category, excludes target drug
+    const getSmartDistracters = (targetDrug, targetValue, key) => {
+        // High Priority: Same class as target drug
+        const sameClass = all.filter(d => 
+            d !== targetDrug && 
+            d[key] && 
+            d[key] !== targetValue &&
+            d.class === targetDrug.class
+        );
+        if (sameClass.length >= 3) {
+            return shuffled(sameClass).slice(0, 3).map(d => d[key]);
+        }
+        
+        // Medium Priority: Same category as target drug
+        const sameCategory = all.filter(d =>
+            d !== targetDrug &&
+            d[key] &&
+            d[key] !== targetValue &&
+            d.category === targetDrug.category
+        );
+        if (sameCategory.length >= 3) {
+            return shuffled(sameCategory).slice(0, 3).map(d => d[key]);
+        }
+        
+        // Fall back to random drugs (exclude target drug and target value)
+        const random = shuffled(
+            all.filter(d => d !== targetDrug && d[key] && d[key] !== targetValue)
+        ).slice(0, 3).map(d => d[key]);
+        return random;
+    };
+    
+    // Data Handling: Check for brand existence (excluding "N/A")
+    const hasBrand = drug.brand && drug.brand !== "N/A";
+    const brandList = hasBrand 
+        ? drug.brand.split(/[\/,]/).map(b => b.trim()).filter(Boolean)
+        : [];
+    const singleBrand = brandList.length > 0 
+        ? brandList[Math.floor(Math.random() * brandList.length)]
+        : null;
+    
+    // CRITICAL: If no brand exists (e.g., Rocuronium), force Single Component MCQ
+    if (!hasBrand || !singleBrand) {
+        const mcqTypes = [
+            {l:'Classification', k:'class'}, 
+            {l:'Category', k:'category'}, 
+            {l:'MOA', k:'moa'}
+        ].filter(x => drug[x.k]);
+        
+        if (mcqTypes.length === 0) {
+            // Fallback for drugs with no brand and no classifiable fields
+            return { 
+                type: "short", 
+                prompt: `Name the drug (generic):`, 
+                answer: drug.generic || "Unknown",
+                drugRef: drug 
+            };
+        }
+        
+        const t = mcqTypes[Math.floor(Math.random() * mcqTypes.length)];
+        const correctAns = drug[t.k];
+        const distractors = getSmartDistracters(drug, correctAns, t.k);
+        
+        return {
+            type: "mcq",
+            prompt: `<b>${t.l}</b> for <b>${drug.generic}</b>?`,
+            choices: shuffled([correctAns, ...distractors]),
+            answer: correctAns,
+            drugRef: drug
+        };
     }
-    if (r < 0.55) return { type: "short", prompt: `Generic for <b>${singleBrand}</b>?`, answer: drug.generic, drugRef: drug };
-    if (r < 0.80) return { type: "short", prompt: `Brand for <b>${drug.generic}</b>?`, answer: singleBrand, drugRef: drug };
-
-    const mcqTypes = [{l:'Classification', k:'class'}, {l:'Category', k:'category'}, {l:'MOA', k:'moa'}].filter(x => drug[x.k]);
-    const t = mcqTypes.length > 0 ? mcqTypes[Math.floor(Math.random() * mcqTypes.length)] : {l:'Classification', k:'class'};
-    const correctAns = drug[t.k] || "N/A";
-    return { type: "mcq", prompt: `<b>${t.l}</b> for <b>${drug.generic}</b>?`, choices: shuffled([correctAns, ...distract(correctAns, t.k)]), answer: correctAns, drugRef: drug };
+    
+    // Drugs WITH brands: Use new probability distribution
+    const r = Math.random();
+    
+    // 35% Brand & Class MCQ with Trap Logic
+    if (r < 0.35 && drug.class) {
+        const correct = `${singleBrand} / ${drug.class}`;
+        
+        // Trap 1: Correct Brand / WRONG Class
+        const wrongClass = all.find(d => d.class && d.class !== drug.class);
+        const w1 = `${singleBrand} / ${wrongClass?.class || 'Inhibitor'}`;
+        
+        // Trap 2: WRONG Brand / Correct Class
+        const wrongBrand = all.find(d => d.brand && d.brand !== drug.brand);
+        const w2 = `${wrongBrand?.brand?.split(/[\/,]/)[0] || 'Drug'} / ${drug.class}`;
+        
+        // Distractor 3: Wrong Brand / Wrong Class
+        const w3 = `${wrongBrand?.brand?.split(/[\/,]/)[0] || 'Drug'} / ${wrongClass?.class || 'Antagonist'}`;
+        
+        return { 
+            type: "mcq", 
+            prompt: `Identify <b>Brand & Class</b> for <b>${drug.generic}</b>?`, 
+            choices: shuffled([correct, w1, w2, w3]), 
+            answer: correct, 
+            drugRef: drug 
+        };
+    }
+    
+    // 30% Generic → Brand (Short Answer)
+    if (r < 0.65) {
+        return { 
+            type: "short", 
+            prompt: `Brand for <b>${drug.generic}</b>?`, 
+            answer: singleBrand, 
+            drugRef: drug 
+        };
+    }
+    
+    // 25% Brand → Generic (Short Answer)
+    if (r < 0.90) {
+        return { 
+            type: "short", 
+            prompt: `Generic for <b>${singleBrand}</b>?`, 
+            answer: drug.generic, 
+            drugRef: drug 
+        };
+    }
+    
+    // 10% Single Component MCQ with Smart Distractors
+    const mcqTypes = [
+        {l:'Classification', k:'class'}, 
+        {l:'Category', k:'category'}, 
+        {l:'MOA', k:'moa'}
+    ].filter(x => drug[x.k]);
+    
+    if (mcqTypes.length === 0) {
+        // Fallback to brand → generic
+        return { 
+            type: "short", 
+            prompt: `Generic for <b>${singleBrand}</b>?`, 
+            answer: drug.generic, 
+            drugRef: drug 
+        };
+    }
+    
+    const t = mcqTypes[Math.floor(Math.random() * mcqTypes.length)];
+    const correctAns = drug[t.k];
+    const distractors = getSmartDistracters(drug, correctAns, t.k);
+    
+    return {
+        type: "mcq",
+        prompt: `<b>${t.l}</b> for <b>${drug.generic}</b>?`,
+        choices: shuffled([correctAns, ...distractors]),
+        answer: correctAns,
+        drugRef: drug
+    };
 }
 
 // --- 3. UI RENDERING ---
@@ -211,7 +339,7 @@ function wireEvents() {
         "reveal-solution": () => scoreCurrent("Revealed"),
    "theme-toggle": () => {
     const isDark = document.documentElement.classList.toggle("dark");
-    localStorage.setItem("quiz-theme", isDark ? "dark" : "light");
+    localStorage.setItem("pharmlet.theme", isDark ? "dark" : "light");
     
     // FORCE BLACK TEXT ON HELP BUTTON IN DARK MODE
     const helpBtn = getEl("help-shortcuts");
@@ -375,7 +503,7 @@ async function main() {
         if (getEl("qtotal")) getEl("qtotal").textContent = state.questions.length;
         startSmartTimer();
         wireEvents();
-        localStorage.setItem("last-quiz", weekParam ? `?week=${weekParam}` : `?id=${quizId}`);
+        localStorage.setItem("pharmlet.last-quiz", weekParam ? `?week=${weekParam}` : `?id=${quizId}`);
         render();
     } catch (err) {
         console.error("Quiz Error:", err);

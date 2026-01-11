@@ -17,6 +17,16 @@ The UAMS College of Pharmacy Class of 2029 Personalized Hub is designed to assis
 All questions include hint + solution for Show/Hide (MTC) support.
 Answer types: numeric, multi-numeric, short-answer (with acceptable variants).
 
+### Keyboard Shortcuts
+Press `?` during any quiz to view available shortcuts:
+- **Mark for review**: M
+- **Toggle timer**: T  
+- **Next question**: → / N
+- **Previous question**: ← / P
+- **Show/hide solution**: S
+- **Zoom in**: Ctrl/Cmd + +
+- **Zoom out**: Ctrl/Cmd + -
+
 ## New Features
 
 ### 📊 Performance Dashboard (`stats.html`)
