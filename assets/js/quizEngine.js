@@ -3,6 +3,7 @@ const params = new URLSearchParams(location.search);
 const weekParam = parseInt(params.get("week") || "", 10);  // Single week: ?week=1
 const weeksParam = params.get("weeks");                      // Cumulative range: ?weeks=1-5
 const tagParam = params.get("tag");                          // Topic mode: ?tag=Anticoagulants
+const labParam = parseInt(params.get("lab") || "2", 10);     // Lab isolation: &lab=1 or &lab=2 (default: 2)
 const quizId = params.get("id");
 
 const state = { 
@@ -472,13 +473,22 @@ function scoreCurrent(val) {
     // --- SMART ALIAS MATCHING ---
     // If we have a drug reference and the user is being asked for a Brand
     if (q.drugRef && q.drugRef.brand && q.prompt.includes("Brand")) {
-        const allBrands = q.drugRef.brand.split(/[,/]/).map(b => normalizeWhitespace(b));
+        const allBrands = q.drugRef.brand.split(/[,/;]/).map(b => normalizeWhitespace(b));
         if (allBrands.includes(userNorm)) {
             isCorrect = true;
         }
     }
 
+    // --- MULTI-OPTION MATCHING (semicolon, comma = ANY one is correct) ---
+    if (!isCorrect && /[;,]/.test(String(correctAnswer))) {
+        const validOptions = String(correctAnswer).split(/[;,]/).map(opt => normalizeWhitespace(opt)).filter(Boolean);
+        if (validOptions.includes(userNorm)) {
+            isCorrect = true;
+        }
+    }
+
     if (!isCorrect) {
+        // --- COMBINATION MATCHING (slash, hyphen, "and" = ALL parts required) ---
         const splitBySeparators = s => {
             const str = normalizeWhitespace(s);
             if (!str) return [];
@@ -554,12 +564,43 @@ async function main() {
         let fullPool = [];
         let storageKey = null;
         
-        // ========== MODE 1: ?week=N (Single Week - Strict) ==========
+        // ========== MODE 1: ?week=N (6 New + 4 Review) ==========
         if (weekParam) {
             fullPool = await smartFetch("master_pool.json");
-            filteredPool = fullPool.filter(d => Number(d.metadata?.week) === weekParam);
-            state.title = `Week ${weekParam} Review`;
-            storageKey = `pharmlet.week${weekParam}.easy`;
+            
+            // CEILING FILTER: lab=1 → only Lab 1; lab=2 → Lab 1 + Lab 2 (cumulative curriculum)
+            const ceilingPool = fullPool.filter(d => Number(d.metadata?.lab) <= labParam);
+            
+            // NEW DRUGS: Current week + current lab ONLY (strict match for "new" portion)
+            const newDrugs = ceilingPool.filter(d => 
+                Number(d.metadata?.week) === weekParam && 
+                Number(d.metadata?.lab) === labParam
+            );
+            
+            // REVIEW DRUGS: All prior weeks from the ceiling pool (any lab up to current)
+            const reviewDrugs = ceilingPool.filter(d => {
+                const dWeek = Number(d.metadata?.week);
+                const dLab = Number(d.metadata?.lab);
+                // Prior weeks from current lab OR all weeks from prior labs
+                return (dLab === labParam && dWeek < weekParam) || (dLab < labParam);
+            });
+            
+            // Build 6+4 quiz: 6 new drugs + 4 review drugs (flexible if pool is small)
+            const newCount = Math.min(6, newDrugs.length);
+            const reviewCount = Math.min(4, reviewDrugs.length);
+            
+            const selectedNew = shuffled(newDrugs).slice(0, newCount);
+            const selectedReview = shuffled(reviewDrugs).slice(0, reviewCount);
+            
+            filteredPool = [...selectedNew, ...selectedReview];
+            
+            // Use ceiling pool for distractor generation (all available drugs)
+            fullPool = ceilingPool;
+            
+            state.title = labParam === 1 
+                ? `Lab I: Week ${weekParam} (${newCount} New + ${reviewCount} Review)` 
+                : `Week ${weekParam} (${newCount} New + ${reviewCount} Review)`;
+            storageKey = `pharmlet.lab${labParam}.week${weekParam}.easy`;
         }
         // ========== MODE 2: ?weeks=Start-End (Cumulative Range) ==========
         else if (weeksParam) {
@@ -568,18 +609,37 @@ async function main() {
             if (isNaN(startWeek) || isNaN(endWeek)) {
                 throw new Error("Invalid weeks format. Use ?weeks=1-5");
             }
-            filteredPool = fullPool.filter(d => {
+            
+            // CEILING FILTER: lab=1 → only Lab 1; lab=2 → Lab 1 + Lab 2 (cumulative curriculum)
+            const ceilingPool = fullPool.filter(d => Number(d.metadata?.lab) <= labParam);
+            
+            // Filter to week range within the ceiling pool
+            filteredPool = ceilingPool.filter(d => {
                 const week = Number(d.metadata?.week);
-                return week >= startWeek && week <= endWeek;
+                const lab = Number(d.metadata?.lab);
+                // For current lab: respect week range; for prior labs: include all
+                return (lab === labParam && week >= startWeek && week <= endWeek) || (lab < labParam);
             });
-            state.title = `Cumulative Review: Weeks ${startWeek}-${endWeek}`;
-            storageKey = `pharmlet.weeks${startWeek}-${endWeek}.easy`;
+            
+            // Use ceiling pool for distractor generation
+            fullPool = ceilingPool;
+            
+            state.title = labParam === 1 
+                ? `Lab I: Cumulative Weeks ${startWeek}-${endWeek}` 
+                : `Cumulative Review: Weeks ${startWeek}-${endWeek}`;
+            storageKey = `pharmlet.lab${labParam}.weeks${startWeek}-${endWeek}.easy`;
         }
         // ========== MODE 3: ?tag=String (Topic Mode) ==========
         else if (tagParam) {
             fullPool = await smartFetch("master_pool.json");
             const tagLower = tagParam.toLowerCase();
-            filteredPool = fullPool.filter(d => 
+            
+            // STRICT LAB ISOLATION: Filter by lab FIRST (if specified, else use all)
+            const labPool = params.has("lab") 
+                ? fullPool.filter(d => Number(d.metadata?.lab) === labParam)
+                : fullPool;
+            
+            filteredPool = labPool.filter(d => 
                 (d.class && d.class.toLowerCase().includes(tagLower)) ||
                 (d.category && d.category.toLowerCase().includes(tagLower))
             );
@@ -615,20 +675,30 @@ async function main() {
             if (stored) lastRoundGenerics = JSON.parse(stored);
         } catch (e) { /* ignore parse errors */ }
         
-        // Filter out drugs from last round (unless pool is too small)
-        const unseenDrugs = filteredPool.filter(d => !lastRoundGenerics.includes(d.generic));
-        const workingPool = unseenDrugs.length >= Math.min(10, filteredPool.length) ? unseenDrugs : filteredPool;
-        
-        // Select quiz drugs (shuffle and take subset or all if small pool)
-        const quizSize = Math.min(10, workingPool.length);
-        const selectedDrugs = shuffled(workingPool).slice(0, quizSize);
+        // For MODE 1 (?week=N), drugs are already pre-selected (6+4 split)
+        // For other modes, apply standard selection logic
+        let selectedDrugs;
+        if (weekParam) {
+            // MODE 1: filteredPool IS the pre-selected 6+4 split
+            // Apply anti-repetition by swapping out repeated drugs if possible
+            const freshPool = filteredPool.filter(d => !lastRoundGenerics.includes(d.generic));
+            selectedDrugs = freshPool.length >= filteredPool.length * 0.5 
+                ? shuffled(freshPool).slice(0, filteredPool.length)
+                : shuffled(filteredPool);
+        } else {
+            // MODE 2/3: Standard selection from filtered pool
+            const unseenDrugs = filteredPool.filter(d => !lastRoundGenerics.includes(d.generic));
+            const workingPool = unseenDrugs.length >= Math.min(10, filteredPool.length) ? unseenDrugs : filteredPool;
+            const quizSize = Math.min(10, workingPool.length);
+            selectedDrugs = shuffled(workingPool).slice(0, quizSize);
+        }
         
         // Save this round for anti-repetition
         sessionStorage.setItem(sessionKey, JSON.stringify(selectedDrugs.map(d => d.generic)));
         
-        // Generate questions using the filtered pool for distractor context
+        // Generate questions using the full pool for distractor context
         state.questions = shuffled(selectedDrugs).map((d, i) => ({
-            ...createQuestion(d, filteredPool),  // Use filtered pool for density-safe distractors
+            ...createQuestion(d, fullPool),  // Use full ceiling pool for density-safe distractors
             _id: i,
             drugRef: d
         }));
@@ -655,9 +725,10 @@ function finishSetup(storageKey) {
     startSmartTimer();
     wireEvents();
     
-    // Save last quiz for quick resume
-    const lastQuizParam = weekParam ? `?week=${weekParam}` 
-                        : weeksParam ? `?weeks=${weeksParam}`
+    // Save last quiz for quick resume (include lab param for week-based modes)
+    const labSuffix = (weekParam || weeksParam) ? `&lab=${labParam}` : '';
+    const lastQuizParam = weekParam ? `?week=${weekParam}${labSuffix}` 
+                        : weeksParam ? `?weeks=${weeksParam}${labSuffix}`
                         : tagParam ? `?tag=${tagParam}`
                         : `?id=${quizId}`;
     localStorage.setItem("pharmlet.last-quiz", lastQuizParam);
