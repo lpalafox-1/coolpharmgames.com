@@ -89,6 +89,45 @@ function createQuestion(drug, all) {
         return random;
     };
     
+    // Helper: Create Negative MCQ ("Which is NOT...?")
+    const createNegativeMCQ = () => {
+        const attributes = [
+            { key: 'class', label: 'classification' },
+            { key: 'category', label: 'category' },
+            { key: 'moa', label: 'MOA' }
+        ].filter(a => drug[a.key]);
+        
+        if (attributes.length === 0) return null; // Can't create negative MCQ
+        
+        const attr = attributes[Math.floor(Math.random() * attributes.length)];
+        const targetValue = drug[attr.key];
+        
+        // Find 3 drugs that SHARE the target attribute (these will be wrong answers)
+        const sameAttribute = shuffled(
+            all.filter(d => d !== drug && d[attr.key] === targetValue && d[attr.key])
+        ).slice(0, 3);
+        
+        if (sameAttribute.length < 3) return null; // Not enough drugs with same attribute
+        
+        // Find 1 drug with DIFFERENT attribute (this is the correct answer for "NOT")
+        const differentAttribute = shuffled(
+            all.filter(d => d !== drug && d[attr.key] && d[attr.key] !== targetValue)
+        )[0];
+        
+        if (!differentAttribute) return null; // Can't find a different attribute
+        
+        const correctAnswer = differentAttribute.generic;
+        const wrongAnswers = sameAttribute.map(d => d.generic);
+        
+        return {
+            type: "mcq",
+            prompt: `Which is <b>NOT</b> a drug with <b>${attr.label} ${targetValue}</b>?`,
+            choices: shuffled([correctAnswer, ...wrongAnswers]),
+            answer: correctAnswer,
+            drugRef: drug
+        };
+    };
+    
     // Data Handling: Check for brand existence (excluding "N/A")
     const hasBrand = drug.brand && drug.brand !== "N/A";
     const brandList = hasBrand 
@@ -129,7 +168,7 @@ function createQuestion(drug, all) {
         };
     }
     
-    // Drugs WITH brands: Use new probability distribution
+    // Drugs WITH brands: Use NEW probability distribution (35/25/15/15/10)
     const r = Math.random();
     
     // 35% Brand & Class MCQ with Trap Logic
@@ -156,8 +195,8 @@ function createQuestion(drug, all) {
         };
     }
     
-    // 30% Generic → Brand (Short Answer)
-    if (r < 0.65) {
+    // 25% Generic → Brand (Short Answer)
+    if (r < 0.60) {
         return { 
             type: "short", 
             prompt: `Brand for <b>${drug.generic}</b>?`, 
@@ -166,8 +205,21 @@ function createQuestion(drug, all) {
         };
     }
     
-    // 25% Brand → Generic (Short Answer)
+    // 15% Brand → Generic (Short Answer)
+    if (r < 0.75) {
+        return { 
+            type: "short", 
+            prompt: `Generic for <b>${singleBrand}</b>?`, 
+            answer: drug.generic, 
+            drugRef: drug 
+        };
+    }
+    
+    // 15% Negative MCQ ("Which is NOT...?") - NEW FEATURE
     if (r < 0.90) {
+        const negMCQ = createNegativeMCQ();
+        if (negMCQ) return negMCQ;
+        // Fallback if negative MCQ can't be created
         return { 
             type: "short", 
             prompt: `Generic for <b>${singleBrand}</b>?`, 
@@ -346,8 +398,22 @@ function wireEvents() {
     });
 
     window.onkeydown = (e) => {
+        // Prevent typing shortcuts inside the short-answer input
         if (document.activeElement.tagName === 'INPUT' && e.key !== 'Enter') return;
+        
         const key = e.key.toLowerCase();
+
+        // --- NEW: ASDF Shortcuts for MCQ Option Selection ---
+        const mcqMap = { 'a': 0, 's': 1, 'd': 2, 'f': 3 };
+        if (mcqMap.hasOwnProperty(key)) {
+            const options = document.querySelectorAll("#options label");
+            // If the option exists (e.g., option 3), click it
+            if (options[mcqMap[key]]) {
+                options[mcqMap[key]].click();
+            }
+        }
+        // -----------------------------------
+
         if (key === "t") toggleTimer();
         if (key === "m") toggleMark();
         if (key === "arrowright") { if (state.index < state.questions.length - 1) { state.index++; render(); } }
@@ -463,7 +529,24 @@ async function main() {
             const weeks = GAME_PLAN[weekParam] || 'ALL';
             const newP = pool.filter(d => Number(d.metadata?.lab) === 2 && Number(d.metadata?.week) === weekParam);
             const revP = (weeks === 'ALL') ? pool.filter(d => Number(d.metadata?.lab) === 1) : pool.filter(d => Number(d.metadata?.lab) === 1 && weeks.includes(Number(d.metadata?.week)));
-            const combined = [...shuffled(newP).slice(0, 6), ...shuffled(revP).slice(0, 4)];
+            
+            // FEATURE 1: Session-based anti-repetition shuffling
+            let lastRoundGenerics = [];
+            const sessionKey = `pharmlet.session.lastRound.week${weekParam}`;
+            try {
+                const stored = sessionStorage.getItem(sessionKey);
+                if (stored) lastRoundGenerics = JSON.parse(stored);
+            } catch (e) { /* ignore parse errors */ }
+            
+            // Filter out drugs from last round (unless we have too few unseen drugs)
+            let candidates = [...newP, ...shuffled(revP)];
+            const unseenCandidates = candidates.filter(d => !lastRoundGenerics.includes(d.generic));
+            const finalPool = unseenCandidates.length >= 10 ? unseenCandidates : candidates;
+            
+            const combined = [...shuffled(finalPool).slice(0, 6), ...shuffled(finalPool).slice(0, 4)];
+            const newDrugGenerics = combined.map(d => d.generic);
+            sessionStorage.setItem(sessionKey, JSON.stringify(newDrugGenerics));
+            
             state.title = `Top Drug Quiz ${weekParam}`;
             state.questions = shuffled(combined).map((d, i) => ({ ...createQuestion(d, pool), _id: i, drugRef: d }));
         } else if (quizId) {
