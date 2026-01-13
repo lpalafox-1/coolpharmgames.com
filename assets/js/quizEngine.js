@@ -9,7 +9,9 @@ const quizId = params.get("id");
 const state = { 
     questions: [], index: 0, score: 0, title: "",
     timerSeconds: 0, timerHandle: null, marked: new Set(),
-    currentScale: 1.0 
+    currentScale: 1.0,
+    originalQuestions: [],  // For restart with original pool
+    hintsUsed: 0            // Track hints for stats
 };
 
 const getEl = (id) => document.getElementById(id);
@@ -45,6 +47,80 @@ function changeZoom(dir) {
     if (state.currentScale < 0.6) state.currentScale = 0.6;
     document.body.style.zoom = state.currentScale;
     document.documentElement.style.setProperty('--quiz-size', `${state.currentScale}rem`);
+}
+
+// --- SMART HINT SYSTEM ---
+function showHint() {
+    const q = state.questions[state.index];
+    if (!q || q._answered) return;
+    
+    const drug = q.drugRef;
+    if (!drug) {
+        alert("💡 No hint available for this question.");
+        return;
+    }
+    
+    let hintText = "";
+    const prompt = q.prompt.toLowerCase();
+    
+    // Determine hint based on question type
+    if (prompt.includes("brand")) {
+        // Asking for Brand → Show first letter
+        const brand = drug.brand?.split(/[,/;]/)[0]?.trim() || "?";
+        hintText = `💡 First letter: "${brand.charAt(0).toUpperCase()}..."\n📦 Category: ${drug.category || "N/A"}`;
+    } else if (prompt.includes("generic")) {
+        // Asking for Generic → Show brand as hint
+        hintText = `💡 Brand: ${drug.brand || "N/A"}\n📦 Category: ${drug.category || "N/A"}`;
+    } else if (prompt.includes("class") || prompt.includes("moa")) {
+        // Asking for Class/MOA → Show category
+        hintText = `💡 Category: ${drug.category || "N/A"}\n💊 Generic: ${drug.generic || "N/A"}`;
+    } else {
+        // Fallback: Show category and class
+        hintText = `💡 Category: ${drug.category || "N/A"}\n🏷️ Class: ${drug.class || "N/A"}`;
+    }
+    
+    // Mark hint as used and increment counter
+    q._hintUsed = true;
+    state.hintsUsed++;
+    
+    alert(hintText);
+}
+
+// --- REVEAL ANSWER (Give Up) ---
+function revealAnswer() {
+    const q = state.questions[state.index];
+    if (!q || q._answered) return;
+    scoreCurrent("Revealed");
+}
+
+// --- RESTART WITH CONFIRMATION ---
+function restartQuiz() {
+    if (confirm("🔄 Restart this quiz? Your progress will be lost.")) {
+        location.reload();
+    }
+}
+
+// --- REVIEW MISSED QUESTIONS ---
+function reviewMissed() {
+    const missed = state.questions.filter(q => q._answered && !q._correct);
+    if (missed.length === 0) {
+        alert("🎉 No missed questions to review!");
+        return;
+    }
+    
+    // Reset state for review mode
+    state.questions = missed.map((q, i) => ({ ...q, _answered: false, _user: null, _correct: false, _id: i }));
+    state.index = 0;
+    state.score = 0;
+    state.hintsUsed = 0;
+    state.marked.clear();
+    state.title = `Review: ${missed.length} Missed`;
+    
+    if (getEl("quiz-title")) getEl("quiz-title").textContent = state.title;
+    if (getEl("qtotal")) getEl("qtotal").textContent = state.questions.length;
+    
+    startSmartTimer();
+    render();
 }
 
 // --- 2. DATA PIPELINE ---
@@ -380,17 +456,9 @@ function wireEvents() {
         }
     }
 },
-        "hint-btn": () => {
-            const q = state.questions[state.index];
-            if (!q) return;
-            alert(q.hint || "No hint available for this question.");
-        },
+        "hint-btn": showHint,
         "mark-mobile": toggleMark,
-        "hint-btn-mobile": () => {
-            const q = state.questions[state.index];
-            if (!q) return;
-            alert(q.hint || "No hint available for this question.");
-        },
+        "hint-btn-mobile": showHint,
         "reveal-solution-mobile": () => scoreCurrent("Revealed"),
         "restart-mobile": () => location.reload(),
     };
@@ -430,6 +498,11 @@ function wireEvents() {
             if (!q || !q._answered) getEl("check")?.click();
             else getEl("next")?.click();
         }
+        
+        // --- NEW: R/X/H Keyboard Shortcuts ---
+        if (key === "r") restartQuiz();           // R = Restart with confirm
+        if (key === "x") revealAnswer();          // X = Give Up / Reveal
+        if (key === "h") showHint();              // H = Show Hint
     };
 }
 
@@ -553,7 +626,21 @@ function showResults() {
     }
     
     const card = getEl("question-card");
-    if (card) card.innerHTML = `<div class="text-center py-10"><h2 class="text-4xl font-black mb-4">Quiz Complete!</h2><p class="text-2xl">Final Score: ${state.score} / ${state.questions.length}</p><button onclick="location.reload()" class="mt-8 px-8 py-4 bg-maroon text-white rounded-2xl font-bold">Restart Quiz</button></div>`;
+    const missed = state.questions.filter(q => q._answered && !q._correct);
+    const hintsNote = state.hintsUsed > 0 ? `<p class="text-sm opacity-60 mt-2">💡 Hints used: ${state.hintsUsed}</p>` : '';
+    const reviewBtn = missed.length > 0 
+        ? `<button onclick="reviewMissed()" class="mt-4 px-6 py-3 bg-red-600 text-white rounded-xl font-bold">🔄 Review ${missed.length} Missed</button>` 
+        : `<p class="text-green-600 font-bold mt-4">🎉 Perfect Score!</p>`;
+    
+    if (card) card.innerHTML = `<div class="text-center py-10">
+        <h2 class="text-4xl font-black mb-4">Quiz Complete!</h2>
+        <p class="text-2xl">Final Score: ${state.score} / ${state.questions.length}</p>
+        ${hintsNote}
+        <div class="flex flex-col gap-3 items-center mt-6">
+            ${reviewBtn}
+            <button onclick="location.reload()" class="px-8 py-4 bg-maroon text-white rounded-2xl font-bold">🔁 Restart Quiz</button>
+        </div>
+    </div>`;
 }
 
 function shuffled(a) { return [...a].sort(() => 0.5 - Math.random()); }
@@ -577,12 +664,40 @@ async function main() {
                 Number(d.metadata?.lab) === labParam
             );
             
-            // REVIEW DRUGS: All prior weeks from the ceiling pool (any lab up to current)
+            // DR. CHEN'S REVIEW SCHEDULE: Maps Lab 2 week → specific Lab 1 week ranges
+            const getReviewSourceWeeks = (currentWeek) => {
+                if (labParam === 1) {
+                    // Lab 1 mode: review from prior Lab 1 weeks only
+                    return [1, currentWeek - 1];
+                }
+                // Lab 2 mode: use Dr. Chen's syllabus schedule
+                switch (currentWeek) {
+                    case 1: return [1, 3];   // Lab 1 Weeks 1-3
+                    case 2: return [4, 6];   // Lab 1 Weeks 4-6
+                    case 3: return [6, 7];   // Lab 1 Weeks 6-7
+                    case 4: return [8, 8];   // Lab 1 Week 8 only
+                    case 5: return [9, 9];   // Lab 1 Week 9 only
+                    case 6: return [10, 11]; // Lab 1 Weeks 10-11
+                    default: return [1, 11]; // Week 7+: All Lab 1
+                }
+            };
+            
+            const [reviewStart, reviewEnd] = getReviewSourceWeeks(weekParam);
+            
+            // REVIEW DRUGS: Filter based on Dr. Chen's schedule
             const reviewDrugs = ceilingPool.filter(d => {
                 const dWeek = Number(d.metadata?.week);
                 const dLab = Number(d.metadata?.lab);
-                // Prior weeks from current lab OR all weeks from prior labs
-                return (dLab === labParam && dWeek < weekParam) || (dLab < labParam);
+                
+                if (labParam === 2) {
+                    // Lab 2 mode: Review from Lab 1 within scheduled range + prior Lab 2 weeks
+                    const isScheduledLab1 = dLab === 1 && dWeek >= reviewStart && dWeek <= reviewEnd;
+                    const isPriorLab2 = dLab === 2 && dWeek < weekParam;
+                    return isScheduledLab1 || isPriorLab2;
+                } else {
+                    // Lab 1 mode: Prior weeks from Lab 1 only
+                    return dLab === 1 && dWeek < weekParam;
+                }
             });
             
             // Build 6+4 quiz: 6 new drugs + 4 review drugs (flexible if pool is small)
@@ -597,9 +712,14 @@ async function main() {
             // Use ceiling pool for distractor generation (all available drugs)
             fullPool = ceilingPool;
             
+            // Build descriptive title showing review source
+            const reviewRangeLabel = reviewStart === reviewEnd 
+                ? `L1-W${reviewStart}` 
+                : `L1-W${reviewStart}-${reviewEnd}`;
+            
             state.title = labParam === 1 
                 ? `Lab I: Week ${weekParam} (${newCount} New + ${reviewCount} Review)` 
-                : `Week ${weekParam} (${newCount} New + ${reviewCount} Review)`;
+                : `Week ${weekParam} (${newCount} New + ${reviewCount} Rev: ${reviewRangeLabel})`;
             storageKey = `pharmlet.lab${labParam}.week${weekParam}.easy`;
         }
         // ========== MODE 2: ?weeks=Start-End (Cumulative Range) ==========
