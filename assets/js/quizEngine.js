@@ -1,6 +1,8 @@
 // assets/js/quizEngine.js
 const params = new URLSearchParams(location.search);
-const weekParam = parseInt(params.get("week") || "", 10);
+const weekParam = parseInt(params.get("week") || "", 10);  // Single week: ?week=1
+const weeksParam = params.get("weeks");                      // Cumulative range: ?weeks=1-5
+const tagParam = params.get("tag");                          // Topic mode: ?tag=Anticoagulants
 const quizId = params.get("id");
 
 const state = { 
@@ -509,66 +511,158 @@ function scoreCurrent(val) {
 }
 
 function showResults() {
+    // Save high score to localStorage (only if it's better than existing)
+    let storageKey = null;
+    if (weekParam) {
+        storageKey = `pharmlet.week${weekParam}.easy`;
+    } else if (weeksParam) {
+        const [startWeek, endWeek] = weeksParam.split('-').map(n => parseInt(n, 10));
+        storageKey = `pharmlet.weeks${startWeek}-${endWeek}.easy`;
+    } else if (tagParam) {
+        storageKey = `pharmlet.tag-${tagParam.toLowerCase()}.easy`;
+    } else if (quizId) {
+        storageKey = `pharmlet.${quizId}.easy`;
+    }
+    
+    if (storageKey) {
+        try {
+            const existing = JSON.parse(localStorage.getItem(storageKey) || '{}');
+            const existingScore = existing.score || 0;
+            
+            // Only update if new score is higher
+            if (state.score >= existingScore) {
+                localStorage.setItem(storageKey, JSON.stringify({
+                    score: state.score,
+                    total: state.questions.length,
+                    date: Date.now()
+                }));
+            }
+        } catch (e) {
+            console.warn('Failed to save high score:', e);
+        }
+    }
+    
     const card = getEl("question-card");
     if (card) card.innerHTML = `<div class="text-center py-10"><h2 class="text-4xl font-black mb-4">Quiz Complete!</h2><p class="text-2xl">Final Score: ${state.score} / ${state.questions.length}</p><button onclick="location.reload()" class="mt-8 px-8 py-4 bg-maroon text-white rounded-2xl font-bold">Restart Quiz</button></div>`;
-}
-
-if (weekParam) {
-    localStorage.setItem(`pharmlet.week${weekParam}.easy`, JSON.stringify({ score: 0, total: state.questions.length }));
-} else if (quizId) {
-    localStorage.setItem(`pharmlet.${quizId}.easy`, JSON.stringify({ score: 0, total: state.questions.length }));
 }
 
 function shuffled(a) { return [...a].sort(() => 0.5 - Math.random()); }
 
 async function main() {
     try {
+        let filteredPool = [];
+        let fullPool = [];
+        let storageKey = null;
+        
+        // ========== MODE 1: ?week=N (Single Week - Strict) ==========
         if (weekParam) {
-            const pool = await smartFetch("master_pool.json");
-            const GAME_PLAN = { 1:[1,2,3], 2:[4,5,6], 3:[6,7], 4:[8], 5:[9], 6:[10,11] };
-            const weeks = GAME_PLAN[weekParam] || 'ALL';
-            const newP = pool.filter(d => Number(d.metadata?.lab) === 2 && Number(d.metadata?.week) === weekParam);
-            const revP = (weeks === 'ALL') ? pool.filter(d => Number(d.metadata?.lab) === 1) : pool.filter(d => Number(d.metadata?.lab) === 1 && weeks.includes(Number(d.metadata?.week)));
-            
-            // FEATURE 1: Session-based anti-repetition shuffling
-            let lastRoundGenerics = [];
-            const sessionKey = `pharmlet.session.lastRound.week${weekParam}`;
-            try {
-                const stored = sessionStorage.getItem(sessionKey);
-                if (stored) lastRoundGenerics = JSON.parse(stored);
-            } catch (e) { /* ignore parse errors */ }
-            
-            // Filter out drugs from last round (unless we have too few unseen drugs)
-            let candidates = [...newP, ...shuffled(revP)];
-            const unseenCandidates = candidates.filter(d => !lastRoundGenerics.includes(d.generic));
-            const finalPool = unseenCandidates.length >= 10 ? unseenCandidates : candidates;
-            
-            const combined = [...shuffled(finalPool).slice(0, 6), ...shuffled(finalPool).slice(0, 4)];
-            const newDrugGenerics = combined.map(d => d.generic);
-            sessionStorage.setItem(sessionKey, JSON.stringify(newDrugGenerics));
-            
-            state.title = `Top Drug Quiz ${weekParam}`;
-            state.questions = shuffled(combined).map((d, i) => ({ ...createQuestion(d, pool), _id: i, drugRef: d }));
-        } else if (quizId) {
+            fullPool = await smartFetch("master_pool.json");
+            filteredPool = fullPool.filter(d => Number(d.metadata?.week) === weekParam);
+            state.title = `Week ${weekParam} Review`;
+            storageKey = `pharmlet.week${weekParam}.easy`;
+        }
+        // ========== MODE 2: ?weeks=Start-End (Cumulative Range) ==========
+        else if (weeksParam) {
+            fullPool = await smartFetch("master_pool.json");
+            const [startWeek, endWeek] = weeksParam.split('-').map(n => parseInt(n, 10));
+            if (isNaN(startWeek) || isNaN(endWeek)) {
+                throw new Error("Invalid weeks format. Use ?weeks=1-5");
+            }
+            filteredPool = fullPool.filter(d => {
+                const week = Number(d.metadata?.week);
+                return week >= startWeek && week <= endWeek;
+            });
+            state.title = `Cumulative Review: Weeks ${startWeek}-${endWeek}`;
+            storageKey = `pharmlet.weeks${startWeek}-${endWeek}.easy`;
+        }
+        // ========== MODE 3: ?tag=String (Topic Mode) ==========
+        else if (tagParam) {
+            fullPool = await smartFetch("master_pool.json");
+            const tagLower = tagParam.toLowerCase();
+            filteredPool = fullPool.filter(d => 
+                (d.class && d.class.toLowerCase().includes(tagLower)) ||
+                (d.category && d.category.toLowerCase().includes(tagLower))
+            );
+            state.title = `${tagParam} Review`;
+            storageKey = `pharmlet.tag-${tagParam.toLowerCase()}.easy`;
+        }
+        // ========== MODE 4: ?id=quiz-name (Legacy Static JSON) ==========
+        else if (quizId) {
             const data = await smartFetch(`${quizId}.json`);
             const pool = data.pools ? Object.values(data.pools).flat() : (data.questions || []);
             state.title = data.title || "Quiz";
             state.questions = shuffled(pool).map((q, i) => ({ ...q, _id: i }));
-        } else {
-            throw new Error("Missing ?id=quiz-name or ?week=N parameter");
+            storageKey = `pharmlet.${quizId}.easy`;
+            
+            // Skip to render for legacy quizzes
+            finishSetup(storageKey);
+            return;
         }
-
-        if (getEl("quiz-title")) getEl("quiz-title").textContent = state.title;
-        if (getEl("qtotal")) getEl("qtotal").textContent = state.questions.length;
-        startSmartTimer();
-        wireEvents();
-        localStorage.setItem("pharmlet.last-quiz", weekParam ? `?week=${weekParam}` : `?id=${quizId}`);
-        render();
+        else {
+            throw new Error("Missing URL parameter. Use ?week=N, ?weeks=1-5, ?tag=Topic, or ?id=quiz-name");
+        }
+        
+        // Validate pool has drugs
+        if (filteredPool.length === 0) {
+            throw new Error(`No drugs found for this filter. Check your URL parameters.`);
+        }
+        
+        // Session-based anti-repetition shuffling
+        let lastRoundGenerics = [];
+        const sessionKey = `pharmlet.session.lastRound.${storageKey}`;
+        try {
+            const stored = sessionStorage.getItem(sessionKey);
+            if (stored) lastRoundGenerics = JSON.parse(stored);
+        } catch (e) { /* ignore parse errors */ }
+        
+        // Filter out drugs from last round (unless pool is too small)
+        const unseenDrugs = filteredPool.filter(d => !lastRoundGenerics.includes(d.generic));
+        const workingPool = unseenDrugs.length >= Math.min(10, filteredPool.length) ? unseenDrugs : filteredPool;
+        
+        // Select quiz drugs (shuffle and take subset or all if small pool)
+        const quizSize = Math.min(10, workingPool.length);
+        const selectedDrugs = shuffled(workingPool).slice(0, quizSize);
+        
+        // Save this round for anti-repetition
+        sessionStorage.setItem(sessionKey, JSON.stringify(selectedDrugs.map(d => d.generic)));
+        
+        // Generate questions using the filtered pool for distractor context
+        state.questions = shuffled(selectedDrugs).map((d, i) => ({
+            ...createQuestion(d, filteredPool),  // Use filtered pool for density-safe distractors
+            _id: i,
+            drugRef: d
+        }));
+        
+        finishSetup(storageKey);
+        
     } catch (err) {
         console.error("Quiz Error:", err);
         const card = getEl("question-card");
         if (card) card.innerHTML = `<div class="p-4 text-red-600"><p><b>Error:</b> ${err.message}</p></div>`;
     }
+}
+
+// Helper function to complete quiz setup
+function finishSetup(storageKey) {
+    if (getEl("quiz-title")) getEl("quiz-title").textContent = state.title;
+    if (getEl("qtotal")) getEl("qtotal").textContent = state.questions.length;
+    
+    // Initialize high score storage ONLY if it doesn't exist yet
+    if (storageKey && !localStorage.getItem(storageKey)) {
+        localStorage.setItem(storageKey, JSON.stringify({ score: 0, total: state.questions.length, date: Date.now() }));
+    }
+    
+    startSmartTimer();
+    wireEvents();
+    
+    // Save last quiz for quick resume
+    const lastQuizParam = weekParam ? `?week=${weekParam}` 
+                        : weeksParam ? `?weeks=${weeksParam}`
+                        : tagParam ? `?tag=${tagParam}`
+                        : `?id=${quizId}`;
+    localStorage.setItem("pharmlet.last-quiz", lastQuizParam);
+    
+    render();
 }
 
 document.addEventListener('DOMContentLoaded', main);
