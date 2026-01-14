@@ -251,6 +251,7 @@ function createQuestion(drug, allDrugs) {
   let q = {};
 
   switch (type) {
+    // ENFORCE: Brand/Generic questions must ALWAYS be Fill-in-the-Blank (short)
     case "brand-generic":
       q = {
         type: "short",
@@ -267,6 +268,7 @@ function createQuestion(drug, allDrugs) {
         mapping: { generic: drug.generic, brand: drug.brand }
       };
       break;
+    // ENFORCE: Class/Category/MOA questions must ALWAYS be Multiple Choice (mcq)
     case "class":
       q = createMCQ(
         `Which class does <strong>${drug.generic}</strong> belong to?`,
