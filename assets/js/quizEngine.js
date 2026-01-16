@@ -108,6 +108,8 @@ async function main() {
     await loadDynamicQuiz();
   } else if (quizId) {
     // --- STATIC MODE ---
+    // LEGACY SAFETY: Static quizzes (e.g. previous semester) must load via this path
+    // and NOT trigger dynamic generation rules.
     await loadStaticQuiz();
   } else {
     throw new Error("Missing ?id=… or ?week=…");
@@ -252,6 +254,7 @@ function createQuestion(drug, allDrugs) {
 
   switch (type) {
     case "brand-generic":
+      // ENFORCE: Brand/Generic Questions Must ALWAYS be Fill-in-the-Blank (Input)
       q = {
         type: "short",
         prompt: `What is the generic name for <strong>${drug.brand}</strong>?`,
@@ -260,6 +263,7 @@ function createQuestion(drug, allDrugs) {
       };
       break;
     case "generic-brand":
+      // ENFORCE: Brand/Generic Questions Must ALWAYS be Fill-in-the-Blank (Input)
       q = {
         type: "short",
         prompt: `What is the brand name for <strong>${drug.generic}</strong>?`,
@@ -268,6 +272,7 @@ function createQuestion(drug, allDrugs) {
       };
       break;
     case "class":
+      // ENFORCE: MOA / Class / Category Must ALWAYS be Multiple Choice (Radio)
       q = createMCQ(
         `Which class does <strong>${drug.generic}</strong> belong to?`,
         drug.class,
@@ -275,6 +280,7 @@ function createQuestion(drug, allDrugs) {
       );
       break;
     case "category":
+      // ENFORCE: MOA / Class / Category Must ALWAYS be Multiple Choice (Radio)
       q = createMCQ(
         `What is the category of <strong>${drug.generic}</strong>?`,
         drug.category,
@@ -282,6 +288,7 @@ function createQuestion(drug, allDrugs) {
       );
       break;
     case "moa":
+      // ENFORCE: MOA / Class / Category Must ALWAYS be Multiple Choice (Radio)
       q = createMCQ(
         `What is the MOA of <strong>${drug.generic}</strong>?`,
         drug.moa,
