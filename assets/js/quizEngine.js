@@ -799,12 +799,17 @@ async function main() {
         // For other modes, apply standard selection logic
         let selectedDrugs;
         if (weekParam) {
-            // MODE 1: filteredPool IS the pre-selected 6+4 split
-            // Apply anti-repetition by swapping out repeated drugs if possible
+            // MODE 1: filteredPool IS the pre-selected 6+4 split (always use ALL of it)
+            // Anti-repetition: shuffle fresh drugs first, then pad with repeats if needed
             const freshPool = filteredPool.filter(d => !lastRoundGenerics.includes(d.generic));
-            selectedDrugs = freshPool.length >= filteredPool.length * 0.5 
-                ? shuffled(freshPool).slice(0, filteredPool.length)
-                : shuffled(filteredPool);
+            const repeatPool = filteredPool.filter(d => lastRoundGenerics.includes(d.generic));
+            
+            // Always return exactly filteredPool.length drugs (the 6+4 = 10 we pre-selected)
+            // Prioritize fresh drugs, fill remainder with repeats
+            const targetCount = filteredPool.length;
+            const shuffledFresh = shuffled(freshPool);
+            const shuffledRepeat = shuffled(repeatPool);
+            selectedDrugs = [...shuffledFresh, ...shuffledRepeat].slice(0, targetCount);
         } else {
             // MODE 2/3: Standard selection from filtered pool
             const unseenDrugs = filteredPool.filter(d => !lastRoundGenerics.includes(d.generic));
