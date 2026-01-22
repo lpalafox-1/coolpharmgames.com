@@ -9,6 +9,7 @@
     "check:links": "node tools/check-links.mjs"
   },
   "devDependencies": {
+    "@playwright/test": "^1.57.0",
     "ajv": "^8.17.1"
   }
 }
