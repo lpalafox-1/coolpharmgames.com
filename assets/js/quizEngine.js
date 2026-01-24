@@ -253,7 +253,7 @@ function createQuestion(drug, allDrugs) {
   switch (type) {
     case "brand-generic":
       q = {
-        type: "short",
+        type: "short", // ENFORCE: Brand/Generic must be fill-in-the-blank
         prompt: `What is the generic name for <strong>${drug.brand}</strong>?`,
         answerText: [drug.generic.toLowerCase()],
         mapping: { generic: drug.generic, brand: drug.brand }
@@ -261,13 +261,14 @@ function createQuestion(drug, allDrugs) {
       break;
     case "generic-brand":
       q = {
-        type: "short",
+        type: "short", // ENFORCE: Brand/Generic must be fill-in-the-blank
         prompt: `What is the brand name for <strong>${drug.generic}</strong>?`,
         answerText: [drug.brand.toLowerCase()],
         mapping: { generic: drug.generic, brand: drug.brand }
       };
       break;
     case "class":
+      // ENFORCE: Class/Category/MOA must be MCQ
       q = createMCQ(
         `Which class does <strong>${drug.generic}</strong> belong to?`,
         drug.class,
@@ -275,6 +276,7 @@ function createQuestion(drug, allDrugs) {
       );
       break;
     case "category":
+      // ENFORCE: Class/Category/MOA must be MCQ
       q = createMCQ(
         `What is the category of <strong>${drug.generic}</strong>?`,
         drug.category,
@@ -282,6 +284,7 @@ function createQuestion(drug, allDrugs) {
       );
       break;
     case "moa":
+      // ENFORCE: Class/Category/MOA must be MCQ
       q = createMCQ(
         `What is the MOA of <strong>${drug.generic}</strong>?`,
         drug.moa,
