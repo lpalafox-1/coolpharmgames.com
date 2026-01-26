@@ -50,7 +50,7 @@ if (document.readyState === 'loading') {
   initTheme();
 }
 
-function initTheme() {
+export function initTheme() {
   applyTheme(localStorage.getItem(THEME_KEY) || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
   if (els.themeToggle) {
     els.themeToggle.addEventListener("click", () => {
@@ -65,7 +65,7 @@ function applyTheme(mode){
   if (els.themeToggle) els.themeToggle.textContent = mode === "dark" ? "Light" : "Dark";
 }
 
-const state = {
+export const state = {
   title: "",
   questions: [],
   index: 0,
@@ -200,7 +200,7 @@ function finalizeSetup() {
 
 /* ---------- DYNAMIC GENERATION LOGIC ---------- */
 
-function generateQuizFromPool(masterPool, week) {
+export function generateQuizFromPool(masterPool, week) {
   // 1. Define Review Schedule (Lab 1)
   let lab1Filter;
   if (week === 1) lab1Filter = d => d.metadata.lab === 1 && d.metadata.week >= 1 && d.metadata.week <= 3;
@@ -234,7 +234,7 @@ function generateQuizFromPool(masterPool, week) {
   };
 }
 
-function createQuestion(drug, allDrugs) {
+export function createQuestion(drug, allDrugs) {
   // Determine question types based on available data
   const types = [];
   if (drug.brand) { types.push("brand-generic", "generic-brand"); }
