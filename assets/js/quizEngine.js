@@ -247,11 +247,13 @@ function createQuestion(drug, allDrugs) {
       return { type: "short", prompt: `Error: No data for ${drug.generic}`, answer: "error" };
   }
 
+  // Select a field to test (Constraint: Do not randomize question TYPE for a specific field)
   const type = types[Math.floor(Math.random() * types.length)];
   let q = {};
 
   switch (type) {
     case "brand-generic":
+      // ENFORCE: Brand/Generic Questions must be Fill-in-the-Blank
       q = {
         type: "short",
         prompt: `What is the generic name for <strong>${drug.brand}</strong>?`,
@@ -260,6 +262,7 @@ function createQuestion(drug, allDrugs) {
       };
       break;
     case "generic-brand":
+      // ENFORCE: Brand/Generic Questions must be Fill-in-the-Blank
       q = {
         type: "short",
         prompt: `What is the brand name for <strong>${drug.generic}</strong>?`,
@@ -268,6 +271,7 @@ function createQuestion(drug, allDrugs) {
       };
       break;
     case "class":
+      // ENFORCE: Class must be MCQ
       q = createMCQ(
         `Which class does <strong>${drug.generic}</strong> belong to?`,
         drug.class,
@@ -275,6 +279,7 @@ function createQuestion(drug, allDrugs) {
       );
       break;
     case "category":
+      // ENFORCE: Category must be MCQ
       q = createMCQ(
         `What is the category of <strong>${drug.generic}</strong>?`,
         drug.category,
@@ -282,6 +287,7 @@ function createQuestion(drug, allDrugs) {
       );
       break;
     case "moa":
+      // ENFORCE: MOA must be MCQ
       q = createMCQ(
         `What is the MOA of <strong>${drug.generic}</strong>?`,
         drug.moa,
