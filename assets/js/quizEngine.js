@@ -251,6 +251,7 @@ function createQuestion(drug, allDrugs) {
   let q = {};
 
   switch (type) {
+    // ENFORCE: Brand/Generic MUST be Short Answer (Input)
     case "brand-generic":
       q = {
         type: "short",
@@ -267,6 +268,8 @@ function createQuestion(drug, allDrugs) {
         mapping: { generic: drug.generic, brand: drug.brand }
       };
       break;
+
+    // ENFORCE: Class/Category/MOA MUST be Multiple Choice (Radio)
     case "class":
       q = createMCQ(
         `Which class does <strong>${drug.generic}</strong> belong to?`,
