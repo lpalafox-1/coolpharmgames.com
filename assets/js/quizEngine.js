@@ -207,6 +207,55 @@ function createQuestion(drug, all) {
         };
     };
     
+    // Helper: Create Correctly Paired Class MCQ (Lab 2 Only)
+    const createCorrectlyPairedMCQ = () => {
+        if (!drug.class) return null; // Need class information
+        
+        // Find other drugs from same category/therapeutic area for realistic traps
+        const sameCategoryDrugs = all.filter(d => 
+            d !== drug && 
+            d.class && 
+            d.generic && 
+            d.category === drug.category
+        );
+        
+        // If not enough in same category, use any drugs with classes
+        const candidateDrugs = sameCategoryDrugs.length >= 3 
+            ? sameCategoryDrugs 
+            : all.filter(d => d !== drug && d.class && d.generic);
+        
+        if (candidateDrugs.length < 3) return null; // Need at least 3 other drugs
+        
+        const selectedOthers = shuffled(candidateDrugs).slice(0, 3);
+        
+        // Correct answer: target drug with its correct class
+        const correctAnswer = `${drug.generic}: ${drug.class}`;
+        
+        // Wrong answers: Other drugs paired with INCORRECT classes
+        // Strategy: Mix of using target's class (confusing trap) and other wrong classes
+        const wrongAnswers = selectedOthers.map((d, idx) => {
+            if (idx < 2) {
+                // Options 1-2: Other drugs wrongly claiming to be in target drug's class
+                // This matches the example where multiple drugs claim "1st generation H1 antagonist"
+                return `${d.generic}: ${drug.class}`;
+            } else {
+                // Option 3: Another drug with a different class (could be correct or wrong for that drug)
+                // Use random selection for variety
+                const shouldUseCorrect = Math.random() < 0.5;
+                const classToUse = shouldUseCorrect ? d.class : drug.class;
+                return `${d.generic}: ${classToUse}`;
+            }
+        });
+        
+        return {
+            type: "mcq",
+            prompt: `Which of the following medications are <b>correctly paired</b> with their medication class?`,
+            choices: shuffled([correctAnswer, ...wrongAnswers]),
+            answer: correctAnswer,
+            drugRef: drug
+        };
+    };
+    
     // Data Handling: Check for brand existence (excluding "N/A")
     const hasBrand = drug.brand && drug.brand !== "N/A";
     const brandList = hasBrand 
@@ -247,11 +296,15 @@ function createQuestion(drug, all) {
         };
     }
     
-    // Drugs WITH brands: Use NEW probability distribution (35/25/15/15/10)
+    // Drugs WITH brands: Use probability distribution
+    // Lab 2: 30/20/15/15/10/10 (with Correctly Paired MCQ)
+    // Others: 35/25/15/15/10 (original distribution)
+    const isLab2Quiz = weekParam && labParam === 2;
     const r = Math.random();
     
-    // 35% Brand & Class MCQ with Trap Logic
-    if (r < 0.35 && drug.class) {
+    // Brand & Class MCQ with Trap Logic (35% normal, 30% Lab 2)
+    const brandClassThreshold = isLab2Quiz ? 0.30 : 0.35;
+    if (r < brandClassThreshold && drug.class) {
         const correct = `${singleBrand} / ${drug.class}`;
         
         // Trap 1: Correct Brand / WRONG Class
@@ -274,8 +327,9 @@ function createQuestion(drug, all) {
         };
     }
     
-    // 25% Generic → Brand (Short Answer)
-    if (r < 0.60) {
+    // Generic → Brand (Short Answer) (25% normal, 20% Lab 2)
+    const genericBrandThreshold = isLab2Quiz ? 0.50 : 0.60;
+    if (r < genericBrandThreshold) {
         return { 
             type: "short", 
             prompt: `Brand for <b>${drug.generic}</b>?`, 
@@ -284,8 +338,9 @@ function createQuestion(drug, all) {
         };
     }
     
-    // 15% Brand → Generic (Short Answer)
-    if (r < 0.75) {
+    // Brand → Generic (Short Answer) (15% for both)
+    const brandGenericThreshold = isLab2Quiz ? 0.65 : 0.75;
+    if (r < brandGenericThreshold) {
         return { 
             type: "short", 
             prompt: `Generic for <b>${singleBrand}</b>?`, 
@@ -294,8 +349,9 @@ function createQuestion(drug, all) {
         };
     }
     
-    // 15% Negative MCQ ("Which is NOT...?") - NEW FEATURE
-    if (r < 0.90) {
+    // Negative MCQ ("Which is NOT...?") (15% for both)
+    const negativeMCQThreshold = isLab2Quiz ? 0.80 : 0.90;
+    if (r < negativeMCQThreshold) {
         const negMCQ = createNegativeMCQ();
         if (negMCQ) return negMCQ;
         // Fallback if negative MCQ can't be created
@@ -307,7 +363,14 @@ function createQuestion(drug, all) {
         };
     }
     
-    // 10% Single Component MCQ with Smart Distractors
+    // Correctly Paired Class MCQ (10% Lab 2 only)
+    if (isLab2Quiz && r < 0.90) {
+        const pairedMCQ = createCorrectlyPairedMCQ();
+        if (pairedMCQ) return pairedMCQ;
+        // Fallback if paired MCQ can't be created
+    }
+    
+    // Single Component MCQ with Smart Distractors (10% for both, fallback for Lab 2)
     const mcqTypes = [
         {l:'Classification', k:'class'}, 
         {l:'Category', k:'category'}, 
@@ -690,10 +753,8 @@ async function main() {
                 const dLab = Number(d.metadata?.lab);
                 
                 if (labParam === 2) {
-                    // Lab 2 mode: Review from Lab 1 within scheduled range + prior Lab 2 weeks
-                    const isScheduledLab1 = dLab === 1 && dWeek >= reviewStart && dWeek <= reviewEnd;
-                    const isPriorLab2 = dLab === 2 && dWeek < weekParam;
-                    return isScheduledLab1 || isPriorLab2;
+                    // Lab 2 mode: Review only from scheduled Lab 1 weeks
+                    return dLab === 1 && dWeek >= reviewStart && dWeek <= reviewEnd;
                 } else {
                     // Lab 1 mode: Prior weeks from Lab 1 only
                     return dLab === 1 && dWeek < weekParam;
