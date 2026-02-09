@@ -123,6 +123,9 @@ function reviewMissed() {
     render();
 }
 
+// Expose to global scope for inline onclick handlers
+window.reviewMissed = reviewMissed;
+
 // --- 2. DATA PIPELINE ---
 async function smartFetch(fileName) {
     const paths = [`assets/data/${fileName}`, `data/${fileName}`, `quizzes/${fileName}`, `../assets/data/${fileName}`];
@@ -231,20 +234,12 @@ function createQuestion(drug, all) {
         // Correct answer: target drug with its correct class
         const correctAnswer = `${drug.generic}: ${drug.class}`;
         
-        // Wrong answers: Other drugs paired with INCORRECT classes
-        // Strategy: Mix of using target's class (confusing trap) and other wrong classes
-        const wrongAnswers = selectedOthers.map((d, idx) => {
-            if (idx < 2) {
-                // Options 1-2: Other drugs wrongly claiming to be in target drug's class
-                // This matches the example where multiple drugs claim "1st generation H1 antagonist"
-                return `${d.generic}: ${drug.class}`;
-            } else {
-                // Option 3: Another drug with a different class (could be correct or wrong for that drug)
-                // Use random selection for variety
-                const shouldUseCorrect = Math.random() < 0.5;
-                const classToUse = shouldUseCorrect ? d.class : drug.class;
-                return `${d.generic}: ${classToUse}`;
-            }
+        // Wrong answers: ALL options must be INCORRECTLY paired
+        // Strategy: Show other drugs ALL wrongly claiming to be in target drug's class
+        // This matches the example where multiple drugs claim "1st generation H1 antagonist"
+        const wrongAnswers = selectedOthers.map(d => {
+            // Always use target's class (WRONG for these other drugs)
+            return `${d.generic}: ${drug.class}`;
         });
         
         return {
