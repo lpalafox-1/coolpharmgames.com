@@ -1136,6 +1136,46 @@
     "metadata": { "lab": 1, "week": 8, "is_new": false }
   },
   {
+    "generic": "Levothyroxine",
+    "brand": "Synthroid",
+    "class": "Thyroid Hormone",
+    "category": "Hypothyroidism Agent",
+    "moa": "Synthetic form of thyroxine (T4) that is converted to active metabolite T3 which binds to thyroid receptor to increase its effects.",
+    "metadata": { "lab": 1, "week": 8, "is_new": false }
+  },
+  {
+    "generic": "Zolpidem",
+    "brand": "Ambien",
+    "class": "Hypnotic",
+    "category": "Hypnotic",
+    "moa": "Enhances the activity of GABA by binding to the benzodiazepine receptor subtype BZ1, which increases GABA's inhibitory effects.",
+    "metadata": { "lab": 1, "week": 8, "is_new": false }
+  },
+  {
+    "generic": "Eszopiclone",
+    "brand": "Lunesta",
+    "class": "Hypnotic",
+    "category": "Hypnotic",
+    "moa": "May interact with GABA-receptor complexes at binding domains located close to or allosterically coupled to benzodiazepine receptors.",
+    "metadata": { "lab": 1, "week": 8, "is_new": false }
+  },
+  {
+    "generic": "Lisdexamfetamine",
+    "brand": "Vyvanse",
+    "class": "Central Nervous System Stimulant",
+    "category": "Stimulant (ADHD)",
+    "moa": "Prodrug of dextroamphetamine; increases the release of norepinephrine and dopamine in the brain.",
+    "metadata": { "lab": 1, "week": 8, "is_new": false }
+  },
+  {
+    "generic": "Dextroamphetamine/Amphetamine",
+    "brand": "Adderall",
+    "class": "Central Nervous System Stimulant",
+    "category": "Stimulant (ADHD)",
+    "moa": "Promotes the release of dopamine and norepinephrine from their storage sites in presynaptic nerve terminals in the brain.",
+    "metadata": { "lab": 1, "week": 8, "is_new": false }
+  },
+  {
     "generic": "Escitalopram",
     "brand": "Lexapro",
     "class": "Selective Serotonin Reuptake Inhibitor (SSRI)",

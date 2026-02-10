@@ -214,18 +214,20 @@ function createQuestion(drug, all) {
     const createCorrectlyPairedMCQ = () => {
         if (!drug.class) return null; // Need class information
         
-        // Find other drugs from same category/therapeutic area for realistic traps
+        // Find other drugs from same category/therapeutic area BUT with DIFFERENT classes
+        // This ensures no other drug will have the same correct class as the target
         const sameCategoryDrugs = all.filter(d => 
             d !== drug && 
             d.class && 
             d.generic && 
-            d.category === drug.category
+            d.category === drug.category &&
+            d.class !== drug.class  // CRITICAL: Exclude drugs with same class
         );
         
-        // If not enough in same category, use any drugs with classes
+        // If not enough in same category, use any drugs with DIFFERENT classes
         const candidateDrugs = sameCategoryDrugs.length >= 3 
             ? sameCategoryDrugs 
-            : all.filter(d => d !== drug && d.class && d.generic);
+            : all.filter(d => d !== drug && d.class && d.generic && d.class !== drug.class);
         
         if (candidateDrugs.length < 3) return null; // Need at least 3 other drugs
         
@@ -716,11 +718,19 @@ async function main() {
             // CEILING FILTER: lab=1 → only Lab 1; lab=2 → Lab 1 + Lab 2 (cumulative curriculum)
             const ceilingPool = fullPool.filter(d => Number(d.metadata?.lab) <= labParam);
             
-            // NEW DRUGS: Current week + current lab ONLY (strict match for "new" portion)
-            const newDrugs = ceilingPool.filter(d => 
-                Number(d.metadata?.week) === weekParam && 
-                Number(d.metadata?.lab) === labParam
-            );
+            // NEW DRUGS: For Lab 2, cumulative (weeks 1-current); for Lab 1, current week only
+            const newDrugs = ceilingPool.filter(d => {
+                const dWeek = Number(d.metadata?.week);
+                const dLab = Number(d.metadata?.lab);
+                
+                if (labParam === 2) {
+                    // Lab 2 cumulative: all weeks from 1 to current week
+                    return dLab === 2 && dWeek >= 1 && dWeek <= weekParam;
+                } else {
+                    // Lab 1: only current week
+                    return dLab === 1 && dWeek === weekParam;
+                }
+            });
             
             // DR. CHEN'S REVIEW SCHEDULE: Maps Lab 2 week → specific Lab 1 week ranges
             const getReviewSourceWeeks = (currentWeek) => {
@@ -757,16 +767,38 @@ async function main() {
             });
             
             // Build 6+4 quiz: 6 new drugs + 4 review drugs (flexible if pool is small)
-            const newCount = Math.min(6, newDrugs.length);
-            const reviewCount = Math.min(4, reviewDrugs.length);
+            let selectedNew;
             
-            const selectedNew = shuffled(newDrugs).slice(0, newCount);
+            if (labParam === 2) {
+                // Lab 2: Guarantee minimum 3 from current week, rest from cumulative
+                const currentWeekDrugs = newDrugs.filter(d => Number(d.metadata?.week) === weekParam);
+                const currentWeekMin = Math.min(3, currentWeekDrugs.length);
+                const cumulativeRemaining = Math.min(3, Math.max(0, newDrugs.length - currentWeekMin));
+                
+                // Select minimum from current week
+                const fromCurrent = shuffled(currentWeekDrugs).slice(0, currentWeekMin);
+                // Select remaining from full cumulative pool
+                const fromCumulative = shuffled(newDrugs.filter(d => !fromCurrent.includes(d))).slice(0, cumulativeRemaining);
+                
+                selectedNew = [...fromCurrent, ...fromCumulative];
+            } else {
+                // Lab 1: All from current week only
+                selectedNew = shuffled(newDrugs).slice(0, Math.min(6, newDrugs.length));
+            }
+            
+            const newCount = selectedNew.length;
+            const reviewCount = Math.min(4, reviewDrugs.length);
             const selectedReview = shuffled(reviewDrugs).slice(0, reviewCount);
             
             filteredPool = [...selectedNew, ...selectedReview];
             
-            // Use ceiling pool for distractor generation (all available drugs)
-            fullPool = ceilingPool;
+            // Distractor pool: Only drugs from current week and prior (no future weeks)
+            fullPool = ceilingPool.filter(d => {
+                const dWeek = Number(d.metadata?.week);
+                const dLab = Number(d.metadata?.lab);
+                // Include all Lab 1 drugs, and Lab 2 drugs only up to current week
+                return dLab === 1 || (dLab === 2 && dWeek <= weekParam);
+            });
             
             // Build descriptive title showing review source
             const reviewRangeLabel = reviewStart === reviewEnd 
@@ -775,7 +807,7 @@ async function main() {
             
             state.title = labParam === 1 
                 ? `Lab I: Week ${weekParam} (${newCount} New + ${reviewCount} Review)` 
-                : `Week ${weekParam} (${newCount} New + ${reviewCount} Rev: ${reviewRangeLabel})`;
+                : `Lab 2 W1-${weekParam} (${newCount} New + ${reviewCount} Rev: ${reviewRangeLabel})`;
             storageKey = `pharmlet.lab${labParam}.week${weekParam}.easy`;
         }
         // ========== MODE 2: ?weeks=Start-End (Cumulative Range) ==========
@@ -797,8 +829,13 @@ async function main() {
                 return (lab === labParam && week >= startWeek && week <= endWeek) || (lab < labParam);
             });
             
-            // Use ceiling pool for distractor generation
-            fullPool = ceilingPool;
+            // Distractor pool: Only drugs from endWeek and prior (no future weeks)
+            fullPool = ceilingPool.filter(d => {
+                const dWeek = Number(d.metadata?.week);
+                const dLab = Number(d.metadata?.lab);
+                // Include all Lab 1 drugs, and Lab 2 drugs only up to endWeek
+                return dLab === 1 || (dLab === 2 && dWeek <= endWeek);
+            });
             
             state.title = labParam === 1 
                 ? `Lab I: Cumulative Weeks ${startWeek}-${endWeek}` 
