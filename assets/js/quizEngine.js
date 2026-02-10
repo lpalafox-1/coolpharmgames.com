@@ -103,6 +103,7 @@ function restartQuiz() {
 // --- REVIEW MISSED QUESTIONS ---
 function reviewMissed() {
     const missed = state.questions.filter(q => q._answered && !q._correct);
+    
     if (missed.length === 0) {
         alert("🎉 No missed questions to review!");
         return;
@@ -118,6 +119,20 @@ function reviewMissed() {
     
     if (getEl("quiz-title")) getEl("quiz-title").textContent = state.title;
     if (getEl("qtotal")) getEl("qtotal").textContent = state.questions.length;
+    
+    // CRITICAL FIX: Restore question card structure (showResults replaced it)
+    const card = getEl("question-card");
+    if (card) {
+        card.innerHTML = `
+            <div id="drug-context" class="text-[10px] uppercase tracking-widest text-[#8b1e3f] font-black mb-3 opacity-60 h-4"></div>
+            <h2 id="prompt" class="text-xl sm:text-2xl lg:text-3xl font-bold leading-tight mb-8">Loading...</h2>
+            <div id="options" class="space-y-4"></div>
+            <div id="short-wrap" class="mt-8 hidden">
+                <input id="short-input" class="w-full rounded-2xl border border-[var(--ring)] bg-[var(--bg)] px-5 py-5 text-xl outline-[#8b1e3f]" placeholder="Type answer...">
+            </div>
+            <div id="explain" class="mt-8"></div>
+        `;
+    }
     
     startSmartTimer();
     render();
@@ -236,12 +251,17 @@ function createQuestion(drug, all) {
         // Correct answer: target drug with its correct class
         const correctAnswer = `${drug.generic}: ${drug.class}`;
         
-        // Wrong answers: ALL options must be INCORRECTLY paired
-        // Strategy: Show other drugs ALL wrongly claiming to be in target drug's class
-        // This matches the example where multiple drugs claim "1st generation H1 antagonist"
-        const wrongAnswers = selectedOthers.map(d => {
-            // Always use target's class (WRONG for these other drugs)
-            return `${d.generic}: ${drug.class}`;
+        // Wrong answers: Each drug paired with a WRONG class (not their own, not target's)
+        // This creates distinct options so students can identify the correctly paired one
+        const wrongAnswers = selectedOthers.map((d, idx) => {
+            // Get a random wrong class from other drugs (exclude this drug's class and target's class)
+            const wrongClassPool = all
+                .filter(other => other.class && other.class !== d.class && other.class !== drug.class)
+                .map(other => other.class);
+            
+            // Use different wrong classes for variety (rotate through pool)
+            const wrongClass = wrongClassPool[idx % wrongClassPool.length] || wrongClassPool[0] || 'Inhibitor';
+            return `${d.generic}: ${wrongClass}`;
         });
         
         return {
@@ -770,10 +790,11 @@ async function main() {
             let selectedNew;
             
             if (labParam === 2) {
-                // Lab 2: Guarantee minimum 3 from current week, rest from cumulative
+                // Lab 2: Guarantee minimum 3 from current week, rest from cumulative to reach 6 total
+                const targetTotal = 6;
                 const currentWeekDrugs = newDrugs.filter(d => Number(d.metadata?.week) === weekParam);
                 const currentWeekMin = Math.min(3, currentWeekDrugs.length);
-                const cumulativeRemaining = Math.min(3, Math.max(0, newDrugs.length - currentWeekMin));
+                const cumulativeRemaining = Math.min(targetTotal - currentWeekMin, Math.max(0, newDrugs.length - currentWeekMin));
                 
                 // Select minimum from current week
                 const fromCurrent = shuffled(currentWeekDrugs).slice(0, currentWeekMin);
