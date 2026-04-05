@@ -48,6 +48,52 @@ function changeZoom(dir) {
     document.body.style.zoom = state.currentScale;
     document.documentElement.style.setProperty('--quiz-size', `${state.currentScale}rem`);
 }
+const FINAL_EXAM_ID = "log-lab-final-2";
+const FINAL_EXAM_TITLE = "Log Lab Final 2 — 87 Questions";
+const FINAL_EXAM_TOTAL = 87;
+
+function selectFinalExamDrugs(pool) {
+    const byLabWeek = new Map();
+
+    for (const drug of pool) {
+        const lab = Number(drug?.metadata?.lab);
+        const week = Number(drug?.metadata?.week);
+        if (![1, 2].includes(lab) || !week) continue;
+
+        const key = `${lab}-${week}`;
+        if (!byLabWeek.has(key)) byLabWeek.set(key, []);
+        byLabWeek.get(key).push(drug);
+    }
+
+    const selected = [];
+
+    for (let week = 1; week <= 10; week++) {
+        const lab1Week = byLabWeek.get(`1-${week}`) || [];
+        const lab2Week = byLabWeek.get(`2-${week}`) || [];
+
+        for (let i = 0; i < 4; i++) {
+            if (lab1Week[i]) selected.push(lab1Week[i]);
+            if (lab2Week[i]) selected.push(lab2Week[i]);
+        }
+    }
+
+    const lab1Week11 = byLabWeek.get("1-11") || [];
+    const lab2Week11 = byLabWeek.get("2-11") || [];
+
+    for (let i = 0; i < 4; i++) {
+        if (lab1Week11[i]) selected.push(lab1Week11[i]);
+        if (i < 3 && lab2Week11[i]) selected.push(lab2Week11[i]);
+    }
+
+    const lab1Count = selected.filter(d => Number(d?.metadata?.lab) === 1).length;
+    const lab2Count = selected.filter(d => Number(d?.metadata?.lab) === 2).length;
+
+    if (selected.length !== FINAL_EXAM_TOTAL || lab1Count !== 44 || lab2Count !== 43) {
+        throw new Error(`Final exam generator expected 44 Lab 1 and 43 Lab 2 drugs, got ${lab1Count} and ${lab2Count}.`);
+    }
+
+    return selected;
+}
 
 // --- SMART HINT SYSTEM ---
 function showHint() {
@@ -879,6 +925,20 @@ async function main() {
             );
             state.title = `${tagParam} Review`;
             storageKey = `pharmlet.tag-${tagParam.toLowerCase()}.easy`;
+        }
+        else if (quizId === FINAL_EXAM_ID) {
+            fullPool = await smartFetch("master_pool.json");
+            const selectedDrugs = selectFinalExamDrugs(fullPool);
+
+            state.title = FINAL_EXAM_TITLE;
+            state.questions = shuffled(selectedDrugs).map((d, i) => ({
+                ...createQuestion(d, fullPool),
+                _id: i
+            }));
+            storageKey = `pharmlet.${quizId}.easy`;
+
+            finishSetup(storageKey);
+            return;
         }
         // ========== MODE 4: ?id=quiz-name (Legacy Static JSON) ==========
         else if (quizId) {

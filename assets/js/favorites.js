@@ -28,6 +28,7 @@ const QUIZ_METADATA = {
   "top-drugs-final-mockC": { title: "Top Drugs Final Mock C", category: "final" },
   "top-drugs-final-mockD": { title: "Top Drugs Final Mock D", category: "final" },
   "top-drugs-final-mockE": { title: "Top Drugs Final Mock E", category: "final" },
+  "log-lab-final-2": { title: "Log Lab Final 2", category: "final" },
   "popp-practice-exam1": { title: "POPP Practice Exam 1", category: "practice" },
   "popp-practice-law": { title: "POPP Practice Law", category: "practice" },
   "popp-practice-mock-E1": { title: "POPP Practice Mock E1", category: "practice" },

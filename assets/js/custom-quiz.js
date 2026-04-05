@@ -4,6 +4,14 @@
 const THEME_KEY = "pharmlet.theme";
 const CUSTOM_QUIZ_KEY = "pharmlet.custom-quiz";
 
+const QUIZ_OVERRIDES = {
+  "log-lab-final-2": {
+    title: "Log Lab Final 2 — 87 Questions",
+    questionCount: 87,
+    pools: {}
+  }
+};
+
 const state = {
   availableQuizzes: [],
   selectedQuizzes: new Set(),
@@ -47,7 +55,7 @@ async function loadAvailableQuizzes() {
     "popp-practice-exam1", "popp-practice-law", "popp-practice-mock-E1",
     "basis-practice-exam1", "basis-practice-mock-E1",
     "top-drugs-final-mockA", "top-drugs-final-mockB", "top-drugs-final-mockC",
-    "top-drugs-final-mockD", "top-drugs-final-mockE",
+    "top-drugs-final-mockD", "top-drugs-final-mockE", "log-lab-final-2",
     "sig-wildcards", "latin-fun"
   ];
 
@@ -56,15 +64,19 @@ async function loadAvailableQuizzes() {
 
   for (const quizId of quizIds) {
     try {
-      const res = await fetch(`quizzes/${quizId}.json`, { cache: "no-store" });
-      if (!res.ok) continue;
-      const data = await res.json();
+      const override = QUIZ_OVERRIDES[quizId];
+      const data = override || await (async () => {
+        const res = await fetch(`quizzes/${quizId}.json`, { cache: "no-store" });
+        if (!res.ok) return null;
+        return res.json();
+      })();
+      if (!data) continue;
       
       const quizInfo = {
         id: quizId,
         title: data.title || quizId,
         pools: data.pools || {},
-        questionCount: calculateQuestionCount(data)
+        questionCount: override?.questionCount ?? calculateQuestionCount(data)
       };
       
       state.availableQuizzes.push(quizInfo);

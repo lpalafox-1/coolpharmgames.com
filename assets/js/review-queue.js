@@ -25,7 +25,8 @@ const QUIZ_TITLES = {
   "top-drugs-final-mockB": "Final Mock B",
   "top-drugs-final-mockC": "Final Mock C",
   "top-drugs-final-mockD": "Final Mock D",
-  "top-drugs-final-mockE": "Final Mock E"
+  "top-drugs-final-mockE": "Final Mock E",
+  "log-lab-final-2": "Log Lab Final 2"
 };
 
 document.addEventListener("DOMContentLoaded", () => {
