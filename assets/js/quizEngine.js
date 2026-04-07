@@ -65,31 +65,55 @@ function selectFinalExamDrugs(pool) {
         byLabWeek.get(key).push(drug);
     }
 
+    const targetCounts = { 1: 44, 2: 43 };
+    const counts = { 1: 0, 2: 0 };
     const selected = [];
+    const seenGenerics = new Set();
+    const normalizeGeneric = (value) => String(value ?? "").trim().replace(/\s+/g, " ").toLowerCase();
+
+    const addDrug = (drug) => {
+        const lab = Number(drug?.metadata?.lab);
+        const genericKey = normalizeGeneric(drug?.generic);
+
+        if (![1, 2].includes(lab) || !genericKey) return false;
+        if (counts[lab] >= targetCounts[lab] || seenGenerics.has(genericKey)) return false;
+
+        seenGenerics.add(genericKey);
+        selected.push(drug);
+        counts[lab] += 1;
+        return true;
+    };
+
+    const bucketPlan = [];
 
     for (let week = 1; week <= 10; week++) {
-        const lab1Week = byLabWeek.get(`1-${week}`) || [];
-        const lab2Week = byLabWeek.get(`2-${week}`) || [];
+        bucketPlan.push({ bucket: byLabWeek.get(`1-${week}`) || [], lab: 1, limit: 4 });
+        bucketPlan.push({ bucket: byLabWeek.get(`2-${week}`) || [], lab: 2, limit: 4 });
+    }
 
-        for (let i = 0; i < 4; i++) {
-            if (lab1Week[i]) selected.push(lab1Week[i]);
-            if (lab2Week[i]) selected.push(lab2Week[i]);
+    bucketPlan.push({ bucket: byLabWeek.get("1-11") || [], lab: 1, limit: 4 });
+    bucketPlan.push({ bucket: byLabWeek.get("2-11") || [], lab: 2, limit: 3 });
+
+    const fillBuckets = (respectBucketLimits) => {
+        for (const { bucket, lab, limit } of bucketPlan) {
+            let pickedInBucket = 0;
+
+            for (const drug of bucket) {
+                if (counts[lab] >= targetCounts[lab]) break;
+                if (respectBucketLimits && pickedInBucket >= limit) break;
+                if (addDrug(drug)) pickedInBucket += 1;
+            }
         }
+    };
+
+    fillBuckets(true);
+
+    if (counts[1] < targetCounts[1] || counts[2] < targetCounts[2]) {
+        fillBuckets(false);
     }
 
-    const lab1Week11 = byLabWeek.get("1-11") || [];
-    const lab2Week11 = byLabWeek.get("2-11") || [];
-
-    for (let i = 0; i < 4; i++) {
-        if (lab1Week11[i]) selected.push(lab1Week11[i]);
-        if (i < 3 && lab2Week11[i]) selected.push(lab2Week11[i]);
-    }
-
-    const lab1Count = selected.filter(d => Number(d?.metadata?.lab) === 1).length;
-    const lab2Count = selected.filter(d => Number(d?.metadata?.lab) === 2).length;
-
-    if (selected.length !== FINAL_EXAM_TOTAL || lab1Count !== 44 || lab2Count !== 43) {
-        throw new Error(`Final exam generator expected 44 Lab 1 and 43 Lab 2 drugs, got ${lab1Count} and ${lab2Count}.`);
+    if (selected.length !== FINAL_EXAM_TOTAL || counts[1] !== targetCounts[1] || counts[2] !== targetCounts[2]) {
+        throw new Error(`Final exam generator expected 44 Lab 1 and 43 Lab 2 unique drugs, got ${counts[1]} and ${counts[2]}.`);
     }
 
     return selected;
@@ -664,28 +688,40 @@ function scoreCurrent(val) {
     }
 
     const normalizeWhitespace = s => String(s).replace(/\s+/g, ' ').trim().toLowerCase();
+    const normalizeLoose = s => normalizeWhitespace(s).replace(/[\s\-\/.,;]+/g, '');
     const userNorm = normalizeWhitespace(val);
-    const canonNorm = normalizeWhitespace(correctAnswer);
+    const userLoose = normalizeLoose(val);
+
+    const acceptedAnswers = new Set();
+    const allowLooseBrandForms = q.prompt.includes("Brand");
+    const addAcceptedForms = (answer, includeLooseForms = false) => {
+        if (answer === undefined || answer === null) return;
+
+        for (const part of String(answer).split(/[;,]/)) {
+            const trimmed = normalizeWhitespace(part);
+            if (!trimmed) continue;
+
+            acceptedAnswers.add(trimmed);
+            if (includeLooseForms) {
+                acceptedAnswers.add(normalizeLoose(part));
+            }
+        }
+    };
+
+    const rawAnswers = Array.isArray(raw) ? raw : [raw];
+    rawAnswers.forEach(answer => addAcceptedForms(answer, allowLooseBrandForms));
+
+    if (q.drugRef?.brand && allowLooseBrandForms) {
+        q.drugRef.brand.split(/[,/;]/).forEach(answer => addAcceptedForms(answer, true));
+    }
 
     let isCorrect = false;
 
-    // --- SMART ALIAS MATCHING ---
-    // If we have a drug reference and the user is being asked for a Brand
-    if (q.drugRef && q.drugRef.brand && q.prompt.includes("Brand")) {
-        const allBrands = q.drugRef.brand.split(/[,/;]/).map(b => normalizeWhitespace(b));
-        if (allBrands.includes(userNorm)) {
-            isCorrect = true;
-        }
+    if (acceptedAnswers.has(userNorm) || acceptedAnswers.has(userLoose)) {
+        isCorrect = true;
     }
 
     // --- MULTI-OPTION MATCHING (semicolon, comma = ANY one is correct) ---
-    if (!isCorrect && /[;,]/.test(String(correctAnswer))) {
-        const validOptions = String(correctAnswer).split(/[;,]/).map(opt => normalizeWhitespace(opt)).filter(Boolean);
-        if (validOptions.includes(userNorm)) {
-            isCorrect = true;
-        }
-    }
-
     if (!isCorrect) {
         // --- COMBINATION MATCHING (slash, hyphen, "and" = ALL parts required) ---
         const splitBySeparators = s => {
