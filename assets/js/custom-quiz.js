@@ -6,8 +6,8 @@ const CUSTOM_QUIZ_KEY = "pharmlet.custom-quiz";
 
 const QUIZ_OVERRIDES = {
   "log-lab-final-2": {
-    title: "Log Lab Final 2 — 87 Questions",
-    questionCount: 87,
+    title: "Top Drugs Final Lab 2 — 110 Questions",
+    questionCount: 110,
     pools: {}
   }
 };

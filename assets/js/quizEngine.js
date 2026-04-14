@@ -49,8 +49,8 @@ function changeZoom(dir) {
     document.documentElement.style.setProperty('--quiz-size', `${state.currentScale}rem`);
 }
 const FINAL_EXAM_ID = "log-lab-final-2";
-const FINAL_EXAM_TITLE = "Log Lab Final 2 — 87 Questions";
-const FINAL_EXAM_TOTAL = 87;
+const FINAL_EXAM_TITLE = "Top Drugs Final Lab 2 — 110 Questions";
+const FINAL_EXAM_TOTAL = 110;
 
 function selectFinalExamDrugs(pool) {
     const byLabWeek = new Map();
@@ -65,7 +65,7 @@ function selectFinalExamDrugs(pool) {
         byLabWeek.get(key).push(drug);
     }
 
-    const targetCounts = { 1: 44, 2: 43 };
+    const targetCounts = { 1: 44, 2: 66 };
     const counts = { 1: 0, 2: 0 };
     const selected = [];
     const seenGenerics = new Set();
@@ -113,7 +113,7 @@ function selectFinalExamDrugs(pool) {
     }
 
     if (selected.length !== FINAL_EXAM_TOTAL || counts[1] !== targetCounts[1] || counts[2] !== targetCounts[2]) {
-        throw new Error(`Final exam generator expected 44 Lab 1 and 43 Lab 2 unique drugs, got ${counts[1]} and ${counts[2]}.`);
+        throw new Error(`Final exam generator expected 44 Lab 1 and 66 Lab 2 unique drugs, got ${counts[1]} and ${counts[2]}.`);
     }
 
     return selected;
@@ -691,6 +691,7 @@ function scoreCurrent(val) {
     const normalizeLoose = s => normalizeWhitespace(s).replace(/[\s\-\/.,;]+/g, '');
     const userNorm = normalizeWhitespace(val);
     const userLoose = normalizeLoose(val);
+    const canonNorm = normalizeWhitespace(correctAnswer);
 
     const acceptedAnswers = new Set();
     const allowLooseBrandForms = q.prompt.includes("Brand");
