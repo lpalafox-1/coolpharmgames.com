@@ -5,13 +5,16 @@ const weeksParam = params.get("weeks");                      // Cumulative range
 const tagParam = params.get("tag");                          // Topic mode: ?tag=Anticoagulants
 const labParam = parseInt(params.get("lab") || "2", 10);     // Lab isolation: &lab=1 or &lab=2 (default: 2)
 const quizId = params.get("id");
+const modeParam = params.get("mode") || "easy";
+const HISTORY_KEY = "pharmlet.history";
 
 const state = { 
     questions: [], index: 0, score: 0, title: "",
     timerSeconds: 0, timerHandle: null, marked: new Set(),
     currentScale: 1.0,
     originalQuestions: [],  // For restart with original pool
-    hintsUsed: 0            // Track hints for stats
+    hintsUsed: 0,           // Track hints for stats
+    resultsRecorded: false
 };
 
 const getEl = (id) => document.getElementById(id);
@@ -163,6 +166,38 @@ function revealAnswer() {
     scoreCurrent("Revealed");
 }
 
+function getHistoryQuizId() {
+    if (quizId) return quizId;
+    if (weekParam) return `week-${weekParam}`;
+    if (weeksParam) return `weeks-${weeksParam}`;
+    if (tagParam) return `tag-${tagParam.toLowerCase()}`;
+    return "quiz";
+}
+
+function saveQuizHistory() {
+    if (state.resultsRecorded) return;
+
+    try {
+        const raw = localStorage.getItem(HISTORY_KEY);
+        const history = raw ? JSON.parse(raw) : [];
+
+        history.push({
+            quizId: getHistoryQuizId(),
+            mode: modeParam,
+            title: state.title || FINAL_EXAM_TITLE,
+            score: state.score,
+            total: state.questions.length,
+            bestStreak: 0,
+            timestamp: Date.now()
+        });
+
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(-200)));
+        state.resultsRecorded = true;
+    } catch (e) {
+        console.warn("Failed to save quiz history:", e);
+    }
+}
+
 // --- RESTART WITH CONFIRMATION ---
 function restartQuiz() {
     if (confirm("🔄 Restart this quiz? Your progress will be lost.")) {
@@ -226,33 +261,60 @@ async function smartFetch(fileName) {
 
 function createQuestion(drug, all) {
     // Smart Distractor Helper - Prioritizes same class, then category, excludes target drug
+    const normalizeChoiceValue = (value) => String(value).replace(/\s+/g, ' ').trim().toLowerCase();
+    const uniqueChoiceValues = (pool, key, excluded = new Set()) => {
+        const seen = new Set();
+        const values = [];
+
+        for (const item of shuffled(pool)) {
+            const value = item?.[key];
+            const normalized = normalizeChoiceValue(value);
+
+            if (!value || excluded.has(normalized) || seen.has(normalized)) continue;
+            seen.add(normalized);
+            values.push(value);
+        }
+
+        return values;
+    };
+
     const getSmartDistracters = (targetDrug, targetValue, key) => {
+        const excluded = new Set([normalizeChoiceValue(targetValue)]);
+
         // High Priority: Same class as target drug
-        const sameClass = all.filter(d => 
-            d !== targetDrug && 
-            d[key] && 
-            d[key] !== targetValue &&
-            d.class === targetDrug.class
+        const sameClass = uniqueChoiceValues(
+            all.filter(d => 
+                d !== targetDrug && 
+                d[key] && 
+                d.class === targetDrug.class
+            ),
+            key,
+            excluded
         );
         if (sameClass.length >= 3) {
-            return shuffled(sameClass).slice(0, 3).map(d => d[key]);
+            return sameClass.slice(0, 3);
         }
         
         // Medium Priority: Same category as target drug
-        const sameCategory = all.filter(d =>
-            d !== targetDrug &&
-            d[key] &&
-            d[key] !== targetValue &&
-            d.category === targetDrug.category
+        const sameCategory = uniqueChoiceValues(
+            all.filter(d =>
+                d !== targetDrug &&
+                d[key] &&
+                d.category === targetDrug.category
+            ),
+            key,
+            excluded
         );
         if (sameCategory.length >= 3) {
-            return shuffled(sameCategory).slice(0, 3).map(d => d[key]);
+            return sameCategory.slice(0, 3);
         }
         
         // Fall back to random drugs (exclude target drug and target value)
-        const random = shuffled(
-            all.filter(d => d !== targetDrug && d[key] && d[key] !== targetValue)
-        ).slice(0, 3).map(d => d[key]);
+        const random = uniqueChoiceValues(
+            all.filter(d => d !== targetDrug && d[key]),
+            key,
+            excluded
+        ).slice(0, 3);
         return random;
     };
     
@@ -757,6 +819,8 @@ function scoreCurrent(val) {
 }
 
 function showResults() {
+    saveQuizHistory();
+
     // Save high score to localStorage (only if it's better than existing)
     let storageKey = null;
     if (weekParam) {
@@ -1052,6 +1116,7 @@ async function main() {
 function finishSetup(storageKey) {
     if (getEl("quiz-title")) getEl("quiz-title").textContent = state.title;
     if (getEl("qtotal")) getEl("qtotal").textContent = state.questions.length;
+    state.resultsRecorded = false;
     
     // Initialize high score storage ONLY if it doesn't exist yet
     if (storageKey && !localStorage.getItem(storageKey)) {

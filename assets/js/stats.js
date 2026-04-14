@@ -164,11 +164,12 @@ function getCategoryFromQuizId(quizId) {
   if (quizId.startsWith("chapter")) return "Chapter Reviews";
   if (quizId.startsWith("practice-")) return "Exam Practice";
   if (quizId.startsWith("lab-quiz")) return "Lab Quizzes";
+  if (quizId.startsWith("week") || quizId.startsWith("weeks")) return "Top Drugs";
   if (quizId.startsWith("cumulative")) return "Cumulative";
   if (quizId.startsWith("popp")) return "POPP";
   if (quizId.startsWith("basis")) return "Basis";
   if (quizId.startsWith("ceutics")) return "Pharmaceutics";
-  if (quizId.includes("top-drugs")) return "Final Review";
+  if (quizId.includes("final") || quizId.includes("top-drugs")) return "Final Review";
   if (quizId.includes("latin") || quizId.includes("sig")) return "Fun Modes";
   return "Other";
 }
