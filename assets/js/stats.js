@@ -3,6 +3,7 @@
 
 const THEME_KEY = "quiz-theme";
 const HISTORY_KEY = "pharmlet.history";
+const REVIEW_KEY = "pharmlet.review-queue";
 
 // Theme toggle
 document.addEventListener("DOMContentLoaded", () => {
@@ -36,6 +37,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function loadStats() {
   const history = getHistory();
+  const reviewQueue = getReviewQueue();
+
+  renderMostMissedQuestions(reviewQueue);
   
   if (history.length === 0) {
     return; // Show default empty state
@@ -149,6 +153,117 @@ function loadStats() {
       categoryStatsEl.appendChild(div);
     });
   }
+}
+
+function renderMostMissedQuestions(reviewQueue) {
+  const container = document.getElementById("missed-stats");
+  if (!container) return;
+
+  const missedItems = getMostMissedQuestions(reviewQueue).slice(0, 5);
+
+  if (missedItems.length === 0) {
+    container.innerHTML = `<p style="color:var(--muted)">No missed-question data yet. Wrong answers will appear here with the correct answer and your most common wrong pick.</p>`;
+    return;
+  }
+
+  container.innerHTML = "";
+  missedItems.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "rounded-xl border border-[var(--ring)] p-4";
+    div.style.background = "var(--accent-light, rgba(139,30,63,0.06))";
+    div.innerHTML = `
+      <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+        <div class="space-y-1">
+          <div class="font-semibold">${sanitize(toPlainText(item.prompt))}</div>
+          <div class="text-sm" style="color:var(--muted)">
+            Correct answer: <span class="font-medium" style="color:var(--text)">${sanitize(toPlainText(item.answer))}</span>
+          </div>
+          <div class="text-sm" style="color:var(--muted)">
+            Most common wrong answer: <span class="font-medium" style="color:var(--bad)">${sanitize(item.commonWrong || "—")}</span>
+          </div>
+        </div>
+        <div class="text-sm lg:text-right" style="color:var(--muted)">
+          <div>${item.misses} miss${item.misses === 1 ? "" : "es"}</div>
+          <div>${item.quizCount} quiz${item.quizCount === 1 ? "" : "zes"}</div>
+        </div>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function getMostMissedQuestions(reviewQueue) {
+  const groups = new Map();
+
+  reviewQueue.forEach(entry => {
+    const prompt = toPlainText(entry.prompt || "");
+    const answer = toPlainText(entry.answer || entry.answerText || "");
+    if (!prompt || !answer) return;
+
+    const key = `${normalizeText(prompt)}||${normalizeText(answer)}`;
+    if (!groups.has(key)) {
+      groups.set(key, {
+        prompt,
+        answer,
+        misses: 0,
+        wrongCounts: new Map(),
+        latest: 0,
+        quizIds: new Set()
+      });
+    }
+
+    const group = groups.get(key);
+    group.misses++;
+
+    const wrongAnswer = toPlainText(entry.userAnswer || entry.user || entry.selected || "");
+    if (wrongAnswer) {
+      group.wrongCounts.set(wrongAnswer, (group.wrongCounts.get(wrongAnswer) || 0) + 1);
+    }
+
+    const timestamp = new Date(entry.timestamp).getTime();
+    if (!Number.isNaN(timestamp)) {
+      group.latest = Math.max(group.latest, timestamp);
+    }
+
+    if (entry.quizId) {
+      group.quizIds.add(entry.quizId);
+    }
+  });
+
+  return Array.from(groups.values())
+    .map(group => {
+      const commonWrong = Array.from(group.wrongCounts.entries())
+        .sort((a, b) => b[1] - a[1])[0]?.[0] || "";
+
+      return {
+        prompt: group.prompt,
+        answer: group.answer,
+        misses: group.misses,
+        commonWrong,
+        quizCount: group.quizIds.size,
+        latest: group.latest
+      };
+    })
+    .sort((a, b) => b.misses - a.misses || b.latest - a.latest);
+}
+
+function getReviewQueue() {
+  try {
+    const raw = localStorage.getItem(REVIEW_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function toPlainText(value) {
+  const div = document.createElement("div");
+  div.innerHTML = String(value ?? "");
+  return (div.textContent || div.innerText || "").replace(/\s+/g, " ").trim();
+}
+
+function normalizeText(value) {
+  return toPlainText(value).toLowerCase();
 }
 
 function getHistory() {
