@@ -79,7 +79,7 @@ input:focus, select:focus, textarea:focus {
 
 .dark #short-input:focus {
   background-color: var(--card) !important;
-  color: #000000 !important;
+  color: var(--text) !important;
 }
 
 /* ===== Cards / hero ===== */
