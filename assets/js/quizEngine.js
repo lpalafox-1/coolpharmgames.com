@@ -356,6 +356,135 @@ function getRelationshipVariants(relationship) {
     return [...variants];
 }
 
+const CONCEPT_ANSWER_ALIAS_GROUPS = [
+    ["growth hormone", "gh", "somatotropin"],
+    ["luteinizing hormone", "lh", "lutropin"],
+    ["follicle stimulating hormone", "follicle-stimulating hormone", "fsh", "follitropin"],
+    ["thyroid stimulating hormone", "thyroid-stimulating hormone", "tsh", "thyrotropin"],
+    ["adrenocorticotropic hormone", "acth", "corticotropin"],
+    ["corticotropin releasing hormone", "corticotropin-releasing hormone", "crh"],
+    ["thyrotropin releasing hormone", "thyrotropin-releasing hormone", "trh"],
+    ["growth hormone releasing hormone", "growth hormone-releasing hormone", "ghrh"],
+    ["androgen", "androgens"],
+    ["prolactin", "prl"],
+    ["epinephrine", "adrenaline"],
+    ["norepinephrine", "noradrenaline"],
+    ["triiodothyronine", "t3"],
+    ["thyroxine", "t4"],
+    ["parathyroid hormone", "pth"],
+    ["antidiuretic hormone", "adh", "vasopressin"]
+];
+
+const CONCEPT_ANSWER_ALIAS_LOOKUP = (() => {
+    const lookup = new Map();
+
+    const normalizeAliasKey = (value) => String(value ?? "")
+        .toLowerCase()
+        .replace(/[()]/g, " ")
+        .replace(/[-/]+/g, " ")
+        .replace(/[.,;:!?]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+
+    for (const group of CONCEPT_ANSWER_ALIAS_GROUPS) {
+        const canonical = normalizeAliasKey(group[0]);
+        for (const alias of group) {
+            const key = normalizeAliasKey(alias);
+            if (key) lookup.set(key, canonical);
+        }
+    }
+
+    return lookup;
+})();
+
+function normalizeConceptAnswerKey(value) {
+    const text = String(value ?? "")
+        .toLowerCase()
+        .replace(/[()]/g, " ")
+        .replace(/[.,;:!?]+/g, " ")
+        .replace(/[-/]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+
+    if (!text) return "";
+
+    const direct = CONCEPT_ANSWER_ALIAS_LOOKUP.get(text);
+    if (direct) return direct;
+
+    const words = text.split(" ").filter(Boolean);
+    const lastWord = words[words.length - 1] || "";
+    let singularLast = lastWord;
+    if (lastWord.endsWith("ies")) {
+        singularLast = lastWord.replace(/ies$/, "y");
+    } else if (lastWord.endsWith("s") && !/(ss|us|is|ous)$/i.test(lastWord)) {
+        singularLast = lastWord.replace(/s$/, "");
+    }
+
+    if (singularLast !== lastWord) {
+        const singularText = [...words.slice(0, -1), singularLast].join(" ");
+        const singularDirect = CONCEPT_ANSWER_ALIAS_LOOKUP.get(singularText);
+        if (singularDirect) return singularDirect;
+        return singularText;
+    }
+
+    return text;
+}
+
+function isConceptAnswerList(value) {
+    const raw = String(value ?? "").trim();
+    if (!raw) return false;
+
+    if (/[,&/]/.test(raw)) return true;
+    if (!/\s+\b(?:and|or)\b\s+/i.test(raw)) return false;
+
+    const lower = raw.toLowerCase();
+    if (/\b(stimulat|inhibi|promot|caus|trigger|convert|releas|secret|responsible for|essential for|mediat|process)\b/i.test(lower)) {
+        return false;
+    }
+
+    const parts = raw.split(/(?:\s*(?:,|\/|&)\s*|\s+\b(?:and|or)\b\s+)/i).map(part => part.trim()).filter(Boolean);
+    return parts.length > 1;
+}
+
+function normalizeConceptAnswerParts(value) {
+    const raw = String(value ?? "").trim();
+    if (!raw) return [];
+
+    const parts = isConceptAnswerList(raw)
+        ? raw.split(/(?:\s*(?:,|\/|&)\s*|\s+\b(?:and|or)\b\s+)/i)
+        : [raw];
+
+    return parts
+        .map(part => normalizeConceptAnswerKey(part))
+        .filter(Boolean)
+        .sort();
+}
+
+function areConceptAnswersEquivalent(expected, actual) {
+    const expectedParts = normalizeConceptAnswerParts(expected);
+    const actualParts = normalizeConceptAnswerParts(actual);
+
+    if (!expectedParts.length || !actualParts.length) return false;
+    if (expectedParts.length !== actualParts.length) return false;
+
+    return expectedParts.every((part, index) => part === actualParts[index]);
+}
+
+function isStimulusLikeSource(value) {
+    const text = String(value ?? "").trim().toLowerCase();
+    if (!text) return false;
+
+    return /\b(increased|decreased|increase|decrease|low|high|elevated|reduced|plasma|blood|glucose|potassium|calcium|sodium|osmolar|pressure|stretch|volume|fasting|fed state|hypoglycemia|hyperglycemia|ph|temperature)\b/.test(text);
+}
+
+function getRegulationActorLabel(source) {
+    return isStimulusLikeSource(source) ? "What factor" : "Which hormone";
+}
+
+function getMultiAnswerPromptNote(answer) {
+    return isConceptAnswerList(answer) ? " (More than one answer is expected.)" : "";
+}
+
 function collectConceptValues(all, item, key, answer) {
     const answerValues = key === "relationship"
         ? getRelationshipVariants(answer)
@@ -524,14 +653,15 @@ function getConceptPromptSpecs(item) {
     switch (conceptType) {
         case "regulation_pair": {
             if (source && target && relationship) {
+                const actorLabel = getRegulationActorLabel(source);
                 if (/^stimulates$/i.test(relationshipTerm)) {
-                    addSpec(`Which hormone stimulates ${targetTerm} release?`, source, "source", "relationship");
-                    addSpec(`Which hormone stimulates ${targetTerm} secretion?`, source, "source", "relationship");
+                    addSpec(`${actorLabel} stimulates ${targetTerm} release?`, source, "source", "relationship");
+                    addSpec(`${actorLabel} stimulates ${targetTerm} secretion?`, source, "source", "relationship");
                 } else if (/^inhibits$/i.test(relationshipTerm)) {
-                    addSpec(`Which hormone inhibits ${targetTerm} secretion?`, source, "source", "relationship");
-                    addSpec(`Which hormone inhibits ${targetTerm} release?`, source, "source", "relationship");
+                    addSpec(`${actorLabel} inhibits ${targetTerm} secretion?`, source, "source", "relationship");
+                    addSpec(`${actorLabel} inhibits ${targetTerm} release?`, source, "source", "relationship");
                 } else if (/^stimulates\s+/i.test(relationshipTerm) || /^inhibits\s+/i.test(relationshipTerm)) {
-                    addSpec(`Which hormone ${relationshipTerm}?`, source, "source", "relationship");
+                    addSpec(`${actorLabel} ${relationshipTerm}?`, source, "source", "relationship");
                 } else if (relationship) {
                     addSpec(relationQuestion, relationship, "relationship", "relationship", getRelationshipVariants(relationship));
                 }
@@ -548,23 +678,31 @@ function getConceptPromptSpecs(item) {
         }
         case "cell_to_hormone": {
             if (source && target) {
+                const multiAnswerNote = getMultiAnswerPromptNote(target);
+                const isPlural = isConceptAnswerList(target);
+                const hormoneLabel = isPlural ? "Which hormones" : "Which hormone";
+                const verb = isPlural ? "are" : "is";
                 if (/anterior pituitary/i.test(item?.topic || "")) {
-                    addSpec(`Which anterior pituitary cell secretes ${targetTerm}?`, source, "source", "source");
+                    addSpec(`Which anterior pituitary cell secretes ${targetTerm}?${multiAnswerNote}`, source, "source", "source");
                 } else if (/endocrine pancreas|islet/i.test(item?.topic || "")) {
-                    addSpec(`Which pancreatic islet cell secretes ${targetTerm}?`, source, "source", "source");
+                    addSpec(`Which pancreatic islet cell secretes ${targetTerm}?${multiAnswerNote}`, source, "source", "source");
                 } else {
-                    addSpec(`Which cell secretes ${targetTerm}?`, source, "source", "source");
+                    addSpec(`Which cell secretes ${targetTerm}?${multiAnswerNote}`, source, "source", "source");
                 }
 
-                addSpec(`Which hormone is secreted by the ${sourceTerm}?`, target, "target", "target");
+                addSpec(`${hormoneLabel} ${verb} secreted by the ${sourceTerm}?${multiAnswerNote}`, target, "target", "target");
             }
             break;
         }
         case "gland_to_hormone": {
             if (source && target) {
+                const multiAnswerNote = getMultiAnswerPromptNote(target);
+                const isPlural = isConceptAnswerList(target);
+                const hormoneLabel = isPlural ? "Which hormones" : "Which hormone";
+                const verb = isPlural ? "are" : "is";
                 const glandPrompt = /medulla/i.test(source) || /medulla/i.test(item?.topic || "")
-                    ? `Which hormone is released by the ${sourceTerm}?`
-                    : `Which hormone is secreted by the ${sourceTerm}?`;
+                    ? `${hormoneLabel} ${verb} released by the ${sourceTerm}?${multiAnswerNote}`
+                    : `${hormoneLabel} ${verb} secreted by the ${sourceTerm}?${multiAnswerNote}`;
                 addSpec(glandPrompt, target, "target", "target");
                 addSpec(`Which gland secretes ${targetTerm}?`, source, "source", "source");
             }
@@ -572,7 +710,11 @@ function getConceptPromptSpecs(item) {
         }
         case "zone_to_hormone": {
             if (source && target) {
-                addSpec(`Which hormone is produced by the ${sourceTerm}?`, target, "target", "target");
+                const multiAnswerNote = getMultiAnswerPromptNote(target);
+                const isPlural = isConceptAnswerList(target);
+                const hormoneLabel = isPlural ? "Which hormones" : "Which hormone";
+                const verb = isPlural ? "are" : "is";
+                addSpec(`${hormoneLabel} ${verb} produced by the ${sourceTerm}?${multiAnswerNote}`, target, "target", "target");
                 addSpec(`Which adrenal zone produces ${targetTerm}?`, source, "source", "source");
             }
             break;
@@ -599,11 +741,11 @@ function getConceptPromptSpecs(item) {
         case "sequence_step": {
             if (source && target) {
                 if (/glucose metabolism in beta cells/i.test(source)) {
-                    addSpec(`What happens after glucose metabolism in beta cells?`, target, "target", "sequence-forward", undefined, "short");
+                    addSpec(`What happens after glucose metabolism in beta cells?`, target, "target", "sequence-forward");
                 } else if (/increased atp/i.test(source)) {
-                    addSpec(`What happens after increased ATP?`, target, "target", "sequence-forward", undefined, "short");
+                    addSpec(`What happens after increased ATP?`, target, "target", "sequence-forward");
                 } else if (/cholesterol/i.test(source) && /pregnenolone/i.test(target)) {
-                    addSpec(`What is the first step in steroid hormone synthesis?`, target, "target", "sequence-forward", undefined, "short");
+                    addSpec(`What is the first step in steroid hormone synthesis?`, target, "target", "sequence-forward");
                 } else {
                     addSpec(`What comes next after ${sourceTerm}${scopeLabel ? ` in ${scopeLabel}` : ""}?`, target, "target", "sequence-forward");
                 }
@@ -614,24 +756,24 @@ function getConceptPromptSpecs(item) {
         }
         case "consequence_pair": {
             if (source && target) {
-                addSpec(`What can ${sourceTerm} cause?`, target, "target", "fact", undefined, "short");
-                addSpec(`Which consequence is associated with ${sourceTerm}?`, target, "target", "fact", undefined, "short");
+                addSpec(`What can ${sourceTerm} cause?`, target, "target", "fact");
+                addSpec(`Which consequence is associated with ${sourceTerm}?`, target, "target", "fact");
             }
             break;
         }
         case "axis_sequence": {
             if (source && target) {
-                addSpec(`Which sequence correctly describes the ${getConceptAxisLabel(item)}?`, target, "target", "sequence-forward", undefined, "short");
-                addSpec(`What comes after ${sourceTerm} in the ${getConceptAxisLabel(item)}?`, target, "target", "sequence-forward", undefined, "short");
+                addSpec(`Which sequence correctly describes the ${getConceptAxisLabel(item)}?`, target, "target", "sequence-forward");
+                addSpec(`What comes after ${sourceTerm} in the ${getConceptAxisLabel(item)}?`, target, "target", "sequence-forward");
             }
             break;
         }
         default: {
             if (source && target) {
                 if (/^stimulates$/i.test(relationshipTerm)) {
-                    addSpec(`Which hormone stimulates ${targetTerm} release?`, source, "source", "relationship");
+                    addSpec(`${getRegulationActorLabel(source)} stimulates ${targetTerm} release?`, source, "source", "relationship");
                 } else if (/^inhibits$/i.test(relationshipTerm)) {
-                    addSpec(`Which hormone inhibits ${targetTerm} secretion?`, source, "source", "relationship");
+                    addSpec(`${getRegulationActorLabel(source)} inhibits ${targetTerm} secretion?`, source, "source", "relationship");
                 } else if (relationship) {
                     addSpec(relationQuestion, relationship, "relationship", "relationship", getRelationshipVariants(relationship));
                 }
@@ -655,8 +797,7 @@ function getConceptPromptSpecs(item) {
 function createConceptQuestion(item, all) {
     const difficulty = normalizeQuizValue(item?.difficulty);
     const preferShort = /hard|advanced|challenging/.test(difficulty);
-    const promptSpecs = getConceptPromptSpecs(item);
-    const builders = [];
+    const promptSpecs = shuffled(getConceptPromptSpecs(item));
 
     for (const spec of promptSpecs) {
         const mcqBuilder = () => buildConceptMcqQuestion({
@@ -676,16 +817,15 @@ function createConceptQuestion(item, all) {
             conceptPromptKind: spec.conceptPromptKind
         });
 
-        if (spec.preferredType === "short" || preferShort) {
-            builders.push(shortBuilder, mcqBuilder);
-        } else {
-            builders.push(mcqBuilder, shortBuilder);
-        }
-    }
+        const preferredType = spec.preferredType || (preferShort ? "short" : "mcq");
+        const builders = preferredType === "short"
+            ? [shortBuilder, mcqBuilder]
+            : [mcqBuilder, shortBuilder];
 
-    for (const build of shuffled(builders)) {
-        const question = build();
-        if (question) return question;
+        for (const build of builders) {
+            const question = build();
+            if (question) return question;
+        }
     }
 
     const source = String(item?.source ?? "").trim();
@@ -1233,6 +1373,10 @@ function scoreCurrent(val) {
     }
 
     let isCorrect = false;
+
+    if (q._mode === "concept" || q.conceptRef) {
+        isCorrect = rawAnswers.some(answer => areConceptAnswersEquivalent(answer, val));
+    }
 
     if (acceptedAnswers.has(userNorm) || acceptedAnswers.has(userLoose)) {
         isCorrect = true;
