@@ -261,10 +261,20 @@ window.reviewMissed = reviewMissed;
 async function smartFetch(fileName) {
     const paths = [`assets/data/${fileName}`, `data/${fileName}`, `quizzes/${fileName}`, `../assets/data/${fileName}`];
     for (let path of paths) {
+        let res;
         try {
-            const res = await fetch(path);
-            if (res.ok) return await res.json();
-        } catch (e) { continue; }
+            res = await fetch(path);
+        } catch (e) {
+            continue;
+        }
+
+        if (!res.ok) continue;
+
+        try {
+            return await res.json();
+        } catch (error) {
+            throw new Error(`Invalid JSON in ${fileName} (${path}): ${error.message}`);
+        }
     }
     console.warn(`Warning: Unable to fetch ${fileName} from any path`);
     throw new Error(`File not found: ${fileName}`);
