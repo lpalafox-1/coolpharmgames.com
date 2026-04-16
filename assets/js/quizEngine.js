@@ -731,7 +731,25 @@ function getConceptPromptSpecs(item) {
         }
         case "fact_statement": {
             if (source && target) {
-                const isAdrenocorticalOriginFact = /adrenocortical hormones/i.test(source) && /cholesterol/i.test(target);
+                const isSteroidActionFact = /steroid hormones?/i.test(source)
+                    && /(diffuse through the cell membrane|bind intracellular receptors?|intracellular receptors?)/i.test(target);
+                if (isSteroidActionFact) {
+                    const actionAliases = Array.isArray(item?.answer_aliases)
+                        ? item.answer_aliases
+                        : undefined;
+                    addSpec(
+                        "Which statement best describes how steroid hormones act at target cells?",
+                        target,
+                        "target",
+                        "fact-action",
+                        actionAliases,
+                        "short"
+                    );
+                    break;
+                }
+
+                const isAdrenocorticalOriginFact = /adrenocortical hormones/i.test(source)
+                    && /cholesterol/i.test(`${target} ${relationship}`);
                 if (isAdrenocorticalOriginFact) {
                     const originAliases = Array.isArray(item?.answer_aliases)
                         ? item.answer_aliases
@@ -739,6 +757,26 @@ function getConceptPromptSpecs(item) {
                     addSpec(
                         "Which statement specifically describes the origin of adrenocortical hormones?",
                         target,
+                        "target",
+                        "fact-origin",
+                        originAliases,
+                        "short"
+                    );
+                    break;
+                }
+
+                const isSteroidOriginFact = /steroid hormones?/i.test(source)
+                    && /cholesterol/i.test(`${target} ${relationship}`);
+                if (isSteroidOriginFact) {
+                    const originAnswer = /derived from/i.test(target)
+                        ? target
+                        : `Derived from ${formatConceptTerm(target)}`;
+                    const originAliases = Array.isArray(item?.answer_aliases)
+                        ? [...item.answer_aliases, target]
+                        : [target];
+                    addSpec(
+                        "Which statement specifically describes the origin of steroid hormones?",
+                        originAnswer,
                         "target",
                         "fact-origin",
                         originAliases,
