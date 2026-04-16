@@ -731,6 +731,22 @@ function getConceptPromptSpecs(item) {
         }
         case "fact_statement": {
             if (source && target) {
+                const isAdrenocorticalOriginFact = /adrenocortical hormones/i.test(source) && /cholesterol/i.test(target);
+                if (isAdrenocorticalOriginFact) {
+                    const originAliases = Array.isArray(item?.answer_aliases)
+                        ? item.answer_aliases
+                        : undefined;
+                    addSpec(
+                        "Which statement specifically describes the origin of adrenocortical hormones?",
+                        target,
+                        "target",
+                        "fact-origin",
+                        originAliases,
+                        "short"
+                    );
+                    break;
+                }
+
                 const useTargetAsTopic = looksLikeConceptStatement(source) && !looksLikeConceptStatement(target);
                 const factTopic = useTargetAsTopic ? targetTerm : sourceTerm;
                 const factAnswer = useTargetAsTopic ? source : target;
