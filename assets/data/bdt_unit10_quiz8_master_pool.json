@@ -9,6 +9,7 @@
     "target": "Prolactin",
     "relationship": "inhibits",
     "difficulty": "easy",
+    "prompt_bias": "mcq_or_short",
     "tags": ["dopamine", "prolactin", "pituitary", "hypothalamus"]
   },
   {
@@ -21,6 +22,8 @@
     "target": "TSH",
     "relationship": "stimulates",
     "difficulty": "easy",
+    "prompt_bias": "mcq_or_short",
+    "answer_aliases": ["thyrotropin-releasing hormone", "thyroid-releasing hormone"],
     "tags": ["TRH", "TSH", "pituitary", "hypothalamus"]
   },
   {
@@ -33,6 +36,8 @@
     "target": "Prolactin",
     "relationship": "stimulates",
     "difficulty": "easy",
+    "prompt_bias": "mcq_or_short",
+    "answer_aliases": ["thyrotropin-releasing hormone", "thyroid-releasing hormone"],
     "tags": ["TRH", "prolactin", "pituitary", "hypothalamus"]
   },
   {
@@ -45,6 +50,8 @@
     "target": "ACTH",
     "relationship": "stimulates",
     "difficulty": "easy",
+    "prompt_bias": "mcq_or_short",
+    "answer_aliases": ["corticotropin-releasing hormone"],
     "tags": ["CRH", "ACTH", "pituitary", "hypothalamus"]
   },
   {
@@ -57,6 +64,8 @@
     "target": "LH",
     "relationship": "stimulates",
     "difficulty": "easy",
+    "prompt_bias": "mcq_or_short",
+    "answer_aliases": ["gonadotropin-releasing hormone"],
     "tags": ["GnRH", "LH", "pituitary", "hypothalamus"]
   },
   {
@@ -69,6 +78,8 @@
     "target": "FSH",
     "relationship": "stimulates",
     "difficulty": "easy",
+    "prompt_bias": "mcq_or_short",
+    "answer_aliases": ["gonadotropin-releasing hormone"],
     "tags": ["GnRH", "FSH", "pituitary", "hypothalamus"]
   },
   {
@@ -81,6 +92,8 @@
     "target": "GH",
     "relationship": "stimulates",
     "difficulty": "easy",
+    "prompt_bias": "mcq_or_short",
+    "answer_aliases": ["growth hormone-releasing hormone"],
     "tags": ["GHRH", "GH", "pituitary", "hypothalamus"]
   },
   {
@@ -93,6 +106,7 @@
     "target": "GH",
     "relationship": "inhibits",
     "difficulty": "easy",
+    "prompt_bias": "mcq_or_short",
     "tags": ["somatostatin", "GH", "pituitary", "hypothalamus"]
   },
   {
@@ -103,8 +117,10 @@
     "concept_type": "cell_to_hormone",
     "source": "Thyrotropes",
     "target": "TSH",
-    "relationship": "secretes",
+    "relationship": "secrete",
     "difficulty": "easy",
+    "prompt_bias": "mcq_or_short",
+    "answer_aliases": ["thyroid-stimulating hormone"],
     "tags": ["thyrotropes", "TSH", "pituitary"]
   },
   {
@@ -115,8 +131,10 @@
     "concept_type": "cell_to_hormone",
     "source": "Corticotropes",
     "target": "ACTH",
-    "relationship": "secretes",
+    "relationship": "secrete",
     "difficulty": "easy",
+    "prompt_bias": "mcq_or_short",
+    "answer_aliases": ["adrenocorticotropic hormone"],
     "tags": ["corticotropes", "ACTH", "pituitary"]
   },
   {
@@ -127,8 +145,15 @@
     "concept_type": "cell_to_hormone",
     "source": "Gonadotropes",
     "target": "LH and FSH",
-    "relationship": "secretes",
+    "relationship": "secrete",
     "difficulty": "easy",
+    "prompt_bias": "mcq_preferred",
+    "answer_count": 2,
+    "answer_aliases": [
+      "FSH and LH",
+      "luteinizing hormone and follicle-stimulating hormone",
+      "follicle-stimulating hormone and luteinizing hormone"
+    ],
     "tags": ["gonadotropes", "LH", "FSH", "pituitary"]
   },
   {
@@ -139,9 +164,11 @@
     "concept_type": "cell_to_hormone",
     "source": "Somatotropes",
     "target": "GH",
-    "relationship": "secretes",
+    "relationship": "secrete",
     "difficulty": "easy",
-    "tags": ["somatotropes", "GH", "pituitary"]
+    "prompt_bias": "mcq_or_short",
+    "answer_aliases": ["growth hormone"],
+    "tags": ["somatotropes", "GH", "pituitary", "growth hormone"]
   },
   {
     "id": "lactotropes-prolactin",
@@ -151,8 +178,9 @@
     "concept_type": "cell_to_hormone",
     "source": "Lactotropes",
     "target": "Prolactin",
-    "relationship": "secretes",
+    "relationship": "secrete",
     "difficulty": "easy",
+    "prompt_bias": "mcq_or_short",
     "tags": ["lactotropes", "prolactin", "pituitary"]
   },
   {
@@ -162,9 +190,15 @@
     "subtopic": "Gonadotropins",
     "concept_type": "function_pair",
     "source": "LH and FSH",
-    "target": "Regulating gonadal function and reproduction",
+    "target": "Regulate gonadal function and reproduction",
     "relationship": "responsible_for",
     "difficulty": "easy",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": [
+      "regulating gonadal function and reproduction",
+      "gonadal function and reproduction",
+      "reproduction and gonadal function"
+    ],
     "tags": ["LH", "FSH", "gonads", "reproduction"]
   },
   {
@@ -177,6 +211,8 @@
     "target": "Thyroid gland",
     "relationship": "stimulates thyroid hormone synthesis and release",
     "difficulty": "easy",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": ["thyroid-stimulating hormone"],
     "tags": ["TSH", "thyroid", "T3", "T4"]
   },
   {
@@ -186,9 +222,11 @@
     "subtopic": "Synthesis",
     "concept_type": "fact_statement",
     "source": "Iodine",
-    "target": "Thyroid hormone synthesis",
-    "relationship": "is essential for",
+    "target": "Essential for thyroid hormone synthesis",
+    "relationship": "is",
     "difficulty": "easy",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": ["is essential for thyroid hormone synthesis"],
     "tags": ["iodine", "thyroid", "synthesis"]
   },
   {
@@ -198,9 +236,14 @@
     "subtopic": "Feedback regulation",
     "concept_type": "fact_statement",
     "source": "Negative feedback",
-    "target": "Maintaining homeostasis by inhibiting further hormone secretion",
-    "relationship": "is the most common mechanism for",
+    "target": "Most common mechanism that maintains homeostasis by inhibiting further hormone secretion",
+    "relationship": "is",
     "difficulty": "easy",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": [
+      "maintaining homeostasis by inhibiting further hormone secretion",
+      "most common mechanism for maintaining homeostasis by inhibiting further hormone secretion"
+    ],
     "tags": ["negative feedback", "homeostasis", "endocrine"]
   },
   {
@@ -213,6 +256,8 @@
     "target": "Growth hormone",
     "relationship": "secretes",
     "difficulty": "easy",
+    "prompt_bias": "mcq_or_short",
+    "answer_aliases": ["GH"],
     "tags": ["anterior pituitary", "GH", "growth hormone"]
   },
   {
@@ -225,6 +270,8 @@
     "target": "Endoplasmic reticulum",
     "relationship": "directs entry into",
     "difficulty": "easy",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": ["ER"],
     "tags": ["preprohormone", "ER", "peptide hormone", "signal peptide"]
   },
   {
@@ -234,9 +281,11 @@
     "subtopic": "General properties",
     "concept_type": "fact_statement",
     "source": "Steroid hormones",
-    "target": "Diffuse through the cell membrane to bind intracellular receptors",
+    "target": "Diffuse through the cell membrane and bind intracellular receptors",
     "relationship": "do",
     "difficulty": "easy",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": ["diffuse through the cell membrane to bind intracellular receptors"],
     "tags": ["steroid hormone", "intracellular receptor", "membrane"]
   },
   {
@@ -249,6 +298,7 @@
     "target": "Pregnenolone",
     "relationship": "is converted to in mitochondria as the first step of steroid synthesis",
     "difficulty": "medium",
+    "prompt_bias": "mcq_preferred",
     "tags": ["cholesterol", "pregnenolone", "steroid synthesis", "mitochondria"]
   },
   {
@@ -258,9 +308,11 @@
     "subtopic": "Steroid synthesis",
     "concept_type": "fact_statement",
     "source": "Adrenocortical hormones",
-    "target": "Cholesterol",
-    "relationship": "are derived from",
+    "target": "Derived from cholesterol",
+    "relationship": "are",
     "difficulty": "easy",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": ["cholesterol", "are derived from cholesterol"],
     "tags": ["adrenal cortex", "cholesterol", "steroid"]
   },
   {
@@ -273,6 +325,7 @@
     "target": "Aldosterone",
     "relationship": "produces",
     "difficulty": "easy",
+    "prompt_bias": "mcq_or_short",
     "tags": ["zona glomerulosa", "aldosterone", "adrenal cortex"]
   },
   {
@@ -285,6 +338,7 @@
     "target": "Cortisol",
     "relationship": "produces",
     "difficulty": "easy",
+    "prompt_bias": "mcq_or_short",
     "tags": ["zona fasciculata", "cortisol", "adrenal cortex"]
   },
   {
@@ -297,6 +351,8 @@
     "target": "Androgens",
     "relationship": "produces",
     "difficulty": "easy",
+    "prompt_bias": "mcq_or_short",
+    "answer_aliases": ["androgen"],
     "tags": ["zona reticularis", "androgens", "adrenal cortex"]
   },
   {
@@ -309,6 +365,12 @@
     "target": "Norepinephrine and epinephrine",
     "relationship": "releases",
     "difficulty": "easy",
+    "prompt_bias": "mcq_preferred",
+    "answer_count": 2,
+    "answer_aliases": [
+      "epinephrine and norepinephrine",
+      "catecholamines"
+    ],
     "tags": ["adrenal medulla", "epinephrine", "norepinephrine", "catecholamines"]
   },
   {
@@ -321,6 +383,7 @@
     "target": "Aldosterone",
     "relationship": "stimulates",
     "difficulty": "medium",
+    "prompt_bias": "mcq_preferred",
     "tags": ["angiotensin II", "aldosterone", "RAAS"]
   },
   {
@@ -332,7 +395,10 @@
     "source": "Increased plasma potassium",
     "target": "Aldosterone",
     "relationship": "stimulates",
+    "source_label": "factor",
     "difficulty": "medium",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": ["high potassium", "increased potassium", "elevated plasma potassium"],
     "tags": ["potassium", "aldosterone", "zona glomerulosa"]
   },
   {
@@ -345,6 +411,8 @@
     "target": "ACTH to cortisol",
     "relationship": "stimulates the HPA axis sequence",
     "difficulty": "medium",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": ["ACTH then cortisol", "ACTH → cortisol", "ACTH to cortisol"],
     "tags": ["CRH", "ACTH", "cortisol", "HPA axis"]
   },
   {
@@ -357,6 +425,9 @@
     "target": "CRH and ACTH",
     "relationship": "inhibits",
     "difficulty": "medium",
+    "prompt_bias": "mcq_preferred",
+    "answer_count": 2,
+    "answer_aliases": ["ACTH and CRH"],
     "tags": ["cortisol", "CRH", "ACTH", "negative feedback", "HPA axis"]
   }
 ]
