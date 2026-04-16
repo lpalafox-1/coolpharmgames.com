@@ -806,5 +806,60 @@
       "angiotensin II"
     ],
     "tags": ["angiotensin II", "aldosterone", "RAAS", "chronic regulation"]
+  },
+  {
+    "id": "acth-adrenal-function",
+    "unit": 10,
+    "topic": "Anterior Pituitary",
+    "subtopic": "Hormone functions",
+    "concept_type": "function_pair",
+    "source": "ACTH",
+    "target": "Stimulates the adrenal cortex to produce adrenal hormones",
+    "relationship": "does",
+    "difficulty": "easy",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": [
+      "stimulates the adrenal cortex to produce adrenal hormones",
+      "stimulates adrenal hormone production",
+      "stimulates the adrenal gland"
+    ],
+    "tags": ["ACTH", "adrenal cortex", "adrenal hormones", "anterior pituitary"]
+  },
+  {
+    "id": "gh-growth-protein-synthesis",
+    "unit": 10,
+    "topic": "Anterior Pituitary",
+    "subtopic": "Hormone functions",
+    "concept_type": "function_pair",
+    "source": "GH",
+    "target": "Promotes growth and protein synthesis",
+    "relationship": "does",
+    "difficulty": "easy",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": [
+      "promotes growth and protein synthesis",
+      "growth and protein synthesis",
+      "growth"
+    ],
+    "tags": ["GH", "growth hormone", "growth", "protein synthesis", "anterior pituitary"]
+  },
+  {
+    "id": "prolactin-lactation",
+    "unit": 10,
+    "topic": "Anterior Pituitary",
+    "subtopic": "Hormone functions",
+    "concept_type": "function_pair",
+    "source": "Prolactin",
+    "target": "Stimulates lactation and milk production",
+    "relationship": "does",
+    "difficulty": "easy",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": [
+      "stimulates lactation",
+      "stimulates milk production",
+      "lactation and milk production",
+      "milk production"
+    ],
+    "tags": ["prolactin", "lactation", "milk production", "anterior pituitary"]
   }
 ]
