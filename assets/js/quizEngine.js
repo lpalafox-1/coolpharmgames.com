@@ -532,7 +532,13 @@ function collectConceptValues(all, item, key, answer) {
 }
 
 function buildConceptMcqQuestion({ item, all, prompt, answer, answerText, key, conceptPromptKind }) {
-    const distractors = collectConceptValues(all, item, key, answer);
+    let distractors = collectConceptValues(all, item, key, answer);
+
+    // Keep origin-style adrenal question unambiguous by excluding receptor-action statements.
+    if (item?.id === "adrenal-cortex-cholesterol-derived" && conceptPromptKind === "fact-origin") {
+        distractors = distractors.filter(value => !/diffuse through the cell membrane|intracellular receptors?/i.test(String(value)));
+    }
+
     if (distractors.length < 3 || !answer) return null;
 
     return {
@@ -751,15 +757,22 @@ function getConceptPromptSpecs(item) {
                 const isAdrenocorticalOriginFact = /adrenocortical hormones/i.test(source)
                     && /cholesterol/i.test(`${target} ${relationship}`);
                 if (isAdrenocorticalOriginFact) {
-                    const originAliases = Array.isArray(item?.answer_aliases)
-                        ? item.answer_aliases
-                        : undefined;
+                    const originStatement = "Are derived from cholesterol";
+
                     addSpec(
                         "Which statement specifically describes the origin of adrenocortical hormones?",
-                        target,
+                        originStatement,
                         "target",
                         "fact-origin",
-                        originAliases,
+                        undefined,
+                        "mcq-only"
+                    );
+                    addSpec(
+                        "Adrenocortical hormones are derived from what?",
+                        "Cholesterol",
+                        "target",
+                        "fact-origin",
+                        undefined,
                         "short"
                     );
                     break;
@@ -874,7 +887,9 @@ function createConceptQuestion(item, all) {
         const preferredType = spec.preferredType || (preferShort ? "short" : "mcq");
         const builders = preferredType === "short"
             ? [shortBuilder, mcqBuilder]
-            : [mcqBuilder, shortBuilder];
+            : preferredType === "mcq-only"
+                ? [mcqBuilder]
+                : [mcqBuilder, shortBuilder];
 
         for (const build of builders) {
             const question = build();
