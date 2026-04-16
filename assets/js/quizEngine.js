@@ -579,6 +579,26 @@ function buildConceptHintText(question) {
     const source = concept.source || "N/A";
     const target = concept.target || "N/A";
     const relationship = concept.relationship || "N/A";
+    const conceptType = normalizeQuizValue(concept?.concept_type);
+    const isMcqConceptQuestion = question?.type === "mcq";
+
+    if (isMcqConceptQuestion && ["cell_to_hormone", "gland_to_hormone", "zone_to_hormone"].includes(conceptType)) {
+        const context = `${concept?.topic || ""} ${concept?.subtopic || ""}`;
+        let clue = "Think endocrine structure-to-hormone mapping in this context.";
+
+        if (conceptType === "cell_to_hormone") {
+            clue = /anterior pituitary/i.test(context)
+                ? "Think anterior pituitary cell-to-hormone pairing."
+                : "Think cell-to-hormone pairing in this endocrine tissue.";
+        } else if (conceptType === "gland_to_hormone") {
+            clue = "Think gland-level hormone secretion/release patterns.";
+        } else if (conceptType === "zone_to_hormone") {
+            clue = "Think adrenal cortical zone specialization.";
+        }
+
+        lines.push(`💡 ${clue}`);
+        return lines.join("\n");
+    }
 
     switch (question?.conceptPromptKind) {
         case "relationship":
@@ -727,6 +747,26 @@ function getConceptPromptSpecs(item) {
         }
         case "function_pair": {
             if (source && target) {
+                if (item?.id === "na-k-atpase-supports-nis") {
+                    addSpec(
+                        "Na+/K+ ATPase supports iodide trapping by maintaining what?",
+                        target,
+                        "target",
+                        "target",
+                        undefined,
+                        "short"
+                    );
+                    addSpec(
+                        "What does Na+/K+ ATPase help maintain during iodide trapping?",
+                        target,
+                        "target",
+                        "target",
+                        undefined,
+                        "short"
+                    );
+                    break;
+                }
+
                 if (/(\band\b|,)/i.test(source)) {
                     addSpec(`What are ${sourceTerm} responsible for${stateClause}?`, target, "target", "fact", undefined, "short");
                 } else {
