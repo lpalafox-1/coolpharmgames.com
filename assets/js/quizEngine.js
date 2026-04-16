@@ -485,7 +485,56 @@ function getMultiAnswerPromptNote(answer) {
     return isConceptAnswerList(answer) ? " (More than one answer is expected.)" : "";
 }
 
-function collectConceptValues(all, item, key, answer) {
+function stripHtmlTags(value) {
+    return String(value ?? "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function isStatementRecognitionPrompt(prompt) {
+    const plain = normalizeQuizValue(stripHtmlTags(prompt));
+    return plain.startsWith("which statement") || /\bstatement\b.*\bdescribes\b/.test(plain) || /\bbest describes\b/.test(plain);
+}
+
+function isDirectRecallConceptPrompt(prompt) {
+    const plain = normalizeQuizValue(stripHtmlTags(prompt));
+    if (!plain || isStatementRecognitionPrompt(plain)) return false;
+
+    return /^(what|which)\s+(hormone|hormones|cell|cells|gland|zone|step|steps|factor|process|mechanism|function|comes|happens|is|are|does|do|can)\b/.test(plain)
+        || /\bderived from what\b/.test(plain)
+        || plain.startsWith("complete the relationship");
+}
+
+function isConciseConceptAnswer(answer) {
+    const text = String(answer ?? "").trim();
+    if (!text) return false;
+    if (looksLikeConceptStatement(text)) return false;
+    if (isConceptAnswerList(text)) return false;
+    return text.split(/\s+/).length <= 7;
+}
+
+function normalizeConceptPreferredType(value, preferShort = false) {
+    const normalized = normalizeQuizValue(value);
+    switch (normalized) {
+        case "mcq-only":
+        case "mcq_required":
+            return "mcq-only";
+        case "short-only":
+        case "short_required":
+            return "short-only";
+        case "short_preferred":
+        case "short":
+            return "short_preferred";
+        case "mcq_preferred":
+        case "mcq":
+            return "mcq_preferred";
+        case "mcq_or_short":
+        case "mcq-or-short":
+            return preferShort ? "short_preferred" : "mcq_preferred";
+        default:
+            return preferShort ? "short_preferred" : "mcq_preferred";
+    }
+}
+
+function collectConceptDistractorCandidates(all, item, key, answer) {
     const answerValues = key === "relationship"
         ? getRelationshipVariants(answer)
         : [normalizeQuizValue(answer)];
@@ -515,7 +564,7 @@ function collectConceptValues(all, item, key, answer) {
     pools.push(all.filter(entry => isConceptEntry(entry) && entry !== item && entry?.[key]));
 
     const seen = new Set();
-    const values = [];
+    const candidates = [];
 
     for (const pool of pools) {
         for (const entry of shuffled(pool)) {
@@ -523,21 +572,46 @@ function collectConceptValues(all, item, key, answer) {
             const normalized = normalizeQuizValue(value);
             if (!value || excluded.has(normalized) || seen.has(normalized)) continue;
             seen.add(normalized);
-            values.push(value);
-            if (values.length >= 3) return values;
+            candidates.push({ value, normalized, entry });
+            if (candidates.length >= 12) return candidates;
         }
     }
 
-    return values;
+    return candidates;
 }
 
-function buildConceptMcqQuestion({ item, all, prompt, answer, answerText, key, conceptPromptKind }) {
-    let distractors = collectConceptValues(all, item, key, answer);
+function filterConceptDistractorCandidates({ item, key, conceptPromptKind, candidates }) {
+    let filtered = [...candidates];
+    const conceptType = normalizeQuizValue(item?.concept_type);
+    const sourceNorm = normalizeQuizValue(item?.source);
+
+    // Prevent one-best-answer ambiguity for statement MCQs by excluding other facts about the same source.
+    if (conceptType === "fact_statement" && key === "target" && sourceNorm) {
+        filtered = filtered.filter(candidate => normalizeQuizValue(candidate?.entry?.source) !== sourceNorm);
+    }
 
     // Keep origin-style adrenal question unambiguous by excluding receptor-action statements.
     if (item?.id === "adrenal-cortex-cholesterol-derived" && conceptPromptKind === "fact-origin") {
-        distractors = distractors.filter(value => !/diffuse through the cell membrane|intracellular receptors?/i.test(String(value)));
+        filtered = filtered.filter(candidate => !/diffuse through the cell membrane|intracellular receptors?/i.test(String(candidate?.value)));
     }
+
+    // Keep steroid-action statements focused on mechanism, not biosynthetic origin.
+    if (conceptPromptKind === "fact-action") {
+        filtered = filtered.filter(candidate => !/derived from cholesterol|cholesterol precursor/i.test(String(candidate?.value)));
+    }
+
+    return filtered;
+}
+
+function buildConceptMcqQuestion({ item, all, prompt, answer, answerText, key, conceptPromptKind }) {
+    let distractorCandidates = collectConceptDistractorCandidates(all, item, key, answer);
+    distractorCandidates = filterConceptDistractorCandidates({
+        item,
+        key,
+        conceptPromptKind,
+        candidates: distractorCandidates
+    });
+    const distractors = distractorCandidates.map(candidate => candidate.value);
 
     if (distractors.length < 3 || !answer) return null;
 
@@ -567,6 +641,73 @@ function buildConceptShortQuestion({ item, prompt, answer, answerText, conceptPr
     };
 }
 
+function getConceptHintThemeClue(concept) {
+    const conceptType = normalizeQuizValue(concept?.concept_type);
+    const context = `${concept?.topic || ""} ${concept?.subtopic || ""} ${concept?.source || ""} ${concept?.target || ""} ${(concept?.tags || []).join(" ")}`.toLowerCase();
+
+    switch (conceptType) {
+        case "cell_to_hormone":
+            return /anterior pituitary/i.test(context)
+                ? "Think anterior pituitary cell-to-hormone pairing."
+                : "Think endocrine cell-type to hormone pairing in this tissue.";
+        case "gland_to_hormone":
+            return "Think gland-level hormone secretion and release patterns.";
+        case "zone_to_hormone":
+            return "Think adrenal cortical zone specialization and its signature outputs.";
+        case "regulation_pair":
+            return "Think upstream-to-downstream control direction: stimulatory vs inhibitory.";
+        case "sequence_step":
+        case "axis_sequence":
+            return "Think immediate next-step ordering in the endocrine pathway.";
+        case "function_pair":
+            if (/thyroid hormone synthesis|iodide|organification|peroxidase|tpo|thyroglobulin|nis/.test(context)) {
+                return "Think about iodide processing during thyroid hormone formation.";
+            }
+            if (/adrenal|cortisol|aldosterone|raas|hpa/.test(context)) {
+                return "Think about the key physiologic function within adrenal regulation.";
+            }
+            return "Think about the core physiologic role or mechanism.";
+        case "fact_statement":
+            if (/feedback|homeostasis/.test(context)) return "Think core endocrine feedback principles and direction.";
+            if (/cholesterol|derived|origin|precursor/.test(context)) return "Think hormone class origin and precursor chemistry.";
+            if (/receptor|intracellular|membrane/.test(context)) return "Think hormone class properties and receptor location.";
+            return "Think a defining property or mechanism of this concept.";
+        default:
+            return "Think endocrine pathway context, role, and category clues.";
+    }
+}
+
+function getConceptHintPathwayClue(concept) {
+    const subtopic = String(concept?.subtopic || "").trim();
+    const topic = String(concept?.topic || "").trim();
+
+    if (subtopic) return `Pathway/family clue: ${subtopic}.`;
+    if (topic) return `Pathway/family clue: ${topic}.`;
+    return "";
+}
+
+function getConceptHintPromptCue(question, isMcqConceptQuestion) {
+    const kind = normalizeQuizValue(question?.conceptPromptKind);
+    if (!kind) return "";
+
+    const cues = {
+        relationship: "Focus on control direction (upregulation vs downregulation).",
+        "sequence-forward": "Focus on the immediate next step, not a distant downstream effect.",
+        "sequence-backward": "Focus on the immediate upstream step in the sequence.",
+        source: "Focus on the regulator or producer category rather than a process description.",
+        target: "Focus on the output hormone/process category.",
+        fact: "Focus on definition-level mechanism or property clues.",
+        "fact-origin": "Focus on biosynthetic origin and precursor class.",
+        "fact-action": "Focus on mechanism of action rather than biosynthetic source."
+    };
+
+    if (isMcqConceptQuestion) {
+        return cues[kind] || "Use pathway-level clues to eliminate options.";
+    }
+
+    return cues[kind] || "Use the pathway context to recall the best matching concept.";
+}
+
 function buildConceptHintText(question) {
     const concept = question?.conceptRef;
     if (!concept) return null;
@@ -576,55 +717,17 @@ function buildConceptHintText(question) {
     if (scope) lines.push(`📘 ${scope}`);
     if (concept.concept_type) lines.push(`🧠 Type: ${concept.concept_type}`);
 
-    const source = concept.source || "N/A";
-    const target = concept.target || "N/A";
-    const relationship = concept.relationship || "N/A";
-    const conceptType = normalizeQuizValue(concept?.concept_type);
     const isMcqConceptQuestion = question?.type === "mcq";
+    const themeClue = getConceptHintThemeClue(concept);
+    const pathwayClue = getConceptHintPathwayClue(concept);
+    const promptCue = getConceptHintPromptCue(question, isMcqConceptQuestion);
 
-    if (isMcqConceptQuestion && ["cell_to_hormone", "gland_to_hormone", "zone_to_hormone"].includes(conceptType)) {
-        const context = `${concept?.topic || ""} ${concept?.subtopic || ""}`;
-        let clue = "Think endocrine structure-to-hormone mapping in this context.";
-
-        if (conceptType === "cell_to_hormone") {
-            clue = /anterior pituitary/i.test(context)
-                ? "Think anterior pituitary cell-to-hormone pairing."
-                : "Think cell-to-hormone pairing in this endocrine tissue.";
-        } else if (conceptType === "gland_to_hormone") {
-            clue = "Think gland-level hormone secretion/release patterns.";
-        } else if (conceptType === "zone_to_hormone") {
-            clue = "Think adrenal cortical zone specialization.";
-        }
-
-        lines.push(`💡 ${clue}`);
-        return lines.join("\n");
-    }
-
-    switch (question?.conceptPromptKind) {
-        case "relationship":
-            lines.push(`🔗 Source: ${source}`);
-            lines.push(`🎯 Target: ${target}`);
-            break;
-        case "sequence-forward":
-            lines.push(`➡️ Starts with: ${source}`);
-            lines.push(`➡️ Continues to: ${target}`);
-            break;
-        case "sequence-backward":
-            lines.push(`⬅️ Previous step: ${source}`);
-            lines.push(`⬅️ Followed by: ${target}`);
-            break;
-        case "source":
-            lines.push(`🎯 Target: ${target}`);
-            lines.push(`🔗 Relationship: ${relationship}`);
-            break;
-        case "fact":
-            lines.push(`🧩 Source: ${source}`);
-            lines.push(`🧩 Target: ${target}`);
-            break;
-        default:
-            lines.push(`🔗 Source: ${source}`);
-            lines.push(`🎯 Target: ${target}`);
-            if (relationship && relationship !== "N/A") lines.push(`↔ Relationship: ${relationship}`);
+    if (themeClue) lines.push(`💡 ${themeClue}`);
+    if (pathwayClue) lines.push(`🧭 ${pathwayClue}`);
+    if (!isMcqConceptQuestion && promptCue) {
+        lines.push(`📝 ${promptCue}`);
+    } else if (isMcqConceptQuestion && promptCue) {
+        lines.push(`🧩 ${promptCue}`);
     }
 
     return lines.join("\n");
@@ -667,7 +770,7 @@ function getConceptPromptSpecs(item) {
     const scopeLabel = formatConceptTerm(scopeName);
     const specs = [];
 
-    const addSpec = (prompt, answer, key, conceptPromptKind, answerText, preferredType = "mcq") => {
+    const addSpec = (prompt, answer, key, conceptPromptKind, answerText, preferredType = "mcq_preferred") => {
         if (!prompt || answer === undefined || answer === null || String(prompt).trim() === "") return;
         specs.push({ prompt, answer, key, conceptPromptKind, answerText, preferredType });
     };
@@ -704,19 +807,20 @@ function getConceptPromptSpecs(item) {
         }
         case "cell_to_hormone": {
             if (source && target) {
-                const multiAnswerNote = getMultiAnswerPromptNote(target);
+                const sourceAnswerNote = getMultiAnswerPromptNote(source);
+                const targetAnswerNote = getMultiAnswerPromptNote(target);
                 const isPlural = isConceptAnswerList(target);
                 const hormoneLabel = isPlural ? "Which hormones" : "Which hormone";
                 const verb = isPlural ? "are" : "is";
                 if (/anterior pituitary/i.test(item?.topic || "")) {
-                    addSpec(`Which anterior pituitary cell secretes ${targetTerm}?${multiAnswerNote}`, source, "source", "source");
+                    addSpec(`Which anterior pituitary cell secretes ${targetTerm}?${sourceAnswerNote}`, source, "source", "source");
                 } else if (/endocrine pancreas|islet/i.test(item?.topic || "")) {
-                    addSpec(`Which pancreatic islet cell secretes ${targetTerm}?${multiAnswerNote}`, source, "source", "source");
+                    addSpec(`Which pancreatic islet cell secretes ${targetTerm}?${sourceAnswerNote}`, source, "source", "source");
                 } else {
-                    addSpec(`Which cell secretes ${targetTerm}?${multiAnswerNote}`, source, "source", "source");
+                    addSpec(`Which cell secretes ${targetTerm}?${sourceAnswerNote}`, source, "source", "source");
                 }
 
-                addSpec(`${hormoneLabel} ${verb} secreted by the ${sourceTerm}?${multiAnswerNote}`, target, "target", "target");
+                addSpec(`${hormoneLabel} ${verb} secreted by the ${sourceTerm}?${targetAnswerNote}`, target, "target", "target");
             }
             break;
         }
@@ -747,6 +851,10 @@ function getConceptPromptSpecs(item) {
         }
         case "function_pair": {
             if (source && target) {
+                const contextText = `${item?.topic || ""} ${item?.subtopic || ""} ${source} ${target}`.toLowerCase();
+                const relationshipBase = normalizeQuizValue(relationship);
+                const isThyroidSynthesisContext = /thyroid hormone synthesis|iodide|organification|peroxidase|tpo|thyroglobulin|nis/.test(contextText);
+
                 if (item?.id === "na-k-atpase-supports-nis") {
                     addSpec(
                         "Na+/K+ ATPase supports iodide trapping by maintaining what?",
@@ -754,7 +862,7 @@ function getConceptPromptSpecs(item) {
                         "target",
                         "target",
                         undefined,
-                        "short"
+                        "short_preferred"
                     );
                     addSpec(
                         "What does Na+/K+ ATPase help maintain during iodide trapping?",
@@ -762,16 +870,44 @@ function getConceptPromptSpecs(item) {
                         "target",
                         "target",
                         undefined,
-                        "short"
+                        "short_preferred"
+                    );
+                    break;
+                }
+
+                if (isThyroidSynthesisContext && /peroxidase|tpo/.test(contextText)) {
+                    addSpec(
+                        "Thyroid peroxidase is directly involved in what process?",
+                        target,
+                        "target",
+                        "target",
+                        undefined,
+                        "short_preferred"
+                    );
+                    addSpec(
+                        "Which thyroid hormone synthesis step is catalyzed by thyroid peroxidase?",
+                        target,
+                        "target",
+                        "target",
+                        undefined,
+                        "mcq_preferred"
                     );
                     break;
                 }
 
                 if (/(\band\b|,)/i.test(source)) {
-                    addSpec(`What are ${sourceTerm} responsible for${stateClause}?`, target, "target", "fact", undefined, "short");
+                    addSpec(`What are ${sourceTerm} primarily responsible for${stateClause}?`, target, "target", "fact", undefined, "short_preferred");
                 } else {
-                    addSpec(`What does ${sourceTerm} promote${stateClause}?`, target, "target", "target", undefined, "short");
+                    if (/supports|maintain/.test(relationshipBase) || /\bmaintain/i.test(target)) {
+                        addSpec(`What does ${sourceTerm} help maintain${stateClause}?`, target, "target", "target", undefined, "short_preferred");
+                    } else if (/catalyz|mediat|facilitat|responsible_for|helps_with|serves_as|does/.test(relationshipBase)) {
+                        addSpec(`${sourceTerm} is directly involved in what process${stateClause}?`, target, "target", "target", undefined, "short_preferred");
+                    } else {
+                        addSpec(`What is a key function of ${sourceTerm}${stateClause}?`, target, "target", "target", undefined, "short_preferred");
+                    }
                 }
+
+                addSpec(`Which process best matches the role of ${sourceTerm}${stateClause}?`, target, "target", "target", undefined, "mcq_preferred");
             }
             break;
         }
@@ -789,7 +925,15 @@ function getConceptPromptSpecs(item) {
                         "target",
                         "fact-action",
                         actionAliases,
-                        "short"
+                        "mcq-only"
+                    );
+                    addSpec(
+                        "Steroid hormones primarily act through what receptor location?",
+                        "Intracellular receptors",
+                        "target",
+                        "fact-action",
+                        ["intracellular receptors", "inside the cell", "nuclear receptors"],
+                        "short_preferred"
                     );
                     break;
                 }
@@ -833,7 +977,15 @@ function getConceptPromptSpecs(item) {
                         "target",
                         "fact-origin",
                         originAliases,
-                        "short"
+                        "mcq-only"
+                    );
+                    addSpec(
+                        "Steroid hormones are derived from what precursor?",
+                        "Cholesterol",
+                        "target",
+                        "fact-origin",
+                        ["cholesterol"],
+                        "short_preferred"
                     );
                     break;
                 }
@@ -901,6 +1053,66 @@ function getConceptPromptSpecs(item) {
     return specs;
 }
 
+function getConceptBuildersForPreference(preference, mcqBuilder, shortBuilder) {
+    switch (preference) {
+        case "mcq-only":
+            return [mcqBuilder];
+        case "short-only":
+            return [shortBuilder];
+        case "short_preferred":
+            return [shortBuilder, mcqBuilder];
+        case "mcq_preferred":
+        default:
+            return [mcqBuilder, shortBuilder];
+    }
+}
+
+function resolveConceptSpecPreference(item, spec, preferShort) {
+    const itemPreference = normalizeConceptPreferredType(item?.prompt_bias, preferShort);
+    let specPreference = normalizeConceptPreferredType(spec?.preferredType, preferShort);
+    const conceptType = normalizeQuizValue(item?.concept_type);
+    const hasMultiTargetAnswer = isConceptAnswerList(item?.target);
+
+    if (isStatementRecognitionPrompt(spec?.prompt)) {
+        specPreference = "mcq-only";
+    }
+
+    const obviousMcqConcept = ["cell_to_hormone", "gland_to_hormone", "zone_to_hormone"].includes(conceptType)
+        && hasMultiTargetAnswer;
+    if (obviousMcqConcept && specPreference !== "mcq-only" && itemPreference !== "mcq-only") {
+        specPreference = "short_preferred";
+    }
+
+    if (isDirectRecallConceptPrompt(spec?.prompt)
+        && isConciseConceptAnswer(spec?.answer)
+        && specPreference === "mcq_preferred"
+        && itemPreference !== "mcq-only") {
+        specPreference = "short_preferred";
+    }
+
+    if (itemPreference === "mcq-only") {
+        return specPreference === "short-only" ? "skip" : "mcq-only";
+    }
+
+    if (itemPreference === "short-only") {
+        return specPreference === "mcq-only" ? "skip" : "short-only";
+    }
+
+    if (specPreference === "mcq-only" || specPreference === "short-only") {
+        return specPreference;
+    }
+
+    if (itemPreference === "short_preferred" && specPreference !== "mcq-only") {
+        return "short_preferred";
+    }
+
+    if (itemPreference === "mcq_preferred" && specPreference !== "short-only") {
+        return "mcq_preferred";
+    }
+
+    return specPreference;
+}
+
 function createConceptQuestion(item, all) {
     const difficulty = normalizeQuizValue(item?.difficulty);
     const preferShort = /hard|advanced|challenging/.test(difficulty);
@@ -924,12 +1136,9 @@ function createConceptQuestion(item, all) {
             conceptPromptKind: spec.conceptPromptKind
         });
 
-        const preferredType = spec.preferredType || (preferShort ? "short" : "mcq");
-        const builders = preferredType === "short"
-            ? [shortBuilder, mcqBuilder]
-            : preferredType === "mcq-only"
-                ? [mcqBuilder]
-                : [mcqBuilder, shortBuilder];
+        const preference = resolveConceptSpecPreference(item, spec, preferShort);
+        if (preference === "skip") continue;
+        const builders = getConceptBuildersForPreference(preference, mcqBuilder, shortBuilder);
 
         for (const build of builders) {
             const question = build();
@@ -944,9 +1153,9 @@ function createConceptQuestion(item, all) {
     return {
         type: "short",
         prompt: source && target
-            ? `What relationship best describes <b>${formatConceptTerm(source)}</b> and <b>${formatConceptTerm(target)}</b>?`
+            ? `<b>${formatConceptTerm(source)}</b> _____ <b>${formatConceptTerm(target)}</b>.`
             : source
-                ? `Which statement about <b>${formatConceptTerm(source)}</b> is correct?`
+                ? `What is a key concept linked to <b>${formatConceptTerm(source)}</b>?`
                 : `Endocrine concept practice`,
         answer: fallbackAnswer,
         answerText: relationship ? getRelationshipVariants(relationship) : undefined,
