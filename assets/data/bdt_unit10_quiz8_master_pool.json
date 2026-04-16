@@ -147,7 +147,7 @@
     "target": "LH and FSH",
     "relationship": "secrete",
     "difficulty": "easy",
-    "prompt_bias": "mcq_preferred",
+    "prompt_bias": "short_preferred",
     "answer_count": 2,
     "answer_aliases": [
       "FSH and LH",
@@ -308,11 +308,11 @@
     "subtopic": "Steroid synthesis",
     "concept_type": "fact_statement",
     "source": "Adrenocortical hormones",
-    "target": "Derived from cholesterol",
-    "relationship": "are",
+    "target": "Cholesterol",
+    "relationship": "are derived from",
     "difficulty": "easy",
     "prompt_bias": "mcq_preferred",
-    "answer_aliases": ["cholesterol", "are derived from cholesterol"],
+    "answer_aliases": ["cholesterol", "derived from cholesterol", "are derived from cholesterol"],
     "tags": ["adrenal cortex", "cholesterol", "steroid"]
   },
   {
@@ -429,5 +429,238 @@
     "answer_count": 2,
     "answer_aliases": ["ACTH and CRH"],
     "tags": ["cortisol", "CRH", "ACTH", "negative feedback", "HPA axis"]
+  },
+  {
+    "id": "iodide-trapping-nis",
+    "unit": 10,
+    "topic": "Thyroid",
+    "subtopic": "Thyroid hormone synthesis",
+    "concept_type": "function_pair",
+    "source": "Sodium-iodide symporter",
+    "target": "Iodide trapping into thyroid follicular cells",
+    "relationship": "mediates",
+    "difficulty": "medium",
+    "prompt_bias": "mcq_or_short",
+    "answer_aliases": ["NIS", "sodium iodide symporter"],
+    "tags": ["thyroid", "iodide trapping", "NIS", "follicular cell"]
+  },
+  {
+    "id": "iodide-trapping-secondary-active",
+    "unit": 10,
+    "topic": "Thyroid",
+    "subtopic": "Thyroid hormone synthesis",
+    "concept_type": "fact_statement",
+    "source": "Iodide trapping",
+    "target": "Driven by secondary active transport using the sodium gradient",
+    "relationship": "is",
+    "difficulty": "medium",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": [
+      "secondary active transport",
+      "sodium gradient",
+      "secondary active transport via the sodium gradient"
+    ],
+    "tags": ["thyroid", "iodide trapping", "secondary active transport", "NIS"]
+  },
+  {
+    "id": "na-k-atpase-supports-nis",
+    "unit": 10,
+    "topic": "Thyroid",
+    "subtopic": "Thyroid hormone synthesis",
+    "concept_type": "function_pair",
+    "source": "Na+/K+ ATPase",
+    "target": "Maintaining the sodium gradient that powers iodide trapping",
+    "relationship": "supports",
+    "difficulty": "medium",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": [
+      "maintains the sodium gradient for NIS",
+      "maintains the sodium gradient",
+      "powers iodide trapping indirectly"
+    ],
+    "tags": ["thyroid", "Na/K ATPase", "NIS", "sodium gradient"]
+  },
+  {
+    "id": "thyroid-peroxidase-organification",
+    "unit": 10,
+    "topic": "Thyroid",
+    "subtopic": "Thyroid hormone synthesis",
+    "concept_type": "function_pair",
+    "source": "Thyroid peroxidase",
+    "target": "Oxidation and organification of iodide",
+    "relationship": "catalyzes",
+    "difficulty": "medium",
+    "prompt_bias": "mcq_or_short",
+    "answer_aliases": ["TPO", "thyroid peroxidase"],
+    "tags": ["thyroid", "TPO", "organification", "oxidation"]
+  },
+  {
+    "id": "thyroglobulin-scaffold",
+    "unit": 10,
+    "topic": "Thyroid",
+    "subtopic": "Thyroid hormone synthesis",
+    "concept_type": "function_pair",
+    "source": "Thyroglobulin",
+    "target": "Protein scaffold for thyroid hormone synthesis and storage",
+    "relationship": "serves_as",
+    "difficulty": "medium",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": [
+      "scaffold for thyroid hormone synthesis",
+      "protein scaffold",
+      "storage scaffold for thyroid hormone synthesis"
+    ],
+    "tags": ["thyroid", "thyroglobulin", "storage", "synthesis"]
+  },
+  {
+    "id": "tyrosine-thyroid-precursor",
+    "unit": 10,
+    "topic": "Thyroid",
+    "subtopic": "Thyroid hormone synthesis",
+    "concept_type": "fact_statement",
+    "source": "Tyrosine",
+    "target": "Amino acid precursor for thyroid hormone synthesis",
+    "relationship": "is",
+    "difficulty": "easy",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": [
+      "amino acid precursor for thyroid hormone synthesis",
+      "precursor for thyroid hormone synthesis"
+    ],
+    "tags": ["thyroid", "tyrosine", "precursor", "synthesis"]
+  },
+  {
+    "id": "thyroid-colloid-storage",
+    "unit": 10,
+    "topic": "Thyroid",
+    "subtopic": "Storage",
+    "concept_type": "fact_statement",
+    "source": "Thyroid hormones",
+    "target": "Stored extracellularly in the colloid before release",
+    "relationship": "are",
+    "difficulty": "medium",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": [
+      "stored in the colloid",
+      "stored extracellularly in the colloid",
+      "colloid"
+    ],
+    "tags": ["thyroid", "colloid", "storage", "follicle"]
+  },
+  {
+    "id": "tsh-thyroid-synthesis-release",
+    "unit": 10,
+    "topic": "Thyroid",
+    "subtopic": "Regulation",
+    "concept_type": "function_pair",
+    "source": "TSH",
+    "target": "Stimulates thyroid hormone synthesis and release",
+    "relationship": "does",
+    "difficulty": "easy",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": [
+      "stimulates thyroid hormone synthesis and release",
+      "stimulates synthesis and release of thyroid hormone"
+    ],
+    "tags": ["TSH", "thyroid", "regulation", "T3", "T4"]
+  },
+  {
+    "id": "free-thyroid-hormone-active",
+    "unit": 10,
+    "topic": "Thyroid",
+    "subtopic": "Binding proteins",
+    "concept_type": "fact_statement",
+    "source": "Free thyroid hormone",
+    "target": "Biologically available form that enters tissues and participates in feedback",
+    "relationship": "is the",
+    "difficulty": "medium",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": [
+      "biologically available form",
+      "free hormone is biologically available",
+      "form that enters tissues and participates in feedback"
+    ],
+    "tags": ["thyroid", "free hormone", "binding proteins", "feedback"]
+  },
+  {
+    "id": "tbg-thyroid-binding",
+    "unit": 10,
+    "topic": "Thyroid",
+    "subtopic": "Binding proteins",
+    "concept_type": "function_pair",
+    "source": "Thyroxine-binding globulin",
+    "target": "Binding thyroid hormones in the circulation",
+    "relationship": "does",
+    "difficulty": "medium",
+    "prompt_bias": "mcq_or_short",
+    "answer_aliases": ["TBG", "thyroxine binding globulin"],
+    "tags": ["thyroid", "TBG", "binding protein", "circulation"]
+  },
+  {
+    "id": "thyroid-hormone-intracellular-receptor",
+    "unit": 10,
+    "topic": "Thyroid",
+    "subtopic": "Hormone action",
+    "concept_type": "fact_statement",
+    "source": "Thyroid hormones",
+    "target": "Act mainly through intracellular receptors",
+    "relationship": "do",
+    "difficulty": "medium",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": [
+      "act mainly through intracellular receptors",
+      "intracellular receptors"
+    ],
+    "tags": ["thyroid", "T3", "T4", "intracellular receptor"]
+  },
+  {
+    "id": "wolff-chaikoff-effect-definition",
+    "unit": 10,
+    "topic": "Thyroid",
+    "subtopic": "Autoregulation",
+    "concept_type": "fact_statement",
+    "source": "Wolff-Chaikoff effect",
+    "target": "Acute excess iodide temporarily inhibits thyroid hormone synthesis",
+    "relationship": "is",
+    "difficulty": "medium",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": [
+      "acute excess iodide temporarily inhibits thyroid hormone synthesis",
+      "temporary inhibition of thyroid hormone synthesis by excess iodide",
+      "excess iodide temporarily inhibits thyroid hormone synthesis"
+    ],
+    "tags": ["thyroid", "Wolff-Chaikoff effect", "iodide", "autoregulation"]
+  },
+  {
+    "id": "wolff-chaikoff-trigger",
+    "unit": 10,
+    "topic": "Thyroid",
+    "subtopic": "Autoregulation",
+    "concept_type": "regulation_pair",
+    "source": "Acute excess iodide",
+    "target": "Thyroid hormone synthesis",
+    "relationship": "temporarily inhibits",
+    "difficulty": "medium",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": ["high iodide", "iodide excess", "excess iodine"],
+    "source_label": "factor",
+    "tags": ["thyroid", "iodide excess", "Wolff-Chaikoff effect"]
+  },
+  {
+    "id": "wolff-chaikoff-clinical-purpose",
+    "unit": 10,
+    "topic": "Thyroid",
+    "subtopic": "Autoregulation",
+    "concept_type": "function_pair",
+    "source": "Wolff-Chaikoff effect",
+    "target": "Protecting against sudden excess thyroid hormone synthesis during high iodide exposure",
+    "relationship": "helps_with",
+    "difficulty": "medium",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": [
+      "protecting against sudden excess thyroid hormone synthesis",
+      "protection against excess thyroid hormone synthesis during high iodide exposure"
+    ],
+    "tags": ["thyroid", "Wolff-Chaikoff effect", "protection", "iodide"]
   }
 ]
