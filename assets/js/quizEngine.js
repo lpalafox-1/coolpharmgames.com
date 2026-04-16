@@ -17,16 +17,6 @@ const state = {
     resultsRecorded: false
 };
 
-const getEl = (id) => document.getElementById(id);
-
-// Initialize dark mode from localStorage at startup
-const savedTheme = localStorage.getItem("pharmlet.theme");
-if (savedTheme === "dark") {
-    document.documentElement.classList.add("dark");
-    const helpBtn = document.getElementById("help-shortcuts");
-    if (helpBtn) helpBtn.style.color = "black";
-}
-
 // --- 1. CORE ACTIONS ---
 function toggleMark() {
     if (state.marked.has(state.index)) state.marked.delete(state.index);
@@ -51,6 +41,14 @@ function changeZoom(dir) {
     document.body.style.zoom = state.currentScale;
     document.documentElement.style.setProperty('--quiz-size', `${state.currentScale}rem`);
 }
+
+const getEl = (id) => document.getElementById(id);
+
+const CONCEPT_QUIZ_ID = "bdt-unit10-quiz8";
+const CONCEPT_QUIZ_TITLE = "Endocrine Concept Practice";
+const CONCEPT_QUIZ_SIZE = 10;
+const CONCEPT_QUIZ_POOL_FILE = "bdt_unit10_quiz8_master_pool.json";
+
 const FINAL_EXAM_ID = "log-lab-final-2";
 const FINAL_EXAM_TITLE = "Top Drugs Final Lab 2 — 110 Questions";
 const FINAL_EXAM_TOTAL = 110;
@@ -126,6 +124,19 @@ function selectFinalExamDrugs(pool) {
 function showHint() {
     const q = state.questions[state.index];
     if (!q || q._answered) return;
+
+    if (q._mode === "concept" || q.conceptRef) {
+        const conceptHint = buildConceptHintText(q);
+        if (!conceptHint) {
+            alert("💡 No hint available for this question.");
+            return;
+        }
+
+        q._hintUsed = true;
+        state.hintsUsed++;
+        alert(conceptHint);
+        return;
+    }
     
     const drug = q.drugRef;
     if (!drug) {
@@ -257,6 +268,439 @@ async function smartFetch(fileName) {
     }
     console.warn(`Warning: Unable to fetch ${fileName} from any path`);
     throw new Error(`File not found: ${fileName}`);
+}
+
+function normalizeQuizValue(value) {
+    return String(value ?? "").replace(/\s+/g, " ").trim().toLowerCase();
+}
+
+function flattenPoolData(data) {
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data?.questions)) return data.questions;
+    if (data?.pools && typeof data.pools === "object") return Object.values(data.pools).flat();
+    return [];
+}
+
+function isConceptEntry(item) {
+    return Boolean(item && (
+        item.concept_type ||
+        (item.source && item.target && item.relationship)
+    ));
+}
+
+function formatConceptTerm(value) {
+    const text = String(value ?? "").trim();
+    if (!text) return "";
+    if (/^[A-Z]{2,}(?:[-/][A-Z0-9]+)*(?:\s+(?:and|or|to)\s+[A-Z0-9-]+)*$/.test(text)) return text;
+    if (/^[A-Z]-[A-Za-z0-9]/.test(text)) return text;
+    return text.toLowerCase();
+}
+
+function isLikelyConceptSource(value) {
+    const text = String(value ?? "").trim();
+    if (!text) return false;
+    if (/^[A-Z]{2,}(?:[-/][A-Z0-9]+)*(?:\s+(?:and|or|to)\s+[A-Z0-9-]+)*$/.test(text)) return true;
+    if (/^[A-Z]-[A-Za-z0-9]/.test(text)) return true;
+    const tokens = text.split(/\s+/);
+    return tokens.length <= 2 && /^[A-Z][a-z]+(?:\s+[A-Z0-9-]+)?$/.test(text);
+}
+
+function getConceptAxisLabel(item) {
+    const axisTag = Array.isArray(item?.tags)
+        ? item.tags.find(tag => /axis/i.test(String(tag)))
+        : "";
+    const scope = String(axisTag || item?.topic || item?.subtopic || "").trim();
+    return scope ? formatConceptTerm(scope) : "the HPA axis";
+}
+
+function getQuestionContextLabel(question) {
+    return (question?._mode === "concept" || question?.conceptRef)
+        ? "Endocrine Concept Practice"
+        : "Drug Practice";
+}
+
+function getQuestionIdentity(item) {
+    if (isConceptEntry(item)) {
+        return normalizeQuizValue(item.id || [item.concept_type, item.source, item.target, item.relationship].filter(Boolean).join("|"));
+    }
+
+    return normalizeQuizValue(item?.generic || item?.id || item?.brand || item?.class || item?.category || item?.moa);
+}
+
+function getConceptScopeLabel(item) {
+    return [
+        item?.unit ? `Unit ${item.unit}` : "",
+        item?.topic || "",
+        item?.subtopic || ""
+    ].filter(Boolean).join(" | ");
+}
+
+function getRelationshipVariants(relationship) {
+    const base = normalizeQuizValue(relationship);
+    if (!base) return [];
+
+    const variants = new Set([base]);
+    if (base.endsWith("ies")) variants.add(base.replace(/ies$/, "y"));
+    if (/(xes|zes|ches|shes|sses|oes)$/.test(base)) variants.add(base.replace(/es$/, ""));
+    if (base.endsWith("s")) variants.add(base.replace(/s$/, ""));
+    return [...variants];
+}
+
+function collectConceptValues(all, item, key, answer) {
+    const answerValues = key === "relationship"
+        ? getRelationshipVariants(answer)
+        : [normalizeQuizValue(answer)];
+    const excluded = new Set(answerValues.filter(Boolean));
+    const conceptType = normalizeQuizValue(item?.concept_type);
+    const scopeKey = normalizeQuizValue(item?.subtopic || item?.topic || item?.unit);
+    const pools = [];
+
+    if (conceptType) {
+        pools.push(all.filter(entry =>
+            isConceptEntry(entry) &&
+            entry !== item &&
+            entry?.[key] &&
+            normalizeQuizValue(entry.concept_type) === conceptType
+        ));
+    }
+
+    if (scopeKey) {
+        pools.push(all.filter(entry =>
+            isConceptEntry(entry) &&
+            entry !== item &&
+            entry?.[key] &&
+            normalizeQuizValue(entry?.subtopic || entry?.topic || entry?.unit) === scopeKey
+        ));
+    }
+
+    pools.push(all.filter(entry => isConceptEntry(entry) && entry !== item && entry?.[key]));
+
+    const seen = new Set();
+    const values = [];
+
+    for (const pool of pools) {
+        for (const entry of shuffled(pool)) {
+            const value = entry?.[key];
+            const normalized = normalizeQuizValue(value);
+            if (!value || excluded.has(normalized) || seen.has(normalized)) continue;
+            seen.add(normalized);
+            values.push(value);
+            if (values.length >= 3) return values;
+        }
+    }
+
+    return values;
+}
+
+function buildConceptMcqQuestion({ item, all, prompt, answer, answerText, key, conceptPromptKind }) {
+    const distractors = collectConceptValues(all, item, key, answer);
+    if (distractors.length < 3 || !answer) return null;
+
+    return {
+        type: "mcq",
+        prompt,
+        choices: shuffled([answer, ...distractors.slice(0, 3)]),
+        answer,
+        answerText,
+        conceptRef: item,
+        conceptPromptKind,
+        _mode: "concept"
+    };
+}
+
+function buildConceptShortQuestion({ item, prompt, answer, answerText, conceptPromptKind }) {
+    if (!answer) return null;
+
+    return {
+        type: "short",
+        prompt,
+        answer,
+        answerText: answerText || (conceptPromptKind === "relationship" ? getRelationshipVariants(answer) : undefined),
+        conceptRef: item,
+        conceptPromptKind,
+        _mode: "concept"
+    };
+}
+
+function buildConceptHintText(question) {
+    const concept = question?.conceptRef;
+    if (!concept) return null;
+
+    const lines = [];
+    const scope = getConceptScopeLabel(concept);
+    if (scope) lines.push(`📘 ${scope}`);
+    if (concept.concept_type) lines.push(`🧠 Type: ${concept.concept_type}`);
+
+    const source = concept.source || "N/A";
+    const target = concept.target || "N/A";
+    const relationship = concept.relationship || "N/A";
+
+    switch (question?.conceptPromptKind) {
+        case "relationship":
+            lines.push(`🔗 Source: ${source}`);
+            lines.push(`🎯 Target: ${target}`);
+            break;
+        case "sequence-forward":
+            lines.push(`➡️ Starts with: ${source}`);
+            lines.push(`➡️ Continues to: ${target}`);
+            break;
+        case "sequence-backward":
+            lines.push(`⬅️ Previous step: ${source}`);
+            lines.push(`⬅️ Followed by: ${target}`);
+            break;
+        case "source":
+            lines.push(`🎯 Target: ${target}`);
+            lines.push(`🔗 Relationship: ${relationship}`);
+            break;
+        case "fact":
+            lines.push(`🧩 Source: ${source}`);
+            lines.push(`🧩 Target: ${target}`);
+            break;
+        default:
+            lines.push(`🔗 Source: ${source}`);
+            lines.push(`🎯 Target: ${target}`);
+            if (relationship && relationship !== "N/A") lines.push(`↔ Relationship: ${relationship}`);
+    }
+
+    return lines.join("\n");
+}
+
+function getConceptScopeName(item) {
+    return String(item?.topic || item?.subtopic || "").trim();
+}
+
+function getConceptStateClause(item) {
+    const text = [
+        item?.topic,
+        item?.subtopic,
+        Array.isArray(item?.tags) ? item.tags.join(" ") : ""
+    ].filter(Boolean).join(" ").toLowerCase();
+
+    if (!text) return "";
+    if (text.includes("fed") || text.includes("postprandial")) return " in the fed state";
+    if (text.includes("fasting") || text.includes("fast")) return " in the fasting state";
+    return "";
+}
+
+function looksLikeConceptStatement(value) {
+    const text = String(value ?? "").trim();
+    if (!text) return false;
+    return text.length > 24 && (/[.?!]$/.test(text) || /\b(is|are|was|were|does|do|causes|cause|stimulates|inhibits|promotes|produces|releases|secretes|triggers|closes|opens)\b/i.test(text));
+}
+
+function getConceptPromptSpecs(item) {
+    const source = String(item?.source ?? "").trim();
+    const target = String(item?.target ?? "").trim();
+    const relationship = String(item?.relationship ?? "").trim();
+    const conceptType = normalizeQuizValue(item?.concept_type);
+    const sourceTerm = formatConceptTerm(source);
+    const targetTerm = formatConceptTerm(target);
+    const relationshipTerm = formatConceptTerm(relationship);
+    const sourceLike = isLikelyConceptSource(source);
+    const stateClause = getConceptStateClause(item);
+    const scopeName = getConceptScopeName(item);
+    const scopeLabel = formatConceptTerm(scopeName);
+    const specs = [];
+
+    const addSpec = (prompt, answer, key, conceptPromptKind, answerText, preferredType = "mcq") => {
+        if (!prompt || answer === undefined || answer === null || String(prompt).trim() === "") return;
+        specs.push({ prompt, answer, key, conceptPromptKind, answerText, preferredType });
+    };
+
+    const relationQuestion = source && target && relationship
+        ? `What relationship best describes <b>${sourceTerm}</b> and <b>${targetTerm}</b>?`
+        : null;
+
+    switch (conceptType) {
+        case "regulation_pair": {
+            if (source && target && relationship) {
+                if (/^stimulates$/i.test(relationshipTerm)) {
+                    addSpec(`Which hormone stimulates ${targetTerm} release?`, source, "source", "relationship");
+                    addSpec(`Which hormone stimulates ${targetTerm} secretion?`, source, "source", "relationship");
+                } else if (/^inhibits$/i.test(relationshipTerm)) {
+                    addSpec(`Which hormone inhibits ${targetTerm} secretion?`, source, "source", "relationship");
+                    addSpec(`Which hormone inhibits ${targetTerm} release?`, source, "source", "relationship");
+                } else if (/^stimulates\s+/i.test(relationshipTerm) || /^inhibits\s+/i.test(relationshipTerm)) {
+                    addSpec(`Which hormone ${relationshipTerm}?`, source, "source", "relationship");
+                } else if (relationship) {
+                    addSpec(relationQuestion, relationship, "relationship", "relationship", getRelationshipVariants(relationship));
+                }
+                addSpec(
+                    `<b>${sourceTerm}</b> _____ <b>${targetTerm}</b>.`,
+                    relationship,
+                    "relationship",
+                    "relationship",
+                    getRelationshipVariants(relationship),
+                    "short"
+                );
+            }
+            break;
+        }
+        case "cell_to_hormone": {
+            if (source && target) {
+                if (/anterior pituitary/i.test(item?.topic || "")) {
+                    addSpec(`Which anterior pituitary cell secretes ${targetTerm}?`, source, "source", "source");
+                } else if (/endocrine pancreas|islet/i.test(item?.topic || "")) {
+                    addSpec(`Which pancreatic islet cell secretes ${targetTerm}?`, source, "source", "source");
+                } else {
+                    addSpec(`Which cell secretes ${targetTerm}?`, source, "source", "source");
+                }
+
+                addSpec(`Which hormone is secreted by the ${sourceTerm}?`, target, "target", "target");
+            }
+            break;
+        }
+        case "gland_to_hormone": {
+            if (source && target) {
+                const glandPrompt = /medulla/i.test(source) || /medulla/i.test(item?.topic || "")
+                    ? `Which hormone is released by the ${sourceTerm}?`
+                    : `Which hormone is secreted by the ${sourceTerm}?`;
+                addSpec(glandPrompt, target, "target", "target");
+                addSpec(`Which gland secretes ${targetTerm}?`, source, "source", "source");
+            }
+            break;
+        }
+        case "zone_to_hormone": {
+            if (source && target) {
+                addSpec(`Which hormone is produced by the ${sourceTerm}?`, target, "target", "target");
+                addSpec(`Which adrenal zone produces ${targetTerm}?`, source, "source", "source");
+            }
+            break;
+        }
+        case "function_pair": {
+            if (source && target) {
+                if (/(\band\b|,)/i.test(source)) {
+                    addSpec(`What are ${sourceTerm} responsible for${stateClause}?`, target, "target", "fact", undefined, "short");
+                } else {
+                    addSpec(`What does ${sourceTerm} promote${stateClause}?`, target, "target", "target", undefined, "short");
+                }
+            }
+            break;
+        }
+        case "fact_statement": {
+            if (source && target) {
+                const useTargetAsTopic = looksLikeConceptStatement(source) && !looksLikeConceptStatement(target);
+                const factTopic = useTargetAsTopic ? targetTerm : sourceTerm;
+                const factAnswer = useTargetAsTopic ? source : target;
+                addSpec(`Which statement about ${factTopic} is correct?`, factAnswer, useTargetAsTopic ? "source" : "target", "fact");
+            }
+            break;
+        }
+        case "sequence_step": {
+            if (source && target) {
+                if (/glucose metabolism in beta cells/i.test(source)) {
+                    addSpec(`What happens after glucose metabolism in beta cells?`, target, "target", "sequence-forward", undefined, "short");
+                } else if (/increased atp/i.test(source)) {
+                    addSpec(`What happens after increased ATP?`, target, "target", "sequence-forward", undefined, "short");
+                } else if (/cholesterol/i.test(source) && /pregnenolone/i.test(target)) {
+                    addSpec(`What is the first step in steroid hormone synthesis?`, target, "target", "sequence-forward", undefined, "short");
+                } else {
+                    addSpec(`What comes next after ${sourceTerm}${scopeLabel ? ` in ${scopeLabel}` : ""}?`, target, "target", "sequence-forward");
+                }
+
+                addSpec(`Which step comes before ${targetTerm}?`, source, "source", "sequence-backward");
+            }
+            break;
+        }
+        case "consequence_pair": {
+            if (source && target) {
+                addSpec(`What can ${sourceTerm} cause?`, target, "target", "fact", undefined, "short");
+                addSpec(`Which consequence is associated with ${sourceTerm}?`, target, "target", "fact", undefined, "short");
+            }
+            break;
+        }
+        case "axis_sequence": {
+            if (source && target) {
+                addSpec(`Which sequence correctly describes the ${getConceptAxisLabel(item)}?`, target, "target", "sequence-forward", undefined, "short");
+                addSpec(`What comes after ${sourceTerm} in the ${getConceptAxisLabel(item)}?`, target, "target", "sequence-forward", undefined, "short");
+            }
+            break;
+        }
+        default: {
+            if (source && target) {
+                if (/^stimulates$/i.test(relationshipTerm)) {
+                    addSpec(`Which hormone stimulates ${targetTerm} release?`, source, "source", "relationship");
+                } else if (/^inhibits$/i.test(relationshipTerm)) {
+                    addSpec(`Which hormone inhibits ${targetTerm} secretion?`, source, "source", "relationship");
+                } else if (relationship) {
+                    addSpec(relationQuestion, relationship, "relationship", "relationship", getRelationshipVariants(relationship));
+                }
+
+                if (/\b(cell|cells|gland|pituitary|adrenal|thyroid|zona|zone|cortex|medulla|hypothalamus|pancreas|ovary|testis)\b/i.test(source)) {
+                    addSpec(`Which hormone is secreted by the ${sourceTerm}?`, target, "target", "target");
+                }
+
+                if (!looksLikeConceptStatement(source) && looksLikeConceptStatement(target)) {
+                    addSpec(`Which statement about ${sourceTerm} is correct?`, target, "target", "fact");
+                }
+
+                addSpec(`What relationship best describes ${sourceTerm} and ${targetTerm}?`, relationship || target, relationship ? "relationship" : "target", relationship ? "relationship" : "target", relationship ? getRelationshipVariants(relationship) : undefined);
+            }
+        }
+    }
+
+    return specs;
+}
+
+function createConceptQuestion(item, all) {
+    const difficulty = normalizeQuizValue(item?.difficulty);
+    const preferShort = /hard|advanced|challenging/.test(difficulty);
+    const promptSpecs = getConceptPromptSpecs(item);
+    const builders = [];
+
+    for (const spec of promptSpecs) {
+        const mcqBuilder = () => buildConceptMcqQuestion({
+            item,
+            all,
+            prompt: spec.prompt,
+            answer: spec.answer,
+            answerText: spec.answerText,
+            key: spec.key,
+            conceptPromptKind: spec.conceptPromptKind
+        });
+        const shortBuilder = () => buildConceptShortQuestion({
+            item,
+            prompt: spec.prompt,
+            answer: spec.answer,
+            answerText: spec.answerText,
+            conceptPromptKind: spec.conceptPromptKind
+        });
+
+        if (spec.preferredType === "short" || preferShort) {
+            builders.push(shortBuilder, mcqBuilder);
+        } else {
+            builders.push(mcqBuilder, shortBuilder);
+        }
+    }
+
+    for (const build of shuffled(builders)) {
+        const question = build();
+        if (question) return question;
+    }
+
+    const source = String(item?.source ?? "").trim();
+    const target = String(item?.target ?? "").trim();
+    const relationship = String(item?.relationship ?? "").trim();
+    const fallbackAnswer = relationship || target || source || item?.id || "Unknown";
+    return {
+        type: "short",
+        prompt: source && target
+            ? `What relationship best describes <b>${formatConceptTerm(source)}</b> and <b>${formatConceptTerm(target)}</b>?`
+            : source
+                ? `Which statement about <b>${formatConceptTerm(source)}</b> is correct?`
+                : `Endocrine concept practice`,
+        answer: fallbackAnswer,
+        answerText: relationship ? getRelationshipVariants(relationship) : undefined,
+        conceptRef: item,
+        conceptPromptKind: relationship ? "relationship" : "target",
+        _mode: "concept"
+    };
+}
+
+function createQuestionFromItem(item, all) {
+    return isConceptEntry(item)
+        ? createConceptQuestion(item, all)
+        : createQuestion(item, all);
 }
 
 function createQuestion(drug, all) {
@@ -554,7 +998,7 @@ function render() {
     const q = state.questions[state.index];
     if (!q) return;
 
-    if (getEl("drug-context")) getEl("drug-context").textContent = "Drug Practice";
+    if (getEl("drug-context")) getEl("drug-context").textContent = getQuestionContextLabel(q);
     if (getEl("qnum")) getEl("qnum").textContent = state.index + 1;
     if (getEl("prompt")) getEl("prompt").innerHTML = q.prompt;
     
@@ -1033,7 +1477,7 @@ async function main() {
 
             state.title = FINAL_EXAM_TITLE;
             state.questions = shuffled(selectedDrugs).map((d, i) => ({
-                ...createQuestion(d, fullPool),
+                ...createQuestionFromItem(d, fullPool),
                 _id: i
             }));
             storageKey = `pharmlet.${quizId}.easy`;
@@ -1041,66 +1485,97 @@ async function main() {
             finishSetup(storageKey);
             return;
         }
+        // ========== MODE 4: ?id=bdt-unit10-quiz8 (Generated Concept Quiz) ==========
+        else if (quizId === CONCEPT_QUIZ_ID) {
+            const rawPool = await smartFetch(CONCEPT_QUIZ_POOL_FILE);
+            const conceptPool = flattenPoolData(rawPool).filter(isConceptEntry);
+
+            if (conceptPool.length === 0) {
+                throw new Error("No endocrine concept entries found in the master pool.");
+            }
+
+            filteredPool = conceptPool;
+            fullPool = conceptPool;
+            state.title = CONCEPT_QUIZ_TITLE;
+            storageKey = `pharmlet.${quizId}.easy`;
+        }
         // ========== MODE 4: ?id=quiz-name (Legacy Static JSON) ==========
         else if (quizId) {
             const data = await smartFetch(`${quizId}.json`);
-            const pool = data.pools ? Object.values(data.pools).flat() : (data.questions || []);
-            state.title = data.title || "Quiz";
-            state.questions = shuffled(pool).map((q, i) => ({ ...q, _id: i }));
-            storageKey = `pharmlet.${quizId}.easy`;
-            
-            // Skip to render for legacy quizzes
-            finishSetup(storageKey);
-            return;
+            const pool = flattenPoolData(data);
+
+            if (pool.length > 0 && pool.some(isConceptEntry)) {
+                filteredPool = pool.filter(isConceptEntry);
+                fullPool = filteredPool;
+                state.title = data.title || "Endocrine Concept Practice";
+                storageKey = `pharmlet.${quizId}.easy`;
+            } else {
+                state.title = data.title || "Quiz";
+                state.questions = shuffled(pool).map((q, i) => ({ ...q, _id: i }));
+                storageKey = `pharmlet.${quizId}.easy`;
+
+                // Skip to render for legacy quizzes
+                finishSetup(storageKey);
+                return;
+            }
         }
         else {
             throw new Error("Missing URL parameter. Use ?week=N, ?weeks=1-5, ?tag=Topic, or ?id=quiz-name");
         }
         
-        // Validate pool has drugs
+        // Validate pool has items
         if (filteredPool.length === 0) {
-            throw new Error(`No drugs found for this filter. Check your URL parameters.`);
+            throw new Error(`No items found for this filter. Check your URL parameters.`);
+        }
+
+        const quizUsesConcepts = filteredPool.some(isConceptEntry);
+        if (quizUsesConcepts && filteredPool.length < CONCEPT_QUIZ_SIZE) {
+            throw new Error(`Endocrine quiz needs at least ${CONCEPT_QUIZ_SIZE} concept entries, but only ${filteredPool.length} were loaded.`);
         }
         
         // Session-based anti-repetition shuffling
-        let lastRoundGenerics = [];
+        let lastRoundKeys = [];
         const sessionKey = `pharmlet.session.lastRound.${storageKey}`;
         try {
             const stored = sessionStorage.getItem(sessionKey);
-            if (stored) lastRoundGenerics = JSON.parse(stored);
+            if (stored) lastRoundKeys = JSON.parse(stored);
         } catch (e) { /* ignore parse errors */ }
         
         // For MODE 1 (?week=N), drugs are already pre-selected (6+4 split)
         // For other modes, apply standard selection logic
-        let selectedDrugs;
+        let selectedItems;
         if (weekParam) {
             // MODE 1: filteredPool IS the pre-selected 6+4 split (always use ALL of it)
             // Anti-repetition: shuffle fresh drugs first, then pad with repeats if needed
-            const freshPool = filteredPool.filter(d => !lastRoundGenerics.includes(d.generic));
-            const repeatPool = filteredPool.filter(d => lastRoundGenerics.includes(d.generic));
+            const freshPool = filteredPool.filter(item => !lastRoundKeys.includes(getQuestionIdentity(item)));
+            const repeatPool = filteredPool.filter(item => lastRoundKeys.includes(getQuestionIdentity(item)));
             
             // Always return exactly filteredPool.length drugs (the 6+4 = 10 we pre-selected)
             // Prioritize fresh drugs, fill remainder with repeats
             const targetCount = filteredPool.length;
             const shuffledFresh = shuffled(freshPool);
             const shuffledRepeat = shuffled(repeatPool);
-            selectedDrugs = [...shuffledFresh, ...shuffledRepeat].slice(0, targetCount);
+            selectedItems = [...shuffledFresh, ...shuffledRepeat].slice(0, targetCount);
         } else {
             // MODE 2/3: Standard selection from filtered pool
-            const unseenDrugs = filteredPool.filter(d => !lastRoundGenerics.includes(d.generic));
-            const workingPool = unseenDrugs.length >= Math.min(10, filteredPool.length) ? unseenDrugs : filteredPool;
-            const quizSize = Math.min(10, workingPool.length);
-            selectedDrugs = shuffled(workingPool).slice(0, quizSize);
+            const quizSize = quizUsesConcepts ? CONCEPT_QUIZ_SIZE : 10;
+            const unseenItems = filteredPool.filter(item => !lastRoundKeys.includes(getQuestionIdentity(item)));
+            const workingPool = unseenItems.length >= Math.min(quizSize, filteredPool.length) ? unseenItems : filteredPool;
+            const selectedCount = Math.min(quizSize, workingPool.length);
+            selectedItems = shuffled(workingPool).slice(0, selectedCount);
+        }
+
+        if (quizUsesConcepts && selectedItems.length !== CONCEPT_QUIZ_SIZE) {
+            throw new Error(`Endocrine quiz could not build ${CONCEPT_QUIZ_SIZE} questions from the loaded pool.`);
         }
         
         // Save this round for anti-repetition
-        sessionStorage.setItem(sessionKey, JSON.stringify(selectedDrugs.map(d => d.generic)));
+        sessionStorage.setItem(sessionKey, JSON.stringify(selectedItems.map(getQuestionIdentity)));
         
         // Generate questions using the full pool for distractor context
-        state.questions = shuffled(selectedDrugs).map((d, i) => ({
-            ...createQuestion(d, fullPool),  // Use full ceiling pool for density-safe distractors
+        state.questions = shuffled(selectedItems).map((item, i) => ({
+            ...createQuestionFromItem(item, fullPool),  // Use full pool for density-safe distractors
             _id: i,
-            drugRef: d
         }));
         
         finishSetup(storageKey);
