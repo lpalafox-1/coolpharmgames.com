@@ -861,5 +861,22 @@
       "milk production"
     ],
     "tags": ["prolactin", "lactation", "milk production", "anterior pituitary"]
+  },
+  {
+    "id": "hypothalamus-synthesizes-posterior-pituitary-hormones",
+    "unit": 10,
+    "topic": "Posterior Pituitary",
+    "subtopic": "Hormone origin",
+    "concept_type": "fact_statement",
+    "source": "ADH and oxytocin",
+    "target": "Synthesized in the hypothalamus and released from the posterior pituitary",
+    "relationship": "are",
+    "difficulty": "medium",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": [
+      "synthesized in the hypothalamus and released from the posterior pituitary",
+      "hypothalamus synthesis with posterior pituitary release"
+    ],
+    "tags": ["posterior pituitary", "hypothalamus", "ADH", "oxytocin", "vasopressin"]
   }
 ]
