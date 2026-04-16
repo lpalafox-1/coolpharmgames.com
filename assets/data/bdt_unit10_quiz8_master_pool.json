@@ -662,5 +662,149 @@
       "protection against excess thyroid hormone synthesis during high iodide exposure"
     ],
     "tags": ["thyroid", "Wolff-Chaikoff effect", "protection", "iodide"]
+  },
+  {
+    "id": "steroid-synthesized-on-demand",
+    "unit": 10,
+    "topic": "General Endocrine Principles",
+    "subtopic": "Hormone classes",
+    "concept_type": "fact_statement",
+    "source": "Steroid hormones",
+    "target": "Usually synthesized on demand rather than stored in vesicles",
+    "relationship": "are",
+    "difficulty": "easy",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": [
+      "synthesized on demand",
+      "synthesized on demand rather than stored in vesicles",
+      "not stored in vesicles"
+    ],
+    "tags": ["steroid hormones", "synthesis", "vesicles", "hormone classes"]
+  },
+  {
+    "id": "steroids-thyroid-intracellular-receptors",
+    "unit": 10,
+    "topic": "General Endocrine Principles",
+    "subtopic": "Hormone receptors",
+    "concept_type": "fact_statement",
+    "source": "Steroid hormones and thyroid hormones",
+    "target": "Usually act through intracellular receptors",
+    "relationship": "do",
+    "difficulty": "easy",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": [
+      "steroids and thyroid hormones",
+      "usually act through intracellular receptors",
+      "intracellular receptors"
+    ],
+    "tags": ["steroid hormones", "thyroid hormones", "intracellular receptors", "receptors"]
+  },
+  {
+    "id": "anterior-pituitary-endocrine-cells",
+    "unit": 10,
+    "topic": "Hypothalamus-Anterior Pituitary",
+    "subtopic": "Pituitary structure",
+    "concept_type": "fact_statement",
+    "source": "Anterior pituitary",
+    "target": "Primarily composed of endocrine cells",
+    "relationship": "is",
+    "difficulty": "easy",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": [
+      "endocrine cells",
+      "primarily composed of endocrine cells"
+    ],
+    "tags": ["anterior pituitary", "endocrine cells", "pituitary structure"]
+  },
+  {
+    "id": "hypophyseal-portal-system",
+    "unit": 10,
+    "topic": "Hypothalamus-Anterior Pituitary",
+    "subtopic": "Pituitary blood supply",
+    "concept_type": "function_pair",
+    "source": "Hypophyseal portal system",
+    "target": "Transporting hypothalamic hormones to the anterior pituitary",
+    "relationship": "does",
+    "difficulty": "easy",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": [
+      "transports hypothalamic hormones to the anterior pituitary",
+      "anterior pituitary delivery of hypothalamic hormones",
+      "portal system"
+    ],
+    "tags": ["hypophyseal portal system", "anterior pituitary", "hypothalamus", "blood supply"]
+  },
+  {
+    "id": "adh-aquaporin2",
+    "unit": 10,
+    "topic": "Posterior Pituitary",
+    "subtopic": "ADH action",
+    "concept_type": "function_pair",
+    "source": "ADH",
+    "target": "Inserting aquaporin-2 channels into collecting duct principal cells",
+    "relationship": "increases water reabsorption mainly by",
+    "difficulty": "medium",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": [
+      "inserting aquaporin-2 channels",
+      "aquaporin-2 insertion",
+      "inserting aquaporin-2 channels into collecting duct principal cells",
+      "aquaporin 2"
+    ],
+    "tags": ["ADH", "aquaporin-2", "collecting duct", "principal cells", "water reabsorption"]
+  },
+  {
+    "id": "oxytocin-positive-feedback",
+    "unit": 10,
+    "topic": "Posterior Pituitary",
+    "subtopic": "Oxytocin regulation",
+    "concept_type": "fact_statement",
+    "source": "Oxytocin",
+    "target": "Often operates through positive feedback loops",
+    "relationship": "does",
+    "difficulty": "easy",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": [
+      "positive feedback",
+      "positive feedback loops",
+      "operates through positive feedback loops"
+    ],
+    "tags": ["oxytocin", "positive feedback", "posterior pituitary", "feedback"]
+  },
+  {
+    "id": "ghrh-somatostatin-gh-pair",
+    "unit": 10,
+    "topic": "Hypothalamus-Anterior Pituitary",
+    "subtopic": "Growth hormone regulation",
+    "concept_type": "fact_statement",
+    "source": "Growth hormone secretion",
+    "target": "Stimulated by GHRH and inhibited by somatostatin",
+    "relationship": "is",
+    "difficulty": "easy",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": [
+      "GHRH up, somatostatin down",
+      "stimulated by GHRH and inhibited by somatostatin",
+      "GHRH stimulates and somatostatin inhibits"
+    ],
+    "tags": ["GH", "GHRH", "somatostatin", "growth hormone regulation"]
+  },
+  {
+    "id": "angiotensinII-chronic-aldosterone-regulator",
+    "unit": 10,
+    "topic": "Adrenal Gland",
+    "subtopic": "Aldosterone regulation",
+    "concept_type": "fact_statement",
+    "source": "Angiotensin II",
+    "target": "Most potent chronic regulator of aldosterone secretion",
+    "relationship": "is the",
+    "difficulty": "medium",
+    "prompt_bias": "mcq_preferred",
+    "answer_aliases": [
+      "most potent chronic regulator of aldosterone secretion",
+      "chronic regulator of aldosterone secretion",
+      "angiotensin II"
+    ],
+    "tags": ["angiotensin II", "aldosterone", "RAAS", "chronic regulation"]
   }
 ]
