@@ -1324,7 +1324,10 @@ function timerTick() {
 function startSmartTimer() {
     if (state.timerHandle) clearInterval(state.timerHandle);
     const count = state.questions.length;
-    state.timerSeconds = weekParam ? 600 : (count <= 20 ? 900 : (count <= 50 ? 2700 : 7200));
+    const isEndocrineQuiz = quizId === CONCEPT_QUIZ_ID || state.questions.some(q => q?._mode === "concept");
+    state.timerSeconds = isEndocrineQuiz
+        ? 600
+        : (weekParam ? 600 : (count <= 20 ? 900 : (count <= 50 ? 2700 : 7200)));
     state.timerHandle = setInterval(timerTick, 1000);
 }
 
