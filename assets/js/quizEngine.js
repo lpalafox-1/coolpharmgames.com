@@ -14,7 +14,8 @@ const state = {
     currentScale: 1.0,
     originalQuestions: [],  // For restart with original pool
     hintsUsed: 0,           // Track hints for stats
-    resultsRecorded: false
+    resultsRecorded: false,
+    signalsRecorded: false
 };
 
 // --- 1. CORE ACTIONS ---
@@ -52,6 +53,387 @@ const CONCEPT_QUIZ_POOL_FILE = "bdt_unit10_quiz8_master_pool.json";
 const FINAL_EXAM_ID = "log-lab-final-2";
 const FINAL_EXAM_TITLE = "Top Drugs Final Lab 2 — 110 Questions";
 const FINAL_EXAM_TOTAL = 110;
+const FINAL_RECENT_RUNS_KEY = "pharmlet.finalLab2.recentRuns";
+const TOP_DRUGS_SIGNALS_KEY = "pharmlet.topDrugs.signals";
+const FINAL_RECENT_RUN_LOOKBACK_MS = 14 * 24 * 60 * 60 * 1000;
+
+const FINAL_BLUEPRINT_FAMILY_WEIGHTS = [
+    { family: "generic_to_brand", weight: 0.18 },
+    { family: "brand_to_generic", weight: 0.18 },
+    { family: "drug_to_class", weight: 0.18 },
+    { family: "drug_to_category", weight: 0.14 },
+    { family: "drug_to_moa", weight: 0.12 },
+    { family: "paired_med_class", weight: 0.10 },
+    { family: "negative_mcq", weight: 0.10 }
+];
+
+function normalizeDrugKey(value) {
+    return String(value ?? "").replace(/\s+/g, " ").trim().toLowerCase();
+}
+
+function splitBrandNames(brandValue) {
+    if (!brandValue || String(brandValue).trim().toLowerCase() === "n/a") return [];
+
+    const seen = new Set();
+    const values = [];
+
+    String(brandValue)
+        .split(/[;,/]/)
+        .map(part => part.trim())
+        .filter(Boolean)
+        .forEach(part => {
+            const key = normalizeDrugKey(part);
+            if (!key || seen.has(key)) return;
+            seen.add(key);
+            values.push(part);
+        });
+
+    return values;
+}
+
+function safeReadStorageJson(key, fallbackValue) {
+    try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return fallbackValue;
+        return JSON.parse(raw);
+    } catch (error) {
+        return fallbackValue;
+    }
+}
+
+function createEmptyTopDrugsSignals() {
+    return {
+        version: 1,
+        updatedAt: 0,
+        seenDrugs: {},
+        missedDrugs: {},
+        seenClasses: {},
+        missedClasses: {},
+        seenCategories: {},
+        missedCategories: {},
+        seenBrands: {},
+        missedBrands: {}
+    };
+}
+
+function loadTopDrugsSignals() {
+    const parsed = safeReadStorageJson(TOP_DRUGS_SIGNALS_KEY, null);
+    if (!parsed || typeof parsed !== "object") return createEmptyTopDrugsSignals();
+
+    const base = createEmptyTopDrugsSignals();
+    return {
+        ...base,
+        ...parsed,
+        seenDrugs: parsed.seenDrugs || {},
+        missedDrugs: parsed.missedDrugs || {},
+        seenClasses: parsed.seenClasses || {},
+        missedClasses: parsed.missedClasses || {},
+        seenCategories: parsed.seenCategories || {},
+        missedCategories: parsed.missedCategories || {},
+        seenBrands: parsed.seenBrands || {},
+        missedBrands: parsed.missedBrands || {}
+    };
+}
+
+function saveTopDrugsSignals(signals) {
+    try {
+        localStorage.setItem(TOP_DRUGS_SIGNALS_KEY, JSON.stringify({
+            ...createEmptyTopDrugsSignals(),
+            ...signals,
+            updatedAt: Date.now()
+        }));
+    } catch (error) {
+        console.warn("Unable to persist Top Drugs signals:", error);
+    }
+}
+
+function loadRecentFinalRuns() {
+    const parsed = safeReadStorageJson(FINAL_RECENT_RUNS_KEY, []);
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed
+        .filter(run => run && typeof run === "object")
+        .map(run => ({
+            timestamp: Number(run.timestamp) || 0,
+            generics: Array.isArray(run.generics) ? run.generics.map(normalizeDrugKey).filter(Boolean) : [],
+            familiesByGeneric: run.familiesByGeneric && typeof run.familiesByGeneric === "object" ? run.familiesByGeneric : {}
+        }))
+        .slice(-10);
+}
+
+function saveRecentFinalRuns(runs) {
+    try {
+        localStorage.setItem(FINAL_RECENT_RUNS_KEY, JSON.stringify(runs.slice(-10)));
+    } catch (error) {
+        console.warn("Unable to persist recent final runs:", error);
+    }
+}
+
+function incrementCounter(counter, key, step = 1) {
+    const normalizedKey = normalizeDrugKey(key);
+    if (!normalizedKey) return;
+    counter[normalizedKey] = (Number(counter[normalizedKey]) || 0) + step;
+}
+
+function getCounterValue(counter, key) {
+    return Number(counter?.[normalizeDrugKey(key)] || 0);
+}
+
+function tokenizeTherapeuticText(value) {
+    return String(value ?? "")
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, " ")
+        .split(/\s+/)
+        .map(token => token.trim())
+        .filter(token => token && token.length > 2 && !["and", "for", "the", "with", "agent", "drug"].includes(token));
+}
+
+function getDrugTherapeuticTokens(drug) {
+    const tokenSet = new Set([
+        ...tokenizeTherapeuticText(drug?.class),
+        ...tokenizeTherapeuticText(drug?.category)
+    ]);
+    return [...tokenSet];
+}
+
+function getTherapeuticSimilarity(drugA, drugB) {
+    const a = getDrugTherapeuticTokens(drugA);
+    const b = getDrugTherapeuticTokens(drugB);
+    if (!a.length || !b.length) return 0;
+
+    const bSet = new Set(b);
+    let overlap = 0;
+    for (const token of a) {
+        if (bSet.has(token)) overlap += 1;
+    }
+
+    return overlap / Math.max(a.length, b.length);
+}
+
+function getWeaknessScore(seenCount, missedCount) {
+    const seen = Number(seenCount || 0);
+    const missed = Number(missedCount || 0);
+    if (seen <= 0 && missed <= 0) return 0;
+
+    const missRate = missed / Math.max(1, seen);
+    return Math.min(4, (missed * 0.35) + (missRate * 1.25) - (seen * 0.02));
+}
+
+function getDrugWeaknessScore(drug, signals) {
+    const genericKey = normalizeDrugKey(drug?.generic);
+    const classKey = normalizeDrugKey(drug?.class);
+    const categoryKey = normalizeDrugKey(drug?.category);
+
+    return (
+        getWeaknessScore(getCounterValue(signals.seenDrugs, genericKey), getCounterValue(signals.missedDrugs, genericKey)) * 0.7 +
+        getWeaknessScore(getCounterValue(signals.seenClasses, classKey), getCounterValue(signals.missedClasses, classKey)) * 0.45 +
+        getWeaknessScore(getCounterValue(signals.seenCategories, categoryKey), getCounterValue(signals.missedCategories, categoryKey)) * 0.45
+    );
+}
+
+function getBrandWeaknessScore(drug, signals) {
+    const brands = splitBrandNames(drug?.brand);
+    if (!brands.length) return 0;
+
+    let maxScore = 0;
+    for (const brand of brands) {
+        const seen = getCounterValue(signals.seenBrands, brand);
+        const missed = getCounterValue(signals.missedBrands, brand);
+        const underPracticedBoost = Math.max(0, 3 - seen) * 0.12;
+        const score = getWeaknessScore(seen, missed) + underPracticedBoost;
+        if (score > maxScore) maxScore = score;
+    }
+
+    return maxScore;
+}
+
+function buildRecentFinalUsageContext(runs) {
+    const now = Date.now();
+    const recentGenericUsage = {};
+    const recentFamilyUsageByGeneric = {};
+
+    for (const run of runs) {
+        const timestamp = Number(run?.timestamp || 0);
+        if (!timestamp) continue;
+
+        const ageMs = now - timestamp;
+        if (ageMs < 0 || ageMs > FINAL_RECENT_RUN_LOOKBACK_MS) continue;
+
+        const recencyWeight = Math.max(0.2, 1 - (ageMs / FINAL_RECENT_RUN_LOOKBACK_MS));
+
+        for (const genericKey of run.generics || []) {
+            incrementCounter(recentGenericUsage, genericKey, recencyWeight);
+        }
+
+        for (const [genericKeyRaw, familyRaw] of Object.entries(run.familiesByGeneric || {})) {
+            const genericKey = normalizeDrugKey(genericKeyRaw);
+            const family = String(familyRaw || "").trim();
+            if (!genericKey || !family) continue;
+
+            if (!recentFamilyUsageByGeneric[genericKey]) recentFamilyUsageByGeneric[genericKey] = {};
+            recentFamilyUsageByGeneric[genericKey][family] = (Number(recentFamilyUsageByGeneric[genericKey][family]) || 0) + recencyWeight;
+        }
+    }
+
+    return { recentGenericUsage, recentFamilyUsageByGeneric };
+}
+
+function createFinalSelectionState() {
+    return {
+        selected: [],
+        counts: { 1: 0, 2: 0 },
+        seenGenerics: new Set(),
+        classCounts: {},
+        categoryCounts: {}
+    };
+}
+
+function addDrugToFinalSelection(drug, state, targetCounts) {
+    const lab = Number(drug?.metadata?.lab);
+    const genericKey = normalizeDrugKey(drug?.generic);
+    if (![1, 2].includes(lab) || !genericKey) return false;
+    if (state.counts[lab] >= targetCounts[lab] || state.seenGenerics.has(genericKey)) return false;
+
+    state.seenGenerics.add(genericKey);
+    state.selected.push(drug);
+    state.counts[lab] += 1;
+
+    incrementCounter(state.classCounts, drug?.class);
+    incrementCounter(state.categoryCounts, drug?.category);
+    return true;
+}
+
+function scoreFinalDrugCandidate(drug, state, context) {
+    const signals = context.signals;
+    const genericKey = normalizeDrugKey(drug?.generic);
+    const classKey = normalizeDrugKey(drug?.class);
+    const categoryKey = normalizeDrugKey(drug?.category);
+
+    let score = Math.random() * 0.35;
+    score += getDrugWeaknessScore(drug, signals) * 0.35;
+    score += getBrandWeaknessScore(drug, signals) * 0.12;
+
+    const recentGenericPenalty = Number(context.recentGenericUsage[genericKey] || 0) * 0.95;
+    score -= recentGenericPenalty;
+
+    const classCount = Number(state.classCounts[classKey] || 0);
+    const categoryCount = Number(state.categoryCounts[categoryKey] || 0);
+    score += Math.max(0, 2 - classCount) * 0.28;
+    score += Math.max(0, 2 - categoryCount) * 0.24;
+    if (classCount > 3) score -= (classCount - 3) * 0.55;
+    if (categoryCount > 4) score -= (categoryCount - 4) * 0.45;
+
+    return score;
+}
+
+function pickBestFinalDrugFromCandidates(candidates, state, context) {
+    if (!candidates.length) return null;
+
+    const ranked = candidates
+        .map(drug => ({ drug, score: scoreFinalDrugCandidate(drug, state, context) }))
+        .sort((a, b) => b.score - a.score);
+
+    const topSlice = ranked.slice(0, Math.min(4, ranked.length));
+    return topSlice[Math.floor(Math.random() * topSlice.length)]?.drug || ranked[0]?.drug || null;
+}
+
+function selectFromFinalBucket({ bucket, lab, limit, respectBucketLimit, state, targetCounts, context }) {
+    let pickedInBucket = 0;
+
+    while (state.counts[lab] < targetCounts[lab]) {
+        if (respectBucketLimit && pickedInBucket >= limit) break;
+
+        const available = bucket.filter(drug => {
+            const genericKey = normalizeDrugKey(drug?.generic);
+            return genericKey && !state.seenGenerics.has(genericKey);
+        });
+        if (!available.length) break;
+
+        const chosen = pickBestFinalDrugFromCandidates(available, state, context);
+        if (!chosen) break;
+        if (!addDrugToFinalSelection(chosen, state, targetCounts)) break;
+        pickedInBucket += 1;
+    }
+}
+
+function fillRemainingFinalLab(pool, lab, state, targetCounts, context) {
+    while (state.counts[lab] < targetCounts[lab]) {
+        const available = pool.filter(drug => Number(drug?.metadata?.lab) === lab)
+            .filter(drug => {
+                const genericKey = normalizeDrugKey(drug?.generic);
+                return genericKey && !state.seenGenerics.has(genericKey);
+            });
+
+        if (!available.length) break;
+
+        const chosen = pickBestFinalDrugFromCandidates(available, state, context);
+        if (!chosen || !addDrugToFinalSelection(chosen, state, targetCounts)) break;
+    }
+}
+
+function selectFinalExamDrugs(pool) {
+    const byLabWeek = new Map();
+
+    for (const drug of pool) {
+        const lab = Number(drug?.metadata?.lab);
+        const week = Number(drug?.metadata?.week);
+        if (![1, 2].includes(lab) || !week) continue;
+
+        const key = `${lab}-${week}`;
+        if (!byLabWeek.has(key)) byLabWeek.set(key, []);
+        byLabWeek.get(key).push(drug);
+    }
+
+    const targetCounts = { 1: 44, 2: 66 };
+    const state = createFinalSelectionState();
+    const signals = loadTopDrugsSignals();
+    const recentRuns = loadRecentFinalRuns();
+    const recentUsageContext = buildRecentFinalUsageContext(recentRuns);
+    const context = {
+        signals,
+        recentGenericUsage: recentUsageContext.recentGenericUsage,
+        recentFamilyUsageByGeneric: recentUsageContext.recentFamilyUsageByGeneric
+    };
+
+    const bucketPlan = [];
+    for (let week = 1; week <= 10; week++) {
+        bucketPlan.push({ bucket: shuffled(byLabWeek.get(`1-${week}`) || []), lab: 1, limit: 4 });
+        bucketPlan.push({ bucket: shuffled(byLabWeek.get(`2-${week}`) || []), lab: 2, limit: 4 });
+    }
+    bucketPlan.push({ bucket: shuffled(byLabWeek.get("1-11") || []), lab: 1, limit: 4 });
+    bucketPlan.push({ bucket: shuffled(byLabWeek.get("2-11") || []), lab: 2, limit: 3 });
+
+    for (const step of bucketPlan) {
+        selectFromFinalBucket({
+            ...step,
+            respectBucketLimit: true,
+            state,
+            targetCounts,
+            context
+        });
+    }
+
+    if (state.counts[1] < targetCounts[1] || state.counts[2] < targetCounts[2]) {
+        for (const step of bucketPlan) {
+            selectFromFinalBucket({
+                ...step,
+                respectBucketLimit: false,
+                state,
+                targetCounts,
+                context
+            });
+        }
+    }
+
+    fillRemainingFinalLab(pool, 1, state, targetCounts, context);
+    fillRemainingFinalLab(pool, 2, state, targetCounts, context);
+
+    if (state.selected.length !== FINAL_EXAM_TOTAL || state.counts[1] !== targetCounts[1] || state.counts[2] !== targetCounts[2]) {
+        throw new Error(`Final exam generator expected 44 Lab 1 and 66 Lab 2 unique drugs, got ${state.counts[1]} and ${state.counts[2]}.`);
+    }
+
+    return state.selected;
+}
 
 function selectFinalExamDrugs(pool) {
     const byLabWeek = new Map();
@@ -1461,6 +1843,519 @@ function createQuestion(drug, all) {
     };
 }
 
+function computeFinalQuestionFamilyTargets(totalCount) {
+    const targets = {};
+    const withFractions = [];
+    let assigned = 0;
+
+    for (const { family, weight } of FINAL_BLUEPRINT_FAMILY_WEIGHTS) {
+        const exact = totalCount * weight;
+        const base = Math.floor(exact);
+        targets[family] = base;
+        assigned += base;
+        withFractions.push({ family, fraction: exact - base });
+    }
+
+    let remainder = totalCount - assigned;
+    withFractions.sort((a, b) => b.fraction - a.fraction);
+    let index = 0;
+
+    while (remainder > 0 && withFractions.length) {
+        const family = withFractions[index % withFractions.length].family;
+        targets[family] += 1;
+        index += 1;
+        remainder -= 1;
+    }
+
+    return targets;
+}
+
+function buildFinalPoolStats(pool) {
+    const classToDrugs = new Map();
+    const categoryToDrugs = new Map();
+    const moaToDrugs = new Map();
+    const allClasses = [];
+
+    const addToMap = (map, key, drug) => {
+        const normalized = normalizeDrugKey(key);
+        if (!normalized) return;
+        if (!map.has(normalized)) map.set(normalized, []);
+        map.get(normalized).push(drug);
+    };
+
+    for (const drug of pool) {
+        addToMap(classToDrugs, drug?.class, drug);
+        addToMap(categoryToDrugs, drug?.category, drug);
+        addToMap(moaToDrugs, drug?.moa, drug);
+        if (drug?.class) allClasses.push(drug.class);
+    }
+
+    return {
+        classToDrugs,
+        categoryToDrugs,
+        moaToDrugs,
+        allClasses: [...new Set(allClasses.filter(Boolean))]
+    };
+}
+
+function canBuildFinalQuestionFamily(drug, family, poolStats) {
+    const classKey = normalizeDrugKey(drug?.class);
+    const categoryKey = normalizeDrugKey(drug?.category);
+    const moaKey = normalizeDrugKey(drug?.moa);
+    const brandCount = splitBrandNames(drug?.brand).length;
+
+    switch (family) {
+        case "generic_to_brand":
+        case "brand_to_generic":
+            return brandCount > 0;
+        case "drug_to_class":
+            return Boolean(classKey);
+        case "drug_to_category":
+            return Boolean(categoryKey);
+        case "drug_to_moa":
+            return Boolean(moaKey);
+        case "paired_med_class":
+            return Boolean(classKey) && poolStats.allClasses.length >= 4;
+        case "negative_mcq": {
+            const classCount = classKey ? (poolStats.classToDrugs.get(classKey)?.length || 0) : 0;
+            const categoryCount = categoryKey ? (poolStats.categoryToDrugs.get(categoryKey)?.length || 0) : 0;
+            return classCount >= 4 || categoryCount >= 4;
+        }
+        default:
+            return false;
+    }
+}
+
+function getFinalQuestionFamilyCandidates(drug, poolStats) {
+    return FINAL_BLUEPRINT_FAMILY_WEIGHTS
+        .map(item => item.family)
+        .filter(family => canBuildFinalQuestionFamily(drug, family, poolStats));
+}
+
+function scoreFinalFamilyChoice(drug, family, currentCounts, targetCounts, context) {
+    const genericKey = normalizeDrugKey(drug?.generic);
+    const deficit = Math.max(0, (targetCounts[family] || 0) - (currentCounts[family] || 0));
+    const familyRecentPenalty = Number(context.recentFamilyUsageByGeneric?.[genericKey]?.[family] || 0);
+    const genericRecentPenalty = Number(context.recentGenericUsage?.[genericKey] || 0);
+
+    let score = Math.random() * 0.25;
+    score += deficit * 1.1;
+    score += getDrugWeaknessScore(drug, context.signals) * 0.12;
+
+    if (family === "generic_to_brand" || family === "brand_to_generic") {
+        score += getBrandWeaknessScore(drug, context.signals) * 0.22;
+    }
+
+    score -= familyRecentPenalty * 1.35;
+    score -= genericRecentPenalty * 0.2;
+    return score;
+}
+
+function assignFinalQuestionFamilies(selectedDrugs, poolStats, context) {
+    const families = FINAL_BLUEPRINT_FAMILY_WEIGHTS.map(item => item.family);
+    const targetCounts = computeFinalQuestionFamilyTargets(selectedDrugs.length);
+    const currentCounts = Object.fromEntries(families.map(family => [family, 0]));
+    const assignments = new Map();
+
+    const candidatesByFamily = new Map();
+    for (const family of families) {
+        candidatesByFamily.set(family, selectedDrugs.filter(drug => canBuildFinalQuestionFamily(drug, family, poolStats)));
+    }
+
+    const familyOrder = [...families].sort((a, b) => {
+        const slackA = (candidatesByFamily.get(a)?.length || 0) - (targetCounts[a] || 0);
+        const slackB = (candidatesByFamily.get(b)?.length || 0) - (targetCounts[b] || 0);
+        return slackA - slackB;
+    });
+
+    for (const family of familyOrder) {
+        while ((currentCounts[family] || 0) < (targetCounts[family] || 0)) {
+            const available = (candidatesByFamily.get(family) || [])
+                .filter(drug => !assignments.has(normalizeDrugKey(drug?.generic)));
+            if (!available.length) break;
+
+            const ranked = available
+                .map(drug => ({
+                    drug,
+                    score: scoreFinalFamilyChoice(drug, family, currentCounts, targetCounts, context)
+                }))
+                .sort((a, b) => b.score - a.score);
+
+            const top = ranked.slice(0, Math.min(4, ranked.length));
+            const chosen = top[Math.floor(Math.random() * top.length)]?.drug || ranked[0]?.drug;
+            if (!chosen) break;
+
+            assignments.set(normalizeDrugKey(chosen?.generic), family);
+            currentCounts[family] = (currentCounts[family] || 0) + 1;
+        }
+    }
+
+    for (const drug of selectedDrugs) {
+        const genericKey = normalizeDrugKey(drug?.generic);
+        if (!genericKey || assignments.has(genericKey)) continue;
+
+        const familyCandidates = getFinalQuestionFamilyCandidates(drug, poolStats);
+        if (!familyCandidates.length) continue;
+
+        const ranked = familyCandidates
+            .map(family => ({
+                family,
+                score: scoreFinalFamilyChoice(drug, family, currentCounts, targetCounts, context)
+            }))
+            .sort((a, b) => b.score - a.score);
+
+        const chosenFamily = ranked[0]?.family;
+        if (!chosenFamily) continue;
+
+        assignments.set(genericKey, chosenFamily);
+        currentCounts[chosenFamily] = (currentCounts[chosenFamily] || 0) + 1;
+    }
+
+    return { assignments, currentCounts, targetCounts };
+}
+
+function rankByTherapeuticSimilarity(targetDrug, candidates) {
+    return [...candidates].sort((a, b) => {
+        const similarityDelta = getTherapeuticSimilarity(targetDrug, b) - getTherapeuticSimilarity(targetDrug, a);
+        if (Math.abs(similarityDelta) > 0.0001) return similarityDelta;
+
+        const weekA = Number(a?.metadata?.week || 0);
+        const weekB = Number(b?.metadata?.week || 0);
+        const targetWeek = Number(targetDrug?.metadata?.week || 0);
+        const weekDeltaA = Math.abs(targetWeek - weekA);
+        const weekDeltaB = Math.abs(targetWeek - weekB);
+        return weekDeltaA - weekDeltaB;
+    });
+}
+
+function getFinalFieldDistractors(drug, allPool, key, maxCount = 3) {
+    const targetValue = drug?.[key];
+    const targetNorm = normalizeDrugKey(targetValue);
+    if (!targetValue || !targetNorm) return [];
+
+    const selected = [];
+    const seen = new Set([targetNorm]);
+    const classKey = normalizeDrugKey(drug?.class);
+    const categoryKey = normalizeDrugKey(drug?.category);
+    const targetWeek = Number(drug?.metadata?.week || 0);
+    const targetLab = Number(drug?.metadata?.lab || 0);
+
+    const addFromPhase = (phaseFilter) => {
+        const ranked = [];
+
+        for (const candidate of allPool) {
+            if (candidate === drug) continue;
+            const value = candidate?.[key];
+            const valueNorm = normalizeDrugKey(value);
+            if (!value || !valueNorm || seen.has(valueNorm)) continue;
+            if (!phaseFilter(candidate)) continue;
+
+            const candidateClassKey = normalizeDrugKey(candidate?.class);
+            const candidateCategoryKey = normalizeDrugKey(candidate?.category);
+            const similarity = getTherapeuticSimilarity(drug, candidate);
+
+            let score = Math.random() * 0.2;
+            if (classKey && candidateClassKey && classKey === candidateClassKey) score += 3.2;
+            if (categoryKey && candidateCategoryKey && categoryKey === candidateCategoryKey) score += 2.6;
+            score += similarity * 5;
+
+            const weekDelta = Math.abs(targetWeek - Number(candidate?.metadata?.week || 0));
+            if (targetWeek && Number.isFinite(weekDelta)) {
+                score += Math.max(0, 1.3 - (weekDelta * 0.12));
+            }
+            if (targetLab && Number(candidate?.metadata?.lab || 0) === targetLab) {
+                score += 0.4;
+            }
+
+            ranked.push({ value, valueNorm, score });
+        }
+
+        ranked.sort((a, b) => b.score - a.score);
+        for (const item of ranked) {
+            if (selected.length >= maxCount) break;
+            if (seen.has(item.valueNorm)) continue;
+            selected.push(item.value);
+            seen.add(item.valueNorm);
+        }
+    };
+
+    addFromPhase(candidate => normalizeDrugKey(candidate?.class) === classKey && classKey);
+    addFromPhase(candidate => normalizeDrugKey(candidate?.category) === categoryKey && categoryKey);
+    addFromPhase(candidate => getTherapeuticSimilarity(drug, candidate) > 0);
+    addFromPhase(() => true);
+
+    return selected.slice(0, maxCount);
+}
+
+function pickBrandVariantForFinal(drug, signals) {
+    const brands = splitBrandNames(drug?.brand);
+    if (!brands.length) return null;
+
+    const ranked = brands
+        .map(brand => {
+            const seen = getCounterValue(signals.seenBrands, brand);
+            const missed = getCounterValue(signals.missedBrands, brand);
+            const score = (missed * 1.2) - (seen * 0.35) + (Math.max(0, 3 - seen) * 0.2) + (Math.random() * 0.1);
+            return { brand, score };
+        })
+        .sort((a, b) => b.score - a.score);
+
+    return ranked[0]?.brand || brands[0];
+}
+
+function buildFinalDrugToFieldQuestion(drug, allPool, key, label) {
+    const answer = drug?.[key];
+    if (!answer) return null;
+
+    const distractors = getFinalFieldDistractors(drug, allPool, key, 3);
+    if (distractors.length < 3) return null;
+
+    return {
+        type: "mcq",
+        prompt: `<b>${label}</b> for <b>${drug.generic}</b>?`,
+        choices: shuffled([answer, ...distractors]),
+        answer,
+        drugRef: drug
+    };
+}
+
+function buildFinalGenericToBrandQuestion(drug, signals) {
+    const brand = pickBrandVariantForFinal(drug, signals);
+    if (!brand) return null;
+
+    return {
+        type: "short",
+        prompt: `Brand for <b>${drug.generic}</b>?`,
+        answer: brand,
+        drugRef: drug,
+        _brandVariant: brand
+    };
+}
+
+function buildFinalBrandToGenericQuestion(drug, signals) {
+    const brand = pickBrandVariantForFinal(drug, signals);
+    if (!brand) return null;
+
+    return {
+        type: "short",
+        prompt: `Generic for <b>${brand}</b>?`,
+        answer: drug.generic,
+        drugRef: drug,
+        _brandVariant: brand
+    };
+}
+
+function buildFinalPairedClassQuestion(drug, allPool, poolStats) {
+    if (!drug?.class || !drug?.generic) return null;
+
+    const candidates = allPool.filter(other => other !== drug && other?.generic && other?.class);
+    if (candidates.length < 3) return null;
+
+    const selectedOthers = rankByTherapeuticSimilarity(drug, candidates).slice(0, 8);
+    if (selectedOthers.length < 3) return null;
+
+    const wrongPairs = [];
+    const usedPairs = new Set();
+    const classPool = poolStats.allClasses;
+
+    for (const other of selectedOthers) {
+        if (wrongPairs.length >= 3) break;
+
+        const wrongClass = classPool.find(cls => normalizeDrugKey(cls) !== normalizeDrugKey(other.class)) || null;
+        if (!wrongClass) continue;
+
+        const pair = `${other.generic}: ${wrongClass}`;
+        const pairKey = normalizeDrugKey(pair);
+        if (usedPairs.has(pairKey)) continue;
+        usedPairs.add(pairKey);
+        wrongPairs.push(pair);
+    }
+
+    if (wrongPairs.length < 3) return null;
+
+    const correctPair = `${drug.generic}: ${drug.class}`;
+    return {
+        type: "mcq",
+        prompt: "Which medication/class pair is <b>correctly matched</b>?",
+        choices: shuffled([correctPair, ...wrongPairs.slice(0, 3)]),
+        answer: correctPair,
+        drugRef: drug
+    };
+}
+
+function buildFinalNegativeQuestion(drug, allPool) {
+    const attributes = [
+        { key: "class", label: "class" },
+        { key: "category", label: "category" }
+    ].filter(attr => drug?.[attr.key]);
+
+    for (const attr of attributes) {
+        const targetValue = drug[attr.key];
+        const targetNorm = normalizeDrugKey(targetValue);
+        if (!targetNorm) continue;
+
+        const sameGroup = allPool
+            .filter(other => other !== drug && other?.generic && normalizeDrugKey(other?.[attr.key]) === targetNorm);
+        if (sameGroup.length < 3) continue;
+
+        const wrongChoices = rankByTherapeuticSimilarity(drug, sameGroup)
+            .slice(0, 3)
+            .map(other => other.generic)
+            .filter(Boolean);
+        if (wrongChoices.length < 3) continue;
+
+        const wrongSet = new Set(wrongChoices.map(normalizeDrugKey));
+        const differentCandidates = allPool
+            .filter(other => other !== drug && other?.generic && normalizeDrugKey(other?.[attr.key]) !== targetNorm)
+            .filter(other => !wrongSet.has(normalizeDrugKey(other.generic)));
+        if (!differentCandidates.length) continue;
+
+        const rankedDifferent = rankByTherapeuticSimilarity(drug, differentCandidates);
+        const correctDrug = rankedDifferent[0];
+        if (!correctDrug?.generic) continue;
+
+        return {
+            type: "mcq",
+            prompt: `Which drug is <b>NOT</b> in the <b>${targetValue}</b> ${attr.label}?`,
+            choices: shuffled([correctDrug.generic, ...wrongChoices]),
+            answer: correctDrug.generic,
+            drugRef: drug
+        };
+    }
+
+    return null;
+}
+
+function buildFinalExamQuestionFromFamily(drug, allPool, family, context, poolStats) {
+    switch (family) {
+        case "generic_to_brand":
+            return buildFinalGenericToBrandQuestion(drug, context.signals);
+        case "brand_to_generic":
+            return buildFinalBrandToGenericQuestion(drug, context.signals);
+        case "drug_to_class":
+            return buildFinalDrugToFieldQuestion(drug, allPool, "class", "Class");
+        case "drug_to_category":
+            return buildFinalDrugToFieldQuestion(drug, allPool, "category", "Category");
+        case "drug_to_moa":
+            return buildFinalDrugToFieldQuestion(drug, allPool, "moa", "MOA");
+        case "paired_med_class":
+            return buildFinalPairedClassQuestion(drug, allPool, poolStats);
+        case "negative_mcq":
+            return buildFinalNegativeQuestion(drug, allPool);
+        default:
+            return null;
+    }
+}
+
+function buildFinalExamQuestions(selectedDrugs, fullPool) {
+    const signals = loadTopDrugsSignals();
+    const recentUsageContext = buildRecentFinalUsageContext(loadRecentFinalRuns());
+    const context = {
+        signals,
+        recentGenericUsage: recentUsageContext.recentGenericUsage,
+        recentFamilyUsageByGeneric: recentUsageContext.recentFamilyUsageByGeneric
+    };
+
+    const poolStats = buildFinalPoolStats(fullPool);
+    const assignmentInfo = assignFinalQuestionFamilies(selectedDrugs, poolStats, context);
+
+    const questions = [];
+    for (const drug of selectedDrugs) {
+        const genericKey = normalizeDrugKey(drug?.generic);
+        const preferredFamily = assignmentInfo.assignments.get(genericKey) || null;
+        const fallbackFamilies = getFinalQuestionFamilyCandidates(drug, poolStats);
+
+        const familyOrder = [];
+        if (preferredFamily) familyOrder.push(preferredFamily);
+        for (const family of fallbackFamilies) {
+            if (!familyOrder.includes(family)) familyOrder.push(family);
+        }
+
+        let builtQuestion = null;
+        let usedFamily = "legacy";
+
+        for (const family of familyOrder) {
+            const candidate = buildFinalExamQuestionFromFamily(drug, fullPool, family, context, poolStats);
+            if (!candidate) continue;
+            builtQuestion = candidate;
+            usedFamily = family;
+            break;
+        }
+
+        if (!builtQuestion) {
+            builtQuestion = createQuestion(drug, fullPool);
+        }
+
+        questions.push({
+            ...builtQuestion,
+            _finalFamily: usedFamily
+        });
+    }
+
+    return shuffled(questions);
+}
+
+function saveFinalRunSnapshot(questions) {
+    const runs = loadRecentFinalRuns();
+    const generics = [];
+    const familiesByGeneric = {};
+
+    for (const question of questions) {
+        const genericKey = normalizeDrugKey(question?.drugRef?.generic);
+        if (!genericKey) continue;
+        generics.push(genericKey);
+        if (question?._finalFamily) familiesByGeneric[genericKey] = question._finalFamily;
+    }
+
+    runs.push({
+        timestamp: Date.now(),
+        generics: [...new Set(generics)],
+        familiesByGeneric
+    });
+
+    saveRecentFinalRuns(runs);
+}
+
+function recordTopDrugsSignalsFromQuestions(questions) {
+    if (!Array.isArray(questions) || !questions.length) return;
+
+    const topDrugQuestions = questions.filter(question => question?.drugRef && !question?.conceptRef);
+    if (!topDrugQuestions.length) return;
+
+    const signals = loadTopDrugsSignals();
+
+    for (const question of topDrugQuestions) {
+        const drug = question?.drugRef;
+        if (!drug) continue;
+
+        incrementCounter(signals.seenDrugs, drug.generic);
+        incrementCounter(signals.seenClasses, drug.class);
+        incrementCounter(signals.seenCategories, drug.category);
+
+        const missed = question?._answered && !question?._correct;
+        if (missed) {
+            incrementCounter(signals.missedDrugs, drug.generic);
+            incrementCounter(signals.missedClasses, drug.class);
+            incrementCounter(signals.missedCategories, drug.category);
+        }
+
+        const brandFocusedPrompt = /\bbrand\b|\bgeneric\b/i.test(String(question?.prompt || ""));
+        const familyBrandFocus = question?._finalFamily === "generic_to_brand" || question?._finalFamily === "brand_to_generic";
+        if (!brandFocusedPrompt && !familyBrandFocus) continue;
+
+        const brandVariants = question?._brandVariant
+            ? [question._brandVariant]
+            : splitBrandNames(drug?.brand).slice(0, 1);
+
+        for (const brand of brandVariants) {
+            incrementCounter(signals.seenBrands, brand);
+            if (missed) incrementCounter(signals.missedBrands, brand);
+        }
+    }
+
+    saveTopDrugsSignals(signals);
+}
+
 // --- 3. UI RENDERING ---
 function render() {
     const q = state.questions[state.index];
@@ -1740,6 +2635,11 @@ function scoreCurrent(val) {
 function showResults() {
     saveQuizHistory();
 
+    if (!state.signalsRecorded) {
+        recordTopDrugsSignalsFromQuestions(state.questions);
+        state.signalsRecorded = true;
+    }
+
     // Save high score to localStorage (only if it's better than existing)
     let storageKey = null;
     if (weekParam) {
@@ -1949,12 +2849,14 @@ async function main() {
         else if (quizId === FINAL_EXAM_ID) {
             fullPool = await smartFetch("master_pool.json");
             const selectedDrugs = selectFinalExamDrugs(fullPool);
+            const finalQuestions = buildFinalExamQuestions(selectedDrugs, fullPool);
 
             state.title = FINAL_EXAM_TITLE;
-            state.questions = shuffled(selectedDrugs).map((d, i) => ({
-                ...createQuestionFromItem(d, fullPool),
+            state.questions = finalQuestions.map((question, i) => ({
+                ...question,
                 _id: i
             }));
+            saveFinalRunSnapshot(state.questions);
             storageKey = `pharmlet.${quizId}.easy`;
 
             finishSetup(storageKey);
