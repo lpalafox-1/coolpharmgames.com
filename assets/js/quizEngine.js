@@ -60,11 +60,12 @@ const FINAL_RECENT_RUN_LOOKBACK_MS = 14 * 24 * 60 * 60 * 1000;
 const FINAL_BLUEPRINT_FAMILY_WEIGHTS = [
     { family: "generic_to_brand", weight: 0.18 },
     { family: "brand_to_generic", weight: 0.18 },
-    { family: "drug_to_class", weight: 0.18 },
-    { family: "drug_to_category", weight: 0.14 },
+    { family: "brand_class_pair", weight: 0.08 },
+    { family: "drug_to_class", weight: 0.14 },
+    { family: "drug_to_category", weight: 0.12 },
     { family: "drug_to_moa", weight: 0.12 },
     { family: "paired_med_class", weight: 0.10 },
-    { family: "negative_mcq", weight: 0.10 }
+    { family: "negative_mcq", weight: 0.08 }
 ];
 
 function normalizeDrugKey(value) {
@@ -208,6 +209,258 @@ function getTherapeuticSimilarity(drugA, drugB) {
     }
 
     return overlap / Math.max(a.length, b.length);
+}
+
+const BRAND_CLASS_NEARBY_CLASS_GROUPS = [
+    ["atypical antipsychotic", "typical antipsychotic", "first generation antipsychotic", "second generation antipsychotic"],
+    ["ace inhibitor", "angiotensin converting enzyme inhibitor", "arb", "angiotensin ii receptor blocker"],
+    ["beta blocker", "calcium channel blocker"],
+    ["proton pump inhibitor", "ppi", "h2 receptor antagonist", "h2ra", "histamine 2 receptor antagonist"],
+    ["thiazide", "loop diuretic", "potassium sparing diuretic"],
+    ["basal insulin", "long acting insulin", "rapid acting insulin", "short acting insulin", "prandial insulin"]
+];
+
+function normalizeClassForMatch(value) {
+    return String(value ?? "")
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
+function getTokenOverlapScore(textA, textB) {
+    const tokensA = new Set(tokenizeTherapeuticText(textA));
+    const tokensB = new Set(tokenizeTherapeuticText(textB));
+    if (!tokensA.size || !tokensB.size) return 0;
+
+    let overlap = 0;
+    for (const token of tokensA) {
+        if (tokensB.has(token)) overlap += 1;
+    }
+
+    return overlap / Math.max(tokensA.size, tokensB.size);
+}
+
+function getNearbyClassAlternatives(targetClass, allClasses) {
+    const targetNorm = normalizeClassForMatch(targetClass);
+    if (!targetNorm) return [];
+
+    const classValues = [...new Set((allClasses || []).filter(Boolean))];
+    const targetKey = normalizeDrugKey(targetClass);
+    const nearby = [];
+    const seen = new Set([targetKey]);
+
+    for (const group of BRAND_CLASS_NEARBY_CLASS_GROUPS) {
+        if (!group.some(term => targetNorm.includes(term))) continue;
+
+        for (const classValue of classValues) {
+            const classKey = normalizeDrugKey(classValue);
+            if (!classKey || seen.has(classKey)) continue;
+
+            const classNorm = normalizeClassForMatch(classValue);
+            if (!group.some(term => classNorm.includes(term))) continue;
+
+            seen.add(classKey);
+            nearby.push(classValue);
+        }
+    }
+
+    if (nearby.length) return nearby;
+
+    return classValues
+        .filter(classValue => normalizeDrugKey(classValue) !== targetKey)
+        .map(classValue => ({
+            classValue,
+            score: getTokenOverlapScore(targetClass, classValue)
+        }))
+        .filter(item => item.score >= 0.34)
+        .sort((a, b) => b.score - a.score)
+        .map(item => item.classValue)
+        .slice(0, 6);
+}
+
+function getPlausibleWrongClassesForDrug(drug, allPool, maxCount = 4) {
+    const targetClass = String(drug?.class || "").trim();
+    const targetClassKey = normalizeDrugKey(targetClass);
+    if (!targetClassKey) return [];
+
+    const targetCategoryKey = normalizeDrugKey(drug?.category);
+    const targetLab = Number(drug?.metadata?.lab || 0);
+    const targetWeek = Number(drug?.metadata?.week || 0);
+    const allClasses = [...new Set((allPool || []).map(item => item?.class).filter(Boolean))];
+    const nearbySet = new Set(getNearbyClassAlternatives(targetClass, allClasses).map(normalizeDrugKey));
+    const classScores = new Map();
+
+    const setCandidate = (candidateClassKey, candidateClass, bucket, score, isNearby) => {
+        const existing = classScores.get(candidateClassKey);
+        if (!existing) {
+            classScores.set(candidateClassKey, { className: candidateClass, bucket, score, isNearby });
+            return;
+        }
+
+        if (bucket < existing.bucket || (bucket === existing.bucket && score > existing.score)) {
+            classScores.set(candidateClassKey, { className: candidateClass, bucket, score, isNearby });
+        }
+    };
+
+    for (const candidate of allPool || []) {
+        if (!candidate || candidate === drug) continue;
+
+        const candidateClass = String(candidate?.class || "").trim();
+        const candidateClassKey = normalizeDrugKey(candidateClass);
+        if (!candidateClassKey || candidateClassKey === targetClassKey) continue;
+
+        const sameCategory = targetCategoryKey && normalizeDrugKey(candidate?.category) === targetCategoryKey;
+        const similarity = getTherapeuticSimilarity(drug, candidate);
+        const overlap = getTokenOverlapScore(targetClass, candidateClass);
+        const isNearby = nearbySet.has(candidateClassKey);
+
+        let bucket = 5;
+        if (isNearby && sameCategory) {
+            bucket = 1;
+        } else if (sameCategory && (similarity >= 0.24 || overlap >= 0.24)) {
+            bucket = 2;
+        } else if (isNearby) {
+            bucket = 3;
+        } else if (similarity >= 0.32 || overlap >= 0.36) {
+            bucket = 4;
+        }
+
+        let score = Math.random() * 0.18;
+        if (sameCategory) score += 2.9;
+        score += overlap * 3.7;
+        score += similarity * 3.1;
+        if (isNearby) score += 4.2;
+
+        if (targetLab && Number(candidate?.metadata?.lab || 0) === targetLab) score += 0.28;
+        if (targetWeek) {
+            const weekDelta = Math.abs(targetWeek - Number(candidate?.metadata?.week || 0));
+            score += Math.max(0, 0.9 - (weekDelta * 0.12));
+        }
+
+        setCandidate(candidateClassKey, candidateClass, bucket, score, isNearby);
+    }
+
+    return [...classScores.values()]
+        .sort((a, b) => {
+            if (a.bucket !== b.bucket) return a.bucket - b.bucket;
+            if (a.isNearby !== b.isNearby) return Number(b.isNearby) - Number(a.isNearby);
+            return b.score - a.score;
+        })
+        .slice(0, maxCount)
+        .map(item => item.className);
+}
+
+function pickRealBrandClassDistractors(drug, allPool, signals, count = 2, targetBrand = "") {
+    const targetClass = String(drug?.class || "").trim();
+    const targetCategoryKey = normalizeDrugKey(drug?.category);
+    const targetBrandKey = normalizeDrugKey(targetBrand);
+    const nearbySet = new Set(
+        getNearbyClassAlternatives(
+            targetClass,
+            [...new Set((allPool || []).map(item => item?.class).filter(Boolean))]
+        ).map(normalizeDrugKey)
+    );
+
+    const ranked = [];
+    for (const candidate of allPool || []) {
+        if (!candidate || candidate === drug || !candidate?.class || !candidate?.generic) continue;
+        if (normalizeDrugKey(candidate?.generic) === normalizeDrugKey(drug?.generic)) continue;
+
+        const candidateBrand = pickBrandVariantForFinal(candidate, signals) || splitBrandNames(candidate?.brand)[0];
+        if (!candidateBrand) continue;
+        if (targetBrandKey && normalizeDrugKey(candidateBrand) === targetBrandKey) continue;
+
+        const candidateClass = String(candidate.class).trim();
+        const candidateClassKey = normalizeDrugKey(candidateClass);
+
+        let score = Math.random() * 0.16;
+        if (targetCategoryKey && normalizeDrugKey(candidate?.category) === targetCategoryKey) score += 2.1;
+        score += getTherapeuticSimilarity(drug, candidate) * 4.4;
+        score += getTokenOverlapScore(targetClass, candidateClass) * 2.4;
+        if (nearbySet.has(candidateClassKey)) score += 1.1;
+
+        ranked.push({
+            brand: candidateBrand,
+            className: candidateClass,
+            pairKey: normalizeDrugKey(`${candidateBrand} / ${candidateClass}`),
+            score
+        });
+    }
+
+    ranked.sort((a, b) => b.score - a.score);
+    const used = new Set();
+    const picks = [];
+    for (const item of ranked) {
+        if (used.has(item.pairKey)) continue;
+        used.add(item.pairKey);
+        picks.push(item);
+        if (picks.length >= count) break;
+    }
+
+    return picks;
+}
+
+function buildTopDrugsBrandClassQuestion(drug, allPool, options = {}) {
+    if (!drug?.class) return null;
+
+    const signals = options?.signals || loadTopDrugsSignals();
+    const targetBrand = options?.targetBrand || pickBrandVariantForFinal(drug, signals) || splitBrandNames(drug?.brand)[0];
+    if (!targetBrand) return null;
+
+    const wrongClasses = getPlausibleWrongClassesForDrug(drug, allPool, 6);
+    if (!wrongClasses.length) return null;
+
+    const nearbySet = new Set(
+        getNearbyClassAlternatives(
+            drug?.class,
+            [...new Set((allPool || []).map(item => item?.class).filter(Boolean))]
+        ).map(normalizeDrugKey)
+    );
+
+    const nearbyWrongClass = wrongClasses.find(className => nearbySet.has(normalizeDrugKey(className))) || wrongClasses[0];
+    const secondaryWrongClass = wrongClasses.find(className => normalizeDrugKey(className) !== normalizeDrugKey(nearbyWrongClass || ""));
+    const decoyPairs = pickRealBrandClassDistractors(drug, allPool, signals, 3, targetBrand);
+    if (!nearbyWrongClass || !decoyPairs.length) return null;
+
+    const optionCandidates = [];
+    const seen = new Set();
+    const pushOption = (value) => {
+        const normalized = normalizeDrugKey(value);
+        if (!normalized || seen.has(normalized)) return;
+        seen.add(normalized);
+        optionCandidates.push(value);
+    };
+
+    const correct = `${targetBrand} / ${drug.class}`;
+    pushOption(correct);
+    pushOption(`${targetBrand} / ${nearbyWrongClass}`);
+    pushOption(`${decoyPairs[0].brand} / ${decoyPairs[0].className}`);
+
+    if (secondaryWrongClass) {
+        pushOption(`${targetBrand} / ${secondaryWrongClass}`);
+    }
+
+    for (const decoy of decoyPairs.slice(1)) {
+        if (optionCandidates.length >= 4) break;
+        pushOption(`${decoy.brand} / ${decoy.className}`);
+    }
+
+    for (const className of wrongClasses) {
+        if (optionCandidates.length >= 4) break;
+        pushOption(`${targetBrand} / ${className}`);
+    }
+
+    if (optionCandidates.length < 4) return null;
+
+    return {
+        type: "mcq",
+        prompt: `Identify <b>Brand & Class</b> for <b>${drug.generic}</b>?`,
+        choices: shuffled(optionCandidates.slice(0, 4)),
+        answer: correct,
+        drugRef: drug,
+        _brandVariant: targetBrand
+    };
 }
 
 function getWeaknessScore(seenCount, missedCount) {
@@ -433,73 +686,6 @@ function selectFinalExamDrugs(pool) {
     }
 
     return state.selected;
-}
-
-function selectFinalExamDrugs(pool) {
-    const byLabWeek = new Map();
-
-    for (const drug of pool) {
-        const lab = Number(drug?.metadata?.lab);
-        const week = Number(drug?.metadata?.week);
-        if (![1, 2].includes(lab) || !week) continue;
-
-        const key = `${lab}-${week}`;
-        if (!byLabWeek.has(key)) byLabWeek.set(key, []);
-        byLabWeek.get(key).push(drug);
-    }
-
-    const targetCounts = { 1: 44, 2: 66 };
-    const counts = { 1: 0, 2: 0 };
-    const selected = [];
-    const seenGenerics = new Set();
-    const normalizeGeneric = (value) => String(value ?? "").trim().replace(/\s+/g, " ").toLowerCase();
-
-    const addDrug = (drug) => {
-        const lab = Number(drug?.metadata?.lab);
-        const genericKey = normalizeGeneric(drug?.generic);
-
-        if (![1, 2].includes(lab) || !genericKey) return false;
-        if (counts[lab] >= targetCounts[lab] || seenGenerics.has(genericKey)) return false;
-
-        seenGenerics.add(genericKey);
-        selected.push(drug);
-        counts[lab] += 1;
-        return true;
-    };
-
-    const bucketPlan = [];
-
-    for (let week = 1; week <= 10; week++) {
-        bucketPlan.push({ bucket: byLabWeek.get(`1-${week}`) || [], lab: 1, limit: 4 });
-        bucketPlan.push({ bucket: byLabWeek.get(`2-${week}`) || [], lab: 2, limit: 4 });
-    }
-
-    bucketPlan.push({ bucket: byLabWeek.get("1-11") || [], lab: 1, limit: 4 });
-    bucketPlan.push({ bucket: byLabWeek.get("2-11") || [], lab: 2, limit: 3 });
-
-    const fillBuckets = (respectBucketLimits) => {
-        for (const { bucket, lab, limit } of bucketPlan) {
-            let pickedInBucket = 0;
-
-            for (const drug of bucket) {
-                if (counts[lab] >= targetCounts[lab]) break;
-                if (respectBucketLimits && pickedInBucket >= limit) break;
-                if (addDrug(drug)) pickedInBucket += 1;
-            }
-        }
-    };
-
-    fillBuckets(true);
-
-    if (counts[1] < targetCounts[1] || counts[2] < targetCounts[2]) {
-        fillBuckets(false);
-    }
-
-    if (selected.length !== FINAL_EXAM_TOTAL || counts[1] !== targetCounts[1] || counts[2] !== targetCounts[2]) {
-        throw new Error(`Final exam generator expected 44 Lab 1 and 66 Lab 2 unique drugs, got ${counts[1]} and ${counts[2]}.`);
-    }
-
-    return selected;
 }
 
 // --- SMART HINT SYSTEM ---
@@ -1748,26 +1934,12 @@ function createQuestion(drug, all) {
     // Brand & Class MCQ with Trap Logic (35% normal, 30% Lab 2)
     const brandClassThreshold = isLab2Quiz ? 0.30 : 0.35;
     if (r < brandClassThreshold && drug.class) {
-        const correct = `${singleBrand} / ${drug.class}`;
-        
-        // Trap 1: Correct Brand / WRONG Class
-        const wrongClass = all.find(d => d.class && d.class !== drug.class);
-        const w1 = `${singleBrand} / ${wrongClass?.class || 'Inhibitor'}`;
-        
-        // Trap 2: WRONG Brand / Correct Class
-        const wrongBrand = all.find(d => d.brand && d.brand !== drug.brand);
-        const w2 = `${wrongBrand?.brand?.split(/[\/,]/)[0] || 'Drug'} / ${drug.class}`;
-        
-        // Distractor 3: Wrong Brand / Wrong Class
-        const w3 = `${wrongBrand?.brand?.split(/[\/,]/)[0] || 'Drug'} / ${wrongClass?.class || 'Antagonist'}`;
-        
-        return { 
-            type: "mcq", 
-            prompt: `Identify <b>Brand & Class</b> for <b>${drug.generic}</b>?`, 
-            choices: shuffled([correct, w1, w2, w3]), 
-            answer: correct, 
-            drugRef: drug 
-        };
+        const signals = loadTopDrugsSignals();
+        const brandClassQuestion = buildTopDrugsBrandClassQuestion(drug, all, {
+            signals,
+            targetBrand: singleBrand
+        });
+        if (brandClassQuestion) return brandClassQuestion;
     }
     
     // Generic → Brand (Short Answer) (25% normal, 20% Lab 2)
@@ -1908,6 +2080,8 @@ function canBuildFinalQuestionFamily(drug, family, poolStats) {
         case "generic_to_brand":
         case "brand_to_generic":
             return brandCount > 0;
+        case "brand_class_pair":
+            return brandCount > 0 && Boolean(classKey) && poolStats.allClasses.length >= 4;
         case "drug_to_class":
             return Boolean(classKey);
         case "drug_to_category":
@@ -1942,7 +2116,7 @@ function scoreFinalFamilyChoice(drug, family, currentCounts, targetCounts, conte
     score += deficit * 1.1;
     score += getDrugWeaknessScore(drug, context.signals) * 0.12;
 
-    if (family === "generic_to_brand" || family === "brand_to_generic") {
+    if (family === "generic_to_brand" || family === "brand_to_generic" || family === "brand_class_pair") {
         score += getBrandWeaknessScore(drug, context.signals) * 0.22;
     }
 
@@ -2232,6 +2406,8 @@ function buildFinalExamQuestionFromFamily(drug, allPool, family, context, poolSt
             return buildFinalGenericToBrandQuestion(drug, context.signals);
         case "brand_to_generic":
             return buildFinalBrandToGenericQuestion(drug, context.signals);
+        case "brand_class_pair":
+            return buildTopDrugsBrandClassQuestion(drug, allPool, { signals: context.signals });
         case "drug_to_class":
             return buildFinalDrugToFieldQuestion(drug, allPool, "class", "Class");
         case "drug_to_category":
