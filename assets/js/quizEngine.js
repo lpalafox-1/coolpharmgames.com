@@ -58,14 +58,17 @@ const TOP_DRUGS_SIGNALS_KEY = "pharmlet.topDrugs.signals";
 const FINAL_RECENT_RUN_LOOKBACK_MS = 14 * 24 * 60 * 60 * 1000;
 
 const FINAL_BLUEPRINT_FAMILY_WEIGHTS = [
-    { family: "generic_to_brand", weight: 0.18 },
-    { family: "brand_to_generic", weight: 0.18 },
+    { family: "generic_to_brand", weight: 0.14 },
+    { family: "brand_to_generic", weight: 0.14 },
     { family: "brand_class_pair", weight: 0.08 },
-    { family: "drug_to_class", weight: 0.14 },
-    { family: "drug_to_category", weight: 0.12 },
-    { family: "drug_to_moa", weight: 0.12 },
-    { family: "paired_med_class", weight: 0.10 },
-    { family: "negative_mcq", weight: 0.08 }
+    { family: "drug_to_class", weight: 0.10 },
+    { family: "drug_to_category", weight: 0.08 },
+    { family: "drug_to_moa", weight: 0.08 },
+    { family: "class_to_drug", weight: 0.08 },
+    { family: "category_to_drug", weight: 0.08 },
+    { family: "moa_to_drug", weight: 0.08 },
+    { family: "paired_med_class", weight: 0.08 },
+    { family: "negative_mcq", weight: 0.06 }
 ];
 
 function normalizeDrugKey(value) {
@@ -296,6 +299,46 @@ function getTokenOverlapScore(textA, textB) {
     }
 
     return overlap / Math.max(tokensA.size, tokensB.size);
+}
+
+function isCombinationGenericName(value) {
+    const text = String(value ?? "").trim().toLowerCase();
+    if (!text) return false;
+
+    if (/[+/]/.test(text)) return true;
+    if (/\b(and|with)\b/.test(text)) return true;
+
+    if (text.includes("-")) {
+        const parts = text.split("-").map(part => part.trim()).filter(Boolean);
+        if (parts.length >= 2) return true;
+    }
+
+    return false;
+}
+
+function isContraceptiveLikeText(value) {
+    const text = normalizeClassForMatch(value);
+    if (!text) return false;
+
+    return /(contracept|ethinyl estradiol|norethindrone|levonorgestrel|norgestimate|desogestrel|drospirenone|etonogestrel|progestin)/.test(text);
+}
+
+function isContraceptiveCombinationDrug(drug) {
+    if (!drug) return false;
+
+    return isCombinationGenericName(drug?.generic) && (
+        isContraceptiveLikeText(drug?.generic)
+        || isContraceptiveLikeText(drug?.class)
+        || isContraceptiveLikeText(drug?.category)
+        || isContraceptiveLikeText(drug?.moa)
+    );
+}
+
+function isAntiinfectiveLikeText(value) {
+    const text = normalizeClassForMatch(value);
+    if (!text) return false;
+
+    return /(antiinfective|antimicrobial|antibiotic|antibacterial|antiviral|antifungal|penicillin|beta lactam|cephalosporin|macrolide|aminoglycoside|fluoroquinolone|tetracycline|glycopeptide|sulfonamide|carbapenem)/.test(text);
 }
 
 function getNearbyClassAlternatives(targetClass, allClasses) {
@@ -2271,6 +2314,12 @@ function canBuildFinalQuestionFamily(drug, family, poolStats) {
             return Boolean(categoryKey);
         case "drug_to_moa":
             return Boolean(moaKey);
+        case "class_to_drug":
+            return Boolean(classKey);
+        case "category_to_drug":
+            return Boolean(categoryKey);
+        case "moa_to_drug":
+            return Boolean(moaKey);
         case "paired_med_class":
             return Boolean(classKey) && poolStats.allClasses.length >= 4;
         case "negative_mcq": {
@@ -2294,6 +2343,8 @@ function scoreFinalFamilyChoice(drug, family, currentCounts, targetCounts, conte
     const deficit = Math.max(0, (targetCounts[family] || 0) - (currentCounts[family] || 0));
     const familyRecentPenalty = Number(context.recentFamilyUsageByGeneric?.[genericKey]?.[family] || 0);
     const genericRecentPenalty = Number(context.recentGenericUsage?.[genericKey] || 0);
+    const comboGeneric = isCombinationGenericName(drug?.generic);
+    const comboContraceptive = isContraceptiveCombinationDrug(drug);
 
     let score = Math.random() * 0.25;
     score += deficit * 1.1;
@@ -2301,6 +2352,28 @@ function scoreFinalFamilyChoice(drug, family, currentCounts, targetCounts, conte
 
     if (family === "generic_to_brand" || family === "brand_to_generic" || family === "brand_class_pair") {
         score += getBrandWeaknessScore(drug, context.signals) * 0.22;
+    }
+
+    if (comboGeneric && [
+        "generic_to_brand",
+        "brand_to_generic",
+        "drug_to_class",
+        "drug_to_category",
+        "class_to_drug",
+        "category_to_drug"
+    ].includes(family)) {
+        score += 0.32;
+    }
+
+    if (comboContraceptive && [
+        "generic_to_brand",
+        "brand_to_generic",
+        "drug_to_class",
+        "drug_to_category",
+        "class_to_drug",
+        "category_to_drug"
+    ].includes(family)) {
+        score += 0.38;
     }
 
     score -= familyRecentPenalty * 1.35;
@@ -2470,6 +2543,115 @@ function buildFinalDrugToFieldQuestion(drug, allPool, key, label) {
     return {
         type: "mcq",
         prompt: `<b>${label}</b> for <b>${drug.generic}</b>?`,
+        choices: shuffled([answer, ...distractors]),
+        answer,
+        drugRef: drug
+    };
+}
+
+function getFinalDrugDistractorsForReversePrompt(drug, allPool, key, maxCount = 3) {
+    const targetValue = String(drug?.[key] || "").trim();
+    const targetValueKey = normalizeDrugKey(targetValue);
+    if (!targetValueKey) return [];
+
+    const targetCategoryKey = normalizeDrugKey(drug?.category);
+    const targetClassKey = normalizeDrugKey(drug?.class);
+    const targetLab = Number(drug?.metadata?.lab || 0);
+    const targetWeek = Number(drug?.metadata?.week || 0);
+    const classValues = [...new Set((allPool || []).map(item => item?.class).filter(Boolean))];
+    const nearbyClassSet = new Set(getNearbyClassAlternatives(drug?.class, classValues).map(normalizeDrugKey));
+    const targetIsAntiinfective = isAntiinfectiveLikeText(drug?.class) || isAntiinfectiveLikeText(drug?.category);
+    const targetIsContraceptiveCombo = isContraceptiveCombinationDrug(drug);
+
+    const ranked = [];
+    for (const candidate of allPool || []) {
+        if (!candidate || candidate === drug || !candidate?.generic) continue;
+
+        const candidateGenericKey = normalizeDrugKey(candidate?.generic);
+        if (!candidateGenericKey || candidateGenericKey === normalizeDrugKey(drug?.generic)) continue;
+
+        const candidateValue = String(candidate?.[key] || "").trim();
+        const candidateValueKey = normalizeDrugKey(candidateValue);
+        if (!candidateValueKey || candidateValueKey === targetValueKey) continue;
+
+        const sameCategory = targetCategoryKey && normalizeDrugKey(candidate?.category) === targetCategoryKey;
+        const sameClass = targetClassKey && normalizeDrugKey(candidate?.class) === targetClassKey;
+        const similarity = getTherapeuticSimilarity(drug, candidate);
+        const candidateClassKey = normalizeDrugKey(candidate?.class);
+        const candidateIsAntiinfective = isAntiinfectiveLikeText(candidate?.class) || isAntiinfectiveLikeText(candidate?.category);
+        const candidateIsContraceptive = isContraceptiveCombinationDrug(candidate)
+            || isContraceptiveLikeText(candidate?.generic)
+            || isContraceptiveLikeText(candidate?.class)
+            || isContraceptiveLikeText(candidate?.category);
+
+        let score = Math.random() * 0.14;
+        if (sameCategory) score += 2.6;
+        if (sameClass) score += 1.4;
+        score += similarity * 4.8;
+
+        if (key === "class") {
+            if (nearbyClassSet.has(candidateClassKey)) score += 2.2;
+            score += getTokenOverlapScore(targetValue, candidate?.class) * 2.2;
+        } else if (key === "category") {
+            score += getTokenOverlapScore(targetValue, candidate?.category) * 2.5;
+            if (targetClassKey && candidateClassKey === targetClassKey) score += 1.6;
+        } else if (key === "moa") {
+            score += getTokenOverlapScore(targetValue, candidate?.moa) * 2.8;
+            if (nearbyClassSet.has(candidateClassKey)) score += 1.3;
+        }
+
+        if (targetIsAntiinfective && candidateIsAntiinfective) score += 2.2;
+        if (targetIsAntiinfective && !candidateIsAntiinfective) score -= 0.7;
+
+        if (targetIsContraceptiveCombo && candidateIsContraceptive) score += 2.3;
+        if (targetIsContraceptiveCombo && !candidateIsContraceptive) score -= 0.5;
+
+        if (targetLab && Number(candidate?.metadata?.lab || 0) === targetLab) score += 0.35;
+        if (targetWeek) {
+            const weekDelta = Math.abs(targetWeek - Number(candidate?.metadata?.week || 0));
+            score += Math.max(0, 0.9 - (weekDelta * 0.12));
+        }
+
+        ranked.push({
+            generic: candidate.generic,
+            genericKey: candidateGenericKey,
+            score
+        });
+    }
+
+    ranked.sort((a, b) => b.score - a.score);
+    const picks = [];
+    const used = new Set();
+    for (const candidate of ranked) {
+        if (used.has(candidate.genericKey)) continue;
+        used.add(candidate.genericKey);
+        picks.push(candidate.generic);
+        if (picks.length >= maxCount) break;
+    }
+
+    return picks;
+}
+
+function buildFinalFieldToDrugQuestion(drug, allPool, key, label) {
+    const fieldValue = String(drug?.[key] || "").trim();
+    const answer = String(drug?.generic || "").trim();
+    if (!fieldValue || !answer) return null;
+
+    const distractors = getFinalDrugDistractorsForReversePrompt(drug, allPool, key, 3);
+    if (distractors.length < 3) return null;
+
+    let prompt = `Which medication has this ${label}: <b>${fieldValue}</b>?`;
+    if (key === "class") {
+        prompt = `Which medication belongs to the <b>${fieldValue}</b> class?`;
+    } else if (key === "category") {
+        prompt = `Which medication best fits the <b>${fieldValue}</b> category?`;
+    } else if (key === "moa") {
+        prompt = `Which medication has this <b>MOA</b>: <b>${fieldValue}</b>?`;
+    }
+
+    return {
+        type: "mcq",
+        prompt,
         choices: shuffled([answer, ...distractors]),
         answer,
         drugRef: drug
@@ -2690,6 +2872,12 @@ function buildFinalExamQuestionFromFamily(drug, allPool, family, context, poolSt
             return buildFinalDrugToFieldQuestion(drug, allPool, "category", "Category");
         case "drug_to_moa":
             return buildFinalDrugToFieldQuestion(drug, allPool, "moa", "MOA");
+        case "class_to_drug":
+            return buildFinalFieldToDrugQuestion(drug, allPool, "class", "class");
+        case "category_to_drug":
+            return buildFinalFieldToDrugQuestion(drug, allPool, "category", "category");
+        case "moa_to_drug":
+            return buildFinalFieldToDrugQuestion(drug, allPool, "moa", "MOA");
         case "paired_med_class":
             return buildFinalPairedClassQuestion(drug, allPool, poolStats);
         case "negative_mcq":
