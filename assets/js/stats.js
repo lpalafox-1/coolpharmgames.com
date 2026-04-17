@@ -4,6 +4,9 @@
 const THEME_KEY = "quiz-theme";
 const HISTORY_KEY = "pharmlet.history";
 const REVIEW_KEY = "pharmlet.review-queue";
+const TOP_DRUGS_SIGNALS_KEY = "pharmlet.topDrugs.signals";
+const FINAL_RECENT_RUNS_KEY = "pharmlet.finalLab2.recentRuns";
+const LAST_ROUND_PREFIX = "pharmlet.session.lastRound.";
 
 // Theme toggle
 document.addEventListener("DOMContentLoaded", () => {
@@ -33,7 +36,55 @@ document.addEventListener("DOMContentLoaded", () => {
       location.reload();
     }
   });
+
+  document.getElementById("reset-generator-memory")?.addEventListener("click", () => {
+    if (!confirm("Reset adaptive Top Drugs generator memory on this device/browser? This cannot be undone.")) {
+      return;
+    }
+
+    const result = clearTopDrugsGeneratorMemory();
+    alert(`Adaptive generator memory reset. Cleared ${result.local} local key(s) and ${result.session} session key(s).`);
+  });
 });
+
+function isTopDrugsLastRoundKey(key) {
+  if (!key || !key.startsWith(LAST_ROUND_PREFIX)) return false;
+
+  const suffix = key.slice(LAST_ROUND_PREFIX.length).toLowerCase();
+  return (
+    suffix === "pharmlet.log-lab-final-2.easy"
+    || /pharmlet\.lab[12]\.week\d+\.easy/.test(suffix)
+    || /pharmlet\.lab[12]\.weeks\d+-\d+\.easy/.test(suffix)
+    || /pharmlet\.week\d+\.easy/.test(suffix)
+    || /pharmlet\.weeks\d+-\d+\.easy/.test(suffix)
+  );
+}
+
+function clearTopDrugsGeneratorMemory() {
+  let clearedLocal = 0;
+  let clearedSession = 0;
+
+  for (const key of [TOP_DRUGS_SIGNALS_KEY, FINAL_RECENT_RUNS_KEY]) {
+    if (localStorage.getItem(key) !== null) {
+      localStorage.removeItem(key);
+      clearedLocal += 1;
+    }
+  }
+
+  const sessionKeys = [];
+  for (let i = 0; i < sessionStorage.length; i++) {
+    const key = sessionStorage.key(i);
+    if (key) sessionKeys.push(key);
+  }
+
+  for (const key of sessionKeys) {
+    if (!isTopDrugsLastRoundKey(key)) continue;
+    sessionStorage.removeItem(key);
+    clearedSession += 1;
+  }
+
+  return { local: clearedLocal, session: clearedSession };
+}
 
 function loadStats() {
   const history = getHistory();
