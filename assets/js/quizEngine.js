@@ -217,7 +217,45 @@ const BRAND_CLASS_NEARBY_CLASS_GROUPS = [
     ["beta blocker", "calcium channel blocker"],
     ["proton pump inhibitor", "ppi", "h2 receptor antagonist", "h2ra", "histamine 2 receptor antagonist"],
     ["thiazide", "loop diuretic", "potassium sparing diuretic"],
+    [
+        "selective serotonin reuptake inhibitor",
+        "ssri",
+        "serotonin norepinephrine reuptake inhibitor",
+        "snri",
+        "dopamine norepinephrine reuptake inhibitor",
+        "norepinephrine dopamine reuptake inhibitor",
+        "dnri",
+        "tricyclic antidepressant",
+        "tca",
+        "monoamine oxidase inhibitor",
+        "maoi",
+        "serotonin antagonist and reuptake inhibitor",
+        "sari",
+        "noradrenergic and specific serotonergic antidepressant",
+        "nassa",
+        "atypical antidepressant"
+    ],
     ["basal insulin", "long acting insulin", "rapid acting insulin", "short acting insulin", "prandial insulin"]
+];
+
+const ANTIDEPRESSANT_CLASS_TERMS = [
+    "selective serotonin reuptake inhibitor",
+    "ssri",
+    "serotonin norepinephrine reuptake inhibitor",
+    "snri",
+    "dopamine norepinephrine reuptake inhibitor",
+    "norepinephrine dopamine reuptake inhibitor",
+    "dnri",
+    "tricyclic antidepressant",
+    "tca",
+    "monoamine oxidase inhibitor",
+    "maoi",
+    "serotonin antagonist and reuptake inhibitor",
+    "sari",
+    "noradrenergic and specific serotonergic antidepressant",
+    "nassa",
+    "atypical antidepressant",
+    "antidepressant"
 ];
 
 function normalizeClassForMatch(value) {
@@ -226,6 +264,25 @@ function normalizeClassForMatch(value) {
         .replace(/[^a-z0-9\s]/g, " ")
         .replace(/\s+/g, " ")
         .trim();
+}
+
+function isAntidepressantClassValue(value) {
+    const classNorm = normalizeClassForMatch(value);
+    if (!classNorm) return false;
+    return ANTIDEPRESSANT_CLASS_TERMS.some(term => classNorm.includes(term));
+}
+
+function getAntidepressantClassCueScore(value) {
+    const classNorm = normalizeClassForMatch(value);
+    if (!classNorm) return 0;
+
+    let score = 0;
+    if (/\bssri\b/.test(classNorm) || classNorm.includes("selective serotonin reuptake inhibitor")) score += 0.36;
+    if (/\bsnri\b/.test(classNorm) || classNorm.includes("serotonin norepinephrine reuptake inhibitor")) score += 0.33;
+    if (/(\bdnri\b|dopamine norepinephrine reuptake inhibitor|norepinephrine dopamine reuptake inhibitor)/.test(classNorm)) score += 0.31;
+    if (classNorm.includes("reuptake inhibitor")) score += 0.18;
+    if (classNorm.includes("antidepressant")) score += 0.14;
+    return score;
 }
 
 function getTokenOverlapScore(textA, textB) {
@@ -249,6 +306,7 @@ function getNearbyClassAlternatives(targetClass, allClasses) {
     const targetKey = normalizeDrugKey(targetClass);
     const nearby = [];
     const seen = new Set([targetKey]);
+    const targetIsAntidepressant = isAntidepressantClassValue(targetClass);
 
     for (const group of BRAND_CLASS_NEARBY_CLASS_GROUPS) {
         if (!group.some(term => targetNorm.includes(term))) continue;
@@ -265,7 +323,29 @@ function getNearbyClassAlternatives(targetClass, allClasses) {
         }
     }
 
-    if (nearby.length) return nearby;
+    // Keep antidepressant distractors inside adjacent antidepressant classes when possible.
+    if (targetIsAntidepressant) {
+        const antidepressantAdjacents = classValues
+            .filter(classValue => {
+                const classKey = normalizeDrugKey(classValue);
+                return classKey && !seen.has(classKey) && isAntidepressantClassValue(classValue);
+            })
+            .map(classValue => ({
+                classValue,
+                score: getTokenOverlapScore(targetClass, classValue) + getAntidepressantClassCueScore(classValue)
+            }))
+            .sort((a, b) => b.score - a.score)
+            .map(item => item.classValue);
+
+        for (const classValue of antidepressantAdjacents) {
+            const classKey = normalizeDrugKey(classValue);
+            if (!classKey || seen.has(classKey)) continue;
+            seen.add(classKey);
+            nearby.push(classValue);
+        }
+    }
+
+    if (nearby.length) return nearby.slice(0, 8);
 
     return classValues
         .filter(classValue => normalizeDrugKey(classValue) !== targetKey)
@@ -285,6 +365,7 @@ function getPlausibleWrongClassesForDrug(drug, allPool, maxCount = 4) {
     if (!targetClassKey) return [];
 
     const targetCategoryKey = normalizeDrugKey(drug?.category);
+    const targetIsAntidepressant = isAntidepressantClassValue(targetClass);
     const targetLab = Number(drug?.metadata?.lab || 0);
     const targetWeek = Number(drug?.metadata?.week || 0);
     const allClasses = [...new Set((allPool || []).map(item => item?.class).filter(Boolean))];
@@ -314,10 +395,15 @@ function getPlausibleWrongClassesForDrug(drug, allPool, maxCount = 4) {
         const similarity = getTherapeuticSimilarity(drug, candidate);
         const overlap = getTokenOverlapScore(targetClass, candidateClass);
         const isNearby = nearbySet.has(candidateClassKey);
+        const candidateIsAntidepressant = isAntidepressantClassValue(candidateClass);
 
         let bucket = 5;
         if (isNearby && sameCategory) {
             bucket = 1;
+        } else if (targetIsAntidepressant && candidateIsAntidepressant && isNearby) {
+            bucket = 2;
+        } else if (targetIsAntidepressant && candidateIsAntidepressant) {
+            bucket = 2;
         } else if (sameCategory && (similarity >= 0.24 || overlap >= 0.24)) {
             bucket = 2;
         } else if (isNearby) {
@@ -331,6 +417,10 @@ function getPlausibleWrongClassesForDrug(drug, allPool, maxCount = 4) {
         score += overlap * 3.7;
         score += similarity * 3.1;
         if (isNearby) score += 4.2;
+        if (targetIsAntidepressant && candidateIsAntidepressant) {
+            score += 2.6;
+            score += getAntidepressantClassCueScore(candidateClass) * 1.4;
+        }
 
         if (targetLab && Number(candidate?.metadata?.lab || 0) === targetLab) score += 0.28;
         if (targetWeek) {
@@ -341,20 +431,27 @@ function getPlausibleWrongClassesForDrug(drug, allPool, maxCount = 4) {
         setCandidate(candidateClassKey, candidateClass, bucket, score, isNearby);
     }
 
-    return [...classScores.values()]
+    let ranked = [...classScores.values()]
         .sort((a, b) => {
             if (a.bucket !== b.bucket) return a.bucket - b.bucket;
             if (a.isNearby !== b.isNearby) return Number(b.isNearby) - Number(a.isNearby);
             return b.score - a.score;
-        })
-        .slice(0, maxCount)
-        .map(item => item.className);
+        });
+
+    const plausibleOnly = ranked.filter(item => item.bucket <= 4);
+    if (plausibleOnly.length >= maxCount) {
+        ranked = plausibleOnly;
+    }
+
+    return ranked.slice(0, maxCount).map(item => item.className);
 }
 
 function pickRealBrandClassDistractors(drug, allPool, signals, count = 2, targetBrand = "") {
     const targetClass = String(drug?.class || "").trim();
+    const targetClassKey = normalizeDrugKey(targetClass);
     const targetCategoryKey = normalizeDrugKey(drug?.category);
     const targetBrandKey = normalizeDrugKey(targetBrand);
+    const targetIsAntidepressant = isAntidepressantClassValue(targetClass);
     const nearbySet = new Set(
         getNearbyClassAlternatives(
             targetClass,
@@ -373,29 +470,83 @@ function pickRealBrandClassDistractors(drug, allPool, signals, count = 2, target
 
         const candidateClass = String(candidate.class).trim();
         const candidateClassKey = normalizeDrugKey(candidateClass);
+        const sameCategory = targetCategoryKey && normalizeDrugKey(candidate?.category) === targetCategoryKey;
+        const similarity = getTherapeuticSimilarity(drug, candidate);
+        const overlap = getTokenOverlapScore(targetClass, candidateClass);
+        const isNearby = nearbySet.has(candidateClassKey);
+        const sameClass = candidateClassKey === targetClassKey;
+        const candidateIsAntidepressant = isAntidepressantClassValue(candidateClass);
+
+        let bucket = 5;
+        if (sameClass && sameCategory) {
+            bucket = 1;
+        } else if (sameClass) {
+            bucket = 2;
+        } else if (isNearby && (sameCategory || (targetIsAntidepressant && candidateIsAntidepressant))) {
+            bucket = 2;
+        } else if (sameCategory && (similarity >= 0.2 || overlap >= 0.2)) {
+            bucket = 3;
+        } else if (isNearby || similarity >= 0.28 || overlap >= 0.28) {
+            bucket = 4;
+        }
 
         let score = Math.random() * 0.16;
-        if (targetCategoryKey && normalizeDrugKey(candidate?.category) === targetCategoryKey) score += 2.1;
-        score += getTherapeuticSimilarity(drug, candidate) * 4.4;
-        score += getTokenOverlapScore(targetClass, candidateClass) * 2.4;
-        if (nearbySet.has(candidateClassKey)) score += 1.1;
+        if (sameCategory) score += 2.1;
+        if (sameClass) score += 2.6;
+        score += similarity * 4.6;
+        score += overlap * 2.7;
+        if (isNearby) score += 1.8;
+        if (targetIsAntidepressant && candidateIsAntidepressant) {
+            score += 2.2;
+            score += getAntidepressantClassCueScore(candidateClass) * 1.1;
+        }
 
         ranked.push({
             brand: candidateBrand,
             className: candidateClass,
+            brandKey: normalizeDrugKey(candidateBrand),
+            classKey: candidateClassKey,
             pairKey: normalizeDrugKey(`${candidateBrand} / ${candidateClass}`),
+            bucket,
+            isNearby,
             score
         });
     }
 
-    ranked.sort((a, b) => b.score - a.score);
-    const used = new Set();
+    ranked.sort((a, b) => {
+        if (a.bucket !== b.bucket) return a.bucket - b.bucket;
+        if (a.isNearby !== b.isNearby) return Number(b.isNearby) - Number(a.isNearby);
+        return b.score - a.score;
+    });
+
+    const plausibleRanked = ranked.filter(item => item.bucket <= 4);
+    const rankedPool = plausibleRanked.length >= count ? plausibleRanked : ranked;
+
+    const usedPairs = new Set();
+    const usedBrands = new Set();
+    const usedClasses = new Set();
     const picks = [];
-    for (const item of ranked) {
-        if (used.has(item.pairKey)) continue;
-        used.add(item.pairKey);
+
+    for (const item of rankedPool) {
+        if (usedPairs.has(item.pairKey)) continue;
+        if (usedBrands.has(item.brandKey) || usedClasses.has(item.classKey)) continue;
+
+        usedPairs.add(item.pairKey);
+        usedBrands.add(item.brandKey);
+        usedClasses.add(item.classKey);
         picks.push(item);
         if (picks.length >= count) break;
+    }
+
+    for (const item of rankedPool) {
+        if (picks.length >= count) break;
+        if (usedPairs.has(item.pairKey)) continue;
+        if (usedBrands.has(item.brandKey) && usedClasses.has(item.classKey)) continue;
+
+        usedPairs.add(item.pairKey);
+        usedBrands.add(item.brandKey);
+        usedClasses.add(item.classKey);
+        picks.push(item);
     }
 
     return picks;
@@ -418,37 +569,69 @@ function buildTopDrugsBrandClassQuestion(drug, allPool, options = {}) {
         ).map(normalizeDrugKey)
     );
 
-    const nearbyWrongClass = wrongClasses.find(className => nearbySet.has(normalizeDrugKey(className))) || wrongClasses[0];
-    const secondaryWrongClass = wrongClasses.find(className => normalizeDrugKey(className) !== normalizeDrugKey(nearbyWrongClass || ""));
-    const decoyPairs = pickRealBrandClassDistractors(drug, allPool, signals, 3, targetBrand);
-    if (!nearbyWrongClass || !decoyPairs.length) return null;
+    const nearbyWrongClasses = wrongClasses.filter(className => nearbySet.has(normalizeDrugKey(className)));
+    const plausibleWrongClasses = [
+        ...nearbyWrongClasses,
+        ...wrongClasses.filter(className => !nearbySet.has(normalizeDrugKey(className)))
+    ];
+
+    const primaryWrongClass = plausibleWrongClasses[0];
+    const primaryWrongKey = normalizeDrugKey(primaryWrongClass || "");
+    const secondaryNearbyWrongClass = nearbyWrongClasses.find(className => normalizeDrugKey(className) !== primaryWrongKey);
+    const secondaryWrongClass = secondaryNearbyWrongClass
+        || plausibleWrongClasses.find(className => normalizeDrugKey(className) !== primaryWrongKey);
+
+    const decoyPairs = pickRealBrandClassDistractors(drug, allPool, signals, 4, targetBrand);
+    if (!primaryWrongClass || !decoyPairs.length) return null;
 
     const optionCandidates = [];
     const seen = new Set();
-    const pushOption = (value) => {
+    const patternCounts = {
+        sameBrandWrong: 0,
+        differentBrandReal: 0
+    };
+
+    const pushOption = (value, pattern = "") => {
+        if (pattern && patternCounts[pattern] >= 2) return;
+
         const normalized = normalizeDrugKey(value);
         if (!normalized || seen.has(normalized)) return;
         seen.add(normalized);
+
+        if (pattern) {
+            patternCounts[pattern] = (patternCounts[pattern] || 0) + 1;
+        }
+
         optionCandidates.push(value);
     };
 
     const correct = `${targetBrand} / ${drug.class}`;
     pushOption(correct);
-    pushOption(`${targetBrand} / ${nearbyWrongClass}`);
-    pushOption(`${decoyPairs[0].brand} / ${decoyPairs[0].className}`);
+    pushOption(`${targetBrand} / ${primaryWrongClass}`, "sameBrandWrong");
+    pushOption(`${decoyPairs[0].brand} / ${decoyPairs[0].className}`, "differentBrandReal");
 
-    if (secondaryWrongClass) {
-        pushOption(`${targetBrand} / ${secondaryWrongClass}`);
+    if (secondaryNearbyWrongClass) {
+        pushOption(`${targetBrand} / ${secondaryNearbyWrongClass}`, "sameBrandWrong");
     }
 
     for (const decoy of decoyPairs.slice(1)) {
         if (optionCandidates.length >= 4) break;
-        pushOption(`${decoy.brand} / ${decoy.className}`);
+        pushOption(`${decoy.brand} / ${decoy.className}`, "differentBrandReal");
     }
 
-    for (const className of wrongClasses) {
+    if (optionCandidates.length < 4 && secondaryWrongClass) {
+        pushOption(`${targetBrand} / ${secondaryWrongClass}`, "sameBrandWrong");
+    }
+
+    for (const className of plausibleWrongClasses) {
         if (optionCandidates.length >= 4) break;
-        pushOption(`${targetBrand} / ${className}`);
+        if (normalizeDrugKey(className) === primaryWrongKey) continue;
+        pushOption(`${targetBrand} / ${className}`, "sameBrandWrong");
+    }
+
+    for (const decoy of decoyPairs) {
+        if (optionCandidates.length >= 4) break;
+        pushOption(`${decoy.brand} / ${decoy.className}`, "differentBrandReal");
     }
 
     if (optionCandidates.length < 4) return null;
@@ -2322,27 +2505,120 @@ function buildFinalBrandToGenericQuestion(drug, signals) {
 function buildFinalPairedClassQuestion(drug, allPool, poolStats) {
     if (!drug?.class || !drug?.generic) return null;
 
+    const classPool = (poolStats?.allClasses || []).filter(Boolean);
+    if (classPool.length < 4) return null;
+
+    const targetCategoryKey = normalizeDrugKey(drug?.category);
+    const targetClass = String(drug?.class || "").trim();
+
+    const isAntiinfectiveText = (value) => {
+        const text = normalizeClassForMatch(value);
+        if (!text) return false;
+        return /(antiinfective|antimicrobial|antibiotic|antibacterial|antiviral|antifungal|penicillin|beta lactam|cephalosporin|macrolide|aminoglycoside|fluoroquinolone|tetracycline|glycopeptide|sulfonamide|carbapenem)/.test(text);
+    };
+
+    const isAntiinfectiveDrug = (item) => isAntiinfectiveText(item?.class) || isAntiinfectiveText(item?.category);
+    const targetIsAntiinfective = isAntiinfectiveDrug(drug);
+
     const candidates = allPool.filter(other => other !== drug && other?.generic && other?.class);
     if (candidates.length < 3) return null;
 
-    const selectedOthers = rankByTherapeuticSimilarity(drug, candidates).slice(0, 8);
+    const sameCategoryCandidates = targetCategoryKey
+        ? candidates.filter(other => normalizeDrugKey(other?.category) === targetCategoryKey)
+        : [];
+    const nonCategoryCandidates = candidates.filter(other => normalizeDrugKey(other?.category) !== targetCategoryKey);
+
+    const selectedOthers = [
+        ...rankByTherapeuticSimilarity(drug, sameCategoryCandidates),
+        ...rankByTherapeuticSimilarity(drug, nonCategoryCandidates)
+    ].slice(0, 14);
     if (selectedOthers.length < 3) return null;
 
     const wrongPairs = [];
     const usedPairs = new Set();
-    const classPool = poolStats.allClasses;
+    const usedWrongClasses = new Set();
 
-    for (const other of selectedOthers) {
+    const pickWrongClassForDrug = (otherDrug, avoidReusedWrongClass) => {
+        const otherClass = String(otherDrug?.class || "").trim();
+        const otherClassKey = normalizeDrugKey(otherClass);
+        if (!otherClassKey) return null;
+
+        const otherCategoryKey = normalizeDrugKey(otherDrug?.category);
+        const nearbySet = new Set(getNearbyClassAlternatives(otherClass, classPool).map(normalizeDrugKey));
+        const otherIsAntiinfective = isAntiinfectiveDrug(otherDrug);
+
+        const ranked = classPool
+            .map(classValue => {
+                const classKey = normalizeDrugKey(classValue);
+                if (!classKey || classKey === otherClassKey) return null;
+                if (avoidReusedWrongClass && usedWrongClasses.has(classKey)) return null;
+
+                const classDrugs = poolStats?.classToDrugs?.get(classKey) || [];
+                const sameOtherCategory = otherCategoryKey
+                    ? classDrugs.some(item => normalizeDrugKey(item?.category) === otherCategoryKey)
+                    : false;
+                const sameTargetCategory = targetCategoryKey
+                    ? classDrugs.some(item => normalizeDrugKey(item?.category) === targetCategoryKey)
+                    : false;
+
+                const classIsNearby = nearbySet.has(classKey);
+                const candidateIsAntiinfective = isAntiinfectiveText(classValue);
+
+                let score = Math.random() * 0.12;
+                if (classIsNearby) score += 3.8;
+                if (sameOtherCategory) score += 2.4;
+                if (sameTargetCategory) score += 1.5;
+
+                score += getTokenOverlapScore(otherClass, classValue) * 3.2;
+                score += getTokenOverlapScore(targetClass, classValue) * 1.1;
+
+                if ((targetIsAntiinfective || otherIsAntiinfective) && candidateIsAntiinfective) {
+                    score += 2.6;
+                } else if ((targetIsAntiinfective || otherIsAntiinfective) && !candidateIsAntiinfective) {
+                    score -= 1.0;
+                }
+
+                return {
+                    classValue,
+                    classKey,
+                    sameOtherCategory,
+                    sameTargetCategory,
+                    classIsNearby,
+                    candidateIsAntiinfective,
+                    score
+                };
+            })
+            .filter(Boolean)
+            .sort((a, b) => {
+                if (a.sameOtherCategory !== b.sameOtherCategory) return Number(b.sameOtherCategory) - Number(a.sameOtherCategory);
+                if (a.candidateIsAntiinfective !== b.candidateIsAntiinfective && (targetIsAntiinfective || otherIsAntiinfective)) {
+                    return Number(b.candidateIsAntiinfective) - Number(a.candidateIsAntiinfective);
+                }
+                if (a.classIsNearby !== b.classIsNearby) return Number(b.classIsNearby) - Number(a.classIsNearby);
+                if (a.sameTargetCategory !== b.sameTargetCategory) return Number(b.sameTargetCategory) - Number(a.sameTargetCategory);
+                return b.score - a.score;
+            });
+
+        return ranked[0] || null;
+    };
+
+    for (const avoidReuse of [true, false]) {
+        for (const other of selectedOthers) {
+            if (wrongPairs.length >= 3) break;
+
+            const wrongPick = pickWrongClassForDrug(other, avoidReuse);
+            if (!wrongPick) continue;
+
+            const pair = `${other.generic}: ${wrongPick.classValue}`;
+            const pairKey = normalizeDrugKey(pair);
+            if (usedPairs.has(pairKey)) continue;
+
+            usedPairs.add(pairKey);
+            usedWrongClasses.add(wrongPick.classKey);
+            wrongPairs.push(pair);
+        }
+
         if (wrongPairs.length >= 3) break;
-
-        const wrongClass = classPool.find(cls => normalizeDrugKey(cls) !== normalizeDrugKey(other.class)) || null;
-        if (!wrongClass) continue;
-
-        const pair = `${other.generic}: ${wrongClass}`;
-        const pairKey = normalizeDrugKey(pair);
-        if (usedPairs.has(pairKey)) continue;
-        usedPairs.add(pairKey);
-        wrongPairs.push(pair);
     }
 
     if (wrongPairs.length < 3) return null;
