@@ -63,17 +63,19 @@ const FINAL_RECENT_RUN_LOOKBACK_MS = 14 * 24 * 60 * 60 * 1000;
 const GENERATED_QUIZ_IDS = new Set(["custom-quiz", "review-quiz"]);
 
 const FINAL_BLUEPRINT_FAMILY_WEIGHTS = [
-    { family: "generic_to_brand", weight: 0.14 },
-    { family: "brand_to_generic", weight: 0.14 },
-    { family: "brand_class_pair", weight: 0.08 },
-    { family: "drug_to_class", weight: 0.10 },
-    { family: "drug_to_category", weight: 0.08 },
-    { family: "drug_to_moa", weight: 0.08 },
-    { family: "class_to_drug", weight: 0.08 },
-    { family: "category_to_drug", weight: 0.08 },
-    { family: "moa_to_drug", weight: 0.08 },
-    { family: "paired_med_class", weight: 0.08 },
-    { family: "negative_mcq", weight: 0.06 }
+    { family: "generic_to_brand", weight: 0.13 },
+    { family: "brand_to_generic", weight: 0.13 },
+    { family: "brand_class_pair", weight: 0.07 },
+    { family: "brand_category_pair", weight: 0.05 },
+    { family: "drug_to_class", weight: 0.09 },
+    { family: "drug_to_category", weight: 0.09 },
+    { family: "drug_to_moa", weight: 0.07 },
+    { family: "class_to_drug", weight: 0.07 },
+    { family: "category_to_drug", weight: 0.09 },
+    { family: "moa_to_drug", weight: 0.07 },
+    { family: "paired_med_class", weight: 0.06 },
+    { family: "paired_med_category", weight: 0.04 },
+    { family: "negative_mcq", weight: 0.04 }
 ];
 
 function normalizeDrugKey(value) {
@@ -570,6 +572,79 @@ function getPlausibleWrongClassesForDrug(drug, allPool, maxCount = 4) {
     return ranked.slice(0, maxCount).map(item => item.className);
 }
 
+function getPlausibleWrongCategoriesForDrug(drug, allPool, maxCount = 4) {
+    const targetCategory = String(drug?.category || "").trim();
+    const targetCategoryKey = normalizeDrugKey(targetCategory);
+    if (!targetCategoryKey) return [];
+
+    const targetClassKey = normalizeDrugKey(drug?.class);
+    const targetWeek = Number(drug?.metadata?.week || 0);
+    const targetLab = Number(drug?.metadata?.lab || 0);
+    const categoryScores = new Map();
+
+    const setCandidate = (candidateCategoryKey, candidateCategory, bucket, score) => {
+        const existing = categoryScores.get(candidateCategoryKey);
+        if (!existing) {
+            categoryScores.set(candidateCategoryKey, { categoryName: candidateCategory, bucket, score });
+            return;
+        }
+
+        if (bucket < existing.bucket || (bucket === existing.bucket && score > existing.score)) {
+            categoryScores.set(candidateCategoryKey, { categoryName: candidateCategory, bucket, score });
+        }
+    };
+
+    for (const candidate of allPool || []) {
+        if (!candidate || candidate === drug) continue;
+
+        const candidateCategory = String(candidate?.category || "").trim();
+        const candidateCategoryKey = normalizeDrugKey(candidateCategory);
+        if (!candidateCategoryKey || candidateCategoryKey === targetCategoryKey) continue;
+        if (isAmbiguousTherapeuticFieldMatch(targetCategory, candidateCategory, "category", allPool)) continue;
+
+        const sameClass = targetClassKey && normalizeDrugKey(candidate?.class) === targetClassKey;
+        const similarity = getTherapeuticSimilarity(drug, candidate);
+        const overlap = getTokenOverlapScore(targetCategory, candidateCategory);
+
+        let bucket = 5;
+        if (sameClass && (similarity >= 0.22 || overlap >= 0.22)) {
+            bucket = 1;
+        } else if (sameClass) {
+            bucket = 2;
+        } else if (similarity >= 0.28 || overlap >= 0.28) {
+            bucket = 3;
+        } else if (targetClassKey && normalizeDrugKey(candidate?.class) && getTokenOverlapScore(drug?.class, candidate?.class) >= 0.3) {
+            bucket = 4;
+        }
+
+        let score = Math.random() * 0.16;
+        if (sameClass) score += 3.1;
+        score += overlap * 3.3;
+        score += similarity * 4.4;
+
+        if (targetLab && Number(candidate?.metadata?.lab || 0) === targetLab) score += 0.28;
+        if (targetWeek) {
+            const weekDelta = Math.abs(targetWeek - Number(candidate?.metadata?.week || 0));
+            score += Math.max(0, 0.9 - (weekDelta * 0.12));
+        }
+
+        setCandidate(candidateCategoryKey, candidateCategory, bucket, score);
+    }
+
+    let ranked = [...categoryScores.values()]
+        .sort((a, b) => {
+            if (a.bucket !== b.bucket) return a.bucket - b.bucket;
+            return b.score - a.score;
+        });
+
+    const plausibleOnly = ranked.filter(item => item.bucket <= 4);
+    if (plausibleOnly.length >= maxCount) {
+        ranked = plausibleOnly;
+    }
+
+    return ranked.slice(0, maxCount).map(item => item.categoryName);
+}
+
 function pickRealBrandClassDistractors(drug, allPool, signals, count = 2, targetBrand = "") {
     const targetClass = String(drug?.class || "").trim();
     const targetClassKey = normalizeDrugKey(targetClass);
@@ -676,6 +751,94 @@ function pickRealBrandClassDistractors(drug, allPool, signals, count = 2, target
     return picks;
 }
 
+function pickRealBrandCategoryDistractors(drug, allPool, signals, count = 2, targetBrand = "") {
+    const targetCategory = String(drug?.category || "").trim();
+    const targetCategoryKey = normalizeDrugKey(targetCategory);
+    const targetClassKey = normalizeDrugKey(drug?.class);
+    const targetBrandKey = normalizeDrugKey(targetBrand);
+
+    const ranked = [];
+    for (const candidate of allPool || []) {
+        if (!candidate || candidate === drug || !candidate?.category || !candidate?.generic) continue;
+        if (normalizeDrugKey(candidate?.generic) === normalizeDrugKey(drug?.generic)) continue;
+
+        const candidateBrand = pickBrandVariantForFinal(candidate, signals) || splitBrandNames(candidate?.brand)[0];
+        if (!candidateBrand) continue;
+        if (targetBrandKey && normalizeDrugKey(candidateBrand) === targetBrandKey) continue;
+
+        const candidateCategory = String(candidate.category).trim();
+        const candidateCategoryKey = normalizeDrugKey(candidateCategory);
+        const sameCategory = candidateCategoryKey === targetCategoryKey;
+        const sameClass = targetClassKey && normalizeDrugKey(candidate?.class) === targetClassKey;
+        const similarity = getTherapeuticSimilarity(drug, candidate);
+        const overlap = getTokenOverlapScore(targetCategory, candidateCategory);
+
+        let bucket = 5;
+        if (sameCategory && sameClass) {
+            bucket = 1;
+        } else if (sameCategory) {
+            bucket = 2;
+        } else if (sameClass) {
+            bucket = 3;
+        } else if (similarity >= 0.28 || overlap >= 0.24) {
+            bucket = 4;
+        }
+
+        let score = Math.random() * 0.16;
+        if (sameCategory) score += 2.7;
+        if (sameClass) score += 2.1;
+        score += similarity * 4.8;
+        score += overlap * 2.7;
+
+        ranked.push({
+            brand: candidateBrand,
+            categoryName: candidateCategory,
+            brandKey: normalizeDrugKey(candidateBrand),
+            categoryKey: candidateCategoryKey,
+            pairKey: normalizeDrugKey(`${candidateBrand} / ${candidateCategory}`),
+            bucket,
+            score
+        });
+    }
+
+    ranked.sort((a, b) => {
+        if (a.bucket !== b.bucket) return a.bucket - b.bucket;
+        return b.score - a.score;
+    });
+
+    const plausibleRanked = ranked.filter(item => item.bucket <= 4);
+    const rankedPool = plausibleRanked.length >= count ? plausibleRanked : ranked;
+
+    const usedPairs = new Set();
+    const usedBrands = new Set();
+    const usedCategories = new Set();
+    const picks = [];
+
+    for (const item of rankedPool) {
+        if (usedPairs.has(item.pairKey)) continue;
+        if (usedBrands.has(item.brandKey) || usedCategories.has(item.categoryKey)) continue;
+
+        usedPairs.add(item.pairKey);
+        usedBrands.add(item.brandKey);
+        usedCategories.add(item.categoryKey);
+        picks.push(item);
+        if (picks.length >= count) break;
+    }
+
+    for (const item of rankedPool) {
+        if (picks.length >= count) break;
+        if (usedPairs.has(item.pairKey)) continue;
+        if (usedBrands.has(item.brandKey) && usedCategories.has(item.categoryKey)) continue;
+
+        usedPairs.add(item.pairKey);
+        usedBrands.add(item.brandKey);
+        usedCategories.add(item.categoryKey);
+        picks.push(item);
+    }
+
+    return picks;
+}
+
 function buildTopDrugsBrandClassQuestion(drug, allPool, options = {}) {
     if (!drug?.class) return null;
 
@@ -763,6 +926,81 @@ function buildTopDrugsBrandClassQuestion(drug, allPool, options = {}) {
     return {
         type: "mcq",
         prompt: `Identify <b>Brand & Class</b> for <b>${drug.generic}</b>?`,
+        choices: shuffled(optionCandidates.slice(0, 4)),
+        answer: correct,
+        drugRef: drug,
+        _brandVariant: targetBrand
+    };
+}
+
+function buildTopDrugsBrandCategoryQuestion(drug, allPool, options = {}) {
+    if (!drug?.category) return null;
+
+    const signals = options?.signals || loadTopDrugsSignals();
+    const targetBrand = options?.targetBrand || pickBrandVariantForFinal(drug, signals) || splitBrandNames(drug?.brand)[0];
+    if (!targetBrand) return null;
+
+    const wrongCategories = getPlausibleWrongCategoriesForDrug(drug, allPool, 6);
+    if (!wrongCategories.length) return null;
+
+    const primaryWrongCategory = wrongCategories[0];
+    const primaryWrongKey = normalizeDrugKey(primaryWrongCategory || "");
+    const secondaryWrongCategory = wrongCategories.find(categoryName => normalizeDrugKey(categoryName) !== primaryWrongKey);
+
+    const decoyPairs = pickRealBrandCategoryDistractors(drug, allPool, signals, 4, targetBrand);
+    if (!primaryWrongCategory || !decoyPairs.length) return null;
+
+    const optionCandidates = [];
+    const seen = new Set();
+    const patternCounts = {
+        sameBrandWrong: 0,
+        differentBrandReal: 0
+    };
+
+    const pushOption = (value, pattern = "") => {
+        if (pattern && patternCounts[pattern] >= 2) return;
+
+        const normalized = normalizeDrugKey(value);
+        if (!normalized || seen.has(normalized)) return;
+        seen.add(normalized);
+
+        if (pattern) {
+            patternCounts[pattern] = (patternCounts[pattern] || 0) + 1;
+        }
+
+        optionCandidates.push(value);
+    };
+
+    const correct = `${targetBrand} / ${drug.category}`;
+    pushOption(correct);
+    pushOption(`${targetBrand} / ${primaryWrongCategory}`, "sameBrandWrong");
+    pushOption(`${decoyPairs[0].brand} / ${decoyPairs[0].categoryName}`, "differentBrandReal");
+
+    if (secondaryWrongCategory) {
+        pushOption(`${targetBrand} / ${secondaryWrongCategory}`, "sameBrandWrong");
+    }
+
+    for (const decoy of decoyPairs.slice(1)) {
+        if (optionCandidates.length >= 4) break;
+        pushOption(`${decoy.brand} / ${decoy.categoryName}`, "differentBrandReal");
+    }
+
+    for (const categoryName of wrongCategories) {
+        if (optionCandidates.length >= 4) break;
+        if (normalizeDrugKey(categoryName) === primaryWrongKey) continue;
+        pushOption(`${targetBrand} / ${categoryName}`, "sameBrandWrong");
+    }
+
+    for (const decoy of decoyPairs) {
+        if (optionCandidates.length >= 4) break;
+        pushOption(`${decoy.brand} / ${decoy.categoryName}`, "differentBrandReal");
+    }
+
+    if (optionCandidates.length < 4) return null;
+
+    return {
+        type: "mcq",
+        prompt: `Identify <b>Brand & Category</b> for <b>${drug.generic}</b>?`,
         choices: shuffled(optionCandidates.slice(0, 4)),
         answer: correct,
         drugRef: drug,
@@ -2455,6 +2693,7 @@ function buildFinalPoolStats(pool) {
     const categoryToDrugs = new Map();
     const moaToDrugs = new Map();
     const allClasses = [];
+    const allCategories = [];
 
     const addToMap = (map, key, drug) => {
         const normalized = normalizeDrugKey(key);
@@ -2468,13 +2707,15 @@ function buildFinalPoolStats(pool) {
         addToMap(categoryToDrugs, drug?.category, drug);
         addToMap(moaToDrugs, drug?.moa, drug);
         if (drug?.class) allClasses.push(drug.class);
+        if (drug?.category) allCategories.push(drug.category);
     }
 
     return {
         classToDrugs,
         categoryToDrugs,
         moaToDrugs,
-        allClasses: [...new Set(allClasses.filter(Boolean))]
+        allClasses: [...new Set(allClasses.filter(Boolean))],
+        allCategories: [...new Set(allCategories.filter(Boolean))]
     };
 }
 
@@ -2490,6 +2731,8 @@ function canBuildFinalQuestionFamily(drug, family, poolStats) {
             return brandCount > 0;
         case "brand_class_pair":
             return brandCount > 0 && Boolean(classKey) && poolStats.allClasses.length >= 4;
+        case "brand_category_pair":
+            return brandCount > 0 && Boolean(categoryKey) && poolStats.allCategories.length >= 4;
         case "drug_to_class":
             return Boolean(classKey);
         case "drug_to_category":
@@ -2504,6 +2747,8 @@ function canBuildFinalQuestionFamily(drug, family, poolStats) {
             return Boolean(moaKey);
         case "paired_med_class":
             return Boolean(classKey) && poolStats.allClasses.length >= 4;
+        case "paired_med_category":
+            return Boolean(categoryKey) && poolStats.allCategories.length >= 4;
         case "negative_mcq": {
             const classCount = classKey ? (poolStats.classToDrugs.get(classKey)?.length || 0) : 0;
             const categoryCount = categoryKey ? (poolStats.categoryToDrugs.get(categoryKey)?.length || 0) : 0;
@@ -2532,17 +2777,19 @@ function scoreFinalFamilyChoice(drug, family, currentCounts, targetCounts, conte
     score += deficit * 1.1;
     score += getDrugWeaknessScore(drug, context.signals) * 0.12;
 
-    if (family === "generic_to_brand" || family === "brand_to_generic" || family === "brand_class_pair") {
+    if (family === "generic_to_brand" || family === "brand_to_generic" || family === "brand_class_pair" || family === "brand_category_pair") {
         score += getBrandWeaknessScore(drug, context.signals) * 0.22;
     }
 
     if (comboGeneric && [
         "generic_to_brand",
         "brand_to_generic",
+        "brand_category_pair",
         "drug_to_class",
         "drug_to_category",
         "class_to_drug",
-        "category_to_drug"
+        "category_to_drug",
+        "paired_med_category"
     ].includes(family)) {
         score += 0.32;
     }
@@ -2550,10 +2797,12 @@ function scoreFinalFamilyChoice(drug, family, currentCounts, targetCounts, conte
     if (comboContraceptive && [
         "generic_to_brand",
         "brand_to_generic",
+        "brand_category_pair",
         "drug_to_class",
         "drug_to_category",
         "class_to_drug",
-        "category_to_drug"
+        "category_to_drug",
+        "paired_med_category"
     ].includes(family)) {
         score += 0.38;
     }
@@ -3000,6 +3249,110 @@ function buildFinalPairedClassQuestion(drug, allPool, poolStats) {
     };
 }
 
+function buildFinalPairedCategoryQuestion(drug, allPool, poolStats) {
+    if (!drug?.category || !drug?.generic) return null;
+
+    const categoryPool = (poolStats?.allCategories || []).filter(Boolean);
+    if (categoryPool.length < 4) return null;
+
+    const targetClassKey = normalizeDrugKey(drug?.class);
+    const targetCategory = String(drug?.category || "").trim();
+
+    const candidates = allPool.filter(other => other !== drug && other?.generic && other?.category);
+    if (candidates.length < 3) return null;
+
+    const sameClassCandidates = targetClassKey
+        ? candidates.filter(other => normalizeDrugKey(other?.class) === targetClassKey)
+        : [];
+    const nonClassCandidates = candidates.filter(other => normalizeDrugKey(other?.class) !== targetClassKey);
+
+    const selectedOthers = [
+        ...rankByTherapeuticSimilarity(drug, sameClassCandidates),
+        ...rankByTherapeuticSimilarity(drug, nonClassCandidates)
+    ].slice(0, 14);
+    if (selectedOthers.length < 3) return null;
+
+    const wrongPairs = [];
+    const usedPairs = new Set();
+    const usedWrongCategories = new Set();
+
+    const pickWrongCategoryForDrug = (otherDrug, avoidReusedWrongCategory) => {
+        const otherCategory = String(otherDrug?.category || "").trim();
+        const otherCategoryKey = normalizeDrugKey(otherCategory);
+        if (!otherCategoryKey) return null;
+
+        const otherClassKey = normalizeDrugKey(otherDrug?.class);
+
+        const ranked = categoryPool
+            .map(categoryValue => {
+                const categoryKey = normalizeDrugKey(categoryValue);
+                if (!categoryKey || categoryKey === otherCategoryKey) return null;
+                if (avoidReusedWrongCategory && usedWrongCategories.has(categoryKey)) return null;
+                if (isAmbiguousTherapeuticFieldMatch(otherCategory, categoryValue, "category", allPool)) return null;
+
+                const categoryDrugs = poolStats?.categoryToDrugs?.get(categoryKey) || [];
+                const sameOtherClass = otherClassKey
+                    ? categoryDrugs.some(item => normalizeDrugKey(item?.class) === otherClassKey)
+                    : false;
+                const sameTargetClass = targetClassKey
+                    ? categoryDrugs.some(item => normalizeDrugKey(item?.class) === targetClassKey)
+                    : false;
+
+                let score = Math.random() * 0.12;
+                if (sameOtherClass) score += 3.0;
+                if (sameTargetClass) score += 1.8;
+                score += getTokenOverlapScore(otherCategory, categoryValue) * 3.0;
+                score += getTokenOverlapScore(targetCategory, categoryValue) * 1.6;
+
+                return {
+                    categoryValue,
+                    categoryKey,
+                    sameOtherClass,
+                    sameTargetClass,
+                    score
+                };
+            })
+            .filter(Boolean)
+            .sort((a, b) => {
+                if (a.sameOtherClass !== b.sameOtherClass) return Number(b.sameOtherClass) - Number(a.sameOtherClass);
+                if (a.sameTargetClass !== b.sameTargetClass) return Number(b.sameTargetClass) - Number(a.sameTargetClass);
+                return b.score - a.score;
+            });
+
+        return ranked[0] || null;
+    };
+
+    for (const avoidReuse of [true, false]) {
+        for (const other of selectedOthers) {
+            if (wrongPairs.length >= 3) break;
+
+            const wrongPick = pickWrongCategoryForDrug(other, avoidReuse);
+            if (!wrongPick) continue;
+
+            const pair = `${other.generic}: ${wrongPick.categoryValue}`;
+            const pairKey = normalizeDrugKey(pair);
+            if (usedPairs.has(pairKey)) continue;
+
+            usedPairs.add(pairKey);
+            usedWrongCategories.add(wrongPick.categoryKey);
+            wrongPairs.push(pair);
+        }
+
+        if (wrongPairs.length >= 3) break;
+    }
+
+    if (wrongPairs.length < 3) return null;
+
+    const correctPair = `${drug.generic}: ${drug.category}`;
+    return {
+        type: "mcq",
+        prompt: "Which medication/category pair is <b>correctly matched</b>?",
+        choices: shuffled([correctPair, ...wrongPairs.slice(0, 3)]),
+        answer: correctPair,
+        drugRef: drug
+    };
+}
+
 function buildFinalNegativeQuestion(drug, allPool) {
     const attributes = [
         { key: "class", label: "class" },
@@ -3052,6 +3405,8 @@ function buildFinalExamQuestionFromFamily(drug, allPool, family, context, poolSt
             return buildFinalBrandToGenericQuestion(drug, context.signals);
         case "brand_class_pair":
             return buildTopDrugsBrandClassQuestion(drug, allPool, { signals: context.signals });
+        case "brand_category_pair":
+            return buildTopDrugsBrandCategoryQuestion(drug, allPool, { signals: context.signals });
         case "drug_to_class":
             return buildFinalDrugToFieldQuestion(drug, allPool, "class", "Class");
         case "drug_to_category":
@@ -3066,6 +3421,8 @@ function buildFinalExamQuestionFromFamily(drug, allPool, family, context, poolSt
             return buildFinalFieldToDrugQuestion(drug, allPool, "moa", "MOA");
         case "paired_med_class":
             return buildFinalPairedClassQuestion(drug, allPool, poolStats);
+        case "paired_med_category":
+            return buildFinalPairedCategoryQuestion(drug, allPool, poolStats);
         case "negative_mcq":
             return buildFinalNegativeQuestion(drug, allPool);
         default:
