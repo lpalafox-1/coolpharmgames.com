@@ -2470,7 +2470,9 @@ function createQuestion(drug, all) {
             prompt: `Which is <b>NOT</b> a drug with <b>${attr.label} ${targetValue}</b>?`,
             choices: shuffled([correctAnswer, ...wrongAnswers]),
             answer: correctAnswer,
-            drugRef: drug
+            drugRef: drug,
+            _focusFieldKey: attr.key,
+            _focusFieldValue: targetValue
         };
     };
     
@@ -3087,7 +3089,9 @@ function buildFinalFieldToDrugQuestion(drug, allPool, key, label) {
         prompt,
         choices: shuffled([answer, ...distractors]),
         answer,
-        drugRef: drug
+        drugRef: drug,
+        _focusFieldKey: key,
+        _focusFieldValue: fieldValue
     };
 }
 
@@ -3390,11 +3394,20 @@ function buildFinalNegativeQuestion(drug, allPool) {
             prompt: `Which drug is <b>NOT</b> in the <b>${targetValue}</b> ${attr.label}?`,
             choices: shuffled([correctDrug.generic, ...wrongChoices]),
             answer: correctDrug.generic,
-            drugRef: drug
+            drugRef: drug,
+            _focusFieldKey: attr.key,
+            _focusFieldValue: targetValue
         };
     }
 
     return null;
+}
+
+function getFinalQuestionFocusSignature(question) {
+    const fieldKey = normalizeDrugKey(question?._focusFieldKey);
+    const fieldValue = normalizeDrugKey(question?._focusFieldValue);
+    if (!fieldKey || !fieldValue) return null;
+    return `${fieldKey}:${fieldValue}`;
 }
 
 function buildFinalExamQuestionFromFamily(drug, allPool, family, context, poolStats) {
@@ -3443,6 +3456,7 @@ function buildFinalExamQuestions(selectedDrugs, fullPool) {
     const assignmentInfo = assignFinalQuestionFamilies(selectedDrugs, poolStats, context);
 
     const questions = [];
+    const usedFocusSignatures = new Set();
     for (const drug of selectedDrugs) {
         const genericKey = normalizeDrugKey(drug?.generic);
         const preferredFamily = assignmentInfo.assignments.get(genericKey) || null;
@@ -3456,18 +3470,25 @@ function buildFinalExamQuestions(selectedDrugs, fullPool) {
 
         let builtQuestion = null;
         let usedFamily = "legacy";
+        let usedFocusSignature = null;
 
         for (const family of familyOrder) {
             const candidate = buildFinalExamQuestionFromFamily(drug, fullPool, family, context, poolStats);
             if (!candidate) continue;
+            const focusSignature = getFinalQuestionFocusSignature(candidate);
+            if (focusSignature && usedFocusSignatures.has(focusSignature)) continue;
             builtQuestion = candidate;
             usedFamily = family;
+            usedFocusSignature = focusSignature;
             break;
         }
 
         if (!builtQuestion) {
             builtQuestion = createQuestion(drug, fullPool);
+            usedFocusSignature = getFinalQuestionFocusSignature(builtQuestion);
         }
+
+        if (usedFocusSignature) usedFocusSignatures.add(usedFocusSignature);
 
         questions.push({
             ...builtQuestion,
