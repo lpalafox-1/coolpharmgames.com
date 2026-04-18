@@ -2,6 +2,16 @@ import { readFileSync, readdirSync } from 'fs';
 
 console.log('🔍 COMPREHENSIVE SITE HEALTH CHECK\n');
 
+const VIRTUAL_QUIZ_IDS = new Set(['log-lab-final-2', 'bdt-unit10-quiz8', 'custom-quiz', 'review-quiz']);
+
+function getQuizQuestionCount(quiz) {
+  const questions = Array.isArray(quiz.questions) ? quiz.questions.length : 0;
+  const pools = quiz.pools && typeof quiz.pools === 'object'
+    ? Object.values(quiz.pools).reduce((sum, pool) => sum + (Array.isArray(pool) ? pool.length : 0), 0)
+    : 0;
+  return questions + pools;
+}
+
 // 1. Quiz validation
 const quizDir = './quizzes/';
 const files = readdirSync(quizDir).filter(f => f.endsWith('.json'));
@@ -12,9 +22,7 @@ console.log('📋 QUIZ FILE ANALYSIS:');
 files.forEach(file => {
   try {
     const quiz = JSON.parse(readFileSync(quizDir + file, 'utf8'));
-    const easy = quiz.pools?.easy?.length || 0;
-    const hard = quiz.pools?.hard?.length || 0;
-    const total = easy + hard;
+    const total = getQuizQuestionCount(quiz);
     totalQuestions += total;
     
     // Check for issues
@@ -42,8 +50,8 @@ console.log(`   Issues found: ${issueCount}`);
 
 // 2. Footer count check
 const homepage = readFileSync('./index.html', 'utf8');
-const footerMatch = homepage.match(/(\d+) practice questions/);
-const footerCount = footerMatch ? parseInt(footerMatch[1]) : 0;
+const footerMatch = homepage.match(/([\d,]+)\+?\s+practice questions/i);
+const footerCount = footerMatch ? parseInt(footerMatch[1].replace(/,/g, ''), 10) : 0;
 
 console.log(`\n🏠 HOMEPAGE CHECK:`);
 console.log(`   Footer shows: ${footerCount} questions`);
@@ -66,7 +74,7 @@ files.forEach(file => {
   } catch (e) {}
 });
 
-const brokenLinks = referencedIds.filter(id => !existingIds.has(id));
+const brokenLinks = referencedIds.filter(id => !existingIds.has(id) && !VIRTUAL_QUIZ_IDS.has(id));
 
 console.log(`\n🔗 LINK CHECK:`);
 if (brokenLinks.length > 0) {

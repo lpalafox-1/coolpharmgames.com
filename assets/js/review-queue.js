@@ -207,10 +207,11 @@ function startReviewQuiz(limit) {
         prompt: q.prompt,
         choices: q.choices,
         answer: q.answer,
-        answerText: q.answer,
-        answerIndex: q.answer,
+        answerText: q.answerText ?? q.answer,
+        sourceQuizId: q.quizId || q.sourceQuizId || "",
+        sourceTitle: QUIZ_TITLES[q.quizId] || q.title || q.quizId || "Review Queue",
         hint: "Review your previous answer carefully.",
-        solution: `You previously answered: ${q.userAnswer}`
+        solution: `You previously answered: ${Array.isArray(q.userAnswer) ? q.userAnswer.join(", ") : q.userAnswer}`
       }))
     }
   };

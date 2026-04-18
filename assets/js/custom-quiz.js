@@ -4,14 +4,6 @@
 const THEME_KEY = "pharmlet.theme";
 const CUSTOM_QUIZ_KEY = "pharmlet.custom-quiz";
 
-const QUIZ_OVERRIDES = {
-  "log-lab-final-2": {
-    title: "Top Drugs Final Lab 2 — 110 Questions",
-    questionCount: 110,
-    pools: {}
-  }
-};
-
 const state = {
   availableQuizzes: [],
   selectedQuizzes: new Set(),
@@ -55,7 +47,7 @@ async function loadAvailableQuizzes() {
     "popp-practice-exam1", "popp-practice-law", "popp-practice-mock-E1",
     "basis-practice-exam1", "basis-practice-mock-E1",
     "top-drugs-final-mockA", "top-drugs-final-mockB", "top-drugs-final-mockC",
-    "top-drugs-final-mockD", "top-drugs-final-mockE", "log-lab-final-2",
+    "top-drugs-final-mockD", "top-drugs-final-mockE",
     "sig-wildcards", "latin-fun"
   ];
 
@@ -64,8 +56,7 @@ async function loadAvailableQuizzes() {
 
   for (const quizId of quizIds) {
     try {
-      const override = QUIZ_OVERRIDES[quizId];
-      const data = override || await (async () => {
+      const data = await (async () => {
         const res = await fetch(`quizzes/${quizId}.json`, { cache: "no-store" });
         if (!res.ok) return null;
         return res.json();
@@ -76,7 +67,7 @@ async function loadAvailableQuizzes() {
         id: quizId,
         title: data.title || quizId,
         pools: data.pools || {},
-        questionCount: override?.questionCount ?? calculateQuestionCount(data)
+        questionCount: calculateQuestionCount(data)
       };
       
       state.availableQuizzes.push(quizInfo);
@@ -206,14 +197,28 @@ async function startCustomQuiz() {
         if (mode === 'mix') {
           // Combine all pools
           Object.values(data.pools).forEach(pool => {
-            if (Array.isArray(pool)) allQuestions.push(...pool);
+            if (Array.isArray(pool)) {
+              allQuestions.push(...pool.map(item => ({
+                ...item,
+                sourceQuizId: quizId,
+                sourceTitle: data.title || quizId
+              })));
+            }
           });
         } else if (data.pools[mode]) {
           // Use specific difficulty
-          allQuestions.push(...data.pools[mode]);
+          allQuestions.push(...data.pools[mode].map(item => ({
+            ...item,
+            sourceQuizId: quizId,
+            sourceTitle: data.title || quizId
+          })));
         }
       } else if (Array.isArray(data.questions)) {
-        allQuestions.push(...data.questions);
+        allQuestions.push(...data.questions.map(item => ({
+          ...item,
+          sourceQuizId: quizId,
+          sourceTitle: data.title || quizId
+        })));
       }
     } catch (e) {
       console.warn(`Failed to load ${quizId}:`, e);

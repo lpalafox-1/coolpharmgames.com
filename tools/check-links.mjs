@@ -4,19 +4,30 @@
  */
 
 import { readFileSync, readdirSync } from 'fs';
-import { join } from 'path';
 
 const indexPath = 'index.html';
 const quizzesDir = 'quizzes';
+const virtualQuizIds = new Set(['log-lab-final-2', 'bdt-unit10-quiz8', 'custom-quiz', 'review-quiz']);
+
+function getQuizIds() {
+  const ids = new Set();
+
+  for (const file of readdirSync(quizzesDir).filter(f => f.endsWith('.json'))) {
+    const raw = readFileSync(`${quizzesDir}/${file}`, 'utf8');
+    const quiz = JSON.parse(raw);
+    if (quiz.id) ids.add(quiz.id);
+  }
+
+  return ids;
+}
 
 try {
   // Read index.html
   const indexContent = readFileSync(indexPath, 'utf8');
 
-  // Get all quiz files
-  const quizFiles = readdirSync(quizzesDir)
-    .filter(f => f.endsWith('.json'))
-    .map(f => f.replace('.json', ''));
+  // Get all quiz IDs from JSON plus generated virtual quizzes
+  const quizIds = getQuizIds();
+  for (const id of virtualQuizIds) quizIds.add(id);
 
   // Extract quiz IDs from links in index.html
   const linkRegex = /quiz\.html\?id=([a-z0-9-]+)/g;
@@ -36,7 +47,7 @@ try {
 
   // Check if all links have corresponding files
   for (const linkId of uniqueLinks) {
-    if (quizFiles.includes(linkId)) {
+    if (quizIds.has(linkId)) {
       console.log(`✅ ${linkId}`);
     } else {
       console.log(`❌ ${linkId} - FILE MISSING`);
@@ -45,15 +56,17 @@ try {
   }
 
   // Check if there are quiz files not linked
-  const unlinkedFiles = quizFiles.filter(f => !uniqueLinks.includes(f));
-  if (unlinkedFiles.length > 0) {
-    console.log('\n📁 Quiz files not linked in menu:');
-    unlinkedFiles.forEach(f => console.log(`⚠️  ${f}`));
+  const unlinkedQuizIds = [...quizIds]
+    .filter(id => !virtualQuizIds.has(id))
+    .filter(id => !uniqueLinks.includes(id));
+  if (unlinkedQuizIds.length > 0) {
+    console.log('\n📁 Quiz IDs not linked in menu:');
+    unlinkedQuizIds.forEach(id => console.log(`⚠️  ${id}`));
   }
 
-  console.log(`\n📊 Summary: ${uniqueLinks.length} unique links, ${quizFiles.length} quiz files`);
+  console.log(`\n📊 Summary: ${uniqueLinks.length} unique links, ${quizIds.size} total quiz IDs`);
 
-  if (allValid && unlinkedFiles.length === 0) {
+  if (allValid && unlinkedQuizIds.length === 0) {
     console.log('🎉 All links are valid!');
     process.exit(0);
   } else {

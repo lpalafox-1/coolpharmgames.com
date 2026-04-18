@@ -1,40 +1,37 @@
-// tools/validate-quizzes.mjs
-import { readFileSync, readdirSync } from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import Ajv from 'ajv';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Resolve files relative to the repository root (one level up from tools/)
-const repoRoot = path.resolve(__dirname, '..');
-const schemaPath = path.join(repoRoot, 'schema.json');
-const quizzesDir = path.join(repoRoot, 'quizzes');
-
-const ajv = new Ajv({ allErrors: true, allowUnionTypes: true });
-const schema = JSON.parse(readFileSync(schemaPath, 'utf8'));
-const validate = ajv.compile(schema);
-
-const files = readdirSync(quizzesDir).filter(f => f.endsWith('.json'));
-let ok = true;
-
-for (const f of files) {
-  try {
-    const raw = readFileSync(path.join(quizzesDir, f), 'utf8');
-    const data = JSON.parse(raw);
-    const valid = validate(data);
-    if (!valid) {
-      ok = false;
-      console.error(`❌ ${f}`);
-      console.error(validate.errors);
-    } else {
-      console.log(`✅ ${f}`);
-    }
-  } catch (e) {
-    ok = false;
-    console.error(`💥 ${f}: ${e.message}`);
-  }
-}
-
-if (!ok) process.exit(1);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Validation Help — Pharm-let</title>
+  <meta name="description" content="Quick links for validating and smoke-testing the quiz site locally." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body class="bg-[var(--bg)] text-[var(--text)]">
+  <main class="max-w-3xl mx-auto p-6">
+    <div class="card p-6">
+      <h1 class="text-2xl font-bold mb-3">Validation & Test Tools</h1>
+      <p style="color:var(--muted)">
+        This page is a quick reminder of the local tools available in this repo.
+      </p>
+      <div class="mt-6 space-y-4">
+        <div>
+          <h2 class="font-semibold">Schema validation</h2>
+          <p style="color:var(--muted)">Run the Node validator locally if Node is installed:</p>
+          <pre class="mt-2 p-3 rounded-xl" style="background:var(--card); border:1px solid var(--ring)"><code>node tools/validate-quizzes.mjs</code></pre>
+        </div>
+        <div>
+          <h2 class="font-semibold">Quick browser smoke test</h2>
+          <p style="color:var(--muted)">Open the sample test harness:</p>
+          <a class="btn btn-blue mt-2 inline-block" href="tools/test-quiz.html">Open Test Harness</a>
+        </div>
+        <div>
+          <h2 class="font-semibold">Main library</h2>
+          <a class="btn btn-ghost mt-2 inline-block" href="index.html">Back to Pharm-let</a>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

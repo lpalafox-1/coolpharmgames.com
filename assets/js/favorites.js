@@ -13,7 +13,6 @@ const QUIZ_METADATA = {
   "chapter5-review": { title: "Chapter 5 Review", category: "chapter" },
   "practice-e1-exam1-prep-ch1-4": { title: "Practice E1 — Exam 1 Prep (Ch 1-4)", category: "practice" },
   "practice-e2a-exam2-prep-ch1-5": { title: "Practice E2A — Exam 2 Prep (Ch 1-5)", category: "practice" },
-  "practice-e2b-exam2-prep-expanded": { title: "Practice E2B — Expanded Review", category: "practice" },
   "lab-quiz1-antihypertensives": { title: "Lab Quiz 1 — Antihypertensives", category: "lab" },
   "lab-quiz2-antihypertensives": { title: "Lab Quiz 2 — Antihypertensives", category: "lab" },
   "lab-quiz3-antilipemics": { title: "Lab Quiz 3 — Antilipemics", category: "lab" },
@@ -23,12 +22,12 @@ const QUIZ_METADATA = {
   "cumulative-quiz1-3": { title: "Cumulative Quiz 1–3", category: "cumulative" },
   "cumulative-quiz1-4": { title: "Cumulative Quiz 1–4", category: "cumulative" },
   "cumulative-quiz1-5": { title: "Cumulative Quiz 1–5", category: "cumulative" },
-  "top-drugs-final-mockA": { title: "Top Drugs Final Mock A", category: "final" },
-  "top-drugs-final-mockB": { title: "Top Drugs Final Mock B", category: "final" },
-  "top-drugs-final-mockC": { title: "Top Drugs Final Mock C", category: "final" },
-  "top-drugs-final-mockD": { title: "Top Drugs Final Mock D", category: "final" },
-  "top-drugs-final-mockE": { title: "Top Drugs Final Mock E", category: "final" },
-  "log-lab-final-2": { title: "Top Drugs Final Lab 2", category: "final" },
+  "top-drugs-final-mockA": { title: "Top Drugs Final Mock A", category: "final", modes: ["easy"] },
+  "top-drugs-final-mockB": { title: "Top Drugs Final Mock B", category: "final", modes: ["easy"] },
+  "top-drugs-final-mockC": { title: "Top Drugs Final Mock C", category: "final", modes: ["easy"] },
+  "top-drugs-final-mockD": { title: "Top Drugs Final Mock D", category: "final", modes: ["easy"] },
+  "top-drugs-final-mockE": { title: "Top Drugs Final Mock E", category: "final", modes: ["easy"] },
+  "log-lab-final-2": { title: "Top Drugs Final Lab 2", category: "final", modes: ["easy"] },
   "popp-practice-exam1": { title: "POPP Practice Exam 1", category: "practice" },
   "popp-practice-law": { title: "POPP Practice Law", category: "practice" },
   "popp-practice-mock-E1": { title: "POPP Practice Mock E1", category: "practice" },
@@ -88,7 +87,8 @@ function loadFavorites() {
   let quizzes = favorites.map(id => ({
     id,
     title: QUIZ_METADATA[id]?.title || id,
-    category: QUIZ_METADATA[id]?.category || "other"
+    category: QUIZ_METADATA[id]?.category || "other",
+    modes: QUIZ_METADATA[id]?.modes || ["easy", "hard"]
   }));
 
   // Filter by category
@@ -117,6 +117,11 @@ function loadFavorites() {
   quizzes.forEach(quiz => {
     const div = document.createElement("div");
     div.className = "favorite-item";
+    const modeButtons = quiz.modes.map(mode => {
+      const label = mode.charAt(0).toUpperCase() + mode.slice(1);
+      return `<a href="quiz.html?id=${quiz.id}&mode=${mode}&limit=20" class="btn btn-blue flex-1 text-center">${label}</a>`;
+    }).join("");
+
     div.innerHTML = `
       <div class="flex items-start justify-between mb-3">
         <div>
@@ -126,8 +131,7 @@ function loadFavorites() {
         <button class="remove-favorite text-2xl" data-id="${quiz.id}" title="Remove from favorites" style="color:var(--accent)">★</button>
       </div>
       <div class="flex gap-2">
-        <a href="quiz.html?id=${quiz.id}&mode=easy&limit=20" class="btn btn-blue flex-1 text-center">Easy</a>
-        <a href="quiz.html?id=${quiz.id}&mode=hard&limit=20" class="btn btn-blue flex-1 text-center">Hard</a>
+        ${modeButtons}
       </div>
     `;
     

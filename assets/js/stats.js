@@ -1,7 +1,7 @@
 // assets/js/stats.js
 // Performance dashboard for tracking quiz history and progress
 
-const THEME_KEY = "quiz-theme";
+const THEME_KEY = "pharmlet.theme";
 const HISTORY_KEY = "pharmlet.history";
 const REVIEW_KEY = "pharmlet.review-queue";
 const TOP_DRUGS_SIGNALS_KEY = "pharmlet.topDrugs.signals";

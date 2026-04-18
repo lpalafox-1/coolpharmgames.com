@@ -80,33 +80,18 @@ function runHome() {
 
   // 4) SMART RESUME
   const resumeLink = document.getElementById("resume-link");
-  if (resumeLink) {
-    let lastKey = null;
-    for (let i = localStorage.length - 1; i >= 0; i--) {
-      const k = localStorage.key(i);
-      if (k?.startsWith("pharmlet.") && k.split(".").length === 3) { lastKey = k; break; }
-    }
-    if (lastKey) {
-      const parts = lastKey.split(".");
-      resumeLink.href = parts[1].startsWith("week") 
-        ? `quiz.html?week=${parts[1].replace("week","")}` 
-        : `quiz.html?id=${parts[1]}&mode=${parts[2]||'easy'}&limit=20`;
-      document.getElementById("resume-wrap").style.display = "";
+  const resumeWrap = document.getElementById("resume-wrap");
+  const lastQuiz = localStorage.getItem("pharmlet.last-quiz");
+  if (resumeLink && resumeWrap) {
+    if (lastQuiz) {
+      resumeLink.href = `quiz.html${lastQuiz}`;
+      resumeWrap.style.display = "";
+    } else {
+      resumeWrap.style.display = "none";
     }
   }
 
-  // 5) Filter & Sort
-  const filter = document.getElementById("class-filter");
-  if (filter) {
-    filter.addEventListener("input", () => {
-      const q = filter.value.toLowerCase().trim();
-      document.querySelectorAll(".card").forEach(card => {
-        card.style.display = card.textContent.toLowerCase().includes(q) ? "" : "none";
-      });
-    });
-  }
-
-  // 6) Auto-hide NEW banners after 7 days
+  // 5) Auto-hide NEW banners after 7 days
   document.querySelectorAll('.pill-new[data-added]').forEach(banner => {
     const addedDate = new Date(banner.getAttribute('data-added'));
     if ((new Date() - addedDate) / 86400000 > 7) banner.style.display = 'none';

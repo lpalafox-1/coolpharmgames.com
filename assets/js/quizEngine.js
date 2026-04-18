@@ -6,7 +6,10 @@ const tagParam = params.get("tag");                          // Topic mode: ?tag
 const labParam = parseInt(params.get("lab") || "2", 10);     // Lab isolation: &lab=1 or &lab=2 (default: 2)
 const quizId = params.get("id");
 const modeParam = params.get("mode") || "easy";
+const limitParam = parseInt(params.get("limit") || "", 10);
 const HISTORY_KEY = "pharmlet.history";
+const CUSTOM_QUIZ_KEY = "pharmlet.custom-quiz";
+const REVIEW_KEY = "pharmlet.review-queue";
 
 const state = { 
     questions: [], index: 0, score: 0, title: "",
@@ -53,9 +56,11 @@ const CONCEPT_QUIZ_POOL_FILE = "bdt_unit10_quiz8_master_pool.json";
 const FINAL_EXAM_ID = "log-lab-final-2";
 const FINAL_EXAM_TITLE = "Top Drugs Final Lab 2 — 110 Questions";
 const FINAL_EXAM_TOTAL = 110;
+const FINAL_EXAM_TIMER_SECONDS = 90 * 60;
 const FINAL_RECENT_RUNS_KEY = "pharmlet.finalLab2.recentRuns";
 const TOP_DRUGS_SIGNALS_KEY = "pharmlet.topDrugs.signals";
 const FINAL_RECENT_RUN_LOOKBACK_MS = 14 * 24 * 60 * 60 * 1000;
+const GENERATED_QUIZ_IDS = new Set(["custom-quiz", "review-quiz"]);
 
 const FINAL_BLUEPRINT_FAMILY_WEIGHTS = [
     { family: "generic_to_brand", weight: 0.14 },
@@ -1085,6 +1090,65 @@ function flattenPoolData(data) {
     return [];
 }
 
+function buildQuestionPoolFromQuizData(data, requestedMode = "easy") {
+    if (Array.isArray(data?.questions)) return data.questions;
+
+    const pools = data?.pools && typeof data.pools === "object" ? data.pools : {};
+    const availablePools = Object.entries(pools).filter(([, items]) => Array.isArray(items) && items.length > 0);
+    if (!availablePools.length) return [];
+
+    if (requestedMode === "mix") {
+        return availablePools.flatMap(([, items]) => items);
+    }
+
+    if (Array.isArray(pools[requestedMode]) && pools[requestedMode].length > 0) {
+        return pools[requestedMode];
+    }
+
+    if (availablePools.length === 1) {
+        return availablePools[0][1];
+    }
+
+    throw new Error(`Mode "${requestedMode}" is not available for this quiz.`);
+}
+
+function applyQuestionLimit(items) {
+    if (!Array.isArray(items)) return [];
+    if (!Number.isFinite(limitParam) || limitParam <= 0) return items;
+    return shuffled(items).slice(0, Math.min(limitParam, items.length));
+}
+
+function getCorrectAnswerValue(question) {
+    const directAnswer = question?.answerText ?? question?.answer ?? question?.correct ?? question?.ans;
+    if (directAnswer !== undefined && directAnswer !== null && directAnswer !== "") {
+        return directAnswer;
+    }
+
+    if (Number.isInteger(question?.answerIndex) && Array.isArray(question?.choices)) {
+        return question.choices[question.answerIndex];
+    }
+
+    return "";
+}
+
+function loadGeneratedQuizFromStorage(expectedId) {
+    try {
+        const raw = localStorage.getItem(CUSTOM_QUIZ_KEY);
+        if (!raw) return null;
+
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== "object") return null;
+
+        if (expectedId && parsed.id && parsed.id !== expectedId) {
+            throw new Error(`Saved generated quiz does not match "${expectedId}". Please build it again from the source page.`);
+        }
+
+        return parsed;
+    } catch (error) {
+        throw new Error(`Unable to load saved generated quiz: ${error.message}`);
+    }
+}
+
 function isConceptEntry(item) {
     return Boolean(item && (
         item.concept_type ||
@@ -1129,6 +1193,32 @@ function getQuestionIdentity(item) {
     }
 
     return normalizeQuizValue(item?.generic || item?.id || item?.brand || item?.class || item?.category || item?.moa);
+}
+
+function saveMissedQuestionsToReviewQueue(questions) {
+    const missedEntries = (questions || [])
+        .filter(question => question?._answered && !question?._correct)
+        .map(question => ({
+            quizId: question?.sourceQuizId || getHistoryQuizId(),
+            title: question?.sourceTitle || state.title || "",
+            type: question?.type || "mcq",
+            prompt: question?.prompt || "",
+            choices: Array.isArray(question?.choices) ? question.choices : undefined,
+            answer: getCorrectAnswerValue(question),
+            answerText: question?.answerText,
+            userAnswer: Array.isArray(question?._user) ? question._user : (question?._user ?? ""),
+            timestamp: new Date().toISOString()
+        }))
+        .filter(entry => entry.prompt && (entry.answer || Array.isArray(entry.answer)));
+
+    if (!missedEntries.length) return;
+
+    try {
+        const existing = safeReadStorageJson(REVIEW_KEY, []);
+        localStorage.setItem(REVIEW_KEY, JSON.stringify([...existing, ...missedEntries].slice(-500)));
+    } catch (error) {
+        console.warn("Failed to save review queue:", error);
+    }
 }
 
 function getConceptScopeLabel(item) {
@@ -3000,6 +3090,10 @@ function recordTopDrugsSignalsFromQuestions(questions) {
 function render() {
     const q = state.questions[state.index];
     if (!q) return;
+    const singleChoiceTypes = new Set(["mcq", "tf"]);
+    const renderedChoices = q.type === "tf"
+        ? (Array.isArray(q.choices) && q.choices.length ? q.choices : ["True", "False"])
+        : q.choices;
 
     if (getEl("drug-context")) getEl("drug-context").textContent = getQuestionContextLabel(q);
     if (getEl("qnum")) getEl("qnum").textContent = state.index + 1;
@@ -3012,9 +3106,9 @@ function render() {
     if (getEl("check")) getEl("check").classList.toggle("hidden", !!q._answered);
     if (getEl("next")) getEl("next").classList.toggle("hidden", !q._answered);
 
-    if (q.type === "mcq" && q.choices && optCont) {
+    if (singleChoiceTypes.has(q.type) && renderedChoices && optCont) {
         optCont.style.touchAction = 'manipulation';
-        q.choices.forEach(c => {
+        renderedChoices.forEach(c => {
             const lbl = document.createElement("label");
             lbl.className = `flex items-center gap-3 p-4 border rounded-xl cursor-pointer mb-2 transition-colors ${q._user === c ? 'ring-2 ring-maroon bg-maroon/5 border-maroon' : 'border-gray-200 dark:border-gray-700'}`;
             const rad = document.createElement("input");
@@ -3041,6 +3135,44 @@ function render() {
             lbl.addEventListener('click', selectOption, { passive: false });
             optCont.appendChild(lbl);
         });
+    } else if (q.type === "mcq-multiple" && q.choices && optCont) {
+        optCont.style.touchAction = 'manipulation';
+        const selectedValues = Array.isArray(q._user) ? q._user : [];
+
+        q.choices.forEach(choice => {
+            const isSelected = selectedValues.includes(choice);
+            const lbl = document.createElement("label");
+            lbl.className = `flex items-center gap-3 p-4 border rounded-xl cursor-pointer mb-2 transition-colors ${isSelected ? 'ring-2 ring-maroon bg-maroon/5 border-maroon' : 'border-gray-200 dark:border-gray-700'}`;
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.name = "opt-multi";
+            checkbox.value = choice;
+            checkbox.className = "w-5 h-5 accent-maroon";
+            checkbox.checked = isSelected;
+            if (q._answered) checkbox.disabled = true;
+
+            const span = document.createElement("span");
+            span.className = "flex-1 text-base leading-tight text-[var(--text)]";
+            span.innerHTML = choice;
+
+            const toggleOption = (e) => {
+                e.preventDefault();
+                if (q._answered) return;
+
+                const nextValues = new Set(Array.isArray(q._user) ? q._user : []);
+                if (nextValues.has(choice)) nextValues.delete(choice);
+                else nextValues.add(choice);
+
+                q._user = [...nextValues];
+                render();
+            };
+
+            lbl.appendChild(checkbox);
+            lbl.appendChild(span);
+            lbl.addEventListener('pointerdown', toggleOption, { passive: false });
+            lbl.addEventListener('click', toggleOption, { passive: false });
+            optCont.appendChild(lbl);
+        });
     } else if (q.type === "short") {
         if (getEl("short-wrap")) getEl("short-wrap").classList.remove("hidden");
         const input = getEl("short-input");
@@ -3053,7 +3185,7 @@ function render() {
     if (q._answered) {
         const exp = getEl("explain");
         if (exp) {
-            const raw = q.answerText || q.answer || q.correct || q.ans || "N/A";
+            const raw = getCorrectAnswerValue(q) || "N/A";
             const displayAnswer = Array.isArray(raw) ? raw.join(", ") : raw;
             exp.innerHTML = `<div class="p-3 rounded-lg ${q._correct ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}"><b>${q._correct ? 'Correct!' : 'Answer:'}</b> <b>${displayAnswer}</b></div>`;
             exp.classList.add("show");
@@ -3097,8 +3229,17 @@ function wireEvents() {
         "check": () => {
             const q = state.questions[state.index];
             if (!q) return;
-            let val = (q.type === "mcq") ? document.querySelector("#options input:checked")?.value : getEl("short-input")?.value;
-            if (val) scoreCurrent(val);
+            let val = null;
+
+            if (q.type === "mcq" || q.type === "tf") {
+                val = document.querySelector("#options input:checked")?.value;
+            } else if (q.type === "mcq-multiple") {
+                val = Array.from(document.querySelectorAll("#options input:checked")).map(input => input.value);
+            } else {
+                val = getEl("short-input")?.value;
+            }
+
+            if (Array.isArray(val) ? val.length > 0 : val) scoreCurrent(val);
         },
         "reveal-solution": () => scoreCurrent("Revealed"),
    "theme-toggle": () => {
@@ -3178,9 +3319,10 @@ function startSmartTimer() {
     if (state.timerHandle) clearInterval(state.timerHandle);
     const count = state.questions.length;
     const isEndocrineQuiz = quizId === CONCEPT_QUIZ_ID || state.questions.some(q => q?._mode === "concept");
+    const isFinalExam = quizId === FINAL_EXAM_ID;
     state.timerSeconds = isEndocrineQuiz
         ? 600
-        : (weekParam ? 600 : (count <= 20 ? 900 : (count <= 50 ? 2700 : 7200)));
+        : (isFinalExam ? FINAL_EXAM_TIMER_SECONDS : (weekParam ? 600 : (count <= 20 ? 900 : (count <= 50 ? 2700 : 7200))));
     state.timerHandle = setInterval(timerTick, 1000);
 }
 
@@ -3188,8 +3330,9 @@ function scoreCurrent(val) {
     const q = state.questions[state.index];
     if (!q) return;
 
-    const raw = q.answerText || q.answer || q.correct || q.ans || "";
+    const raw = getCorrectAnswerValue(q);
     const correctAnswer = Array.isArray(raw) ? raw[0] : raw;
+    const normalizeWhitespace = s => String(s).replace(/\s+/g, ' ').trim().toLowerCase();
 
     if (val === "Revealed") {
         q._answered = true;
@@ -3199,11 +3342,25 @@ function scoreCurrent(val) {
         return;
     }
 
-    const normalizeWhitespace = s => String(s).replace(/\s+/g, ' ').trim().toLowerCase();
     const normalizeLoose = s => normalizeWhitespace(s).replace(/[\s\-\/.,;]+/g, '');
-    const userNorm = normalizeWhitespace(val);
-    const userLoose = normalizeLoose(val);
+    const userNorm = normalizeWhitespace(Array.isArray(val) ? val.join(", ") : val);
+    const userLoose = normalizeLoose(Array.isArray(val) ? val.join(", ") : val);
     const canonNorm = normalizeWhitespace(correctAnswer);
+
+    if (q.type === "mcq-multiple") {
+        const expected = [...new Set((Array.isArray(raw) ? raw : [raw]).map(normalizeWhitespace).filter(Boolean))].sort();
+        const selected = [...new Set((Array.isArray(val) ? val : [val]).map(normalizeWhitespace).filter(Boolean))].sort();
+        const isCorrect = selected.length > 0
+            && expected.length === selected.length
+            && expected.every((answer, index) => answer === selected[index]);
+
+        q._answered = true;
+        q._user = Array.isArray(val) ? val : [val];
+        q._correct = isCorrect;
+        if (isCorrect) state.score++;
+        render();
+        return;
+    }
 
     const acceptedAnswers = new Set();
     const allowLooseBrandForms = q.prompt.includes("Brand");
@@ -3274,6 +3431,7 @@ function scoreCurrent(val) {
 
 function showResults() {
     saveQuizHistory();
+    saveMissedQuestionsToReviewQueue(state.questions);
 
     if (!state.signalsRecorded) {
         recordTopDrugsSignalsFromQuestions(state.questions);
@@ -3518,18 +3676,23 @@ async function main() {
         }
         // ========== MODE 4: ?id=quiz-name (Legacy Static JSON) ==========
         else if (quizId) {
-            const data = await smartFetch(`${quizId}.json`);
-            const pool = flattenPoolData(data);
+            const data = GENERATED_QUIZ_IDS.has(quizId)
+                ? loadGeneratedQuizFromStorage(quizId)
+                : await smartFetch(`${quizId}.json`);
+            if (!data) {
+                throw new Error(`Quiz "${quizId}" is not available. Try recreating it from the source page.`);
+            }
+            const pool = buildQuestionPoolFromQuizData(data, modeParam);
 
             if (pool.length > 0 && pool.some(isConceptEntry)) {
                 filteredPool = pool.filter(isConceptEntry);
                 fullPool = filteredPool;
                 state.title = data.title || "Endocrine Concept Practice";
-                storageKey = `pharmlet.${quizId}.easy`;
+                storageKey = `pharmlet.${quizId}.${modeParam}`;
             } else {
                 state.title = data.title || "Quiz";
-                state.questions = shuffled(pool).map((q, i) => ({ ...q, _id: i }));
-                storageKey = `pharmlet.${quizId}.easy`;
+                state.questions = shuffled(applyQuestionLimit(pool)).map((q, i) => ({ ...q, _id: i }));
+                storageKey = `pharmlet.${quizId}.${modeParam}`;
 
                 // Skip to render for legacy quizzes
                 finishSetup(storageKey);

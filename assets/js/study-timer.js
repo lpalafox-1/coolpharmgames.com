@@ -50,6 +50,15 @@ document.addEventListener("DOMContentLoaded", () => {
   updateDisplay();
 });
 
+async function ensureNotificationPermission() {
+  if (typeof Notification === "undefined") return;
+  if (Notification.permission !== "default") return;
+
+  try {
+    await Notification.requestPermission();
+  } catch {}
+}
+
 function switchMode(mode) {
   if (state.running) {
     if (!confirm("Switch timer mode? Current session will be reset.")) return;
@@ -59,6 +68,10 @@ function switchMode(mode) {
   state.mode = mode;
   state.seconds = mode === "pomodoro" ? POMODORO_WORK : 0;
   state.pomodoroPhase = "work";
+
+  if (mode === "pomodoro") {
+    ensureNotificationPermission();
+  }
   
   document.getElementById("mode-session").classList.toggle("btn-blue", mode === "session");
   document.getElementById("mode-session").classList.toggle("btn-ghost", mode !== "session");
@@ -71,6 +84,10 @@ function switchMode(mode) {
 
 function startTimer() {
   if (state.running) return;
+
+  if (state.mode === "pomodoro") {
+    ensureNotificationPermission();
+  }
   
   state.running = true;
   state.sessionStart = state.sessionStart || new Date();
