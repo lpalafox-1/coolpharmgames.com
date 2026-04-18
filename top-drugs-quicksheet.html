@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Top Drugs Quicksheet — Pharm-let</title>
+  <meta name="description" content="Searchable Top Drugs quicksheet for Lab 1 and Lab 2." />
+  <meta name="theme-color" content="#8b1e3f" />
+  <link rel="icon" href="assets/icon.png" />
+
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self';
+             img-src 'self' data:;
+             style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com;
+             script-src 'self' https://cdn.tailwindcss.com;
+             connect-src 'self';">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body class="bg-[var(--bg)] text-[var(--text)]">
+  <header class="border-b border-[var(--ring)]">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3 flex-wrap">
+        <a href="index.html" class="quiz-link">← Back to Library</a>
+        <a href="quiz.html?id=log-lab-final-2" class="quiz-link">Start Final</a>
+        <a href="top-drugs-trends.html" class="quiz-link">View Trends</a>
+      </div>
+      <button id="theme-toggle" class="btn btn-ghost" type="button" aria-label="Toggle dark/light theme">
+        <span id="theme-label">Dark</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <section class="hero rounded-3xl border border-[var(--ring)] p-6">
+      <p class="text-sm font-black uppercase tracking-[0.2em] text-[var(--accent)]">Top Drugs Reference</p>
+      <h1 class="mt-2 text-3xl md:text-4xl font-black tracking-tight">Quicksheet</h1>
+      <p class="mt-3 max-w-3xl text-sm md:text-base opacity-80">
+        Search across generic, brand, class, category, and MOA using the current Top Drugs master pool.
+      </p>
+    </section>
+
+    <section class="mt-8 card p-5">
+      <div class="grid gap-4 lg:grid-cols-[1fr_200px_auto]">
+        <label class="block">
+          <span class="text-xs font-black uppercase tracking-[0.18em] opacity-60">Search</span>
+          <input id="quicksheet-search" type="search" placeholder="Try metoprolol, antihypertensive, beta blocker, brand..." class="mt-2 w-full rounded-2xl border border-[var(--ring)] bg-[var(--card)] px-4 py-3" />
+        </label>
+        <label class="block">
+          <span class="text-xs font-black uppercase tracking-[0.18em] opacity-60">Lab Filter</span>
+          <select id="quicksheet-lab" class="mt-2 w-full rounded-2xl border border-[var(--ring)] bg-[var(--card)] px-4 py-3">
+            <option value="all">All Labs</option>
+            <option value="1">Lab 1</option>
+            <option value="2">Lab 2</option>
+          </select>
+        </label>
+        <div class="flex items-end">
+          <button id="quicksheet-clear" type="button" class="btn btn-ghost w-full">Clear Filters</button>
+        </div>
+      </div>
+      <div class="mt-4 text-sm opacity-70" id="quicksheet-count">Loading quicksheet...</div>
+    </section>
+
+    <section class="mt-8">
+      <div id="quicksheet-grid" class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div class="card p-5">Loading Top Drugs quicksheet...</div>
+      </div>
+    </section>
+  </main>
+
+  <script src="assets/js/top-drugs-quicksheet.js?v=20260418" defer></script>
+</body>
+</html>

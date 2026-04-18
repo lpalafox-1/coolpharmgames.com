@@ -7,6 +7,8 @@ const REVIEW_KEY = "pharmlet.review-queue";
 const TOP_DRUGS_SIGNALS_KEY = "pharmlet.topDrugs.signals";
 const FINAL_RECENT_RUNS_KEY = "pharmlet.finalLab2.recentRuns";
 const LAST_ROUND_PREFIX = "pharmlet.session.lastRound.";
+const PROGRESS_KEY_PREFIX = "pharmlet.";
+const PROGRESS_BACKUP_VERSION = 1;
 
 // Theme toggle
 document.addEventListener("DOMContentLoaded", () => {
@@ -45,6 +47,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const result = clearTopDrugsGeneratorMemory();
     alert(`Adaptive generator memory reset. Cleared ${result.local} local key(s) and ${result.session} session key(s).`);
   });
+
+  document.getElementById("export-progress")?.addEventListener("click", exportProgressBackup);
+  document.getElementById("import-progress")?.addEventListener("click", importProgressBackup);
+  document.getElementById("import-progress-file")?.addEventListener("change", handleProgressBackupFile);
 });
 
 function isTopDrugsLastRoundKey(key) {
@@ -84,6 +90,132 @@ function clearTopDrugsGeneratorMemory() {
   }
 
   return { local: clearedLocal, session: clearedSession };
+}
+
+function setProgressTransferStatus(message, tone = "muted") {
+  const el = document.getElementById("progress-transfer-status");
+  if (!el) return;
+
+  const colors = {
+    muted: "var(--muted)",
+    good: "var(--good)",
+    bad: "var(--bad)",
+    accent: "var(--accent)"
+  };
+
+  el.textContent = message;
+  el.style.color = colors[tone] || colors.muted;
+}
+
+function collectProgressBackupData() {
+  const data = {};
+
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key || !key.startsWith(PROGRESS_KEY_PREFIX)) continue;
+    data[key] = localStorage.getItem(key);
+  }
+
+  return {
+    app: "pharm-let",
+    version: PROGRESS_BACKUP_VERSION,
+    exportedAt: new Date().toISOString(),
+    localStorage: data
+  };
+}
+
+function downloadTextFile(filename, text) {
+  const blob = new Blob([text], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function exportProgressBackup() {
+  const payload = collectProgressBackupData();
+  const text = JSON.stringify(payload, null, 2);
+  const textarea = document.getElementById("progress-transfer-data");
+  if (textarea) textarea.value = text;
+
+  const stamp = new Date().toISOString().slice(0, 10);
+  downloadTextFile(`pharmlet-progress-backup-${stamp}.json`, text);
+  setProgressTransferStatus(`Exported ${Object.keys(payload.localStorage).length} local progress key(s).`, "good");
+}
+
+function parseProgressBackup(text) {
+  const parsed = JSON.parse(text);
+  if (!parsed || typeof parsed !== "object") {
+    throw new Error("Backup data is not a valid object.");
+  }
+
+  if (!parsed.localStorage || typeof parsed.localStorage !== "object" || Array.isArray(parsed.localStorage)) {
+    throw new Error("Backup is missing a valid localStorage payload.");
+  }
+
+  const invalidKey = Object.keys(parsed.localStorage).find((key) => !key.startsWith(PROGRESS_KEY_PREFIX));
+  if (invalidKey) {
+    throw new Error(`Backup contains an unexpected key: ${invalidKey}`);
+  }
+
+  return parsed;
+}
+
+function importProgressBackup() {
+  const textarea = document.getElementById("progress-transfer-data");
+  const rawText = textarea?.value?.trim();
+  if (!rawText) {
+    setProgressTransferStatus("Paste a backup JSON block or load a backup file before importing.", "bad");
+    return;
+  }
+
+  let parsed;
+  try {
+    parsed = parseProgressBackup(rawText);
+  } catch (error) {
+    setProgressTransferStatus(error.message, "bad");
+    return;
+  }
+
+  const keys = Object.keys(parsed.localStorage);
+  if (!confirm(`Import this backup and replace ${PROGRESS_KEY_PREFIX} progress on this browser? (${keys.length} key(s))`)) {
+    return;
+  }
+
+  const existingKeys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith(PROGRESS_KEY_PREFIX)) existingKeys.push(key);
+  }
+
+  existingKeys.forEach((key) => localStorage.removeItem(key));
+  keys.forEach((key) => {
+    localStorage.setItem(key, parsed.localStorage[key]);
+  });
+
+  setProgressTransferStatus(`Imported ${keys.length} key(s). Reloading with restored progress...`, "good");
+  setTimeout(() => location.reload(), 700);
+}
+
+function handleProgressBackupFile(event) {
+  const file = event.target?.files?.[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const text = String(reader.result || "");
+    const textarea = document.getElementById("progress-transfer-data");
+    if (textarea) textarea.value = text;
+    setProgressTransferStatus(`Loaded backup file "${file.name}". Review it below, then import when ready.`, "accent");
+  };
+  reader.onerror = () => {
+    setProgressTransferStatus(`Unable to read "${file.name}".`, "bad");
+  };
+  reader.readAsText(file);
 }
 
 function loadStats() {

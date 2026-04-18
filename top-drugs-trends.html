@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Top Drugs Final Trends — Pharm-let</title>
+  <meta name="description" content="Track Top Drugs Final Lab 2 attempt history, grades, and adaptive weak spots." />
+  <meta name="theme-color" content="#8b1e3f" />
+  <link rel="icon" href="assets/icon.png" />
+
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self';
+             img-src 'self' data:;
+             style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com;
+             script-src 'self' https://cdn.tailwindcss.com;
+             connect-src 'self';">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body class="bg-[var(--bg)] text-[var(--text)]">
+  <header class="border-b border-[var(--ring)]">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3 flex-wrap">
+        <a href="index.html" class="quiz-link">← Back to Library</a>
+        <a href="quiz.html?id=log-lab-final-2" class="quiz-link">Start Final</a>
+        <a href="quiz.html?id=log-lab-final-2&exam=1" class="quiz-link">True Exam Mode</a>
+      </div>
+      <button id="theme-toggle" class="btn btn-ghost" type="button" aria-label="Toggle dark/light theme">
+        <span id="theme-label">Dark</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <section class="hero rounded-3xl border border-[var(--ring)] p-6">
+      <p class="text-sm font-black uppercase tracking-[0.2em] text-[var(--accent)]">Top Drugs Final Lab 2</p>
+      <h1 class="mt-2 text-3xl md:text-4xl font-black tracking-tight">Attempt Trends</h1>
+      <p class="mt-3 max-w-3xl text-sm md:text-base opacity-80">
+        Review score movement, letter grades, and the adaptive weak spots your browser has been tracking from the 110-question final.
+      </p>
+    </section>
+
+    <section class="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div class="card p-5">
+        <div class="text-xs font-black uppercase tracking-[0.18em] opacity-60">Attempts</div>
+        <div id="total-attempts" class="mt-3 text-4xl font-black text-[var(--accent)]">0</div>
+      </div>
+      <div class="card p-5">
+        <div class="text-xs font-black uppercase tracking-[0.18em] opacity-60">Average Score</div>
+        <div id="avg-score" class="mt-3 text-4xl font-black text-[var(--accent)]">0%</div>
+      </div>
+      <div class="card p-5">
+        <div class="text-xs font-black uppercase tracking-[0.18em] opacity-60">Best Score</div>
+        <div id="best-score" class="mt-3 text-4xl font-black text-[var(--accent)]">0/110</div>
+      </div>
+      <div class="card p-5">
+        <div class="text-xs font-black uppercase tracking-[0.18em] opacity-60">Latest Grade</div>
+        <div id="latest-grade" class="mt-3 text-4xl font-black text-[var(--accent)]">—</div>
+      </div>
+    </section>
+
+    <section class="mt-8 card p-6">
+      <div class="flex items-center justify-between gap-3 flex-wrap">
+        <div>
+          <h2 class="text-2xl font-black">Score Trend</h2>
+          <p class="mt-2 text-sm opacity-75">Each bar is one completed 110-question final attempt from this browser.</p>
+        </div>
+      </div>
+      <div id="trend-chart" class="mt-6 space-y-4">
+        <p class="text-sm opacity-70">No final attempts recorded yet.</p>
+      </div>
+    </section>
+
+    <section class="mt-8 grid gap-6 lg:grid-cols-[1.15fr_.85fr]">
+      <div class="card p-6">
+        <h2 class="text-2xl font-black">Recent Attempts</h2>
+        <div id="recent-attempts" class="mt-5 space-y-3">
+          <p class="text-sm opacity-70">No recent attempts yet.</p>
+        </div>
+      </div>
+
+      <div class="space-y-6">
+        <div class="card p-6">
+          <h2 class="text-xl font-black">Weak Categories</h2>
+          <div id="weak-categories" class="mt-4 space-y-3">
+            <p class="text-sm opacity-70">Adaptive category data will show up after a few attempts.</p>
+          </div>
+        </div>
+        <div class="card p-6">
+          <h2 class="text-xl font-black">Weak Brands</h2>
+          <div id="weak-brands" class="mt-4 space-y-3">
+            <p class="text-sm opacity-70">Adaptive brand data will show up after a few attempts.</p>
+          </div>
+        </div>
+        <div class="card p-6">
+          <h2 class="text-xl font-black">Weak Drugs</h2>
+          <div id="weak-drugs" class="mt-4 space-y-3">
+            <p class="text-sm opacity-70">Adaptive drug data will show up after a few attempts.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="assets/js/final-trends.js?v=20260418" defer></script>
+</body>
+</html>

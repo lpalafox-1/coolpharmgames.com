@@ -81,9 +81,18 @@
               </div>
               <div class="font-bold mt-2 text-sm">110-question final: 60% Lab 2, 40% Lab 1</div>
               <p class="mt-1 text-[11px] leading-snug opacity-70">Generative final from the combined Lab 1 and Lab 2 top-drug pools.</p>
-              <a href="quiz.html?id=log-lab-final-2" class="mt-3 inline-flex items-center justify-center rounded-lg border border-[#8b1e3f]/30 bg-[#8b1e3f] px-3 py-2 text-[11px] font-bold text-white transition-all hover:bg-[#6f1630]">
-                Start 110-Question Final
-              </a>
+              <div class="mt-3 flex flex-wrap gap-2">
+                <a href="quiz.html?id=log-lab-final-2" class="inline-flex items-center justify-center rounded-lg border border-[#8b1e3f]/30 bg-[#8b1e3f] px-3 py-2 text-[11px] font-bold text-white transition-all hover:bg-[#6f1630]">
+                  Start 110-Question Final
+                </a>
+                <a href="quiz.html?id=log-lab-final-2&exam=1" class="inline-flex items-center justify-center rounded-lg border border-[#8b1e3f]/20 bg-white/70 px-3 py-2 text-[11px] font-bold text-[#8b1e3f] transition-all hover:bg-[#8b1e3f] hover:text-white dark:bg-black/20 dark:text-white">
+                  True Exam Mode
+                </a>
+              </div>
+              <div class="mt-3 flex flex-wrap gap-3 text-[11px] font-bold">
+                <a href="top-drugs-trends.html" class="hover:underline">View Trends</a>
+                <a href="top-drugs-quicksheet.html" class="hover:underline">Open Quicksheet</a>
+              </div>
             </div>
 
             <div class="card p-5 bg-sky-500/10 border border-sky-500/30">
@@ -123,12 +132,14 @@
     </section>
 
     <main id="main-content" class="max-w-5xl mx-auto px-4 pb-16">
-      <div class="grid sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-6">
+      <div class="grid sm:grid-cols-2 lg:grid-cols-7 gap-3 sm:gap-4 mb-6">
         <a href="stats.html" class="card p-4 hover:border-[var(--accent)] transition-colors text-center">📊 Stats</a>
         <a href="favorites.html" class="card p-4 hover:border-[var(--accent)] transition-colors text-center">⭐ Favorites</a>
         <a href="review-queue.html" class="card p-4 hover:border-[var(--accent)] transition-colors text-center">🎯 Review</a>
         <a href="study-timer.html" class="card p-4 hover:border-[var(--accent)] transition-colors text-center">⏱️ Timer</a>
         <a href="custom-quiz.html" class="card p-4 hover:border-[var(--accent)] transition-colors text-center">🧪 Custom Quiz</a>
+        <a href="top-drugs-trends.html" class="card p-4 hover:border-[var(--accent)] transition-colors text-center">📈 Final Trends</a>
+        <a href="top-drugs-quicksheet.html" class="card p-4 hover:border-[var(--accent)] transition-colors text-center">🧾 Drug Sheet</a>
       </div>
 
       <h2 class="text-xl font-bold mt-8 mb-4" style="color: var(--accent);">Spring 2026 — Longitudinal Lab II COP</h2>
@@ -148,9 +159,18 @@
             <a href="quiz.html?week=10" class="p-3 border rounded-xl font-bold text-center hover:bg-[#8b1e3f] hover:text-white transition-all text-sm border-[var(--ring)]">Week 10</a>
             <a href="quiz.html?week=11" class="p-3 border rounded-xl font-bold text-center hover:bg-[#8b1e3f] hover:text-white transition-all text-sm border-[var(--ring)]">Week 11</a>
           </div>
-          <div class="mt-5 flex justify-center">
+          <div class="mt-5 flex flex-wrap justify-center gap-3">
             <a href="quiz.html?id=log-lab-final-2" class="inline-flex items-center justify-center rounded-xl border border-[#8b1e3f]/30 bg-[#8b1e3f] px-4 py-2 text-xs font-bold text-white transition-all hover:bg-[#6f1630]">
               Top Drugs Final Lab 2
+            </a>
+            <a href="quiz.html?id=log-lab-final-2&exam=1" class="inline-flex items-center justify-center rounded-xl border border-[#8b1e3f]/20 px-4 py-2 text-xs font-bold hover:bg-[#8b1e3f] hover:text-white transition-all">
+              True Exam Mode
+            </a>
+            <a href="top-drugs-trends.html" class="inline-flex items-center justify-center rounded-xl border border-[var(--ring)] px-4 py-2 text-xs font-bold hover:border-[#8b1e3f] transition-all">
+              Trends
+            </a>
+            <a href="top-drugs-quicksheet.html" class="inline-flex items-center justify-center rounded-xl border border-[var(--ring)] px-4 py-2 text-xs font-bold hover:border-[#8b1e3f] transition-all">
+              Quicksheet
             </a>
           </div>
         </div>

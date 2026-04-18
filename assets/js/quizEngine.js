@@ -7,6 +7,7 @@ const labParam = parseInt(params.get("lab") || "2", 10);     // Lab isolation: &
 const quizId = params.get("id");
 const modeParam = params.get("mode") || "easy";
 const limitParam = parseInt(params.get("limit") || "", 10);
+const examModeParam = params.get("exam") === "1";
 const HISTORY_KEY = "pharmlet.history";
 const CUSTOM_QUIZ_KEY = "pharmlet.custom-quiz";
 const REVIEW_KEY = "pharmlet.review-queue";
@@ -18,7 +19,8 @@ const state = {
     originalQuestions: [],  // For restart with original pool
     hintsUsed: 0,           // Track hints for stats
     resultsRecorded: false,
-    signalsRecorded: false
+    signalsRecorded: false,
+    finalBreakdown: null
 };
 
 // --- 1. CORE ACTIONS ---
@@ -61,6 +63,13 @@ const FINAL_RECENT_RUNS_KEY = "pharmlet.finalLab2.recentRuns";
 const TOP_DRUGS_SIGNALS_KEY = "pharmlet.topDrugs.signals";
 const FINAL_RECENT_RUN_LOOKBACK_MS = 14 * 24 * 60 * 60 * 1000;
 const GENERATED_QUIZ_IDS = new Set(["custom-quiz", "review-quiz"]);
+const FINAL_FOCUS_AREAS = ["brand", "class", "category", "moa"];
+const FINAL_FOCUS_AREA_LABELS = {
+    brand: "Brand",
+    class: "Class",
+    category: "Category",
+    moa: "MOA"
+};
 
 const FINAL_BLUEPRINT_FAMILY_WEIGHTS = [
     { family: "generic_to_brand", weight: 0.13 },
@@ -123,6 +132,33 @@ function getGenericBrandPromptLabel(drug, brandValue) {
     }
 
     return `${generic} ${qualifier}`;
+}
+
+function isFullTopDrugsFinalAttempt(questions = state.questions) {
+    return quizId === FINAL_EXAM_ID && Array.isArray(questions) && questions.length === FINAL_EXAM_TOTAL;
+}
+
+function isTrueExamMode() {
+    return quizId === FINAL_EXAM_ID && examModeParam;
+}
+
+function getHistoryModeLabel() {
+    if (quizId === FINAL_EXAM_ID) {
+        return isTrueExamMode() ? "exam" : "practice";
+    }
+
+    return modeParam;
+}
+
+function applyTrueExamModeUI() {
+    const active = isTrueExamMode();
+
+    getEl("mode-banner")?.classList.toggle("hidden", !active);
+    getEl("exam-shortcut-note")?.classList.toggle("hidden", !active);
+
+    document.querySelectorAll("[data-exam-hidden='true']").forEach((el) => {
+        el.classList.toggle("hidden", active);
+    });
 }
 
 function safeReadStorageJson(key, fallbackValue) {
@@ -201,6 +237,163 @@ function saveRecentFinalRuns(runs) {
     } catch (error) {
         console.warn("Unable to persist recent final runs:", error);
     }
+}
+
+function getFinalFocusAreaLabel(areaKey) {
+    return FINAL_FOCUS_AREA_LABELS[areaKey] || "Other";
+}
+
+function getQuestionFocusArea(question) {
+    const familyAreaMap = {
+        generic_to_brand: "brand",
+        brand_to_generic: "brand",
+        brand_class_pair: "class",
+        brand_category_pair: "category",
+        drug_to_class: "class",
+        drug_to_category: "category",
+        drug_to_moa: "moa",
+        class_to_drug: "class",
+        category_to_drug: "category",
+        moa_to_drug: "moa",
+        paired_med_class: "class",
+        paired_med_category: "category"
+    };
+
+    const familyArea = familyAreaMap[question?._finalFamily];
+    if (familyArea) return familyArea;
+
+    const prompt = String(question?.prompt || "").toLowerCase();
+    if (/\bbrand\b|\bgeneric\b/.test(prompt)) return "brand";
+    if (/\bmechanism of action\b|\bmoa\b/.test(prompt)) return "moa";
+    if (/\bcategory\b/.test(prompt)) return "category";
+    if (/\bclass\b/.test(prompt)) return "class";
+    return "other";
+}
+
+function buildFinalPerformanceBreakdown(questions) {
+    if (!isFullTopDrugsFinalAttempt(questions)) return null;
+
+    const areas = FINAL_FOCUS_AREAS.map((key) => ({
+        key,
+        label: getFinalFocusAreaLabel(key),
+        total: 0,
+        correct: 0,
+        missed: 0,
+        accuracy: 0,
+        questions: [],
+        missedQuestions: []
+    }));
+    const areaLookup = new Map(areas.map((area) => [area.key, area]));
+
+    for (const question of questions) {
+        const areaKey = getQuestionFocusArea(question);
+        const bucket = areaLookup.get(areaKey);
+        if (!bucket) continue;
+
+        bucket.total += 1;
+        bucket.questions.push(question);
+
+        if (question?._answered && question?._correct) {
+            bucket.correct += 1;
+        } else if (question?._answered && !question?._correct) {
+            bucket.missed += 1;
+            bucket.missedQuestions.push(question);
+        }
+    }
+
+    areas.forEach((area) => {
+        area.accuracy = area.total ? Math.round((area.correct / area.total) * 100) : 0;
+    });
+
+    const weakAreas = areas
+        .filter((area) => area.total > 0 && area.missed > 0)
+        .sort((a, b) => a.accuracy - b.accuracy || b.missed - a.missed || b.total - a.total);
+
+    return {
+        areas,
+        weakAreas,
+        focusAreas: weakAreas.slice(0, 2).map((area) => area.key)
+    };
+}
+
+function cloneQuestionForGeneratedQuiz(question) {
+    const cloned = JSON.parse(JSON.stringify(question));
+    delete cloned._answered;
+    delete cloned._user;
+    delete cloned._correct;
+    delete cloned._id;
+    delete cloned._hintUsed;
+    return cloned;
+}
+
+function buildWeakAreaRetakeQuestions(questions) {
+    const breakdown = buildFinalPerformanceBreakdown(questions);
+    if (!breakdown) return [];
+
+    const focusAreas = breakdown.focusAreas.length ? breakdown.focusAreas : breakdown.areas.filter((area) => area.missed > 0).map((area) => area.key);
+    if (!focusAreas.length) return [];
+
+    const areaLookup = new Map(breakdown.areas.map((area) => [area.key, area]));
+    const picked = [];
+    const seen = new Set();
+    const addQuestion = (question) => {
+        if (!question) return;
+        const identity = normalizeQuizValue(`${question.prompt || ""}||${JSON.stringify(getCorrectAnswerValue(question))}`);
+        if (!identity || seen.has(identity)) return;
+        seen.add(identity);
+        picked.push(cloneQuestionForGeneratedQuiz(question));
+    };
+
+    for (const areaKey of focusAreas) {
+        (areaLookup.get(areaKey)?.missedQuestions || []).forEach(addQuestion);
+    }
+
+    if (picked.length < 12) {
+        for (const areaKey of focusAreas) {
+            (areaLookup.get(areaKey)?.questions || [])
+                .filter((question) => question?._correct)
+                .forEach(addQuestion);
+            if (picked.length >= 12) break;
+        }
+    }
+
+    if (picked.length < 12) {
+        breakdown.areas
+            .flatMap((area) => area.missedQuestions)
+            .forEach(addQuestion);
+    }
+
+    return picked.slice(0, Math.min(20, picked.length));
+}
+
+function launchWeakAreaRetake() {
+    const retakeQuestions = buildWeakAreaRetakeQuestions(state.questions);
+    if (!retakeQuestions.length) {
+        alert("No weak-area retake is available yet for this attempt.");
+        return;
+    }
+
+    const breakdown = buildFinalPerformanceBreakdown(state.questions);
+    const focusLabels = (breakdown?.focusAreas || [])
+        .map(getFinalFocusAreaLabel)
+        .join(" + ");
+
+    const payload = {
+        id: "custom-quiz",
+        title: focusLabels
+            ? `Weak Area Retake — ${focusLabels}`
+            : "Weak Area Retake",
+        metadata: {
+            generatedFrom: FINAL_EXAM_ID,
+            kind: "weak-area-retake",
+            createdAt: Date.now(),
+            focusAreas: breakdown?.focusAreas || []
+        },
+        questions: retakeQuestions
+    };
+
+    localStorage.setItem(CUSTOM_QUIZ_KEY, JSON.stringify(payload));
+    location.href = "quiz.html?id=custom-quiz";
 }
 
 function incrementCounter(counter, key, step = 1) {
@@ -1264,6 +1457,10 @@ function selectFinalExamDrugs(pool) {
 function showHint() {
     const q = state.questions[state.index];
     if (!q || q._answered) return;
+    if (isTrueExamMode()) {
+        alert("True Exam Mode disables hints for this attempt.");
+        return;
+    }
 
     if (q._mode === "concept" || q.conceptRef) {
         const conceptHint = buildConceptHintText(q);
@@ -1314,6 +1511,10 @@ function showHint() {
 function revealAnswer() {
     const q = state.questions[state.index];
     if (!q || q._answered) return;
+    if (isTrueExamMode()) {
+        alert("True Exam Mode disables answer reveals for this attempt.");
+        return;
+    }
     scoreCurrent("Revealed");
 }
 
@@ -1331,15 +1532,19 @@ function saveQuizHistory() {
     try {
         const raw = localStorage.getItem(HISTORY_KEY);
         const history = raw ? JSON.parse(raw) : [];
+        const letterGradeInfo = getLetterGradeInfoForQuiz(state.score, state.questions.length);
 
         history.push({
             quizId: getHistoryQuizId(),
-            mode: modeParam,
+            mode: getHistoryModeLabel(),
             title: state.title || FINAL_EXAM_TITLE,
             score: state.score,
             total: state.questions.length,
             bestStreak: 0,
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            examMode: isTrueExamMode(),
+            hintsUsed: state.hintsUsed,
+            letterGrade: letterGradeInfo?.letter || null
         });
 
         localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(-200)));
@@ -1423,6 +1628,7 @@ function reviewMissed() {
 
 // Expose to global scope for inline onclick handlers
 window.reviewMissed = reviewMissed;
+window.launchWeakAreaRetake = launchWeakAreaRetake;
 
 // --- 2. DATA PIPELINE ---
 async function smartFetch(fileName) {
@@ -3834,7 +4040,7 @@ function wireEvents() {
 
             if (Array.isArray(val) ? val.length > 0 : val) scoreCurrent(val);
         },
-        "reveal-solution": () => scoreCurrent("Revealed"),
+        "reveal-solution": revealAnswer,
    "theme-toggle": () => {
     const isDark = document.documentElement.classList.toggle("dark");
     localStorage.setItem("pharmlet.theme", isDark ? "dark" : "light");
@@ -3852,7 +4058,7 @@ function wireEvents() {
         "hint-btn": showHint,
         "mark-mobile": toggleMark,
         "hint-btn-mobile": showHint,
-        "reveal-solution-mobile": () => scoreCurrent("Revealed"),
+        "reveal-solution-mobile": revealAnswer,
         "restart-mobile": () => location.reload(),
     };
 
@@ -3894,8 +4100,8 @@ function wireEvents() {
         
         // --- NEW: R/X/H Keyboard Shortcuts ---
         if (key === "r") restartQuiz();           // R = Restart with confirm
-        if (key === "x") revealAnswer();          // X = Give Up / Reveal
-        if (key === "h") showHint();              // H = Show Hint
+        if (key === "x" && !isTrueExamMode()) revealAnswer();          // X = Give Up / Reveal
+        if (key === "h" && !isTrueExamMode()) showHint();              // H = Show Hint
     };
 }
 
@@ -4032,6 +4238,61 @@ function scoreCurrent(val) {
     render();
 }
 
+function buildFinalBreakdownMarkup(breakdown) {
+    if (!breakdown) return "";
+
+    const areaCards = breakdown.areas
+        .filter((area) => area.total > 0)
+        .map((area) => `
+            <div class="rounded-2xl border border-[var(--ring)] bg-[var(--card)] px-4 py-4">
+                <div class="text-xs font-black uppercase tracking-[0.18em] opacity-60">${area.label}</div>
+                <div class="mt-2 flex items-end justify-between gap-3">
+                    <div class="text-2xl font-black">${area.correct}/${area.total}</div>
+                    <div class="text-sm font-semibold ${area.accuracy >= 80 ? "text-green-600" : "text-[#8b1e3f]"}">${area.accuracy}%</div>
+                </div>
+                <div class="mt-3 h-2 rounded-full bg-[var(--ring)] overflow-hidden">
+                    <div class="h-full rounded-full bg-[#8b1e3f]" style="width:${area.accuracy}%"></div>
+                </div>
+                <div class="mt-2 text-xs opacity-70">${area.missed} miss${area.missed === 1 ? "" : "es"}</div>
+            </div>
+        `)
+        .join("");
+
+    const weakAreaText = breakdown.weakAreas.length
+        ? breakdown.weakAreas
+            .slice(0, 2)
+            .map((area) => `${area.label} (${area.missed} miss${area.missed === 1 ? "" : "es"})`)
+            .join(" • ")
+        : "No weak areas detected on this run.";
+
+    const retakeCount = buildWeakAreaRetakeQuestions(state.questions).length;
+    const retakeButton = retakeCount > 0
+        ? `<button onclick="launchWeakAreaRetake()" class="px-6 py-3 bg-[#8b1e3f] text-white rounded-xl font-bold">🎯 Retake Weak Areas (${retakeCount})</button>`
+        : "";
+
+    return `
+        <section class="mt-6 text-left">
+            <div class="rounded-3xl border border-[var(--ring)] bg-[var(--card)] px-5 py-5">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                        <p class="text-sm font-semibold uppercase tracking-[0.18em] opacity-70">Post-Final Breakdown</p>
+                        <h3 class="mt-2 text-2xl font-black">Where To Tighten Up Next</h3>
+                        <p class="mt-2 text-sm opacity-75">Weakest areas on this run: ${weakAreaText}</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        ${retakeButton}
+                        <a href="top-drugs-trends.html" class="px-5 py-3 rounded-xl border border-[var(--ring)] font-bold">📈 View Trends</a>
+                        <a href="top-drugs-quicksheet.html" class="px-5 py-3 rounded-xl border border-[var(--ring)] font-bold">🧾 Open Quicksheet</a>
+                    </div>
+                </div>
+                <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                    ${areaCards}
+                </div>
+            </div>
+        </section>
+    `;
+}
+
 function showResults() {
     saveQuizHistory();
     saveMissedQuestionsToReviewQueue(state.questions);
@@ -4079,23 +4340,31 @@ function showResults() {
         ? `<button onclick="reviewMissed()" class="mt-4 px-6 py-3 bg-red-600 text-white rounded-xl font-bold">🔄 Review ${missed.length} Missed</button>` 
         : `<p class="text-green-600 font-bold mt-4">🎉 Perfect Score!</p>`;
     const letterGradeInfo = getLetterGradeInfoForQuiz(state.score, state.questions.length);
+    const finalBreakdown = buildFinalPerformanceBreakdown(state.questions);
+    state.finalBreakdown = finalBreakdown;
     const letterGradeMarkup = letterGradeInfo
-        ? `<div class="mt-4 rounded-2xl border border-[var(--ring)] bg-[var(--panel)] px-5 py-4">
+        ? `<div class="mt-4 rounded-2xl border border-[var(--ring)] bg-[var(--card)] px-5 py-4">
             <p class="text-sm font-semibold uppercase tracking-[0.2em] opacity-70">Letter Grade</p>
             <p class="mt-2 text-4xl font-black text-[#8b1e3f]">${letterGradeInfo.letter}</p>
             <p class="mt-2 text-sm opacity-75">Scale for this final: A ${letterGradeInfo.cutoffs[0].minCorrect}+ • B ${letterGradeInfo.cutoffs[1].minCorrect}+ • C ${letterGradeInfo.cutoffs[2].minCorrect}+ • D ${letterGradeInfo.cutoffs[3].minCorrect}+ • F below ${letterGradeInfo.cutoffs[3].minCorrect}</p>
           </div>`
         : "";
+    const examModeMarkup = isTrueExamMode()
+        ? `<p class="text-sm opacity-70 mt-2">True Exam Mode was active for this attempt.</p>`
+        : "";
+    const breakdownMarkup = buildFinalBreakdownMarkup(finalBreakdown);
     
     if (card) card.innerHTML = `<div class="text-center py-10">
         <h2 class="text-4xl font-black mb-4">Quiz Complete!</h2>
         <p class="text-2xl">Final Score: ${state.score} / ${state.questions.length}</p>
         ${letterGradeMarkup}
+        ${examModeMarkup}
         ${hintsNote}
         <div class="flex flex-col gap-3 items-center mt-6">
             ${reviewBtn}
             <button onclick="location.reload()" class="px-8 py-4 bg-maroon text-white rounded-2xl font-bold">🔁 Restart Quiz</button>
         </div>
+        ${breakdownMarkup}
     </div>`;
 }
 
@@ -4261,7 +4530,9 @@ async function main() {
             const selectedDrugs = selectFinalExamDrugs(fullPool);
             const finalQuestions = buildFinalExamQuestions(selectedDrugs, fullPool);
 
-            state.title = FINAL_EXAM_TITLE;
+            state.title = isTrueExamMode()
+                ? `${FINAL_EXAM_TITLE} (True Exam Mode)`
+                : FINAL_EXAM_TITLE;
             state.questions = finalQuestions.map((question, i) => ({
                 ...question,
                 _id: i
@@ -4384,6 +4655,7 @@ function finishSetup(storageKey) {
     if (getEl("quiz-title")) getEl("quiz-title").textContent = state.title;
     if (getEl("qtotal")) getEl("qtotal").textContent = state.questions.length;
     state.resultsRecorded = false;
+    state.finalBreakdown = null;
     
     // Initialize high score storage ONLY if it doesn't exist yet
     if (storageKey && !localStorage.getItem(storageKey)) {
@@ -4392,13 +4664,15 @@ function finishSetup(storageKey) {
     
     startSmartTimer();
     wireEvents();
+    applyTrueExamModeUI();
     
     // Save last quiz for quick resume (include lab param for week-based modes)
     const labSuffix = (weekParam || weeksParam) ? `&lab=${labParam}` : '';
+    const examSuffix = isTrueExamMode() ? "&exam=1" : "";
     const lastQuizParam = weekParam ? `?week=${weekParam}${labSuffix}` 
                         : weeksParam ? `?weeks=${weeksParam}${labSuffix}`
                         : tagParam ? `?tag=${tagParam}`
-                        : `?id=${quizId}`;
+                        : `?id=${quizId}${examSuffix}`;
     localStorage.setItem("pharmlet.last-quiz", lastQuizParam);
     
     render();

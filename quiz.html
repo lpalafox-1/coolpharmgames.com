@@ -69,6 +69,11 @@
       <div>Score <span id="score">0</span></div>
     </div>
 
+    <div id="mode-banner" class="hidden mb-6 rounded-2xl border border-[#8b1e3f]/20 bg-[#8b1e3f]/8 px-4 py-3 text-sm">
+      <div class="font-black uppercase tracking-[0.18em] text-[#8b1e3f]">True Exam Mode</div>
+      <div class="mt-1 opacity-80">Hints and answer reveals are disabled for this attempt.</div>
+    </div>
+
     <div id="nav-map" class="mb-8 flex flex-wrap gap-2 justify-center"></div>
 
     <div class="grid lg:grid-cols-[1fr_350px] gap-8 items-start">
@@ -87,8 +92,8 @@
           <h3 class="text-[10px] font-black uppercase opacity-40 mb-5 tracking-widest">Mastery Controls</h3>
           <div class="grid grid-cols-1 gap-3">
             <button id="mark" class="p-4 bg-[var(--card)] border border-[var(--ring)] rounded-2xl text-xs font-bold hover:bg-[#8b1e3f] hover:text-white transition-all">🚩 Mark (M)</button>
-            <button id="hint-btn" class="p-4 bg-[var(--card)] border border-[var(--ring)] rounded-2xl text-xs font-bold hover:bg-[#8b1e3f] hover:text-white transition-all">💡 Hint</button>
-            <button id="reveal-solution" class="p-4 bg-[var(--card)] border border-[var(--ring)] rounded-2xl text-xs font-bold hover:bg-[#8b1e3f] hover:text-white transition-all">👁️ Reveal Answer</button>
+            <button id="hint-btn" data-exam-hidden="true" class="p-4 bg-[var(--card)] border border-[var(--ring)] rounded-2xl text-xs font-bold hover:bg-[#8b1e3f] hover:text-white transition-all">💡 Hint</button>
+            <button id="reveal-solution" data-exam-hidden="true" class="p-4 bg-[var(--card)] border border-[var(--ring)] rounded-2xl text-xs font-bold hover:bg-[#8b1e3f] hover:text-white transition-all">👁️ Reveal Answer</button>
             <button id="restart" class="p-4 bg-red-500/5 text-red-600 border border-red-500/10 rounded-2xl text-xs font-bold hover:bg-red-500 hover:text-white transition-all">🔄 Reset</button>
           </div>
         </div>
@@ -98,8 +103,8 @@
     <!-- Mobile Controls (visible only on small screens) -->
     <div class="lg:hidden flex gap-2 justify-center mt-6 flex-wrap">
       <button id="mark-mobile" class="px-4 py-2 bg-[var(--card)] border border-[var(--ring)] rounded-xl text-xs font-bold">🚩 Mark</button>
-      <button id="hint-btn-mobile" class="px-4 py-2 bg-[var(--card)] border border-[var(--ring)] rounded-xl text-xs font-bold">💡 Hint</button>
-      <button id="reveal-solution-mobile" class="px-4 py-2 bg-[var(--card)] border border-[var(--ring)] rounded-xl text-xs font-bold">👁️ Reveal</button>
+      <button id="hint-btn-mobile" data-exam-hidden="true" class="px-4 py-2 bg-[var(--card)] border border-[var(--ring)] rounded-xl text-xs font-bold">💡 Hint</button>
+      <button id="reveal-solution-mobile" data-exam-hidden="true" class="px-4 py-2 bg-[var(--card)] border border-[var(--ring)] rounded-xl text-xs font-bold">👁️ Reveal</button>
       <button id="restart-mobile" class="px-4 py-2 bg-red-500/5 text-red-600 border border-red-500/10 rounded-xl text-xs font-bold">🔄 Restart</button>
     </div>
 
@@ -121,14 +126,17 @@
         <div class="flex justify-between"><span>Jump to Question</span><kbd class="bg-gray-100 px-2 py-1 rounded border">1 - 9</kbd></div>
         <div class="flex justify-between"><span>Select Option 1-4</span><kbd class="bg-gray-100 px-2 py-1 rounded border">A / S / D / F</kbd></div>
         <hr class="border-[var(--ring)] my-2">
-        <div class="flex justify-between"><span>💡 Show Hint</span><kbd class="bg-yellow-100 px-2 py-1 rounded border border-yellow-400">H</kbd></div>
-        <div class="flex justify-between"><span>👁️ Reveal Answer</span><kbd class="bg-red-100 px-2 py-1 rounded border border-red-400">X</kbd></div>
+        <div class="flex justify-between" data-exam-hidden="true"><span>💡 Show Hint</span><kbd class="bg-yellow-100 px-2 py-1 rounded border border-yellow-400">H</kbd></div>
+        <div class="flex justify-between" data-exam-hidden="true"><span>👁️ Reveal Answer</span><kbd class="bg-red-100 px-2 py-1 rounded border border-red-400">X</kbd></div>
+        <div id="exam-shortcut-note" class="hidden rounded-xl border border-[#8b1e3f]/20 bg-[#8b1e3f]/8 px-3 py-2 text-xs">
+          True Exam Mode removes the hint and reveal shortcuts for this run.
+        </div>
         <div class="flex justify-between"><span>🔄 Restart Quiz</span><kbd class="bg-blue-100 px-2 py-1 rounded border border-blue-400">R</kbd></div>
       </div>
       <button id="close-shortcuts" class="w-full mt-8 py-4 bg-[#8b1e3f] text-white font-bold rounded-2xl">Got it</button>
     </div>
   </div>
 
-  <script src="assets/js/quizEngine.js?v=20260416"></script>
+  <script src="assets/js/quizEngine.js?v=20260418a"></script>
 </body>
 </html>
