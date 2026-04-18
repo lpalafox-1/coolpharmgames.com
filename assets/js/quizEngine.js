@@ -1349,6 +1349,33 @@ function saveQuizHistory() {
     }
 }
 
+function getLetterGradeInfoForQuiz(score, total) {
+    if (quizId !== FINAL_EXAM_ID || total !== FINAL_EXAM_TOTAL) return null;
+
+    const cutoffs = [
+        { letter: "A", minCorrect: Math.ceil(total * 0.9) },
+        { letter: "B", minCorrect: Math.ceil(total * 0.8) },
+        { letter: "C", minCorrect: Math.ceil(total * 0.7) },
+        { letter: "D", minCorrect: Math.ceil(total * 0.6) }
+    ];
+
+    for (const cutoff of cutoffs) {
+        if (score >= cutoff.minCorrect) {
+            return {
+                letter: cutoff.letter,
+                minCorrect: cutoff.minCorrect,
+                cutoffs
+            };
+        }
+    }
+
+    return {
+        letter: "F",
+        minCorrect: 0,
+        cutoffs
+    };
+}
+
 // --- RESTART WITH CONFIRMATION ---
 function restartQuiz() {
     if (confirm("🔄 Restart this quiz? Your progress will be lost.")) {
@@ -4051,10 +4078,19 @@ function showResults() {
     const reviewBtn = missed.length > 0 
         ? `<button onclick="reviewMissed()" class="mt-4 px-6 py-3 bg-red-600 text-white rounded-xl font-bold">🔄 Review ${missed.length} Missed</button>` 
         : `<p class="text-green-600 font-bold mt-4">🎉 Perfect Score!</p>`;
+    const letterGradeInfo = getLetterGradeInfoForQuiz(state.score, state.questions.length);
+    const letterGradeMarkup = letterGradeInfo
+        ? `<div class="mt-4 rounded-2xl border border-[var(--ring)] bg-[var(--panel)] px-5 py-4">
+            <p class="text-sm font-semibold uppercase tracking-[0.2em] opacity-70">Letter Grade</p>
+            <p class="mt-2 text-4xl font-black text-[#8b1e3f]">${letterGradeInfo.letter}</p>
+            <p class="mt-2 text-sm opacity-75">Scale for this final: A ${letterGradeInfo.cutoffs[0].minCorrect}+ • B ${letterGradeInfo.cutoffs[1].minCorrect}+ • C ${letterGradeInfo.cutoffs[2].minCorrect}+ • D ${letterGradeInfo.cutoffs[3].minCorrect}+ • F below ${letterGradeInfo.cutoffs[3].minCorrect}</p>
+          </div>`
+        : "";
     
     if (card) card.innerHTML = `<div class="text-center py-10">
         <h2 class="text-4xl font-black mb-4">Quiz Complete!</h2>
         <p class="text-2xl">Final Score: ${state.score} / ${state.questions.length}</p>
+        ${letterGradeMarkup}
         ${hintsNote}
         <div class="flex flex-col gap-3 items-center mt-6">
             ${reviewBtn}
