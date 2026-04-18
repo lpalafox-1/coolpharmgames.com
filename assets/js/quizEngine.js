@@ -929,7 +929,9 @@ function buildTopDrugsBrandClassQuestion(drug, allPool, options = {}) {
         choices: shuffled(optionCandidates.slice(0, 4)),
         answer: correct,
         drugRef: drug,
-        _brandVariant: targetBrand
+        _brandVariant: targetBrand,
+        _focusFieldKey: "class",
+        _focusFieldValue: drug.class
     };
 }
 
@@ -1004,7 +1006,9 @@ function buildTopDrugsBrandCategoryQuestion(drug, allPool, options = {}) {
         choices: shuffled(optionCandidates.slice(0, 4)),
         answer: correct,
         drugRef: drug,
-        _brandVariant: targetBrand
+        _brandVariant: targetBrand,
+        _focusFieldKey: "category",
+        _focusFieldValue: drug.category
     };
 }
 
@@ -2529,7 +2533,9 @@ function createQuestion(drug, all) {
             prompt: `Which of the following medications are <b>correctly paired</b> with their medication class?`,
             choices: shuffled([correctAnswer, ...wrongAnswers]),
             answer: correctAnswer,
-            drugRef: drug
+            drugRef: drug,
+            _focusFieldKey: "class",
+            _focusFieldValue: drug.class
         };
     };
     
@@ -2569,7 +2575,9 @@ function createQuestion(drug, all) {
             prompt: `<b>${t.l}</b> for <b>${drug.generic}</b>?`,
             choices: shuffled([correctAns, ...distractors]),
             answer: correctAns,
-            drugRef: drug
+            drugRef: drug,
+            _focusFieldKey: t.k,
+            _focusFieldValue: correctAns
         };
     }
     
@@ -2659,7 +2667,9 @@ function createQuestion(drug, all) {
         prompt: `<b>${t.l}</b> for <b>${drug.generic}</b>?`,
         choices: shuffled([correctAns, ...distractors]),
         answer: correctAns,
-        drugRef: drug
+        drugRef: drug,
+        _focusFieldKey: t.k,
+        _focusFieldValue: correctAns
     };
 }
 
@@ -2979,7 +2989,9 @@ function buildFinalDrugToFieldQuestion(drug, allPool, key, label) {
         prompt: `<b>${label}</b> for <b>${drug.generic}</b>?`,
         choices: shuffled([answer, ...distractors]),
         answer,
-        drugRef: drug
+        drugRef: drug,
+        _focusFieldKey: key,
+        _focusFieldValue: answer
     };
 }
 
@@ -3249,7 +3261,9 @@ function buildFinalPairedClassQuestion(drug, allPool, poolStats) {
         prompt: "Which medication/class pair is <b>correctly matched</b>?",
         choices: shuffled([correctPair, ...wrongPairs.slice(0, 3)]),
         answer: correctPair,
-        drugRef: drug
+        drugRef: drug,
+        _focusFieldKey: "class",
+        _focusFieldValue: drug.class
     };
 }
 
@@ -3353,7 +3367,9 @@ function buildFinalPairedCategoryQuestion(drug, allPool, poolStats) {
         prompt: "Which medication/category pair is <b>correctly matched</b>?",
         choices: shuffled([correctPair, ...wrongPairs.slice(0, 3)]),
         answer: correctPair,
-        drugRef: drug
+        drugRef: drug,
+        _focusFieldKey: "category",
+        _focusFieldValue: drug.category
     };
 }
 
@@ -3408,6 +3424,53 @@ function getFinalQuestionFocusSignature(question) {
     const fieldValue = normalizeDrugKey(question?._focusFieldValue);
     if (!fieldKey || !fieldValue) return null;
     return `${fieldKey}:${fieldValue}`;
+}
+
+function buildLegacyFinalFallbackQuestion(drug, fullPool, usedFocusSignatures, maxAttempts = 8) {
+    let fallback = null;
+
+    for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+        const candidate = createQuestion(drug, fullPool);
+        if (!candidate) continue;
+
+        const focusSignature = getFinalQuestionFocusSignature(candidate);
+        if (!focusSignature || !usedFocusSignatures.has(focusSignature)) {
+            return { question: candidate, focusSignature };
+        }
+
+        if (!fallback) {
+            fallback = { question: candidate, focusSignature };
+        }
+    }
+
+    const brandVariants = splitBrandNames(drug?.brand);
+    if (brandVariants.length) {
+        const brand = brandVariants[0];
+        return {
+            question: {
+                type: "short",
+                prompt: `Generic for <b>${brand}</b>?`,
+                answer: drug.generic,
+                drugRef: drug,
+                _brandVariant: brand
+            },
+            focusSignature: null
+        };
+    }
+
+    if (drug?.generic) {
+        return {
+            question: {
+                type: "short",
+                prompt: "Name the drug (generic):",
+                answer: drug.generic,
+                drugRef: drug
+            },
+            focusSignature: null
+        };
+    }
+
+    return fallback;
 }
 
 function buildFinalExamQuestionFromFamily(drug, allPool, family, context, poolStats) {
@@ -3484,8 +3547,9 @@ function buildFinalExamQuestions(selectedDrugs, fullPool) {
         }
 
         if (!builtQuestion) {
-            builtQuestion = createQuestion(drug, fullPool);
-            usedFocusSignature = getFinalQuestionFocusSignature(builtQuestion);
+            const legacyFallback = buildLegacyFinalFallbackQuestion(drug, fullPool, usedFocusSignatures);
+            builtQuestion = legacyFallback?.question || createQuestion(drug, fullPool);
+            usedFocusSignature = legacyFallback?.focusSignature || getFinalQuestionFocusSignature(builtQuestion);
         }
 
         if (usedFocusSignature) usedFocusSignatures.add(usedFocusSignature);
