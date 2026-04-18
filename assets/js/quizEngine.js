@@ -266,6 +266,8 @@ const ANTIDEPRESSANT_CLASS_TERMS = [
     "antidepressant"
 ];
 
+const medicationNameTokenCache = new WeakMap();
+
 function normalizeClassForMatch(value) {
     return String(value ?? "")
         .toLowerCase()
@@ -304,6 +306,79 @@ function getTokenOverlapScore(textA, textB) {
     }
 
     return overlap / Math.max(tokensA.size, tokensB.size);
+}
+
+function getUniqueTherapeuticTokens(value) {
+    return [...new Set(tokenizeTherapeuticText(value))];
+}
+
+function areTherapeuticTokensSubset(tokensA, tokensB) {
+    if (!tokensA.length || !tokensB.length) return false;
+    const tokenSetB = new Set(tokensB);
+    return tokensA.every(token => tokenSetB.has(token));
+}
+
+function getMedicationNameTokens(allPool) {
+    if (!Array.isArray(allPool)) return new Set();
+
+    const cached = medicationNameTokenCache.get(allPool);
+    if (cached) return cached;
+
+    const tokens = new Set();
+    for (const item of allPool) {
+        for (const rawValue of [item?.generic, item?.brand]) {
+            const parts = String(rawValue ?? "")
+                .split(/[\/,;+]/)
+                .map(part => part.trim())
+                .filter(Boolean);
+
+            for (const part of parts) {
+                for (const token of tokenizeTherapeuticText(part)) {
+                    tokens.add(token);
+                }
+            }
+        }
+    }
+
+    medicationNameTokenCache.set(allPool, tokens);
+    return tokens;
+}
+
+// Prevent MCQs from offering broad/specific or name-swapped variants that still read as correct.
+function isAmbiguousTherapeuticFieldMatch(targetValue, candidateValue, key, allPool = []) {
+    const targetNorm = normalizeClassForMatch(targetValue);
+    const candidateNorm = normalizeClassForMatch(candidateValue);
+    if (!targetNorm || !candidateNorm) return false;
+    if (targetNorm === candidateNorm) return true;
+    if (targetNorm.includes(candidateNorm) || candidateNorm.includes(targetNorm)) return true;
+
+    const targetTokens = getUniqueTherapeuticTokens(targetValue);
+    const candidateTokens = getUniqueTherapeuticTokens(candidateValue);
+    if (!targetTokens.length || !candidateTokens.length) return false;
+
+    if (
+        areTherapeuticTokensSubset(targetTokens, candidateTokens)
+        || areTherapeuticTokensSubset(candidateTokens, targetTokens)
+    ) {
+        return true;
+    }
+
+    if (key !== "moa") return false;
+
+    const overlap = getTokenOverlapScore(targetValue, candidateValue);
+    if (overlap < 0.82) return false;
+
+    const candidateTokenSet = new Set(candidateTokens);
+    const targetTokenSet = new Set(targetTokens);
+    const medicationNameTokens = getMedicationNameTokens(allPool);
+    const targetDistinctiveTokens = targetTokens.filter(
+        token => !candidateTokenSet.has(token) && !medicationNameTokens.has(token)
+    );
+    const candidateDistinctiveTokens = candidateTokens.filter(
+        token => !targetTokenSet.has(token) && !medicationNameTokens.has(token)
+    );
+
+    return !targetDistinctiveTokens.length || !candidateDistinctiveTokens.length;
 }
 
 function isCombinationGenericName(value) {
@@ -438,6 +513,7 @@ function getPlausibleWrongClassesForDrug(drug, allPool, maxCount = 4) {
         const candidateClass = String(candidate?.class || "").trim();
         const candidateClassKey = normalizeDrugKey(candidateClass);
         if (!candidateClassKey || candidateClassKey === targetClassKey) continue;
+        if (isAmbiguousTherapeuticFieldMatch(targetClass, candidateClass, "class", allPool)) continue;
 
         const sameCategory = targetCategoryKey && normalizeDrugKey(candidate?.category) === targetCategoryKey;
         const similarity = getTherapeuticSimilarity(drug, candidate);
@@ -2082,7 +2158,8 @@ function createQuestion(drug, all) {
             all.filter(d => 
                 d !== targetDrug && 
                 d[key] && 
-                d.class === targetDrug.class
+                d.class === targetDrug.class &&
+                !isAmbiguousTherapeuticFieldMatch(targetValue, d[key], key, all)
             ),
             key,
             excluded
@@ -2096,7 +2173,8 @@ function createQuestion(drug, all) {
             all.filter(d =>
                 d !== targetDrug &&
                 d[key] &&
-                d.category === targetDrug.category
+                d.category === targetDrug.category &&
+                !isAmbiguousTherapeuticFieldMatch(targetValue, d[key], key, all)
             ),
             key,
             excluded
@@ -2107,7 +2185,7 @@ function createQuestion(drug, all) {
         
         // Fall back to random drugs (exclude target drug and target value)
         const random = uniqueChoiceValues(
-            all.filter(d => d !== targetDrug && d[key]),
+            all.filter(d => d !== targetDrug && d[key] && !isAmbiguousTherapeuticFieldMatch(targetValue, d[key], key, all)),
             key,
             excluded
         ).slice(0, 3);
@@ -2136,7 +2214,12 @@ function createQuestion(drug, all) {
         
         // Find 1 drug with DIFFERENT attribute (this is the correct answer for "NOT")
         const differentAttribute = shuffled(
-            all.filter(d => d !== drug && d[attr.key] && d[attr.key] !== targetValue)
+            all.filter(
+                d => d !== drug
+                    && d[attr.key]
+                    && d[attr.key] !== targetValue
+                    && !isAmbiguousTherapeuticFieldMatch(targetValue, d[attr.key], attr.key, all)
+            )
         )[0];
         
         if (!differentAttribute) return null; // Can't find a different attribute
@@ -2184,13 +2267,22 @@ function createQuestion(drug, all) {
         const wrongAnswers = selectedOthers.map((d, idx) => {
             // Get a random wrong class from other drugs (exclude this drug's class and target's class)
             const wrongClassPool = all
-                .filter(other => other.class && other.class !== d.class && other.class !== drug.class)
+                .filter(
+                    other => other.class
+                        && other.class !== d.class
+                        && other.class !== drug.class
+                        && !isAmbiguousTherapeuticFieldMatch(d.class, other.class, "class", all)
+                )
                 .map(other => other.class);
-            
+
+            if (!wrongClassPool.length) return null;
+
             // Use different wrong classes for variety (rotate through pool)
-            const wrongClass = wrongClassPool[idx % wrongClassPool.length] || wrongClassPool[0] || 'Inhibitor';
+            const wrongClass = wrongClassPool[idx % wrongClassPool.length] || wrongClassPool[0];
             return `${d.generic}: ${wrongClass}`;
-        });
+        }).filter(Boolean);
+
+        if (wrongAnswers.length < 3) return null;
         
         return {
             type: "mcq",
@@ -2568,6 +2660,7 @@ function getFinalFieldDistractors(drug, allPool, key, maxCount = 3) {
             const value = candidate?.[key];
             const valueNorm = normalizeDrugKey(value);
             if (!value || !valueNorm || seen.has(valueNorm)) continue;
+            if (isAmbiguousTherapeuticFieldMatch(targetValue, value, key, allPool)) continue;
             if (!phaseFilter(candidate)) continue;
 
             const candidateClassKey = normalizeDrugKey(candidate?.class);
@@ -2663,6 +2756,7 @@ function getFinalDrugDistractorsForReversePrompt(drug, allPool, key, maxCount = 
         const candidateValue = String(candidate?.[key] || "").trim();
         const candidateValueKey = normalizeDrugKey(candidateValue);
         if (!candidateValueKey || candidateValueKey === targetValueKey) continue;
+        if (isAmbiguousTherapeuticFieldMatch(targetValue, candidateValue, key, allPool)) continue;
 
         const sameCategory = targetCategoryKey && normalizeDrugKey(candidate?.category) === targetCategoryKey;
         const sameClass = targetClassKey && normalizeDrugKey(candidate?.class) === targetClassKey;
@@ -2732,11 +2826,11 @@ function buildFinalFieldToDrugQuestion(drug, allPool, key, label) {
 
     let prompt = `Which medication has this ${label}: <b>${fieldValue}</b>?`;
     if (key === "class") {
-        prompt = `Which medication belongs to the <b>${fieldValue}</b> class?`;
+        prompt = `Which medication's documented class is <b>${fieldValue}</b>?`;
     } else if (key === "category") {
-        prompt = `Which medication best fits the <b>${fieldValue}</b> category?`;
+        prompt = `Which medication's documented category is <b>${fieldValue}</b>?`;
     } else if (key === "moa") {
-        prompt = `Which medication has this <b>MOA</b>: <b>${fieldValue}</b>?`;
+        prompt = `Which medication has this documented <b>MOA</b>: <b>${fieldValue}</b>?`;
     }
 
     return {
@@ -2824,6 +2918,7 @@ function buildFinalPairedClassQuestion(drug, allPool, poolStats) {
                 const classKey = normalizeDrugKey(classValue);
                 if (!classKey || classKey === otherClassKey) return null;
                 if (avoidReusedWrongClass && usedWrongClasses.has(classKey)) return null;
+                if (isAmbiguousTherapeuticFieldMatch(otherClass, classValue, "class", allPool)) return null;
 
                 const classDrugs = poolStats?.classToDrugs?.get(classKey) || [];
                 const sameOtherCategory = otherCategoryKey
@@ -2929,6 +3024,7 @@ function buildFinalNegativeQuestion(drug, allPool) {
         const wrongSet = new Set(wrongChoices.map(normalizeDrugKey));
         const differentCandidates = allPool
             .filter(other => other !== drug && other?.generic && normalizeDrugKey(other?.[attr.key]) !== targetNorm)
+            .filter(other => !isAmbiguousTherapeuticFieldMatch(targetValue, other?.[attr.key], attr.key, allPool))
             .filter(other => !wrongSet.has(normalizeDrugKey(other.generic)));
         if (!differentCandidates.length) continue;
 
