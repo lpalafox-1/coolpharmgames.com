@@ -532,7 +532,7 @@
     "brand": "Viagra",
     "class": "Phosphodiesterase-5 Inhibitor",
     "category": "Erectile Dysfunction Agent",
-    "moa": "Inhibits the enzyme phosphodiesterase-5 to prevent the degredation of cGMP leading to smooth muscle relaxation and increased blood flow to the corpus cavernosum.",
+    "moa": "Inhibits the enzyme phosphodiesterase-5 to prevent the degradation of cGMP leading to smooth muscle relaxation and increased blood flow to the corpus cavernosum.",
     "metadata": { "lab": 2, "week": 9, "is_new": true }
   },
   {
@@ -540,13 +540,13 @@
     "brand": "Cialis",
     "class": "Phosphodiesterase-5 Inhibitor",
     "category": "Erectile Dysfunction Agent",
-    "moa": "Inhibits the enzyme phosphodiesterase-5 to prevent the degredation of cGMP leading to smooth muscle relaxation and increased blood flow to the corpus cavernosum.",
+    "moa": "Inhibits the enzyme phosphodiesterase-5 to prevent the degradation of cGMP leading to smooth muscle relaxation and increased blood flow to the corpus cavernosum.",
     "metadata": { "lab": 2, "week": 9, "is_new": true }
   },
   {
     "generic": "Tamsulosin",
     "brand": "Flomax",
-    "class": "Agent Alpha-1 Antagonist",
+    "class": "Alpha-1 Antagonist",
     "category": "BPH Agent",
     "moa": "Inhibits alpha-1 receptors in the prostate to cause smooth muscle relaxation in the bladder neck and prostate",
     "metadata": { "lab": 2, "week": 9, "is_new": true }
@@ -563,7 +563,7 @@
     "generic": "Estradiol",
     "brand": "Alora; Climara; Evamist; Femring; Minivelle; Vivelle-Dot",
     "class": "Estrogen Derivative",
-    "category": "Horomone Replacement",
+    "category": "Hormone Replacement",
     "moa": "Modulates the pituitary secretion of gonadotropins, luteinizing hormone, and follicle-stimulating hormone through a negative feedback system",
     "metadata": { "lab": 2, "week": 10, "is_new": true }
   },
@@ -571,7 +571,7 @@
     "generic": "Progesterone",
     "brand": "Crinone; Endometrin; Prometrium",
     "class": "Progestin",
-    "category": "Horomone Replacement",
+    "category": "Hormone Replacement",
     "moa": "Induces secretory changes in the endometrium, promotes mammary gland development, relaxes uterine smooth muscle, blocks follicular maturation and ovulation, and maintains pregnancy",
     "metadata": { "lab": 2, "week": 10, "is_new": true }
   },
@@ -594,7 +594,7 @@
   {
     "generic": "Sumatriptan",
     "brand": "Imitrex; Tosymra",
-    "class": "Serotonin 5-HT1B, 2D Receptor Agonist ",
+    "class": "Serotonin 5-HT1B, 2D Receptor Agonist",
     "category": "Antimigraine",
     "moa": "Selective agonist for serotonin on intracranial blood vessels to cause vasoconstriction and reduce inflammation",
     "metadata": { "lab": 2, "week": 11, "is_new": true }
@@ -602,7 +602,7 @@
   {
     "generic": "Rizatriptan",
     "brand": "Maxalt; Maxalt-MLT",
-    "class": "Serotonin 5-HT1B,2D Receptor Agonist",
+    "class": "Serotonin 5-HT1B, 2D Receptor Agonist",
     "category": "Antimigraine",
     "moa": "Selective agonist for serotonin on intracranial blood vessels to cause vasoconstriction and reduce inflammation",
     "metadata": { "lab": 2, "week": 11, "is_new": true }
@@ -628,7 +628,7 @@
     "brand": "Biorphen",
     "class": "Alpha-Adrenergic Agent",
     "category": "Adrenergic Agent",
-    "moa": "Direct-acting alpha adrenergic agonist producing systemic arterial vasoconstricton",
+    "moa": "Direct-acting alpha adrenergic agonist producing systemic arterial vasoconstriction",
     "metadata": { "lab": 2, "week": 11, "is_new": true }
   },
   {
@@ -706,7 +706,7 @@
   {
     "generic": "Bisoprolol",
     "brand": "Cardicor",
-    "class": "Beta-Blocker",
+    "class": "Beta Blocker",
     "category": "Antihypertensive",
     "moa": "Selectively blocks beta1-adrenergic receptors in the heart, decreasing heart rate and contractility.",
     "metadata": { "lab": 1, "week": 2, "is_new": false }
@@ -994,7 +994,7 @@
   {
     "generic": "Insulin aspart",
     "brand": "Novolog, Fiasp, Merilog",
-    "class": "Rapid-acting insulin",
+    "class": "Rapid-acting Insulin",
     "category": "Antidiabetic",
     "moa": "Functions as bolus glycemic control by regulating glucose metabolism; stimulates glucose uptake in skeletal muscle and fat and inhibits hepatic glucose production.",
     "metadata": { "lab": 1, "week": 6, "is_new": false }

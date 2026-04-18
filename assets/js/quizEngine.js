@@ -134,6 +134,44 @@ function getGenericBrandPromptLabel(drug, brandValue) {
     return `${generic} ${qualifier}`;
 }
 
+const DRUG_ANSWER_ALIAS_GROUPS = [
+    ["Hormone Replacement", "Horomone Replacement"],
+    ["Beta Blocker", "Beta-Blocker"],
+    ["Rapid-acting Insulin", "Rapid-acting insulin"],
+    ["Alpha-1 Antagonist", "Agent Alpha-1 Antagonist"],
+    [
+        "Serotonin 5-HT1B, 2D Receptor Agonist",
+        "Serotonin 5-HT1B,2D Receptor Agonist",
+        "Serotonin 5-HT1B, 1D Receptor Agonist",
+        "Serotonin 5-HT1B,1D Receptor Agonist",
+        "Serotonin 5-HT1B/1D Receptor Agonist"
+    ]
+];
+
+const DRUG_ANSWER_ALIAS_LOOKUP = (() => {
+    const normalizeAliasKey = (value) => String(value ?? "")
+        .toLowerCase()
+        .replace(/[()]/g, " ")
+        .replace(/[.,;:!?]+/g, " ")
+        .replace(/[-/]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+
+    const lookup = new Map();
+    for (const group of DRUG_ANSWER_ALIAS_GROUPS) {
+        const normalizedGroup = [...new Set(group.map(normalizeAliasKey).filter(Boolean))];
+        for (const key of normalizedGroup) {
+            lookup.set(key, normalizedGroup);
+        }
+    }
+    return { lookup, normalizeAliasKey };
+})();
+
+function getDrugAnswerAliasForms(value) {
+    const key = DRUG_ANSWER_ALIAS_LOOKUP.normalizeAliasKey(value);
+    return DRUG_ANSWER_ALIAS_LOOKUP.lookup.get(key) || [];
+}
+
 function isFullTopDrugsFinalAttempt(questions = state.questions) {
     return quizId === FINAL_EXAM_ID && Array.isArray(questions) && questions.length === FINAL_EXAM_TOTAL;
 }
@@ -4166,25 +4204,49 @@ function scoreCurrent(val) {
     const addAcceptedForms = (answer, includeLooseForms = false) => {
         if (answer === undefined || answer === null) return;
 
-        for (const part of String(answer).split(/[;,]/)) {
+        const rawAnswer = String(answer);
+        const fullTrimmed = normalizeWhitespace(rawAnswer);
+        if (fullTrimmed) {
+            acceptedAnswers.add(fullTrimmed);
+
+            if (includeLooseForms) {
+                acceptedAnswers.add(normalizeLoose(rawAnswer));
+            }
+
+            for (const alias of getDrugAnswerAliasForms(rawAnswer)) {
+                acceptedAnswers.add(alias);
+                if (includeLooseForms) {
+                    acceptedAnswers.add(normalizeLoose(alias));
+                }
+            }
+        }
+
+        for (const part of rawAnswer.split(/[;,]/)) {
             const trimmed = normalizeWhitespace(part);
             if (!trimmed) continue;
 
             acceptedAnswers.add(trimmed);
             if (includeLooseForms) {
                 acceptedAnswers.add(normalizeLoose(part));
-                const withoutQualifier = stripBrandQualifier(part);
-                const trimmedWithoutQualifier = normalizeWhitespace(withoutQualifier);
-                if (trimmedWithoutQualifier && trimmedWithoutQualifier !== trimmed) {
-                    acceptedAnswers.add(trimmedWithoutQualifier);
-                    acceptedAnswers.add(normalizeLoose(withoutQualifier));
+                if (allowLooseBrandForms) {
+                    const withoutQualifier = stripBrandQualifier(part);
+                    const trimmedWithoutQualifier = normalizeWhitespace(withoutQualifier);
+                    if (trimmedWithoutQualifier && trimmedWithoutQualifier !== trimmed) {
+                        acceptedAnswers.add(trimmedWithoutQualifier);
+                        acceptedAnswers.add(normalizeLoose(withoutQualifier));
+                    }
+                }
+
+                for (const alias of getDrugAnswerAliasForms(part)) {
+                    acceptedAnswers.add(alias);
+                    acceptedAnswers.add(normalizeLoose(alias));
                 }
             }
         }
     };
 
     const rawAnswers = Array.isArray(raw) ? raw : [raw];
-    rawAnswers.forEach(answer => addAcceptedForms(answer, allowLooseBrandForms));
+    rawAnswers.forEach(answer => addAcceptedForms(answer, true));
 
     if (q.drugRef?.brand && allowLooseBrandForms) {
         const brandAnswers = q._restrictBrandVariantAnswers && q._brandVariant
