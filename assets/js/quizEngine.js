@@ -102,6 +102,29 @@ function splitBrandNames(brandValue) {
     return values;
 }
 
+function getBrandQualifier(brandValue) {
+    const match = String(brandValue ?? "").match(/\(([^)]+)\)\s*$/);
+    return match ? match[1].trim() : "";
+}
+
+function stripBrandQualifier(brandValue) {
+    return String(brandValue ?? "").replace(/\s*\([^)]*\)\s*$/, "").trim();
+}
+
+function getGenericBrandPromptLabel(drug, brandValue) {
+    const generic = String(drug?.generic ?? "").trim();
+    const qualifier = getBrandQualifier(brandValue);
+    if (!generic || !qualifier) return generic;
+
+    const genericKey = normalizeDrugKey(generic);
+    const qualifierKey = normalizeDrugKey(qualifier);
+    if (genericKey && qualifierKey && genericKey.includes(qualifierKey)) {
+        return generic;
+    }
+
+    return `${generic} ${qualifier}`;
+}
+
 function safeReadStorageJson(key, fallbackValue) {
     try {
         const raw = localStorage.getItem(key);
@@ -2601,11 +2624,14 @@ function createQuestion(drug, all) {
     // Generic → Brand (Short Answer) (25% normal, 20% Lab 2)
     const genericBrandThreshold = isLab2Quiz ? 0.50 : 0.60;
     if (r < genericBrandThreshold) {
+        const brandPromptLabel = getGenericBrandPromptLabel(drug, singleBrand);
         return { 
             type: "short", 
-            prompt: `Brand for <b>${drug.generic}</b>?`, 
+            prompt: `Brand for <b>${brandPromptLabel || drug.generic}</b>?`,
             answer: singleBrand, 
-            drugRef: drug 
+            drugRef: drug,
+            _brandVariant: singleBrand,
+            _restrictBrandVariantAnswers: !!getBrandQualifier(singleBrand)
         };
     }
     
@@ -3110,13 +3136,15 @@ function buildFinalFieldToDrugQuestion(drug, allPool, key, label) {
 function buildFinalGenericToBrandQuestion(drug, signals) {
     const brand = pickBrandVariantForFinal(drug, signals);
     if (!brand) return null;
+    const brandPromptLabel = getGenericBrandPromptLabel(drug, brand);
 
     return {
         type: "short",
-        prompt: `Brand for <b>${drug.generic}</b>?`,
+        prompt: `Brand for <b>${brandPromptLabel || drug.generic}</b>?`,
         answer: brand,
         drugRef: drug,
-        _brandVariant: brand
+        _brandVariant: brand,
+        _restrictBrandVariantAnswers: !!getBrandQualifier(brand)
     };
 }
 
@@ -3912,6 +3940,12 @@ function scoreCurrent(val) {
             acceptedAnswers.add(trimmed);
             if (includeLooseForms) {
                 acceptedAnswers.add(normalizeLoose(part));
+                const withoutQualifier = stripBrandQualifier(part);
+                const trimmedWithoutQualifier = normalizeWhitespace(withoutQualifier);
+                if (trimmedWithoutQualifier && trimmedWithoutQualifier !== trimmed) {
+                    acceptedAnswers.add(trimmedWithoutQualifier);
+                    acceptedAnswers.add(normalizeLoose(withoutQualifier));
+                }
             }
         }
     };
@@ -3920,7 +3954,11 @@ function scoreCurrent(val) {
     rawAnswers.forEach(answer => addAcceptedForms(answer, allowLooseBrandForms));
 
     if (q.drugRef?.brand && allowLooseBrandForms) {
-        q.drugRef.brand.split(/[,/;]/).forEach(answer => addAcceptedForms(answer, true));
+        const brandAnswers = q._restrictBrandVariantAnswers && q._brandVariant
+            ? [q._brandVariant]
+            : splitBrandNames(q.drugRef.brand);
+
+        brandAnswers.forEach(answer => addAcceptedForms(answer, true));
     }
 
     let isCorrect = false;
