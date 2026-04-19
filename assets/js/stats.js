@@ -6,6 +6,7 @@ const HISTORY_KEY = "pharmlet.history";
 const REVIEW_KEY = "pharmlet.review-queue";
 const TOP_DRUGS_SIGNALS_KEY = "pharmlet.topDrugs.signals";
 const FINAL_RECENT_RUNS_KEY = "pharmlet.finalLab2.recentRuns";
+const QUESTION_REPORTS_KEY = "pharmlet.question-reports";
 const LAST_ROUND_PREFIX = "pharmlet.session.lastRound.";
 const PROGRESS_KEY_PREFIX = "pharmlet.";
 const PROGRESS_BACKUP_VERSION = 1;
@@ -33,8 +34,9 @@ document.addEventListener("DOMContentLoaded", () => {
   loadStats();
   
   document.getElementById("clear-stats")?.addEventListener("click", () => {
-    if (confirm("Are you sure you want to clear all your quiz statistics? This cannot be undone.")) {
-      localStorage.removeItem(HISTORY_KEY);
+    if (confirm("Clear all saved Pharm-let study data on this browser? This removes quiz history, review queue, saved scores, question reports, favorites, custom quiz progress, and adaptive memory. Theme preference stays.")) {
+      const result = clearAllStudyData();
+      alert(`Cleared ${result.local} local key(s) and ${result.session} session key(s).`);
       location.reload();
     }
   });
@@ -51,6 +53,8 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("export-progress")?.addEventListener("click", exportProgressBackup);
   document.getElementById("import-progress")?.addEventListener("click", importProgressBackup);
   document.getElementById("import-progress-file")?.addEventListener("change", handleProgressBackupFile);
+  document.getElementById("export-question-reports")?.addEventListener("click", exportQuestionReports);
+  document.getElementById("clear-question-reports")?.addEventListener("click", clearQuestionReports);
 });
 
 function isTopDrugsLastRoundKey(key) {
@@ -92,8 +96,54 @@ function clearTopDrugsGeneratorMemory() {
   return { local: clearedLocal, session: clearedSession };
 }
 
+function clearAllStudyData() {
+  let clearedLocal = 0;
+  let clearedSession = 0;
+
+  const localKeys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key) localKeys.push(key);
+  }
+
+  for (const key of localKeys) {
+    if (!key.startsWith(PROGRESS_KEY_PREFIX) || key === THEME_KEY) continue;
+    localStorage.removeItem(key);
+    clearedLocal += 1;
+  }
+
+  const sessionKeys = [];
+  for (let i = 0; i < sessionStorage.length; i++) {
+    const key = sessionStorage.key(i);
+    if (key) sessionKeys.push(key);
+  }
+
+  for (const key of sessionKeys) {
+    if (!key.startsWith(PROGRESS_KEY_PREFIX)) continue;
+    sessionStorage.removeItem(key);
+    clearedSession += 1;
+  }
+
+  return { local: clearedLocal, session: clearedSession };
+}
+
 function setProgressTransferStatus(message, tone = "muted") {
   const el = document.getElementById("progress-transfer-status");
+  if (!el) return;
+
+  const colors = {
+    muted: "var(--muted)",
+    good: "var(--good)",
+    bad: "var(--bad)",
+    accent: "var(--accent)"
+  };
+
+  el.textContent = message;
+  el.style.color = colors[tone] || colors.muted;
+}
+
+function setQuestionReportStatus(message, tone = "muted") {
+  const el = document.getElementById("question-report-status");
   if (!el) return;
 
   const colors = {
@@ -221,8 +271,10 @@ function handleProgressBackupFile(event) {
 function loadStats() {
   const history = getHistory();
   const reviewQueue = getReviewQueue();
+  const questionReports = getQuestionReports();
 
   renderMostMissedQuestions(reviewQueue);
+  renderQuestionReports(questionReports);
   
   if (history.length === 0) {
     return; // Show default empty state
@@ -338,6 +390,47 @@ function loadStats() {
   }
 }
 
+function renderQuestionReports(reports) {
+  const container = document.getElementById("question-reports");
+  if (!container) return;
+
+  const items = Array.isArray(reports) ? reports.slice(0, 10) : [];
+  if (items.length === 0) {
+    container.innerHTML = `<p style="color:var(--muted)">No question reports yet. Use "Report This Question" after answering a quiz item to save it here for later cleanup.</p>`;
+    return;
+  }
+
+  container.innerHTML = "";
+  items.forEach((report) => {
+    const div = document.createElement("div");
+    div.className = "rounded-xl border border-[var(--ring)] p-4";
+    div.style.background = "var(--accent-light, rgba(139,30,63,0.06))";
+
+    const prompt = sanitize(report.promptText || toPlainText(report.prompt || ""));
+    const correctAnswer = sanitize(toPlainText(report.correctAnswer || "—"));
+    const userAnswer = sanitize(toPlainText(report.userAnswer || "—"));
+    const note = sanitize(toPlainText(report.note || ""));
+    const metaParts = [
+      report.title || report.quizId || "",
+      report.mode || "",
+      report.questionFamily || "",
+      report.drugGeneric ? `Drug: ${report.drugGeneric}` : ""
+    ].filter(Boolean).map((part) => sanitize(part));
+    const when = report.timestamp ? getTimeAgo(new Date(report.timestamp)) : "saved just now";
+
+    div.innerHTML = `
+      <div class="space-y-2">
+        <div class="font-semibold">${prompt || "Untitled question report"}</div>
+        <div class="text-sm" style="color:var(--muted)">Expected answer: <span class="font-medium" style="color:var(--text)">${correctAnswer}</span></div>
+        <div class="text-sm" style="color:var(--muted)">Your answer: <span class="font-medium" style="color:var(--bad)">${userAnswer}</span></div>
+        ${note ? `<div class="text-sm" style="color:var(--muted)">Note: <span class="font-medium" style="color:var(--text)">${note}</span></div>` : ""}
+        <div class="text-xs" style="color:var(--muted)">${metaParts.join(" · ")}${metaParts.length ? " · " : ""}${sanitize(when)}</div>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
 function renderMostMissedQuestions(reviewQueue) {
   const container = document.getElementById("missed-stats");
   if (!container) return;
@@ -439,6 +532,18 @@ function getReviewQueue() {
   }
 }
 
+function getQuestionReports() {
+  try {
+    const raw = localStorage.getItem(QUESTION_REPORTS_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed)
+      ? parsed.sort((a, b) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime())
+      : [];
+  } catch {
+    return [];
+  }
+}
+
 function toPlainText(value) {
   const div = document.createElement("div");
   div.innerHTML = String(value ?? "");
@@ -490,6 +595,37 @@ function getTimeAgo(date) {
     }
   }
   return 'just now';
+}
+
+function exportQuestionReports() {
+  const reports = getQuestionReports();
+  const payload = {
+    app: "pharm-let",
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    reports
+  };
+
+  const text = JSON.stringify(payload, null, 2);
+  const stamp = new Date().toISOString().slice(0, 10);
+  downloadTextFile(`pharmlet-question-reports-${stamp}.json`, text);
+  setQuestionReportStatus(`Exported ${reports.length} question report(s).`, reports.length ? "good" : "accent");
+}
+
+function clearQuestionReports() {
+  const reports = getQuestionReports();
+  if (!reports.length) {
+    setQuestionReportStatus("No saved question reports to clear.", "accent");
+    return;
+  }
+
+  if (!confirm(`Clear ${reports.length} saved question report(s) from this browser? This cannot be undone.`)) {
+    return;
+  }
+
+  localStorage.removeItem(QUESTION_REPORTS_KEY);
+  renderQuestionReports([]);
+  setQuestionReportStatus("Question reports cleared.", "good");
 }
 
 function sanitize(str) {

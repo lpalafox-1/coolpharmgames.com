@@ -11,7 +11,9 @@ const examModeParam = params.get("exam") === "1";
 const HISTORY_KEY = "pharmlet.history";
 const CUSTOM_QUIZ_KEY = "pharmlet.custom-quiz";
 const REVIEW_KEY = "pharmlet.review-queue";
+const QUESTION_REPORTS_KEY = "pharmlet.question-reports";
 const THEME_KEY = "pharmlet.theme";
+const MAX_QUESTION_REPORTS = 200;
 
 const state = { 
     questions: [], index: 0, score: 0, title: "",
@@ -231,6 +233,65 @@ function safeReadStorageJson(key, fallbackValue) {
     } catch (error) {
         return fallbackValue;
     }
+}
+
+function toPlainText(value) {
+    const div = document.createElement("div");
+    div.innerHTML = String(value ?? "");
+    return (div.textContent || div.innerText || "").replace(/\s+/g, " ").trim();
+}
+
+function loadQuestionReports() {
+    const parsed = safeReadStorageJson(QUESTION_REPORTS_KEY, []);
+    return Array.isArray(parsed) ? parsed : [];
+}
+
+function saveQuestionReports(reports) {
+    localStorage.setItem(QUESTION_REPORTS_KEY, JSON.stringify(reports));
+}
+
+function serializeReportValue(value) {
+    if (Array.isArray(value)) return value.join(", ");
+    if (value === undefined || value === null) return "";
+    return String(value);
+}
+
+function buildQuestionReportPayload(question) {
+    const rawCorrectAnswer = getCorrectAnswerValue(question);
+    return {
+        quizId: quizId || "unknown",
+        title: state.title || quizId || "Quiz",
+        mode: getHistoryModeLabel(),
+        questionNumber: state.index + 1,
+        totalQuestions: state.questions.length,
+        prompt: String(question?.prompt ?? ""),
+        promptText: toPlainText(question?.prompt ?? ""),
+        correctAnswer: serializeReportValue(rawCorrectAnswer),
+        userAnswer: serializeReportValue(question?._user),
+        questionType: question?.type || "",
+        questionFamily: question?._finalFamily || question?._mode || "",
+        drugGeneric: question?.drugRef?.generic || "",
+        note: "",
+        timestamp: new Date().toISOString()
+    };
+}
+
+function reportCurrentQuestion() {
+    const question = state.questions[state.index];
+    if (!question || !question._answered || question._reported) return;
+
+    const note = window.prompt("Optional note for this report. Example: 'Multiple answers looked correct' or 'Prompt wording felt vague.' Leave blank to save without a note.");
+    if (note === null) return;
+
+    const reports = loadQuestionReports();
+    const payload = buildQuestionReportPayload(question);
+    payload.note = String(note).trim();
+
+    reports.unshift(payload);
+    saveQuestionReports(reports.slice(0, MAX_QUESTION_REPORTS));
+    question._reported = true;
+    render();
+    alert("Question report saved locally. You can review it later on the Stats page.");
 }
 
 function createEmptyTopDrugsSignals() {
@@ -1691,6 +1752,7 @@ function reviewMissed() {
 // Expose to global scope for inline onclick handlers
 window.reviewMissed = reviewMissed;
 window.launchWeakAreaRetake = launchWeakAreaRetake;
+window.reportCurrentQuestion = reportCurrentQuestion;
 
 // --- 2. DATA PIPELINE ---
 async function smartFetch(fileName) {
@@ -4049,6 +4111,29 @@ function render() {
             const raw = getCorrectAnswerValue(q) || "N/A";
             const displayAnswer = Array.isArray(raw) ? raw.join(", ") : raw;
             exp.innerHTML = `<div class="p-3 rounded-lg ${q._correct ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}"><b>${q._correct ? 'Correct!' : 'Answer:'}</b> <b>${displayAnswer}</b></div>`;
+            const reportWrap = document.createElement("div");
+            reportWrap.className = "mt-3 flex flex-wrap items-center gap-2";
+
+            const reportBtn = document.createElement("button");
+            reportBtn.type = "button";
+            reportBtn.className = "px-4 py-2 rounded-xl border border-[var(--ring)] text-sm font-semibold transition-colors";
+            reportBtn.textContent = q._reported ? "Question Flagged" : "Report This Question";
+            reportBtn.disabled = !!q._reported;
+            if (q._reported) {
+                reportBtn.classList.add("opacity-60", "cursor-not-allowed");
+            } else {
+                reportBtn.addEventListener("click", reportCurrentQuestion);
+            }
+
+            const reportHelp = document.createElement("span");
+            reportHelp.className = "text-xs opacity-70";
+            reportHelp.textContent = q._reported
+                ? "Saved to your local question reports."
+                : "Save ambiguous or incorrect items to review later on Stats.";
+
+            reportWrap.appendChild(reportBtn);
+            reportWrap.appendChild(reportHelp);
+            exp.appendChild(reportWrap);
             exp.classList.add("show");
         }
     }

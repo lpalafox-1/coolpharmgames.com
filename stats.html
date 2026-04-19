@@ -100,6 +100,27 @@
       </div>
     </section>
 
+    <section class="mb-8">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
+        <h2 class="text-2xl font-bold">Question Reports</h2>
+        <div class="flex flex-col gap-3 sm:flex-row">
+          <button id="export-question-reports" class="btn btn-blue" type="button">Export Reports</button>
+          <button id="clear-question-reports" class="btn btn-ghost" type="button">Clear Reports</button>
+        </div>
+      </div>
+      <div class="card p-4">
+        <p class="text-sm mb-4" style="color:var(--muted)">
+          Save confusing or possibly incorrect quiz questions from inside the quiz flow, then review them here later.
+        </p>
+        <p id="question-report-status" class="text-sm mb-4" style="color:var(--muted)">
+          Reports stay on this browser unless you clear them or export them.
+        </p>
+        <div id="question-reports" class="space-y-3">
+          <p style="color:var(--muted)">No question reports yet.</p>
+        </div>
+      </div>
+    </section>
+
     <!-- Category Breakdown -->
     <section class="mb-8">
       <h2 class="text-2xl font-bold mb-4">Performance by Category</h2>
@@ -150,6 +171,6 @@
     </section>
   </main>
 
-  <script src="assets/js/stats.js?v=20260418a" defer></script>
+  <script src="assets/js/stats.js?v=20260419b" defer></script>
 </body>
 </html>
