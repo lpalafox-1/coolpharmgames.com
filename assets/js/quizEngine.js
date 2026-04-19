@@ -1698,7 +1698,7 @@ async function smartFetch(fileName) {
     for (let path of paths) {
         let res;
         try {
-            res = await fetch(path);
+            res = await fetch(path, { cache: "no-store" });
         } catch (e) {
             continue;
         }

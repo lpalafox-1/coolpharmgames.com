@@ -44,7 +44,7 @@ function wireControls() {
 
 async function loadQuicksheet() {
   try {
-    const response = await fetch(QUICKSHEET_POOL_PATH);
+    const response = await fetch(QUICKSHEET_POOL_PATH, { cache: "no-store" });
     if (!response.ok) {
       throw new Error(`Unable to load ${QUICKSHEET_POOL_PATH}`);
     }
