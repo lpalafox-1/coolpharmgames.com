@@ -19,7 +19,7 @@
     "generic": "Aspirin",
     "brand": "Bayer",
     "class": "Analgesic; Antiplatelet",
-    "category": "Antiplatelet Agent",
+    "category": "Analgesic; Antiplatelet",
     "moa": "Inhibits cyclooxygenase-1 (COX-1) and cyclooxygenase-2 (COX-2), reducing the formation of thromboxane A2 and inhibiting platelet aggregation.",
     "metadata": { "lab": 2, "week": 1, "is_new": true }
   },
