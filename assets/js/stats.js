@@ -9,7 +9,7 @@ const FINAL_RECENT_RUNS_KEY = "pharmlet.finalLab2.recentRuns";
 const QUESTION_REPORTS_KEY = "pharmlet.question-reports";
 const LAST_ROUND_PREFIX = "pharmlet.session.lastRound.";
 const PROGRESS_KEY_PREFIX = "pharmlet.";
-const PROGRESS_BACKUP_VERSION = 1;
+const PROGRESS_BACKUP_VERSION = 2;
 
 // Theme toggle
 document.addEventListener("DOMContentLoaded", () => {
@@ -158,19 +158,25 @@ function setQuestionReportStatus(message, tone = "muted") {
 }
 
 function collectProgressBackupData() {
-  const data = {};
+  const collectStorage = (storage) => {
+    const data = {};
+    for (let i = 0; i < storage.length; i++) {
+      const key = storage.key(i);
+      if (!key || !key.startsWith(PROGRESS_KEY_PREFIX)) continue;
+      data[key] = storage.getItem(key);
+    }
+    return data;
+  };
 
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (!key || !key.startsWith(PROGRESS_KEY_PREFIX)) continue;
-    data[key] = localStorage.getItem(key);
-  }
+  const localData = collectStorage(localStorage);
+  const sessionData = collectStorage(sessionStorage);
 
   return {
     app: "pharm-let",
     version: PROGRESS_BACKUP_VERSION,
     exportedAt: new Date().toISOString(),
-    localStorage: data
+    localStorage: localData,
+    sessionStorage: sessionData
   };
 }
 
@@ -194,7 +200,7 @@ function exportProgressBackup() {
 
   const stamp = new Date().toISOString().slice(0, 10);
   downloadTextFile(`pharmlet-progress-backup-${stamp}.json`, text);
-  setProgressTransferStatus(`Exported ${Object.keys(payload.localStorage).length} local progress key(s).`, "good");
+  setProgressTransferStatus(`Exported ${Object.keys(payload.localStorage).length} local key(s) and ${Object.keys(payload.sessionStorage || {}).length} session key(s).`, "good");
 }
 
 function parseProgressBackup(text) {
@@ -210,6 +216,17 @@ function parseProgressBackup(text) {
   const invalidKey = Object.keys(parsed.localStorage).find((key) => !key.startsWith(PROGRESS_KEY_PREFIX));
   if (invalidKey) {
     throw new Error(`Backup contains an unexpected key: ${invalidKey}`);
+  }
+
+  if (parsed.sessionStorage !== undefined) {
+    if (typeof parsed.sessionStorage !== "object" || parsed.sessionStorage === null || Array.isArray(parsed.sessionStorage)) {
+      throw new Error("Backup contains an invalid sessionStorage payload.");
+    }
+
+    const invalidSessionKey = Object.keys(parsed.sessionStorage).find((key) => !key.startsWith(PROGRESS_KEY_PREFIX));
+    if (invalidSessionKey) {
+      throw new Error(`Backup contains an unexpected session key: ${invalidSessionKey}`);
+    }
   }
 
   return parsed;
@@ -231,23 +248,35 @@ function importProgressBackup() {
     return;
   }
 
-  const keys = Object.keys(parsed.localStorage);
-  if (!confirm(`Import this backup and replace ${PROGRESS_KEY_PREFIX} progress on this browser? (${keys.length} key(s))`)) {
+  const localKeys = Object.keys(parsed.localStorage);
+  const sessionKeys = Object.keys(parsed.sessionStorage || {});
+  if (!confirm(`Import this backup and replace ${PROGRESS_KEY_PREFIX} progress on this browser? (${localKeys.length} local key(s), ${sessionKeys.length} session key(s))`)) {
     return;
   }
 
-  const existingKeys = [];
+  const existingLocalKeys = [];
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
-    if (key && key.startsWith(PROGRESS_KEY_PREFIX)) existingKeys.push(key);
+    if (key && key.startsWith(PROGRESS_KEY_PREFIX)) existingLocalKeys.push(key);
   }
 
-  existingKeys.forEach((key) => localStorage.removeItem(key));
-  keys.forEach((key) => {
+  const existingSessionKeys = [];
+  for (let i = 0; i < sessionStorage.length; i++) {
+    const key = sessionStorage.key(i);
+    if (key && key.startsWith(PROGRESS_KEY_PREFIX)) existingSessionKeys.push(key);
+  }
+
+  existingLocalKeys.forEach((key) => localStorage.removeItem(key));
+  existingSessionKeys.forEach((key) => sessionStorage.removeItem(key));
+
+  localKeys.forEach((key) => {
     localStorage.setItem(key, parsed.localStorage[key]);
   });
+  sessionKeys.forEach((key) => {
+    sessionStorage.setItem(key, parsed.sessionStorage[key]);
+  });
 
-  setProgressTransferStatus(`Imported ${keys.length} key(s). Reloading with restored progress...`, "good");
+  setProgressTransferStatus(`Imported ${localKeys.length} local key(s) and ${sessionKeys.length} session key(s). Reloading with restored progress...`, "good");
   setTimeout(() => location.reload(), 700);
 }
 

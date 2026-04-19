@@ -25,6 +25,7 @@
         <a href="index.html" class="quiz-link">← Back to Library</a>
         <a href="quiz.html?id=log-lab-final-2" class="quiz-link">Start Final</a>
         <a href="top-drugs-trends.html" class="quiz-link">View Trends</a>
+        <a href="top-drugs-integrity.html" class="quiz-link">Pool Integrity</a>
       </div>
       <button id="theme-toggle" class="btn btn-ghost" type="button" aria-label="Toggle dark/light theme">
         <span id="theme-label">Dark</span>
@@ -39,13 +40,27 @@
       <p class="mt-3 max-w-3xl text-sm md:text-base opacity-80">
         Search across generic, brand, class, category, and MOA using the current Top Drugs master pool.
       </p>
+      <div class="mt-4 flex flex-wrap gap-3">
+        <div id="top-drugs-version-badge" class="hidden rounded-full border border-[var(--ring)] px-3 py-2 text-[10px] font-black uppercase tracking-[0.18em] opacity-70"></div>
+      </div>
     </section>
 
     <section class="mt-8 card p-5">
-      <div class="grid gap-4 lg:grid-cols-[1fr_200px_auto]">
+      <div class="grid gap-4 lg:grid-cols-[1fr_220px_180px_auto]">
         <label class="block">
           <span class="text-xs font-black uppercase tracking-[0.18em] opacity-60">Search</span>
           <input id="quicksheet-search" type="search" placeholder="Try metoprolol, antihypertensive, beta blocker, brand..." class="mt-2 w-full rounded-2xl border border-[var(--ring)] bg-[var(--card)] px-4 py-3" />
+        </label>
+        <label class="block">
+          <span class="text-xs font-black uppercase tracking-[0.18em] opacity-60">Field</span>
+          <select id="quicksheet-field" class="mt-2 w-full rounded-2xl border border-[var(--ring)] bg-[var(--card)] px-4 py-3">
+            <option value="all">All Fields</option>
+            <option value="generic">Generic</option>
+            <option value="brand">Brand</option>
+            <option value="class">Class</option>
+            <option value="category">Category</option>
+            <option value="moa">MOA</option>
+          </select>
         </label>
         <label class="block">
           <span class="text-xs font-black uppercase tracking-[0.18em] opacity-60">Lab Filter</span>
@@ -60,6 +75,7 @@
         </div>
       </div>
       <div class="mt-4 text-sm opacity-70" id="quicksheet-count">Loading quicksheet...</div>
+      <div class="mt-2 text-xs opacity-60" id="quicksheet-active-filter"></div>
     </section>
 
     <section class="mt-8">
@@ -69,6 +85,7 @@
     </section>
   </main>
 
-  <script src="assets/js/top-drugs-quicksheet.js?v=20260419a" defer></script>
+  <script src="assets/js/top-drugs-data.js?v=20260419a" defer></script>
+  <script src="assets/js/top-drugs-quicksheet.js?v=20260419b" defer></script>
 </body>
 </html>

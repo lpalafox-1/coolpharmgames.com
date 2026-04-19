@@ -1,0 +1,42 @@
+{
+  "auditedAt" : "2026-04-19T23:51:35Z",
+  "flaggedEntries" : [
+    {
+      "generic" : "Sumatriptan",
+      "lab" : 2
+    },
+    {
+      "generic" : "Rizatriptan",
+      "lab" : 2
+    }
+  ],
+  "flaggedEntriesCount" : 2,
+  "lab1Entries" : 85,
+  "lab2Entries" : 82,
+  "missingBrandAliases" : [
+
+  ],
+  "missingBrandAliasesCount" : 0,
+  "missingGenerics" : [
+
+  ],
+  "missingGenericsCount" : 0,
+  "poolEntries" : 167,
+  "sourceDocuments" : {
+    "lab1" : "Top Drugs List final.pdf",
+    "lab2" : "Top drugs final 2.pdf"
+  },
+  "statusBadge" : "PDF Audit Notes",
+  "statusLabel" : "Notes",
+  "statusSummary" : "Core coverage checks passed, but cleanup phrases are still flagged for review.",
+  "suspectPhrases" : [
+    "Horomone Replacement",
+    "degredation",
+    "vasoconstricton",
+    "Agent Alpha-1 Antagonist",
+    "Beta-Blocker",
+    "Rapid-acting insulin",
+    "Serotonin 5-HT1B,2D Receptor Agonist",
+    "Serotonin 5-HT1B, 2D Receptor Agonist "
+  ]
+}

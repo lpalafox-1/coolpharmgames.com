@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Top Drugs Pool Integrity — Pharm-let</title>
+  <meta name="description" content="Inspect Top Drugs pool duplicates, typo-risk phrases, label drift, and latest PDF audit status." />
+  <meta name="theme-color" content="#8b1e3f" />
+  <link rel="icon" href="assets/icon.png" />
+
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self';
+             img-src 'self' data:;
+             style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com;
+             script-src 'self' https://cdn.tailwindcss.com;
+             connect-src 'self';">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body class="bg-[var(--bg)] text-[var(--text)]">
+  <header class="border-b border-[var(--ring)]">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3 flex-wrap">
+        <a href="index.html" class="quiz-link">← Back to Library</a>
+        <a href="quiz.html?id=log-lab-final-2" class="quiz-link">Start Final</a>
+        <a href="top-drugs-trends.html" class="quiz-link">View Trends</a>
+        <a href="top-drugs-quicksheet.html" class="quiz-link">Open Quicksheet</a>
+      </div>
+      <button id="theme-toggle" class="btn btn-ghost" type="button" aria-label="Toggle dark/light theme">
+        <span id="theme-label">Dark</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <section class="hero rounded-3xl border border-[var(--ring)] p-6">
+      <p class="text-sm font-black uppercase tracking-[0.2em] text-[var(--accent)]">Top Drugs Reference Quality</p>
+      <h1 class="mt-2 text-3xl md:text-4xl font-black tracking-tight">Pool Integrity</h1>
+      <p class="mt-3 max-w-3xl text-sm md:text-base opacity-80">
+        Surface quiet data drift before it turns into quiz weirdness: duplicates, typo-risk phrases, class/category label drift, and the latest PDF audit snapshot.
+      </p>
+      <div class="mt-4 flex flex-wrap gap-3">
+        <div id="top-drugs-version-badge" class="hidden rounded-full border border-[var(--ring)] px-3 py-2 text-[10px] font-black uppercase tracking-[0.18em] opacity-70"></div>
+        <div id="pdf-audit-badge" class="hidden rounded-full border border-[var(--ring)] px-3 py-2 text-[10px] font-black uppercase tracking-[0.18em] opacity-70"></div>
+      </div>
+    </section>
+
+    <section class="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+      <div class="card p-5">
+        <div class="text-xs font-black uppercase tracking-[0.18em] opacity-60">Pool Entries</div>
+        <div id="integrity-entry-count" class="mt-3 text-4xl font-black text-[var(--accent)]">0</div>
+      </div>
+      <div class="card p-5">
+        <div class="text-xs font-black uppercase tracking-[0.18em] opacity-60">Duplicate Groups</div>
+        <div id="integrity-duplicate-count" class="mt-3 text-4xl font-black text-[var(--accent)]">0</div>
+      </div>
+      <div class="card p-5">
+        <div class="text-xs font-black uppercase tracking-[0.18em] opacity-60">Typo-Risk Flags</div>
+        <div id="integrity-typo-count" class="mt-3 text-4xl font-black text-[var(--accent)]">0</div>
+      </div>
+      <div class="card p-5">
+        <div class="text-xs font-black uppercase tracking-[0.18em] opacity-60">Drift Clusters</div>
+        <div id="integrity-drift-count" class="mt-3 text-4xl font-black text-[var(--accent)]">0</div>
+      </div>
+      <div class="card p-5">
+        <div class="text-xs font-black uppercase tracking-[0.18em] opacity-60">PDF Audit</div>
+        <div id="integrity-audit-status" class="mt-3 text-2xl font-black text-[var(--accent)]">Loading</div>
+      </div>
+    </section>
+
+    <section class="mt-8 grid gap-6 lg:grid-cols-2">
+      <div class="card p-6">
+        <h2 class="text-2xl font-black">Duplicate Groups</h2>
+        <div id="integrity-duplicates" class="mt-5 space-y-3">
+          <p class="text-sm opacity-70">Loading duplicate scan...</p>
+        </div>
+      </div>
+
+      <div class="card p-6">
+        <h2 class="text-2xl font-black">Typo-Risk Phrases</h2>
+        <div id="integrity-typos" class="mt-5 space-y-3">
+          <p class="text-sm opacity-70">Loading typo-risk scan...</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="mt-8 grid gap-6 lg:grid-cols-2">
+      <div class="card p-6">
+        <h2 class="text-2xl font-black">Class Label Drift</h2>
+        <div id="integrity-class-drift" class="mt-5 space-y-3">
+          <p class="text-sm opacity-70">Loading class drift scan...</p>
+        </div>
+      </div>
+
+      <div class="card p-6">
+        <h2 class="text-2xl font-black">Category Label Drift</h2>
+        <div id="integrity-category-drift" class="mt-5 space-y-3">
+          <p class="text-sm opacity-70">Loading category drift scan...</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="mt-8 card p-6">
+      <h2 class="text-2xl font-black">Latest PDF Audit Status</h2>
+      <div id="integrity-pdf-audit" class="mt-5 space-y-4">
+        <p class="text-sm opacity-70">Loading PDF audit snapshot...</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="assets/js/top-drugs-data.js?v=20260419a" defer></script>
+  <script src="assets/js/top-drugs-integrity.js?v=20260419a" defer></script>
+</body>
+</html>

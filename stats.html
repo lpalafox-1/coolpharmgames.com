@@ -133,7 +133,7 @@
       <h2 class="text-2xl font-bold mb-4">Backup & Restore</h2>
       <div class="card p-4 space-y-4">
         <p class="text-sm" style="color:var(--muted)">
-          Export all pharmlet progress from this browser to a JSON backup, or import a backup to replace the current browser’s saved progress.
+          Export all pharmlet progress from this browser to a JSON backup, including session-based anti-repetition state, or import a backup to replace the current browser’s saved progress.
         </p>
         <div class="flex flex-col gap-3 lg:flex-row">
           <button id="export-progress" class="btn btn-blue" type="button">Export Progress Backup</button>
@@ -144,7 +144,7 @@
           <button id="import-progress" class="btn btn-ghost" type="button">Import Backup</button>
         </div>
         <p id="progress-transfer-status" class="text-sm" style="color:var(--muted)">
-          Export will also fill the text box below so you can inspect or copy the backup JSON.
+          Export will also fill the text box below so you can inspect the backup JSON before moving it elsewhere.
         </p>
         <textarea id="progress-transfer-data" rows="10" placeholder="Backup JSON will appear here on export, or paste a backup here before importing."></textarea>
       </div>

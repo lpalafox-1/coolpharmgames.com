@@ -241,6 +241,25 @@ function toPlainText(value) {
     return (div.textContent || div.innerText || "").replace(/\s+/g, " ").trim();
 }
 
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
+function updateTopDrugsVersionBadge(pool) {
+    const badge = getEl("top-drugs-version-badge");
+    if (!badge || !Array.isArray(pool) || !pool.length) return;
+
+    const versionInfo = window.TopDrugsData?.computePoolVersion?.(pool);
+    if (!versionInfo) return;
+
+    window.TopDrugsData.renderVersionBadge(badge, versionInfo);
+}
+
 function loadQuestionReports() {
     const parsed = safeReadStorageJson(QUESTION_REPORTS_KEY, []);
     return Array.isArray(parsed) ? parsed : [];
@@ -436,6 +455,99 @@ function buildFinalPerformanceBreakdown(questions) {
         areas,
         weakAreas,
         focusAreas: weakAreas.slice(0, 2).map((area) => area.key)
+    };
+}
+
+function splitQuicksheetFieldValues(areaKey, value) {
+    if (!value) return [];
+
+    if (areaKey === "brand") {
+        return splitBrandNames(value);
+    }
+
+    if (areaKey === "category") {
+        return String(value)
+            .split(/[;,]/)
+            .map((part) => part.trim())
+            .filter(Boolean);
+    }
+
+    return [String(value).trim()].filter(Boolean);
+}
+
+function buildQuicksheetDeepLink(field, value) {
+    const params = new URLSearchParams();
+    params.set("field", field);
+    params.set("value", String(value || "").trim());
+    return `top-drugs-quicksheet.html?${params.toString()}`;
+}
+
+function buildAreaQuicksheetLinks(area, limit = 2) {
+    const fieldMap = {
+        brand: "brand",
+        class: "class",
+        category: "category",
+        moa: "moa"
+    };
+    const field = fieldMap[area?.key];
+    if (!field) return [];
+
+    const sourceQuestions = area?.missedQuestions?.length ? area.missedQuestions : area?.questions || [];
+    const counts = new Map();
+
+    for (const question of sourceQuestions) {
+        const drug = question?.drugRef;
+        if (!drug) continue;
+
+        let rawValues = [];
+        if (area.key === "brand") {
+            rawValues = question?._brandVariant ? [question._brandVariant] : splitBrandNames(drug?.brand);
+        } else {
+            rawValues = splitQuicksheetFieldValues(area.key, drug?.[field]);
+        }
+
+        for (const rawValue of rawValues) {
+            const trimmed = String(rawValue || "").trim();
+            const key = normalizeDrugKey(trimmed);
+            if (!key) continue;
+
+            const existing = counts.get(key) || { label: trimmed, count: 0 };
+            existing.count += 1;
+            counts.set(key, existing);
+        }
+    }
+
+    return [...counts.values()]
+        .sort((a, b) => b.count - a.count || a.label.length - b.label.length || a.label.localeCompare(b.label))
+        .slice(0, limit)
+        .map((entry) => ({
+            field,
+            label: entry.label,
+            href: buildQuicksheetDeepLink(field, entry.label)
+        }));
+}
+
+function buildStoredFinalAttemptSummary(questions) {
+    const breakdown = buildFinalPerformanceBreakdown(questions);
+    if (!breakdown) return null;
+
+    return {
+        areas: breakdown.areas
+            .filter((area) => area.total > 0)
+            .map((area) => ({
+                key: area.key,
+                label: area.label,
+                total: area.total,
+                correct: area.correct,
+                missed: area.missed,
+                accuracy: area.accuracy
+            })),
+        weakAreas: breakdown.weakAreas.slice(0, 3).map((area) => ({
+            key: area.key,
+            label: area.label,
+            missed: area.missed,
+            accuracy: area.accuracy
+        }))
     };
 }
 
@@ -1656,6 +1768,7 @@ function saveQuizHistory() {
         const raw = localStorage.getItem(HISTORY_KEY);
         const history = raw ? JSON.parse(raw) : [];
         const letterGradeInfo = getLetterGradeInfoForQuiz(state.score, state.questions.length);
+        const finalSummary = buildStoredFinalAttemptSummary(state.questions);
 
         history.push({
             quizId: getHistoryQuizId(),
@@ -1667,7 +1780,8 @@ function saveQuizHistory() {
             timestamp: Date.now(),
             examMode: isTrueExamMode(),
             hintsUsed: state.hintsUsed,
-            letterGrade: letterGradeInfo?.letter || null
+            letterGrade: letterGradeInfo?.letter || null,
+            finalSummary
         });
 
         localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(-200)));
@@ -4401,7 +4515,16 @@ function buildFinalBreakdownMarkup(breakdown) {
 
     const areaCards = breakdown.areas
         .filter((area) => area.total > 0)
-        .map((area) => `
+        .map((area) => {
+            const quickLinks = buildAreaQuicksheetLinks(area)
+                .map((link) => `
+                    <a href="${escapeHtml(link.href)}" class="rounded-full border border-[var(--ring)] px-3 py-1 text-[11px] font-semibold hover:border-[#8b1e3f]">
+                        ${escapeHtml(link.label)}
+                    </a>
+                `)
+                .join("");
+
+            return `
             <div class="rounded-2xl border border-[var(--ring)] bg-[var(--card)] px-4 py-4">
                 <div class="text-xs font-black uppercase tracking-[0.18em] opacity-60">${area.label}</div>
                 <div class="mt-2 flex items-end justify-between gap-3">
@@ -4412,8 +4535,13 @@ function buildFinalBreakdownMarkup(breakdown) {
                     <div class="h-full rounded-full bg-[#8b1e3f]" style="width:${area.accuracy}%"></div>
                 </div>
                 <div class="mt-2 text-xs opacity-70">${area.missed} miss${area.missed === 1 ? "" : "es"}</div>
+                ${quickLinks ? `<div class="mt-3 flex flex-wrap gap-2">
+                    <span class="text-[10px] font-black uppercase tracking-[0.18em] opacity-50">Quicksheet</span>
+                    ${quickLinks}
+                </div>` : ""}
             </div>
-        `)
+        `;
+        })
         .join("");
 
     const weakAreaText = breakdown.weakAreas.length
@@ -4539,6 +4667,7 @@ async function main() {
         // ========== MODE 1: ?week=N (6 New + 4 Review) ==========
         if (weekParam) {
             fullPool = await smartFetch("master_pool.json");
+            updateTopDrugsVersionBadge(fullPool);
             
             // CEILING FILTER: lab=1 → only Lab 1; lab=2 → Lab 1 + Lab 2 (cumulative curriculum)
             const ceilingPool = fullPool.filter(d => Number(d.metadata?.lab) <= labParam);
@@ -4639,6 +4768,7 @@ async function main() {
         // ========== MODE 2: ?weeks=Start-End (Cumulative Range) ==========
         else if (weeksParam) {
             fullPool = await smartFetch("master_pool.json");
+            updateTopDrugsVersionBadge(fullPool);
             const [startWeek, endWeek] = weeksParam.split('-').map(n => parseInt(n, 10));
             if (isNaN(startWeek) || isNaN(endWeek)) {
                 throw new Error("Invalid weeks format. Use ?weeks=1-5");
@@ -4671,6 +4801,7 @@ async function main() {
         // ========== MODE 3: ?tag=String (Topic Mode) ==========
         else if (tagParam) {
             fullPool = await smartFetch("master_pool.json");
+            updateTopDrugsVersionBadge(fullPool);
             const tagLower = tagParam.toLowerCase();
             
             // STRICT LAB ISOLATION: Filter by lab FIRST (if specified, else use all)
@@ -4687,6 +4818,7 @@ async function main() {
         }
         else if (quizId === FINAL_EXAM_ID) {
             fullPool = await smartFetch("master_pool.json");
+            updateTopDrugsVersionBadge(fullPool);
             const selectedDrugs = selectFinalExamDrugs(fullPool);
             const finalQuestions = buildFinalExamQuestions(selectedDrugs, fullPool);
 

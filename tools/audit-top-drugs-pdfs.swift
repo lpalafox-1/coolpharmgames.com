@@ -122,16 +122,36 @@ func loadPoolEntries(from path: String) throws -> [PoolEntry] {
 }
 
 let arguments = CommandLine.arguments
-guard arguments.count == 3 else {
-    fputs("Usage: swift tools/audit-top-drugs-pdfs.swift <lab1.pdf> <lab2.pdf>\n", stderr)
+var positionalArguments: [String] = []
+var jsonOutputPath: String?
+
+var index = 1
+while index < arguments.count {
+    let argument = arguments[index]
+    if argument == "--json-output" {
+        guard index + 1 < arguments.count else {
+            fputs("Error: --json-output requires a file path.\n", stderr)
+            exit(1)
+        }
+        jsonOutputPath = arguments[index + 1]
+        index += 2
+        continue
+    }
+
+    positionalArguments.append(argument)
+    index += 1
+}
+
+guard positionalArguments.count == 2 else {
+    fputs("Usage: swift tools/audit-top-drugs-pdfs.swift <lab1.pdf> <lab2.pdf> [--json-output <file>]\n", stderr)
     exit(1)
 }
 
 let fileManager = FileManager.default
 let repoRoot = fileManager.currentDirectoryPath
 let poolPath = "\(repoRoot)/assets/data/master_pool.json"
-let lab1Path = arguments[1]
-let lab2Path = arguments[2]
+let lab1Path = positionalArguments[0]
+let lab2Path = positionalArguments[1]
 
 do {
     let entries = try loadPoolEntries(from: poolPath)
@@ -171,6 +191,51 @@ do {
     let flaggedEntries = entries.filter { entry in
         let combined = "\(entry.generic) | \(entry.medicationClass) | \(entry.category) | \(entry.moa)"
         return suspectPhrases.contains { combined.contains($0) }
+    }
+
+    let statusLabel: String
+    let statusBadge: String
+    let statusSummary: String
+    if missingGenerics.isEmpty && missingBrands.isEmpty && flaggedEntries.isEmpty {
+        statusLabel = "Clean"
+        statusBadge = "PDF Audit Clean"
+        statusSummary = "No missing generics, missing brand aliases, or cleanup phrases were flagged in this audit."
+    } else if missingGenerics.isEmpty && missingBrands.isEmpty {
+        statusLabel = "Notes"
+        statusBadge = "PDF Audit Notes"
+        statusSummary = "Core coverage checks passed, but cleanup phrases are still flagged for review."
+    } else {
+        statusLabel = "Attention"
+        statusBadge = "PDF Audit Attention"
+        statusSummary = "The audit found missing generic or brand coverage that still needs review."
+    }
+
+    let auditPayload: [String: Any] = [
+        "auditedAt": ISO8601DateFormatter().string(from: Date()),
+        "statusLabel": statusLabel,
+        "statusBadge": statusBadge,
+        "statusSummary": statusSummary,
+        "sourceDocuments": [
+            "lab1": URL(fileURLWithPath: lab1Path).lastPathComponent,
+            "lab2": URL(fileURLWithPath: lab2Path).lastPathComponent
+        ],
+        "poolEntries": entries.count,
+        "lab1Entries": entries.filter { $0.lab == 1 }.count,
+        "lab2Entries": entries.filter { $0.lab == 2 }.count,
+        "missingGenericsCount": missingGenerics.count,
+        "missingBrandAliasesCount": missingBrands.count,
+        "flaggedEntriesCount": flaggedEntries.count,
+        "missingGenerics": missingGenerics.map { ["lab": $0.0, "generic": $0.1] },
+        "missingBrandAliases": missingBrands.map { ["lab": $0.0, "generic": $0.1, "brand": $0.2] },
+        "flaggedEntries": flaggedEntries.map { ["lab": $0.lab, "generic": $0.generic] },
+        "suspectPhrases": suspectPhrases
+    ]
+
+    if let outputPath = jsonOutputPath {
+        let url = URL(fileURLWithPath: outputPath)
+        try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+        let jsonData = try JSONSerialization.data(withJSONObject: auditPayload, options: [.prettyPrinted, .sortedKeys])
+        try jsonData.write(to: url)
     }
 
     print("Top Drugs PDF Audit")
