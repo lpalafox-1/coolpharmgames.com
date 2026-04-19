@@ -11,6 +11,7 @@ const examModeParam = params.get("exam") === "1";
 const HISTORY_KEY = "pharmlet.history";
 const CUSTOM_QUIZ_KEY = "pharmlet.custom-quiz";
 const REVIEW_KEY = "pharmlet.review-queue";
+const THEME_KEY = "pharmlet.theme";
 
 const state = { 
     questions: [], index: 0, score: 0, title: "",
@@ -49,6 +50,29 @@ function changeZoom(dir) {
 }
 
 const getEl = (id) => document.getElementById(id);
+
+function syncQuizThemeAffordances(isDark) {
+    const helpBtn = getEl("help-shortcuts");
+    if (!helpBtn) return;
+    helpBtn.style.color = isDark ? "black" : "";
+}
+
+function applyStoredQuizTheme() {
+    const saved = localStorage.getItem(THEME_KEY);
+    const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)")?.matches;
+    const start = saved || (prefersDark ? "dark" : "light");
+    const isDark = start === "dark";
+
+    document.documentElement.classList.toggle("dark", isDark);
+    syncQuizThemeAffordances(isDark);
+}
+
+function toggleQuizTheme() {
+    const isDark = !document.documentElement.classList.contains("dark");
+    document.documentElement.classList.toggle("dark", isDark);
+    localStorage.setItem(THEME_KEY, isDark ? "dark" : "light");
+    syncQuizThemeAffordances(isDark);
+}
 
 const CONCEPT_QUIZ_ID = "bdt-unit10-quiz8";
 const CONCEPT_QUIZ_TITLE = "Endocrine Concept Practice";
@@ -4079,20 +4103,7 @@ function wireEvents() {
             if (Array.isArray(val) ? val.length > 0 : val) scoreCurrent(val);
         },
         "reveal-solution": revealAnswer,
-   "theme-toggle": () => {
-    const isDark = document.documentElement.classList.toggle("dark");
-    localStorage.setItem("pharmlet.theme", isDark ? "dark" : "light");
-    
-    // FORCE BLACK TEXT ON HELP BUTTON IN DARK MODE
-    const helpBtn = getEl("help-shortcuts");
-    if (helpBtn) {
-        if (isDark) {
-            helpBtn.style.color = "black";
-        } else {
-            helpBtn.style.color = ""; // Resets to default CSS
-        }
-    }
-},
+        "theme-toggle": toggleQuizTheme,
         "hint-btn": showHint,
         "mark-mobile": toggleMark,
         "hint-btn-mobile": showHint,
@@ -4434,6 +4445,8 @@ function shuffled(a) { return [...a].sort(() => 0.5 - Math.random()); }
 
 async function main() {
     try {
+        applyStoredQuizTheme();
+
         let filteredPool = [];
         let fullPool = [];
         let storageKey = null;
