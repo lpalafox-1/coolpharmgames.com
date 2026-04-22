@@ -23,7 +23,8 @@ const state = {
     hintsUsed: 0,           // Track hints for stats
     resultsRecorded: false,
     signalsRecorded: false,
-    finalBreakdown: null
+    finalBreakdown: null,
+    quizConfig: null
 };
 
 // --- 1. CORE ACTIONS ---
@@ -80,6 +81,34 @@ const CONCEPT_QUIZ_ID = "bdt-unit10-quiz8";
 const CONCEPT_QUIZ_TITLE = "Endocrine Concept Practice";
 const CONCEPT_QUIZ_SIZE = 10;
 const CONCEPT_QUIZ_POOL_FILE = "bdt_unit10_quiz8_master_pool.json";
+const EXAM4_CONCEPT_QUIZ_ID = "bdt-unit10-exam4";
+const EXAM4_CONCEPT_QUIZ_POOL_FILE = "bdt_unit10_exam4_master_pool_draft.json";
+const EXAM4_CONCEPT_BLUEPRINT = Object.freeze([
+    { type: "mcq", count: 32, label: "MCQ" },
+    { type: "short", count: 10, label: "Fill In" },
+    { type: "open", count: 4, label: "Open Response" }
+]);
+const CONCEPT_QUIZ_CONFIGS = Object.freeze({
+    [CONCEPT_QUIZ_ID]: {
+        id: CONCEPT_QUIZ_ID,
+        title: CONCEPT_QUIZ_TITLE,
+        questionContextLabel: "Endocrine Concept Practice",
+        poolFile: CONCEPT_QUIZ_POOL_FILE,
+        quizSize: CONCEPT_QUIZ_SIZE,
+        timerSeconds: 10 * 60
+    },
+    [EXAM4_CONCEPT_QUIZ_ID]: {
+        id: EXAM4_CONCEPT_QUIZ_ID,
+        title: "Unit 10 Endocrine Exam 4 Draft",
+        questionContextLabel: "Endocrine Exam 4 Draft",
+        poolFile: EXAM4_CONCEPT_QUIZ_POOL_FILE,
+        quizSize: 46,
+        blueprint: EXAM4_CONCEPT_BLUEPRINT,
+        timerSeconds: 60 * 60,
+        missingPoolMessage: `Exam 4 draft route is waiting for ${EXAM4_CONCEPT_QUIZ_POOL_FILE}.`,
+        insufficientPoolMessage: "Exam 4 generator needs enough endocrine concept entries to build 32 MCQ, 10 fill-in, and 4 open-response questions."
+    }
+});
 
 const FINAL_EXAM_ID = "log-lab-final-2";
 const FINAL_EXAM_TITLE = "Top Drugs Final Lab 2 — 110 Questions";
@@ -1995,7 +2024,7 @@ function getConceptAxisLabel(item) {
 
 function getQuestionContextLabel(question) {
     return (question?._mode === "concept" || question?.conceptRef)
-        ? "Endocrine Concept Practice"
+        ? (state.quizConfig?.questionContextLabel || "Endocrine Concept Practice")
         : "Drug Practice";
 }
 
@@ -2323,11 +2352,11 @@ function buildConceptMcqQuestion({ item, all, prompt, answer, answerText, key, c
     };
 }
 
-function buildConceptShortQuestion({ item, prompt, answer, answerText, conceptPromptKind }) {
+function buildConceptTextQuestion({ item, prompt, answer, answerText, conceptPromptKind, responseType = "short" }) {
     if (!answer) return null;
 
     return {
-        type: "short",
+        type: responseType === "open" ? "open" : "short",
         prompt,
         answer,
         answerText: answerText || (conceptPromptKind === "relationship" ? getRelationshipVariants(answer) : undefined),
@@ -2335,6 +2364,28 @@ function buildConceptShortQuestion({ item, prompt, answer, answerText, conceptPr
         conceptPromptKind,
         _mode: "concept"
     };
+}
+
+function buildConceptShortQuestion({ item, prompt, answer, answerText, conceptPromptKind }) {
+    return buildConceptTextQuestion({
+        item,
+        prompt,
+        answer,
+        answerText,
+        conceptPromptKind,
+        responseType: "short"
+    });
+}
+
+function buildConceptOpenQuestion({ item, prompt, answer, answerText, conceptPromptKind }) {
+    return buildConceptTextQuestion({
+        item,
+        prompt,
+        answer,
+        answerText,
+        conceptPromptKind,
+        responseType: "open"
+    });
 }
 
 function getConceptHintThemeClue(concept) {
@@ -2749,21 +2800,30 @@ function getConceptPromptSpecs(item) {
     return specs;
 }
 
-function getConceptBuildersForPreference(preference, mcqBuilder, shortBuilder) {
+function getConceptBuildersForPreference(preference, mcqBuilder, shortBuilder, openBuilder) {
     switch (preference) {
         case "mcq-only":
             return [mcqBuilder];
         case "short-only":
             return [shortBuilder];
+        case "open-only":
+            return [openBuilder];
         case "short_preferred":
             return [shortBuilder, mcqBuilder];
+        case "open_preferred":
+            return [openBuilder, shortBuilder, mcqBuilder];
         case "mcq_preferred":
         default:
             return [mcqBuilder, shortBuilder];
     }
 }
 
-function resolveConceptSpecPreference(item, spec, preferShort) {
+function resolveConceptSpecPreference(item, spec, preferShort, forcedType = "") {
+    const forced = normalizeQuizValue(forcedType);
+    if (forced === "mcq") return "mcq-only";
+    if (forced === "short") return "short-only";
+    if (forced === "open") return "open-only";
+
     const itemPreference = normalizeConceptPreferredType(item?.prompt_bias, preferShort);
     let specPreference = normalizeConceptPreferredType(spec?.preferredType, preferShort);
     const conceptType = normalizeQuizValue(item?.concept_type);
@@ -2809,9 +2869,10 @@ function resolveConceptSpecPreference(item, spec, preferShort) {
     return specPreference;
 }
 
-function createConceptQuestion(item, all) {
+function createConceptQuestion(item, all, options = {}) {
     const difficulty = normalizeQuizValue(item?.difficulty);
     const preferShort = /hard|advanced|challenging/.test(difficulty);
+    const forcedType = normalizeQuizValue(options?.forcedType);
     const promptSpecs = shuffled(getConceptPromptSpecs(item));
 
     for (const spec of promptSpecs) {
@@ -2831,10 +2892,17 @@ function createConceptQuestion(item, all) {
             answerText: spec.answerText,
             conceptPromptKind: spec.conceptPromptKind
         });
+        const openBuilder = () => buildConceptOpenQuestion({
+            item,
+            prompt: spec.prompt,
+            answer: spec.answer,
+            answerText: spec.answerText,
+            conceptPromptKind: spec.conceptPromptKind
+        });
 
-        const preference = resolveConceptSpecPreference(item, spec, preferShort);
+        const preference = resolveConceptSpecPreference(item, spec, preferShort, forcedType);
         if (preference === "skip") continue;
-        const builders = getConceptBuildersForPreference(preference, mcqBuilder, shortBuilder);
+        const builders = getConceptBuildersForPreference(preference, mcqBuilder, shortBuilder, openBuilder);
 
         for (const build of builders) {
             const question = build();
@@ -2842,12 +2910,15 @@ function createConceptQuestion(item, all) {
         }
     }
 
+    if (forcedType === "mcq") return null;
+
     const source = String(item?.source ?? "").trim();
     const target = String(item?.target ?? "").trim();
     const relationship = String(item?.relationship ?? "").trim();
     const fallbackAnswer = relationship || target || source || item?.id || "Unknown";
+    const fallbackResponseType = forcedType === "open" ? "open" : "short";
     return {
-        type: "short",
+        type: fallbackResponseType,
         prompt: source && target
             ? `<b>${formatConceptTerm(source)}</b> _____ <b>${formatConceptTerm(target)}</b>.`
             : source
@@ -2861,10 +2932,130 @@ function createConceptQuestion(item, all) {
     };
 }
 
-function createQuestionFromItem(item, all) {
+function createQuestionFromItem(item, all, options = {}) {
     return isConceptEntry(item)
-        ? createConceptQuestion(item, all)
+        ? createConceptQuestion(item, all, options)
         : createQuestion(item, all);
+}
+
+function getConceptQuizConfig(quizIdentifier = quizId) {
+    return quizIdentifier ? CONCEPT_QUIZ_CONFIGS[quizIdentifier] || null : null;
+}
+
+async function loadConceptQuizPool(config) {
+    const loadConfiguredFile = async (fileName) => {
+        const rawPool = await smartFetch(fileName);
+        const conceptPool = flattenPoolData(rawPool).filter(isConceptEntry);
+        return { rawPool, conceptPool };
+    };
+
+    try {
+        const loaded = await loadConfiguredFile(config.poolFile);
+        return { ...loaded, usingFallbackPool: false, resolvedPoolFile: config.poolFile };
+    } catch (primaryError) {
+        if (!config.fallbackPoolFile) {
+            throw new Error(config.missingPoolMessage || primaryError.message);
+        }
+
+        try {
+            const loaded = await loadConfiguredFile(config.fallbackPoolFile);
+            return { ...loaded, usingFallbackPool: true, resolvedPoolFile: config.fallbackPoolFile };
+        } catch (fallbackError) {
+            throw new Error(config.missingPoolMessage || fallbackError.message || primaryError.message);
+        }
+    }
+}
+
+function getConceptQuizSize(config) {
+    return Number(config?.quizSize || CONCEPT_QUIZ_SIZE);
+}
+
+function getConceptBlueprintLabel(config) {
+    if (!Array.isArray(config?.blueprint) || !config.blueprint.length) return "";
+    return config.blueprint.map((section) => `${section.count} ${section.label}`).join(" • ");
+}
+
+function prioritizeConceptPoolItems(pool, lastRoundKeys = [], forcedType = "") {
+    const lastRoundSet = new Set(Array.isArray(lastRoundKeys) ? lastRoundKeys : []);
+    const typeKey = normalizeQuizValue(forcedType);
+
+    const scoreItem = (item) => {
+        const conceptType = normalizeQuizValue(item?.concept_type);
+        const answerCandidate = String(item?.relationship || item?.target || item?.source || "").trim();
+        const conciseAnswer = isConciseConceptAnswer(answerCandidate);
+        const longAnswer = looksLikeConceptStatement(answerCandidate) || answerCandidate.split(/\s+/).length > 7;
+        const preference = normalizeConceptPreferredType(item?.prompt_bias);
+        let score = Math.random() * 0.2;
+
+        if (typeKey === "mcq") {
+            if (preference === "mcq-only" || preference === "mcq_preferred") score += 2.2;
+            if (looksLikeConceptStatement(item?.target)) score += 1.4;
+            if (["fact_statement", "function_pair", "axis_sequence", "sequence_step"].includes(conceptType)) score += 0.8;
+        } else if (typeKey === "short") {
+            if (preference === "short-only" || preference === "short_preferred") score += 2.2;
+            if (conciseAnswer) score += 1.7;
+            if (isConceptAnswerList(answerCandidate)) score += 0.5;
+            if (longAnswer) score -= 1.3;
+        } else if (typeKey === "open") {
+            if (longAnswer) score += 2.3;
+            if (["function_pair", "fact_statement", "sequence_step", "axis_sequence", "consequence_pair"].includes(conceptType)) score += 1.6;
+            if (conciseAnswer) score -= 1.5;
+        }
+
+        return score;
+    };
+
+    const unseenItems = shuffled(pool.filter((item) => !lastRoundSet.has(getQuestionIdentity(item))))
+        .sort((a, b) => scoreItem(b) - scoreItem(a));
+    const repeatItems = shuffled(pool.filter((item) => lastRoundSet.has(getQuestionIdentity(item))))
+        .sort((a, b) => scoreItem(b) - scoreItem(a));
+
+    return [...unseenItems, ...repeatItems];
+}
+
+function buildConceptBlueprintQuestions({ config, pool, fullPool, lastRoundKeys }) {
+    const blueprint = Array.isArray(config?.blueprint) ? config.blueprint : [];
+    if (!blueprint.length) return null;
+
+    const selectedItems = [];
+    const builtQuestions = [];
+    const usedIdentities = new Set();
+
+    for (const section of blueprint) {
+        const forcedType = normalizeQuizValue(section?.type);
+        const targetCount = Number(section?.count || 0);
+        if (!forcedType || targetCount <= 0) continue;
+
+        const orderedItems = prioritizeConceptPoolItems(pool, lastRoundKeys, forcedType);
+        let builtCount = 0;
+
+        for (const item of orderedItems) {
+            const identity = getQuestionIdentity(item);
+            if (!identity || usedIdentities.has(identity)) continue;
+
+            const question = createConceptQuestion(item, fullPool, { forcedType });
+            if (!question) continue;
+
+            selectedItems.push(item);
+            builtQuestions.push({
+                ...question,
+                _conceptSectionType: forcedType
+            });
+            usedIdentities.add(identity);
+            builtCount += 1;
+
+            if (builtCount >= targetCount) break;
+        }
+
+        if (builtCount < targetCount) {
+            throw new Error(`${config?.title || "Concept quiz"} could only build ${builtCount} of ${targetCount} required ${section.label || forcedType} question(s).`);
+        }
+    }
+
+    return {
+        selectedItems,
+        questions: shuffled(builtQuestions)
+    };
 }
 
 function createQuestion(drug, all) {
@@ -4210,11 +4401,12 @@ function render() {
             lbl.addEventListener('click', toggleOption, { passive: false });
             optCont.appendChild(lbl);
         });
-    } else if (q.type === "short") {
+    } else if (q.type === "short" || q.type === "open") {
         if (getEl("short-wrap")) getEl("short-wrap").classList.remove("hidden");
         const input = getEl("short-input");
         if (input) {
             input.value = q._user || "";
+            input.placeholder = q.type === "open" ? "Type response..." : "Type answer...";
             q._answered ? input.setAttribute("disabled", "true") : input.removeAttribute("disabled");
         }
     }
@@ -4365,9 +4557,12 @@ function timerTick() {
 function startSmartTimer() {
     if (state.timerHandle) clearInterval(state.timerHandle);
     const count = state.questions.length;
-    const isEndocrineQuiz = quizId === CONCEPT_QUIZ_ID || state.questions.some(q => q?._mode === "concept");
+    const configuredTimerSeconds = Number(state.quizConfig?.timerSeconds || 0);
+    const isEndocrineQuiz = Boolean(state.quizConfig) || quizId === CONCEPT_QUIZ_ID || state.questions.some(q => q?._mode === "concept");
     const isFinalExam = quizId === FINAL_EXAM_ID;
-    state.timerSeconds = isEndocrineQuiz
+    state.timerSeconds = configuredTimerSeconds > 0
+        ? configuredTimerSeconds
+        : isEndocrineQuiz
         ? 600
         : (isFinalExam ? FINAL_EXAM_TIMER_SECONDS : (weekParam ? 600 : (count <= 20 ? 900 : (count <= 50 ? 2700 : 7200))));
     state.timerHandle = setInterval(timerTick, 1000);
@@ -4659,6 +4854,7 @@ function shuffled(a) { return [...a].sort(() => 0.5 - Math.random()); }
 async function main() {
     try {
         applyStoredQuizTheme();
+        state.quizConfig = null;
 
         let filteredPool = [];
         let fullPool = [];
@@ -4835,18 +5031,19 @@ async function main() {
             finishSetup(storageKey);
             return;
         }
-        // ========== MODE 4: ?id=bdt-unit10-quiz8 (Generated Concept Quiz) ==========
-        else if (quizId === CONCEPT_QUIZ_ID) {
-            const rawPool = await smartFetch(CONCEPT_QUIZ_POOL_FILE);
-            const conceptPool = flattenPoolData(rawPool).filter(isConceptEntry);
+        // ========== MODE 4: ?id=concept-quiz-id (Generated Concept Quiz) ==========
+        else if (getConceptQuizConfig(quizId)) {
+            const conceptConfig = getConceptQuizConfig(quizId);
+            const { conceptPool, usingFallbackPool } = await loadConceptQuizPool(conceptConfig);
 
             if (conceptPool.length === 0) {
-                throw new Error("No endocrine concept entries found in the master pool.");
+                throw new Error(`No endocrine concept entries found in ${conceptConfig.poolFile}.`);
             }
 
+            state.quizConfig = conceptConfig;
             filteredPool = conceptPool;
             fullPool = conceptPool;
-            state.title = CONCEPT_QUIZ_TITLE;
+            state.title = conceptConfig.title + (usingFallbackPool && conceptConfig.fallbackTitleSuffix ? conceptConfig.fallbackTitleSuffix : "");
             storageKey = `pharmlet.${quizId}.easy`;
         }
         // ========== MODE 4: ?id=quiz-name (Legacy Static JSON) ==========
@@ -4884,8 +5081,10 @@ async function main() {
         }
 
         const quizUsesConcepts = filteredPool.some(isConceptEntry);
-        if (quizUsesConcepts && filteredPool.length < CONCEPT_QUIZ_SIZE) {
-            throw new Error(`Endocrine quiz needs at least ${CONCEPT_QUIZ_SIZE} concept entries, but only ${filteredPool.length} were loaded.`);
+        const conceptConfig = state.quizConfig || getConceptQuizConfig(quizId);
+        const configuredConceptQuizSize = getConceptQuizSize(conceptConfig);
+        if (quizUsesConcepts && !Array.isArray(conceptConfig?.blueprint) && filteredPool.length < configuredConceptQuizSize) {
+            throw new Error(`Endocrine quiz needs at least ${configuredConceptQuizSize} concept entries, but only ${filteredPool.length} were loaded.`);
         }
         
         // Session-based anti-repetition shuffling
@@ -4899,6 +5098,28 @@ async function main() {
         // For MODE 1 (?week=N), drugs are already pre-selected (6+4 split)
         // For other modes, apply standard selection logic
         let selectedItems;
+        if (quizUsesConcepts && Array.isArray(conceptConfig?.blueprint) && conceptConfig.blueprint.length) {
+            const builtQuiz = buildConceptBlueprintQuestions({
+                config: conceptConfig,
+                pool: filteredPool,
+                fullPool,
+                lastRoundKeys
+            });
+
+            if (!builtQuiz || !builtQuiz.questions?.length) {
+                throw new Error(conceptConfig.insufficientPoolMessage || "Unable to build the requested concept quiz.");
+            }
+
+            sessionStorage.setItem(sessionKey, JSON.stringify(builtQuiz.selectedItems.map(getQuestionIdentity)));
+            state.questions = builtQuiz.questions.map((question, i) => ({
+                ...question,
+                _id: i
+            }));
+
+            finishSetup(storageKey);
+            return;
+        }
+
         if (weekParam) {
             // MODE 1: filteredPool IS the pre-selected 6+4 split (always use ALL of it)
             // Anti-repetition: shuffle fresh drugs first, then pad with repeats if needed
@@ -4913,15 +5134,15 @@ async function main() {
             selectedItems = [...shuffledFresh, ...shuffledRepeat].slice(0, targetCount);
         } else {
             // MODE 2/3: Standard selection from filtered pool
-            const quizSize = quizUsesConcepts ? CONCEPT_QUIZ_SIZE : 10;
+            const quizSize = quizUsesConcepts ? configuredConceptQuizSize : 10;
             const unseenItems = filteredPool.filter(item => !lastRoundKeys.includes(getQuestionIdentity(item)));
             const workingPool = unseenItems.length >= Math.min(quizSize, filteredPool.length) ? unseenItems : filteredPool;
             const selectedCount = Math.min(quizSize, workingPool.length);
             selectedItems = shuffled(workingPool).slice(0, selectedCount);
         }
 
-        if (quizUsesConcepts && selectedItems.length !== CONCEPT_QUIZ_SIZE) {
-            throw new Error(`Endocrine quiz could not build ${CONCEPT_QUIZ_SIZE} questions from the loaded pool.`);
+        if (quizUsesConcepts && selectedItems.length !== configuredConceptQuizSize) {
+            throw new Error(`Endocrine quiz could not build ${configuredConceptQuizSize} questions from the loaded pool.`);
         }
         
         // Save this round for anti-repetition
