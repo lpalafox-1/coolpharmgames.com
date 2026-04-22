@@ -83,6 +83,8 @@ const CONCEPT_QUIZ_SIZE = 10;
 const CONCEPT_QUIZ_POOL_FILE = "bdt_unit10_quiz8_master_pool.json";
 const EXAM4_CONCEPT_QUIZ_ID = "bdt-unit10-exam4";
 const EXAM4_CONCEPT_QUIZ_POOL_FILE = "bdt_unit10_exam4_master_pool_draft.json";
+const EXAM4_HIGH_YIELD_CONCEPT_QUIZ_ID = "bdt-unit10-exam4-high-yield";
+const EXAM4_HIGH_YIELD_CONCEPT_QUIZ_POOL_FILE = "bdt_unit10_exam4_master_pool_high_yield_draft.json";
 const EXAM4_CONCEPT_BLUEPRINT = Object.freeze([
     { type: "mcq", count: 32, label: "MCQ" },
     { type: "short", count: 10, label: "Fill In" },
@@ -107,6 +109,15 @@ const CONCEPT_QUIZ_CONFIGS = Object.freeze({
         timerSeconds: 60 * 60,
         missingPoolMessage: `Exam 4 draft route is waiting for ${EXAM4_CONCEPT_QUIZ_POOL_FILE}.`,
         insufficientPoolMessage: "Exam 4 generator needs enough endocrine concept entries to build 32 MCQ, 10 fill-in, and 4 open-response questions."
+    },
+    [EXAM4_HIGH_YIELD_CONCEPT_QUIZ_ID]: {
+        id: EXAM4_HIGH_YIELD_CONCEPT_QUIZ_ID,
+        title: "Unit 10 Endocrine Exam 4 High-Yield Draft",
+        questionContextLabel: "Endocrine Exam 4 High-Yield",
+        poolFile: EXAM4_HIGH_YIELD_CONCEPT_QUIZ_POOL_FILE,
+        quizSize: 10,
+        timerSeconds: 10 * 60,
+        missingPoolMessage: `Exam 4 high-yield draft route is waiting for ${EXAM4_HIGH_YIELD_CONCEPT_QUIZ_POOL_FILE}.`
     }
 });
 
