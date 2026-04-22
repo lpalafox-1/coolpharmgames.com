@@ -26,7 +26,10 @@ const QUIZ_TITLES = {
   "top-drugs-final-mockC": "Final Mock C",
   "top-drugs-final-mockD": "Final Mock D",
   "top-drugs-final-mockE": "Final Mock E",
-  "log-lab-final-2": "Top Drugs Final Lab 2"
+  "log-lab-final-2": "Top Drugs Final Lab 2",
+  "bdt-unit10-quiz8": "Basis II Quiz 8 — Endocrine System",
+  "bdt-unit10-exam4": "Basis II Exam 4 — Endocrine Draft",
+  "bdt-unit10-exam4-high-yield": "Basis II Exam 4 — High-Yield Draft"
 };
 
 document.addEventListener("DOMContentLoaded", () => {

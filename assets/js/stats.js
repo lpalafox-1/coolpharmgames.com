@@ -593,6 +593,7 @@ function getHistory() {
 }
 
 function getCategoryFromQuizId(quizId) {
+  if (quizId.startsWith("bdt-")) return "Basis";
   if (quizId.startsWith("chapter")) return "Chapter Reviews";
   if (quizId.startsWith("practice-")) return "Exam Practice";
   if (quizId.startsWith("lab-quiz")) return "Lab Quizzes";
