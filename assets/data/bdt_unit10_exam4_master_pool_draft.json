@@ -1,0 +1,1199 @@
+{
+  "title": "Basis 2 Exam 4 Endocrine Master Pool Draft",
+  "quiz_id": "basis2-exam4-endocrine-master",
+  "unit": 10,
+  "questions": [
+    {
+      "id": "endocrine-homeostasis",
+      "unit": 10,
+      "topic": "Core Endocrine Principles",
+      "subtopic": "Big picture",
+      "concept_type": "fact_statement",
+      "source": "Endocrine physiology",
+      "target": "Supports homeostasis through a distributed system of glands and circulating messengers",
+      "relationship": "does",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "homeostasis",
+        "distributed system",
+        "endocrine intro"
+      ]
+    },
+    {
+      "id": "endocrine-vs-exocrine",
+      "unit": 10,
+      "topic": "Core Endocrine Principles",
+      "subtopic": "Gland types",
+      "concept_type": "fact_statement",
+      "source": "Endocrine glands",
+      "target": "Are ductless and secrete hormones into the bloodstream",
+      "relationship": "are",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "endocrine",
+        "exocrine",
+        "ductless",
+        "bloodstream"
+      ]
+    },
+    {
+      "id": "hormone-classes-three",
+      "unit": 10,
+      "topic": "Core Endocrine Principles",
+      "subtopic": "Hormone classes",
+      "concept_type": "fact_statement",
+      "source": "The three major hormone classes",
+      "target": "Amine, peptide/protein, and steroid hormones",
+      "relationship": "are",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "answer_count": 3,
+      "tags": [
+        "hormone classes",
+        "amine",
+        "peptide",
+        "steroid"
+      ]
+    },
+    {
+      "id": "peptides-exocytosis",
+      "unit": 10,
+      "topic": "Core Endocrine Principles",
+      "subtopic": "Secretion behavior",
+      "concept_type": "fact_statement",
+      "source": "Peptide hormones",
+      "target": "Are stored in secretory vesicles and released by exocytosis",
+      "relationship": "are",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "peptides",
+        "vesicles",
+        "exocytosis"
+      ]
+    },
+    {
+      "id": "steroids-synthesized-on-demand",
+      "unit": 10,
+      "topic": "Core Endocrine Principles",
+      "subtopic": "Secretion behavior",
+      "concept_type": "fact_statement",
+      "source": "Steroid hormones",
+      "target": "Are synthesized on demand rather than stored in vesicles",
+      "relationship": "are",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "answer_aliases": [
+        "synthesized on demand",
+        "not stored in vesicles"
+      ],
+      "tags": [
+        "steroids",
+        "on demand",
+        "vesicles"
+      ]
+    },
+    {
+      "id": "steroids-diffuse-out",
+      "unit": 10,
+      "topic": "Core Endocrine Principles",
+      "subtopic": "Secretion behavior",
+      "concept_type": "fact_statement",
+      "source": "Steroid hormones",
+      "target": "Diffuse out of the cell after they are made",
+      "relationship": "do",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "steroids",
+        "diffusion",
+        "fat soluble"
+      ]
+    },
+    {
+      "id": "hydrophilic-hormones",
+      "unit": 10,
+      "topic": "Core Endocrine Principles",
+      "subtopic": "Solubility",
+      "concept_type": "fact_statement",
+      "source": "Catecholamines and peptide/protein hormones",
+      "target": "Are hydrophilic and circulate freely in blood",
+      "relationship": "are",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "hydrophilic",
+        "catecholamines",
+        "peptides"
+      ]
+    },
+    {
+      "id": "hydrophobic-hormones",
+      "unit": 10,
+      "topic": "Core Endocrine Principles",
+      "subtopic": "Solubility",
+      "concept_type": "fact_statement",
+      "source": "Steroid and thyroid hormones",
+      "target": "Are hydrophobic and usually protein-bound in blood",
+      "relationship": "are",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "hydrophobic",
+        "steroids",
+        "thyroid",
+        "binding proteins"
+      ]
+    },
+    {
+      "id": "intracellular-receptor-hormones",
+      "unit": 10,
+      "topic": "Core Endocrine Principles",
+      "subtopic": "Receptor location",
+      "concept_type": "fact_statement",
+      "source": "Steroid and thyroid hormones",
+      "target": "Usually act through intracellular receptors",
+      "relationship": "do",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "intracellular receptors",
+        "steroids",
+        "thyroid"
+      ]
+    },
+    {
+      "id": "free-hormone-active",
+      "unit": 10,
+      "topic": "Core Endocrine Principles",
+      "subtopic": "Binding proteins",
+      "concept_type": "fact_statement",
+      "source": "Free hormone",
+      "target": "Is the biologically active form that enters tissues and participates in feedback",
+      "relationship": "is the",
+      "difficulty": "medium",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "free hormone",
+        "active hormone",
+        "feedback"
+      ]
+    },
+    {
+      "id": "binding-proteins-reservoir",
+      "unit": 10,
+      "topic": "Core Endocrine Principles",
+      "subtopic": "Binding proteins",
+      "concept_type": "function_pair",
+      "source": "Carrier proteins",
+      "target": "Provide a circulating reservoir and prolong hormone action",
+      "relationship": "do",
+      "difficulty": "medium",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "carrier proteins",
+        "reservoir",
+        "prolong action"
+      ]
+    },
+    {
+      "id": "negative-feedback-homeostasis",
+      "unit": 10,
+      "topic": "Core Endocrine Principles",
+      "subtopic": "Feedback regulation",
+      "concept_type": "fact_statement",
+      "source": "Negative feedback",
+      "target": "Is the most common endocrine regulatory pattern and stabilizes homeostasis",
+      "relationship": "is",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "negative feedback",
+        "homeostasis",
+        "common"
+      ]
+    },
+    {
+      "id": "positive-feedback-temporary",
+      "unit": 10,
+      "topic": "Core Endocrine Principles",
+      "subtopic": "Feedback regulation",
+      "concept_type": "fact_statement",
+      "source": "Positive feedback",
+      "target": "Is temporary and amplifies a response to complete a specific event",
+      "relationship": "is",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "positive feedback",
+        "temporary",
+        "event completion"
+      ]
+    },
+    {
+      "id": "hypothalamus-links-nervous-endocrine",
+      "unit": 10,
+      "topic": "Hypothalamus and Pituitary",
+      "subtopic": "Overview",
+      "concept_type": "function_pair",
+      "source": "Hypothalamus",
+      "target": "Links the nervous system to the endocrine system",
+      "relationship": "does",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "hypothalamus",
+        "link",
+        "nervous system",
+        "endocrine"
+      ]
+    },
+    {
+      "id": "anterior-pituitary-endocrine-cells",
+      "unit": 10,
+      "topic": "Hypothalamus and Pituitary",
+      "subtopic": "Pituitary structure",
+      "concept_type": "fact_statement",
+      "source": "Anterior pituitary",
+      "target": "Is primarily composed of endocrine cells",
+      "relationship": "is",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "anterior pituitary",
+        "endocrine cells"
+      ]
+    },
+    {
+      "id": "hypophyseal-portal-system",
+      "unit": 10,
+      "topic": "Hypothalamus and Pituitary",
+      "subtopic": "Pituitary blood supply",
+      "concept_type": "function_pair",
+      "source": "Hypophyseal portal system",
+      "target": "Delivers hypothalamic releasing hormones directly to the anterior pituitary",
+      "relationship": "does",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "portal system",
+        "anterior pituitary",
+        "hypothalamus"
+      ]
+    },
+    {
+      "id": "posterior-pituitary-storage",
+      "unit": 10,
+      "topic": "Hypothalamus and Pituitary",
+      "subtopic": "Posterior pituitary",
+      "concept_type": "fact_statement",
+      "source": "ADH and oxytocin",
+      "target": "Are synthesized in the hypothalamus and stored and released from the posterior pituitary",
+      "relationship": "are",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "answer_count": 2,
+      "tags": [
+        "posterior pituitary",
+        "ADH",
+        "oxytocin",
+        "hypothalamus"
+      ]
+    },
+    {
+      "id": "dopamine-prolactin",
+      "unit": 10,
+      "topic": "Hypothalamus and Pituitary",
+      "subtopic": "Hypothalamic regulation",
+      "concept_type": "regulation_pair",
+      "source": "Dopamine",
+      "target": "Prolactin",
+      "relationship": "inhibits",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_or_short",
+      "tags": [
+        "dopamine",
+        "prolactin",
+        "lactotropes"
+      ]
+    },
+    {
+      "id": "ghrh-gh",
+      "unit": 10,
+      "topic": "Hypothalamus and Pituitary",
+      "subtopic": "Hypothalamic regulation",
+      "concept_type": "regulation_pair",
+      "source": "GHRH",
+      "target": "GH",
+      "relationship": "stimulates",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_or_short",
+      "tags": [
+        "GHRH",
+        "GH"
+      ]
+    },
+    {
+      "id": "somatostatin-gh",
+      "unit": 10,
+      "topic": "Hypothalamus and Pituitary",
+      "subtopic": "Hypothalamic regulation",
+      "concept_type": "regulation_pair",
+      "source": "Somatostatin",
+      "target": "GH",
+      "relationship": "inhibits",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_or_short",
+      "tags": [
+        "somatostatin",
+        "GH"
+      ]
+    },
+    {
+      "id": "trh-tsh",
+      "unit": 10,
+      "topic": "Hypothalamus and Pituitary",
+      "subtopic": "Hypothalamic regulation",
+      "concept_type": "regulation_pair",
+      "source": "TRH",
+      "target": "TSH",
+      "relationship": "stimulates",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_or_short",
+      "tags": [
+        "TRH",
+        "TSH"
+      ]
+    },
+    {
+      "id": "adh-v2-aqp2",
+      "unit": 10,
+      "topic": "Posterior Pituitary",
+      "subtopic": "ADH action",
+      "concept_type": "axis_sequence",
+      "source": "ADH",
+      "target": "V2 receptor to cAMP to aquaporin-2 insertion",
+      "relationship": "signals through",
+      "difficulty": "medium",
+      "prompt_bias": "mcq_preferred",
+      "answer_aliases": [
+        "V2 receptor \u2192 cAMP \u2192 aquaporin-2",
+        "V2 receptor to cAMP to AQP2 insertion"
+      ],
+      "tags": [
+        "ADH",
+        "V2",
+        "AQP2",
+        "cAMP"
+      ]
+    },
+    {
+      "id": "adh-increases-water-reabsorption",
+      "unit": 10,
+      "topic": "Posterior Pituitary",
+      "subtopic": "ADH action",
+      "concept_type": "function_pair",
+      "source": "ADH",
+      "target": "Increases water reabsorption by inserting aquaporin-2 channels into principal cells",
+      "relationship": "does",
+      "difficulty": "medium",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "ADH",
+        "water reabsorption",
+        "AQP2",
+        "principal cells"
+      ]
+    },
+    {
+      "id": "oxytocin-positive-feedback",
+      "unit": 10,
+      "topic": "Posterior Pituitary",
+      "subtopic": "Oxytocin regulation",
+      "concept_type": "fact_statement",
+      "source": "Oxytocin",
+      "target": "Often operates through positive feedback loops",
+      "relationship": "does",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "oxytocin",
+        "positive feedback"
+      ]
+    },
+    {
+      "id": "thyroid-follicle-unit",
+      "unit": 10,
+      "topic": "Thyroid",
+      "subtopic": "Structure",
+      "concept_type": "fact_statement",
+      "source": "Thyroid follicle",
+      "target": "Is the structural and functional unit of the thyroid gland",
+      "relationship": "is",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "thyroid follicle",
+        "structure"
+      ]
+    },
+    {
+      "id": "colloid-storage",
+      "unit": 10,
+      "topic": "Thyroid",
+      "subtopic": "Storage",
+      "concept_type": "fact_statement",
+      "source": "Colloid",
+      "target": "Serves as the main extracellular storage site for thyroid hormone precursor",
+      "relationship": "does",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "colloid",
+        "thyroid storage"
+      ]
+    },
+    {
+      "id": "nis-iodide-trapping",
+      "unit": 10,
+      "topic": "Thyroid",
+      "subtopic": "Synthesis",
+      "concept_type": "function_pair",
+      "source": "Na+/I- symporter (NIS)",
+      "target": "Mediates iodide trapping into the follicular cell",
+      "relationship": "does",
+      "difficulty": "medium",
+      "prompt_bias": "mcq_preferred",
+      "answer_aliases": [
+        "NIS"
+      ],
+      "tags": [
+        "NIS",
+        "iodide trapping",
+        "thyroid"
+      ]
+    },
+    {
+      "id": "tpo-organification",
+      "unit": 10,
+      "topic": "Thyroid",
+      "subtopic": "Synthesis",
+      "concept_type": "function_pair",
+      "source": "Thyroid peroxidase",
+      "target": "Catalyzes iodide oxidation, organification, and coupling on thyroglobulin",
+      "relationship": "does",
+      "difficulty": "medium",
+      "prompt_bias": "mcq_preferred",
+      "answer_aliases": [
+        "TPO"
+      ],
+      "tags": [
+        "TPO",
+        "oxidation",
+        "organification",
+        "coupling"
+      ]
+    },
+    {
+      "id": "mit-dit-products",
+      "unit": 10,
+      "topic": "Thyroid",
+      "subtopic": "Synthesis",
+      "concept_type": "axis_sequence",
+      "source": "DIT + MIT and DIT + DIT",
+      "target": "Form T3 and T4 respectively",
+      "relationship": "produce",
+      "difficulty": "medium",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "MIT",
+        "DIT",
+        "T3",
+        "T4"
+      ]
+    },
+    {
+      "id": "t4-major-secretion",
+      "unit": 10,
+      "topic": "Thyroid",
+      "subtopic": "Hormone output",
+      "concept_type": "fact_statement",
+      "source": "T4",
+      "target": "Is the major hormone secreted by the thyroid and acts as a prohormone",
+      "relationship": "is",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "T4",
+        "prohormone",
+        "thyroid"
+      ]
+    },
+    {
+      "id": "deiodinase-t4-to-t3",
+      "unit": 10,
+      "topic": "Thyroid",
+      "subtopic": "Peripheral activation",
+      "concept_type": "function_pair",
+      "source": "5'-deiodinase",
+      "target": "Converts T4 into the more active T3 in peripheral tissues",
+      "relationship": "does",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "deiodinase",
+        "T4",
+        "T3"
+      ]
+    },
+    {
+      "id": "thyroid-intracellular-receptor",
+      "unit": 10,
+      "topic": "Thyroid",
+      "subtopic": "Hormone action",
+      "concept_type": "fact_statement",
+      "source": "Thyroid hormone receptor",
+      "target": "Is located in the nucleus and alters gene transcription",
+      "relationship": "is",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "thyroid hormone receptor",
+        "nucleus",
+        "gene transcription"
+      ]
+    },
+    {
+      "id": "thyroid-na-k-atpase",
+      "unit": 10,
+      "topic": "Thyroid",
+      "subtopic": "Physiologic effects",
+      "concept_type": "function_pair",
+      "source": "Thyroid hormone",
+      "target": "Increases basal metabolic rate by increasing Na+/K+-ATPase expression",
+      "relationship": "does",
+      "difficulty": "medium",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "thyroid hormone",
+        "Na/K ATPase",
+        "BMR"
+      ]
+    },
+    {
+      "id": "tbg-binding",
+      "unit": 10,
+      "topic": "Thyroid",
+      "subtopic": "Binding proteins",
+      "concept_type": "function_pair",
+      "source": "Thyroxine-binding globulin (TBG)",
+      "target": "Binds thyroid hormones in circulation and shifts total hormone levels more than free hormone levels",
+      "relationship": "does",
+      "difficulty": "medium",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "TBG",
+        "binding proteins",
+        "free hormone",
+        "total hormone"
+      ]
+    },
+    {
+      "id": "estrogen-increases-tbg",
+      "unit": 10,
+      "topic": "Thyroid",
+      "subtopic": "Drug interactions",
+      "concept_type": "regulation_pair",
+      "source": "Oral estrogen",
+      "target": "TBG",
+      "relationship": "increases",
+      "difficulty": "medium",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "estrogen",
+        "TBG",
+        "levothyroxine"
+      ]
+    },
+    {
+      "id": "propranolol-thyroid-storm",
+      "unit": 10,
+      "topic": "Thyroid",
+      "subtopic": "Therapeutic pearls",
+      "concept_type": "function_pair",
+      "source": "Propranolol",
+      "target": "Blunts adrenergic symptoms and reduces peripheral T4 to T3 conversion",
+      "relationship": "does",
+      "difficulty": "medium",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "propranolol",
+        "thyroid storm",
+        "T4 to T3"
+      ]
+    },
+    {
+      "id": "wolff-chaikoff",
+      "unit": 10,
+      "topic": "Thyroid",
+      "subtopic": "Autoregulation",
+      "concept_type": "fact_statement",
+      "source": "Wolff-Chaikoff effect",
+      "target": "Is inhibition of thyroid hormone synthesis caused by excess iodide intake",
+      "relationship": "is",
+      "difficulty": "medium",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "Wolff-Chaikoff",
+        "excess iodide",
+        "thyroid synthesis"
+      ]
+    },
+    {
+      "id": "primary-hypothyroid-labs",
+      "unit": 10,
+      "topic": "Thyroid",
+      "subtopic": "Clinical interpretation",
+      "concept_type": "fact_statement",
+      "source": "Primary hypothyroidism",
+      "target": "Shows high TSH and low free T4",
+      "relationship": "typically",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "primary hypothyroid",
+        "TSH",
+        "free T4"
+      ]
+    },
+    {
+      "id": "graves-labs",
+      "unit": 10,
+      "topic": "Thyroid",
+      "subtopic": "Clinical interpretation",
+      "concept_type": "fact_statement",
+      "source": "Graves disease",
+      "target": "Shows low TSH and high free T4",
+      "relationship": "typically",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "Graves",
+        "TSH",
+        "free T4"
+      ]
+    },
+    {
+      "id": "cholesterol-desmolase",
+      "unit": 10,
+      "topic": "Adrenal Gland",
+      "subtopic": "Steroid synthesis",
+      "concept_type": "function_pair",
+      "source": "Cholesterol desmolase",
+      "target": "Catalyzes the universal rate-limiting conversion of cholesterol to pregnenolone in mitochondria",
+      "relationship": "does",
+      "difficulty": "medium",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "cholesterol desmolase",
+        "pregnenolone",
+        "rate-limiting",
+        "mitochondria"
+      ]
+    },
+    {
+      "id": "zona-glomerulosa-aldosterone",
+      "unit": 10,
+      "topic": "Adrenal Gland",
+      "subtopic": "Cortical zones",
+      "concept_type": "zone_to_hormone",
+      "source": "Zona glomerulosa",
+      "target": "Aldosterone",
+      "relationship": "produces",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "glomerulosa",
+        "aldosterone"
+      ]
+    },
+    {
+      "id": "zona-fasciculata-cortisol",
+      "unit": 10,
+      "topic": "Adrenal Gland",
+      "subtopic": "Cortical zones",
+      "concept_type": "zone_to_hormone",
+      "source": "Zona fasciculata",
+      "target": "Cortisol",
+      "relationship": "produces",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "fasciculata",
+        "cortisol"
+      ]
+    },
+    {
+      "id": "zona-reticularis-androgens",
+      "unit": 10,
+      "topic": "Adrenal Gland",
+      "subtopic": "Cortical zones",
+      "concept_type": "zone_to_hormone",
+      "source": "Zona reticularis",
+      "target": "Androgens",
+      "relationship": "produces",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "answer_aliases": [
+        "DHEA and androstenedione",
+        "DHEA",
+        "androstenedione"
+      ],
+      "tags": [
+        "reticularis",
+        "androgens",
+        "DHEA"
+      ]
+    },
+    {
+      "id": "angII-aldosterone",
+      "unit": 10,
+      "topic": "Adrenal Gland",
+      "subtopic": "Aldosterone regulation",
+      "concept_type": "regulation_pair",
+      "source": "Angiotensin II",
+      "target": "Aldosterone",
+      "relationship": "stimulates",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "angiotensin II",
+        "aldosterone",
+        "RAAS"
+      ]
+    },
+    {
+      "id": "high-k-aldosterone",
+      "unit": 10,
+      "topic": "Adrenal Gland",
+      "subtopic": "Aldosterone regulation",
+      "concept_type": "regulation_pair",
+      "source": "Increased plasma potassium",
+      "target": "Aldosterone",
+      "relationship": "stimulates",
+      "difficulty": "medium",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "potassium",
+        "aldosterone"
+      ]
+    },
+    {
+      "id": "aldosterone-enac-atpase",
+      "unit": 10,
+      "topic": "Adrenal Gland",
+      "subtopic": "Aldosterone mechanism",
+      "concept_type": "function_pair",
+      "source": "Aldosterone",
+      "target": "Upregulates ENaC and Na+/K+-ATPase in principal cells to retain sodium and excrete potassium",
+      "relationship": "does",
+      "difficulty": "medium",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "aldosterone",
+        "ENaC",
+        "Na/K ATPase",
+        "principal cells"
+      ]
+    },
+    {
+      "id": "acth-cortisol",
+      "unit": 10,
+      "topic": "Adrenal Gland",
+      "subtopic": "Cortisol regulation",
+      "concept_type": "regulation_pair",
+      "source": "ACTH",
+      "target": "Cortisol",
+      "relationship": "stimulates",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "ACTH",
+        "cortisol",
+        "HPA axis"
+      ]
+    },
+    {
+      "id": "cortisol-permissive",
+      "unit": 10,
+      "topic": "Adrenal Gland",
+      "subtopic": "Cortisol effects",
+      "concept_type": "function_pair",
+      "source": "Cortisol",
+      "target": "Permits catecholamines to maintain vasoconstriction and supports glucose availability during stress",
+      "relationship": "does",
+      "difficulty": "medium",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "cortisol",
+        "permissive",
+        "vasoconstriction",
+        "stress"
+      ]
+    },
+    {
+      "id": "cortisol-hyperglycemia",
+      "unit": 10,
+      "topic": "Adrenal Gland",
+      "subtopic": "Cortisol effects",
+      "concept_type": "function_pair",
+      "source": "Chronic glucocorticoid excess",
+      "target": "Causes hyperglycemia by increasing gluconeogenesis and proteolysis and opposing insulin action",
+      "relationship": "does",
+      "difficulty": "medium",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "glucocorticoid excess",
+        "hyperglycemia",
+        "gluconeogenesis"
+      ]
+    },
+    {
+      "id": "prednisone-hpa-suppression",
+      "unit": 10,
+      "topic": "Adrenal Gland",
+      "subtopic": "Steroid tapering",
+      "concept_type": "axis_sequence",
+      "source": "Long-term exogenous prednisone",
+      "target": "Suppresses CRH and ACTH leading to adrenal cortical atrophy and risk of adrenal crisis if stopped abruptly",
+      "relationship": "causes",
+      "difficulty": "medium",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "prednisone",
+        "CRH",
+        "ACTH",
+        "atrophy",
+        "adrenal crisis"
+      ]
+    },
+    {
+      "id": "adrenal-medulla-modified-ganglion",
+      "unit": 10,
+      "topic": "Adrenal Gland",
+      "subtopic": "Medulla",
+      "concept_type": "fact_statement",
+      "source": "Adrenal medulla",
+      "target": "Is a modified sympathetic ganglion stimulated by preganglionic acetylcholine release",
+      "relationship": "is",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "adrenal medulla",
+        "sympathetic ganglion",
+        "acetylcholine"
+      ]
+    },
+    {
+      "id": "pnmt-epinephrine",
+      "unit": 10,
+      "topic": "Adrenal Gland",
+      "subtopic": "Medulla",
+      "concept_type": "function_pair",
+      "source": "PNMT",
+      "target": "Converts norepinephrine to epinephrine and is induced by cortisol",
+      "relationship": "does",
+      "difficulty": "medium",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "PNMT",
+        "epinephrine",
+        "cortisol"
+      ]
+    },
+    {
+      "id": "beta-cells-insulin",
+      "unit": 10,
+      "topic": "Pancreatic Endocrine Physiology",
+      "subtopic": "Islet cells",
+      "concept_type": "cell_to_hormone",
+      "source": "Beta cells",
+      "target": "Insulin",
+      "relationship": "secrete",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "beta cells",
+        "insulin"
+      ]
+    },
+    {
+      "id": "alpha-cells-glucagon",
+      "unit": 10,
+      "topic": "Pancreatic Endocrine Physiology",
+      "subtopic": "Islet cells",
+      "concept_type": "cell_to_hormone",
+      "source": "Alpha cells",
+      "target": "Glucagon",
+      "relationship": "secrete",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "alpha cells",
+        "glucagon"
+      ]
+    },
+    {
+      "id": "delta-cells-somatostatin",
+      "unit": 10,
+      "topic": "Pancreatic Endocrine Physiology",
+      "subtopic": "Islet cells",
+      "concept_type": "cell_to_hormone",
+      "source": "Delta cells",
+      "target": "Somatostatin",
+      "relationship": "secrete",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "delta cells",
+        "somatostatin"
+      ]
+    },
+    {
+      "id": "c-peptide-insulin",
+      "unit": 10,
+      "topic": "Pancreatic Endocrine Physiology",
+      "subtopic": "Insulin synthesis",
+      "concept_type": "fact_statement",
+      "source": "C-peptide",
+      "target": "Is released in equimolar amounts with endogenous insulin and indicates endogenous insulin production",
+      "relationship": "is",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "C-peptide",
+        "insulin",
+        "endogenous production"
+      ]
+    },
+    {
+      "id": "insulin-secretion-sequence",
+      "unit": 10,
+      "topic": "Pancreatic Endocrine Physiology",
+      "subtopic": "Insulin secretion",
+      "concept_type": "axis_sequence",
+      "source": "Glucose entry into the beta cell",
+      "target": "ATP rise to KATP channel closure to depolarization to calcium influx to exocytosis",
+      "relationship": "leads to",
+      "difficulty": "medium",
+      "prompt_bias": "mcq_preferred",
+      "answer_aliases": [
+        "ATP rise \u2192 KATP closure \u2192 depolarization \u2192 Ca2+ influx \u2192 exocytosis",
+        "ATP rise to KATP channel closure to depolarization to calcium influx to exocytosis"
+      ],
+      "tags": [
+        "insulin secretion",
+        "ATP",
+        "KATP",
+        "calcium",
+        "exocytosis"
+      ]
+    },
+    {
+      "id": "glut4-insulin-regulated",
+      "unit": 10,
+      "topic": "Pancreatic Endocrine Physiology",
+      "subtopic": "Insulin action",
+      "concept_type": "fact_statement",
+      "source": "GLUT-4",
+      "target": "Is the insulin-regulated glucose transporter in skeletal muscle and adipose tissue",
+      "relationship": "is",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "GLUT-4",
+        "insulin",
+        "skeletal muscle",
+        "adipose"
+      ]
+    },
+    {
+      "id": "insulin-fed-state",
+      "unit": 10,
+      "topic": "Pancreatic Endocrine Physiology",
+      "subtopic": "Insulin action",
+      "concept_type": "function_pair",
+      "source": "Insulin",
+      "target": "Is the fed-state storage hormone that promotes glycogen, fat, and protein synthesis",
+      "relationship": "is",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "insulin",
+        "fed state",
+        "storage hormone"
+      ]
+    },
+    {
+      "id": "glucagon-fasting",
+      "unit": 10,
+      "topic": "Pancreatic Endocrine Physiology",
+      "subtopic": "Glucagon action",
+      "concept_type": "function_pair",
+      "source": "Glucagon",
+      "target": "Is the fasting and fuel mobilization hormone that promotes glycogenolysis and gluconeogenesis",
+      "relationship": "is",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "glucagon",
+        "fasting",
+        "fuel mobilization"
+      ]
+    },
+    {
+      "id": "sglt2-threshold",
+      "unit": 10,
+      "topic": "Pancreatic Endocrine Physiology",
+      "subtopic": "Renal glucose handling",
+      "concept_type": "fact_statement",
+      "source": "SGLT2",
+      "target": "Is overwhelmed when plasma glucose rises to about 180 mg/dL, contributing to glucosuria",
+      "relationship": "is",
+      "difficulty": "medium",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "SGLT2",
+        "renal threshold",
+        "180 mg/dL",
+        "glucosuria"
+      ]
+    },
+    {
+      "id": "sglt2-inhibitor-effects",
+      "unit": 10,
+      "topic": "Pancreatic Endocrine Physiology",
+      "subtopic": "Renal glucose handling",
+      "concept_type": "function_pair",
+      "source": "SGLT2 inhibitors",
+      "target": "Increase urinary glucose loss and decrease plasma glucose",
+      "relationship": "do",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "SGLT2 inhibitors",
+        "glucosuria",
+        "plasma glucose"
+      ]
+    },
+    {
+      "id": "type1-absolute-insulin-deficiency",
+      "unit": 10,
+      "topic": "Pancreatic Endocrine Physiology",
+      "subtopic": "Diabetes pathophysiology",
+      "concept_type": "fact_statement",
+      "source": "Type 1 diabetes mellitus",
+      "target": "Is characterized by absolute insulin deficiency due to autoimmune beta-cell destruction",
+      "relationship": "is",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "type 1 diabetes",
+        "absolute insulin deficiency",
+        "autoimmune"
+      ]
+    },
+    {
+      "id": "type2-relative-insulin-deficiency",
+      "unit": 10,
+      "topic": "Pancreatic Endocrine Physiology",
+      "subtopic": "Diabetes pathophysiology",
+      "concept_type": "fact_statement",
+      "source": "Type 2 diabetes mellitus",
+      "target": "Is characterized by insulin resistance with relative insulin deficiency",
+      "relationship": "is",
+      "difficulty": "easy",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "type 2 diabetes",
+        "insulin resistance",
+        "relative deficiency"
+      ]
+    },
+    {
+      "id": "dka-type1",
+      "unit": 10,
+      "topic": "Pancreatic Endocrine Physiology",
+      "subtopic": "Diabetes pathophysiology",
+      "concept_type": "fact_statement",
+      "source": "Diabetic ketoacidosis",
+      "target": "Is more common in type 1 diabetes because severe insulin deficiency permits unrestrained lipolysis and ketogenesis",
+      "relationship": "is",
+      "difficulty": "medium",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "DKA",
+        "type 1 diabetes",
+        "lipolysis",
+        "ketogenesis"
+      ]
+    },
+    {
+      "id": "hyperglycemia-clinical-triad",
+      "unit": 10,
+      "topic": "Pancreatic Endocrine Physiology",
+      "subtopic": "Diabetes pathophysiology",
+      "concept_type": "axis_sequence",
+      "source": "Hyperglycemia in severe insulin deficiency",
+      "target": "Causes glucosuria to osmotic diuresis to polyuria to polydipsia and weight loss despite polyphagia",
+      "relationship": "leads to",
+      "difficulty": "medium",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "polyuria",
+        "polydipsia",
+        "polyphagia",
+        "weight loss",
+        "hyperglycemia"
+      ]
+    },
+    {
+      "id": "glp1-receptors",
+      "unit": 10,
+      "topic": "Pancreatic Endocrine Physiology",
+      "subtopic": "Incretin physiology",
+      "concept_type": "fact_statement",
+      "source": "GLP-1 receptors",
+      "target": "Are found on pancreatic beta cells and neurons in the brain",
+      "relationship": "are",
+      "difficulty": "medium",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "GLP-1",
+        "beta cells",
+        "brain",
+        "incretin"
+      ]
+    },
+    {
+      "id": "aromatase-estrogen-synthesis",
+      "unit": 10,
+      "topic": "Core Endocrine Principles",
+      "subtopic": "Steroid synthesis enzymes",
+      "concept_type": "function_pair",
+      "source": "Aromatase",
+      "target": "Converts androstenedione to estrone and testosterone to estradiol",
+      "relationship": "does",
+      "difficulty": "medium",
+      "prompt_bias": "mcq_preferred",
+      "tags": [
+        "aromatase",
+        "estrone",
+        "estradiol",
+        "estrogen synthesis"
+      ]
+    }
+  ]
+}
