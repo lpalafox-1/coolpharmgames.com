@@ -79,8 +79,30 @@
     </div>
 
     <div id="mode-banner" class="hidden mb-6 rounded-2xl border border-[#8b1e3f]/20 bg-[#8b1e3f]/8 px-4 py-3 text-sm">
-      <div class="font-black uppercase tracking-[0.18em] text-[#8b1e3f]">True Exam Mode</div>
-      <div class="mt-1 opacity-80">Hints and answer reveals are disabled for this attempt.</div>
+      <div id="mode-banner-title" class="font-black uppercase tracking-[0.18em] text-[#8b1e3f]">True Exam Mode</div>
+      <div id="mode-banner-copy" class="mt-1 opacity-80">Hints and answer reveals are disabled for this attempt.</div>
+    </div>
+
+    <div id="quiz-session-note" class="hidden mb-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm">
+      <div class="font-black uppercase tracking-[0.18em] text-emerald-700">Session Resume</div>
+      <div id="quiz-session-note-text" class="mt-1 opacity-80">Saved progress restored.</div>
+    </div>
+
+    <div class="mb-4 px-2">
+      <div id="quiz-title" class="text-xs font-black uppercase tracking-[0.18em] opacity-60">Loading Quiz...</div>
+      <div id="quiz-status" class="mt-1 text-sm opacity-70">Seen 0/0 • 0 unanswered • 0 marked</div>
+      <div id="streak-panel" class="streak-panel mt-3">
+        <div class="streak-head">
+          <div>
+            <div id="streak-label" class="streak-label">Streak 0</div>
+            <div id="streak-best" class="streak-best">Best 0</div>
+          </div>
+          <div id="streak-flavor" class="streak-flavor">Combo warming up</div>
+        </div>
+        <div class="streak-track mt-3">
+          <div id="streak-fill" class="streak-fill"></div>
+        </div>
+      </div>
     </div>
 
     <div id="nav-map" class="mb-8 flex flex-wrap gap-2 justify-center"></div>
@@ -117,9 +139,10 @@
       <button id="restart-mobile" class="px-4 py-2 bg-red-500/5 text-red-600 border border-red-500/10 rounded-xl text-xs font-bold">🔄 Restart</button>
     </div>
 
-    <footer class="mt-10 flex gap-4 w-full justify-center max-w-2xl mx-auto">
+    <footer class="mt-10 flex flex-wrap gap-4 w-full justify-center max-w-2xl mx-auto">
       <button id="prev" class="action-btn flex-1 py-4 rounded-2xl font-bold bg-gray-100 dark:bg-white/5">← Prev</button>
       <button id="check" class="action-btn flex-[2] py-4 rounded-2xl font-black text-white bg-[#8b1e3f]">Check Answer</button>
+      <button id="check-all" class="hidden action-btn flex-[3] py-4 rounded-2xl font-black text-white bg-blue-600">Check All Answers &amp; Finish</button>
       <button id="next" class="hidden action-btn flex-[2] py-4 rounded-2xl font-black text-white bg-green-600">Next →</button>
     </footer>
   </main>
@@ -137,8 +160,8 @@
         <hr class="border-[var(--ring)] my-2">
         <div class="flex justify-between" data-exam-hidden="true"><span>💡 Show Hint</span><kbd class="bg-yellow-100 px-2 py-1 rounded border border-yellow-400">H</kbd></div>
         <div class="flex justify-between" data-exam-hidden="true"><span>👁️ Reveal Answer</span><kbd class="bg-red-100 px-2 py-1 rounded border border-red-400">X</kbd></div>
-        <div id="exam-shortcut-note" class="hidden rounded-xl border border-[#8b1e3f]/20 bg-[#8b1e3f]/8 px-3 py-2 text-xs">
-          True Exam Mode removes the hint and reveal shortcuts for this run.
+        <div id="restricted-shortcut-note" class="hidden rounded-xl border border-[#8b1e3f]/20 bg-[#8b1e3f]/8 px-3 py-2 text-xs">
+          Restricted mode removes the hint and reveal shortcuts for this run.
         </div>
         <div class="flex justify-between"><span>🔄 Restart Quiz</span><kbd class="bg-blue-100 px-2 py-1 rounded border border-blue-400">R</kbd></div>
       </div>
@@ -147,6 +170,7 @@
   </div>
 
   <script src="assets/js/top-drugs-data.js?v=20260419a"></script>
-  <script src="assets/js/quizEngine.js?v=20260419e"></script>
+  <script src="assets/js/review-queue-store.js?v=20260423a"></script>
+  <script src="assets/js/quizEngine.js?v=20260423a"></script>
 </body>
 </html>

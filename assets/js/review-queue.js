@@ -3,6 +3,7 @@
 
 const THEME_KEY = "pharmlet.theme";
 const REVIEW_KEY = "pharmlet.review-queue";
+const reviewQueueStore = window.PharmletReviewQueueStore;
 
 const QUIZ_TITLES = {
   "chapter1-review": "Chapter 1 Review",
@@ -62,17 +63,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function loadReviewQueue() {
   const queue = getReviewQueue();
+  const activeQueue = reviewQueueStore ? reviewQueueStore.getActiveEntries(queue) : queue;
   const filterQuizId = document.getElementById("filter-quiz")?.value || "";
-  
-  if (queue.length === 0) {
+
+  populateQuizFilter(queue, filterQuizId);
+
+  if (activeQueue.length === 0) {
+    const masteredCount = Math.max(0, queue.length);
     document.getElementById("total-review").textContent = "0";
     document.getElementById("unique-quizzes").textContent = "0";
     document.getElementById("week-added").textContent = "0";
     document.getElementById("avg-age").textContent = "0d";
     document.getElementById("review-list").innerHTML = `
       <div class="text-center py-12" style="color:var(--muted)">
-        <p class="text-lg">No questions to review yet!</p>
-        <p class="mt-2">Wrong answers from quizzes will appear here for targeted practice.</p>
+        <p class="text-lg">${masteredCount > 0 ? "Review queue is clear." : "No questions to review yet!"}</p>
+        <p class="mt-2">${masteredCount > 0 ? `You have ${masteredCount} mastered review card${masteredCount === 1 ? "" : "s"} resting in the archive.` : "Wrong answers from quizzes will appear here for targeted practice."}</p>
         <a href="index.html" class="btn btn-blue mt-4 inline-block">Start a Quiz</a>
       </div>
     `;
@@ -80,41 +85,24 @@ function loadReviewQueue() {
   }
 
   // Calculate stats
-  const uniqueQuizzes = new Set(queue.map(q => q.quizId)).size;
+  const uniqueQuizzes = new Set(activeQueue.map(q => q.quizId)).size;
   const weekAgo = new Date();
   weekAgo.setDate(weekAgo.getDate() - 7);
-  const weekAdded = queue.filter(q => new Date(q.timestamp) >= weekAgo).length;
-  
-  const avgAgeMs = queue.reduce((sum, q) => sum + (Date.now() - new Date(q.timestamp)), 0) / queue.length;
+  const weekAdded = activeQueue.filter((q) => new Date(q.lastMissedAt || q.createdAt || Date.now()) >= weekAgo).length;
+
+  const avgAgeMs = activeQueue.reduce((sum, q) => {
+    const timestamp = new Date(q.lastMissedAt || q.createdAt || Date.now()).getTime();
+    return sum + Math.max(0, Date.now() - timestamp);
+  }, 0) / activeQueue.length;
   const avgAgeDays = Math.floor(avgAgeMs / (1000 * 60 * 60 * 24));
 
-  document.getElementById("total-review").textContent = queue.length;
+  document.getElementById("total-review").textContent = activeQueue.length;
   document.getElementById("unique-quizzes").textContent = uniqueQuizzes;
   document.getElementById("week-added").textContent = weekAdded;
   document.getElementById("avg-age").textContent = avgAgeDays + "d";
 
-  // Group by quiz
-  const byQuiz = {};
-  queue.forEach(q => {
-    if (!byQuiz[q.quizId]) {
-      byQuiz[q.quizId] = [];
-    }
-    byQuiz[q.quizId].push(q);
-  });
-
-  // Populate filter dropdown
-  const filterSelect = document.getElementById("filter-quiz");
-  if (filterSelect && filterSelect.options.length === 1) {
-    Object.keys(byQuiz).forEach(quizId => {
-      const option = document.createElement("option");
-      option.value = quizId;
-      option.textContent = QUIZ_TITLES[quizId] || quizId;
-      filterSelect.appendChild(option);
-    });
-  }
-
   // Filter
-  const filtered = filterQuizId ? byQuiz[filterQuizId] || [] : queue;
+  const filtered = filterQuizId ? activeQueue.filter((q) => q.quizId === filterQuizId) : activeQueue;
 
   // Display
   const container = document.getElementById("review-list");
@@ -138,7 +126,7 @@ function loadReviewQueue() {
     const section = document.createElement("div");
     section.className = "card p-4";
     
-    const title = QUIZ_TITLES[quizId] || quizId;
+    const title = reviewQueueStore ? reviewQueueStore.getDisplayTitle(questions[0], QUIZ_TITLES) : (QUIZ_TITLES[quizId] || quizId);
     section.innerHTML = `
       <div class="flex justify-between items-center mb-3">
         <h4 class="font-semibold text-lg">${sanitize(title)}</h4>
@@ -153,12 +141,21 @@ function loadReviewQueue() {
       div.className = "text-sm p-2 rounded" ;
       div.style.background = "var(--accent-light, rgba(139,30,63,0.05))";
       
-      const promptPreview = q.prompt.length > 80 ? q.prompt.substring(0, 80) + "..." : q.prompt;
-      const timeAgo = getTimeAgo(new Date(q.timestamp));
+      const promptText = reviewQueueStore ? reviewQueueStore.toPlainText(q.prompt) : q.prompt;
+      const promptPreview = promptText.length > 90 ? promptText.substring(0, 90) + "..." : promptText;
+      const timeAgo = getTimeAgo(new Date(q.lastMissedAt || q.createdAt || Date.now()));
+      const mastery = reviewQueueStore ? reviewQueueStore.getMasterySummary(q) : { label: "Fresh miss" };
+      const commonWrong = reviewQueueStore ? reviewQueueStore.getCommonWrongAnswer(q) : "";
+      const missCount = reviewQueueStore ? reviewQueueStore.getEntryMissCount(q) : 1;
       
       div.innerHTML = `
         <div class="font-medium">${sanitize(promptPreview)}</div>
-        <div class="mt-1" style="color:var(--muted)">${timeAgo}</div>
+        <div class="mt-1 flex flex-wrap gap-x-3 gap-y-1" style="color:var(--muted)">
+          <span>${timeAgo}</span>
+          <span>${missCount} miss${missCount === 1 ? "" : "es"}</span>
+          <span>${sanitize(mastery.label)}</span>
+          ${commonWrong ? `<span>Tempting wrong answer: ${sanitize(commonWrong)}</span>` : ""}
+        </div>
       `;
       questionsContainer.appendChild(div);
     });
@@ -177,7 +174,8 @@ function loadReviewQueue() {
 
 function getReviewQueue() {
   try {
-    return JSON.parse(localStorage.getItem(REVIEW_KEY) || "[]");
+    const parsed = JSON.parse(localStorage.getItem(REVIEW_KEY) || "[]");
+    return reviewQueueStore ? reviewQueueStore.normalizeQueue(parsed) : parsed;
   } catch {
     return [];
   }
@@ -186,8 +184,11 @@ function getReviewQueue() {
 function startReviewQuiz(limit) {
   const queue = getReviewQueue();
   const filterQuizId = document.getElementById("filter-quiz")?.value || "";
-  
-  let questions = filterQuizId ? queue.filter(q => q.quizId === filterQuizId) : queue;
+
+  let questions = reviewQueueStore ? reviewQueueStore.getActiveEntries(queue) : queue;
+  if (filterQuizId) {
+    questions = questions.filter((q) => q.quizId === filterQuizId);
+  }
   
   if (questions.length === 0) {
     alert("No questions available for review.");
@@ -203,7 +204,9 @@ function startReviewQuiz(limit) {
   // Create a custom quiz
   const customQuiz = {
     id: "review-quiz",
-    title: "Review Quiz — Missed Questions",
+    title: filterQuizId && questions[0]
+      ? `Review Quiz — ${reviewQueueStore ? reviewQueueStore.getDisplayTitle(questions[0], QUIZ_TITLES) : (QUIZ_TITLES[filterQuizId] || filterQuizId)}`
+      : "Review Quiz — Missed Questions",
     pools: {
       easy: questions.map(q => ({
         type: q.type,
@@ -212,15 +215,56 @@ function startReviewQuiz(limit) {
         answer: q.answer,
         answerText: q.answerText ?? q.answer,
         sourceQuizId: q.quizId || q.sourceQuizId || "",
-        sourceTitle: QUIZ_TITLES[q.quizId] || q.title || q.quizId || "Review Queue",
-        hint: "Review your previous answer carefully.",
-        solution: `You previously answered: ${Array.isArray(q.userAnswer) ? q.userAnswer.join(", ") : q.userAnswer}`
+        sourceTitle: reviewQueueStore ? reviewQueueStore.getDisplayTitle(q, QUIZ_TITLES) : (QUIZ_TITLES[q.quizId] || q.title || q.quizId || "Review Queue"),
+        hint: reviewQueueStore
+          ? `Mastery progress: ${reviewQueueStore.getMasterySummary(q).label}.`
+          : "Review your previous answer carefully.",
+        solution: buildReviewSolutionText(q)
       }))
     }
   };
 
   localStorage.setItem("pharmlet.custom-quiz", JSON.stringify(customQuiz));
   window.location.href = `quiz.html?id=review-quiz&mode=easy&limit=${limit || ''}`;
+}
+
+function populateQuizFilter(queue, selectedValue) {
+  const filterSelect = document.getElementById("filter-quiz");
+  if (!filterSelect) return;
+
+  const options = [`<option value="">All Topics</option>`];
+  const quizMap = new Map();
+
+  queue.forEach((entry) => {
+    if (!entry?.quizId || quizMap.has(entry.quizId)) return;
+    const label = reviewQueueStore ? reviewQueueStore.getDisplayTitle(entry, QUIZ_TITLES) : (QUIZ_TITLES[entry.quizId] || entry.quizId);
+    quizMap.set(entry.quizId, label);
+  });
+
+  Array.from(quizMap.entries())
+    .sort((a, b) => a[1].localeCompare(b[1]))
+    .forEach(([quizId, label]) => {
+      options.push(`<option value="${sanitize(quizId)}">${sanitize(label)}</option>`);
+    });
+
+  filterSelect.innerHTML = options.join("");
+  filterSelect.value = selectedValue && quizMap.has(selectedValue) ? selectedValue : "";
+}
+
+function buildReviewSolutionText(entry) {
+  const parts = [];
+  const temptingWrong = reviewQueueStore ? reviewQueueStore.getCommonWrongAnswer(entry) : "";
+  const lastWrong = entry.lastUserAnswer || "";
+  const missCount = reviewQueueStore ? reviewQueueStore.getEntryMissCount(entry) : 1;
+
+  if (temptingWrong) {
+    parts.push(`Most tempting wrong answer: ${temptingWrong}`);
+  } else if (lastWrong) {
+    parts.push(`Last wrong answer: ${lastWrong}`);
+  }
+
+  parts.push(`Missed ${missCount} time${missCount === 1 ? "" : "s"}`);
+  return parts.join(" • ");
 }
 
 function clearQueue() {

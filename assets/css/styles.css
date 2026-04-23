@@ -142,6 +142,63 @@ input:focus, select:focus, textarea:focus {
 }
 .hidden{ display:none; }
 
+/* ===== Arcade streak meter ===== */
+.streak-panel{
+  border:1px solid color-mix(in oklab, var(--accent) 14%, var(--ring));
+  background:
+    linear-gradient(135deg, color-mix(in oklab, var(--card) 86%, transparent), color-mix(in oklab, var(--accent) 6%, transparent)),
+    radial-gradient(circle at top right, color-mix(in oklab, var(--accent) 10%, transparent), transparent 45%);
+  border-radius:1rem;
+  padding:.9rem 1rem;
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.streak-panel.hot{
+  transform:translateY(-1px);
+  box-shadow:0 14px 30px rgba(139,30,63,.12);
+  border-color:color-mix(in oklab, var(--accent) 28%, var(--ring));
+}
+.streak-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:1rem;
+}
+.streak-label{
+  font-size:.82rem;
+  font-weight:800;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--accent);
+}
+.streak-best{
+  font-size:.8rem;
+  color:var(--muted);
+  margin-top:.2rem;
+}
+.streak-flavor{
+  font-size:.78rem;
+  font-weight:700;
+  color:var(--muted);
+  text-align:right;
+}
+.streak-track{
+  height:10px;
+  border-radius:9999px;
+  overflow:hidden;
+  background:color-mix(in oklab, var(--ring) 82%, transparent);
+}
+.streak-fill{
+  height:100%;
+  width:0%;
+  border-radius:9999px;
+  background:linear-gradient(90deg, #f97316 0%, #fb7185 48%, #8b1e3f 100%);
+  transition:width .22s ease, box-shadow .22s ease;
+  box-shadow:0 0 18px rgba(249,115,22,.24);
+}
+.dark .streak-panel.hot{
+  box-shadow:0 18px 36px rgba(0,0,0,.28);
+}
+
 /* ===== Segmented control ===== */
 .segmented{
   display:inline-flex;
@@ -489,7 +546,7 @@ body.high-contrast a {
 /* --- DESKTOP REFINEMENT --- */
 @media (min-width: 1024px) {
   /* Shrink those giant buttons for mouse users */
-  #check, #next, #prev {
+  #check, #next, #prev, #check-all {
     padding-top: 1rem !important;
     padding-bottom: 1rem !important;
     font-size: 0.875rem !important;
@@ -520,7 +577,7 @@ body.high-contrast a {
 
 /* --- MOBILE UI (Keep the Big Buttons for Thumbs) --- */
 @media (max-width: 1023px) {
-  #check, #next {
+  #check, #next, #check-all {
     width: 100%;
     padding: 1.25rem;
   }

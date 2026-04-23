@@ -13,24 +13,42 @@ const CUSTOM_QUIZ_KEY = "pharmlet.custom-quiz";
 const REVIEW_KEY = "pharmlet.review-queue";
 const QUESTION_REPORTS_KEY = "pharmlet.question-reports";
 const THEME_KEY = "pharmlet.theme";
+const QUIZ_PROGRESS_PREFIX = "pharmlet.quiz-progress.";
 const MAX_QUESTION_REPORTS = 200;
+const QUIZ_PROGRESS_MAX_AGE_MS = 1000 * 60 * 60 * 24 * 7;
+const TIMER_AUTOSAVE_INTERVAL_SECONDS = 15;
 
 const state = { 
     questions: [], index: 0, score: 0, title: "",
     timerSeconds: 0, timerHandle: null, marked: new Set(),
+    seen: new Set(),
     currentScale: 1.0,
+    timerPaused: false,
+    currentStreak: 0,
+    bestStreak: 0,
     originalQuestions: [],  // For restart with original pool
+    reviewMode: false,
+    timedOut: false,
+    bossMode: false,
+    generatedTimerSeconds: 0,
     hintsUsed: 0,           // Track hints for stats
     resultsRecorded: false,
     signalsRecorded: false,
     finalBreakdown: null,
-    quizConfig: null
+    quizConfig: null,
+    progressKey: "",
+    autosaveTimeout: null,
+    lastAutosaveAt: 0,
+    saveStatusMessage: "",
+    progressLifecycleBound: false,
+    progressCompleted: false
 };
 
 // --- 1. CORE ACTIONS ---
 function toggleMark() {
     if (state.marked.has(state.index)) state.marked.delete(state.index);
     else state.marked.add(state.index);
+    renderQuizStatus();
     renderNavMap();
 }
 
@@ -38,11 +56,14 @@ function toggleTimer() {
     if (state.timerHandle) {
         clearInterval(state.timerHandle);
         state.timerHandle = null;
+        state.timerPaused = true;
         if (getEl("timer-readout")) getEl("timer-readout").classList.add("opacity-30", "animate-pulse");
     } else {
         state.timerHandle = setInterval(timerTick, 1000);
+        state.timerPaused = false;
         if (getEl("timer-readout")) getEl("timer-readout").classList.remove("opacity-30", "animate-pulse");
     }
+    queueQuizProgressSave(100);
 }
 
 function changeZoom(dir) {
@@ -50,9 +71,181 @@ function changeZoom(dir) {
     if (state.currentScale < 0.6) state.currentScale = 0.6;
     document.body.style.zoom = state.currentScale;
     document.documentElement.style.setProperty('--quiz-size', `${state.currentScale}rem`);
+    queueQuizProgressSave(100);
 }
 
 const getEl = (id) => document.getElementById(id);
+
+function openShortcutsModal() {
+    const modal = getEl("shortcuts-modal");
+    if (!modal) return;
+    modal.style.display = "flex";
+    modal.classList.remove("hidden");
+}
+
+function closeShortcutsModal() {
+    const modal = getEl("shortcuts-modal");
+    if (!modal) return;
+    modal.style.display = "none";
+    modal.classList.add("hidden");
+}
+
+function markCurrentQuestionSeen() {
+    if (!state.questions[state.index]) return;
+    state.seen.add(state.index);
+}
+
+function getSeenCount() {
+    return Math.min(state.seen.size, state.questions.length);
+}
+
+function hasSeenAllQuestions() {
+    return state.questions.length > 0 && getSeenCount() === state.questions.length;
+}
+
+function getUnansweredCount() {
+    return state.questions.reduce((count, question) => count + (question?._answered ? 0 : 1), 0);
+}
+
+function isReviewRoundComplete() {
+    return state.reviewMode && state.questions.length > 0 && getUnansweredCount() === 0;
+}
+
+function isPerfectReviewRoundComplete() {
+    return isReviewRoundComplete() && state.questions.every((question) => question?._correct);
+}
+
+function getFirstUnseenQuestionIndex() {
+    return state.questions.findIndex((_, index) => !state.seen.has(index));
+}
+
+function syncCurrentDraftFromDom() {
+    const q = state.questions[state.index];
+    if (!q || q._answered) return;
+
+    if (q.type === "short" || q.type === "open") {
+        q._user = getEl("short-input")?.value ?? q._user ?? "";
+        return;
+    }
+
+    if (q.type === "mcq" || q.type === "tf") {
+        const selected = document.querySelector("#options input:checked")?.value;
+        if (selected !== undefined) q._user = selected;
+        return;
+    }
+
+    if (q.type === "mcq-multiple") {
+        q._user = Array.from(document.querySelectorAll("#options input:checked")).map(input => input.value);
+    }
+}
+
+function jumpToQuestion(index) {
+    if (!state.questions[index]) return;
+    syncCurrentDraftFromDom();
+    state.index = index;
+    render();
+}
+
+function renderQuizStatus() {
+    const status = getEl("quiz-status");
+    if (!status) return;
+
+    const total = state.questions.length;
+    const seen = getSeenCount();
+    const unanswered = getUnansweredCount();
+    const marked = state.marked.size;
+    status.textContent = `Seen ${seen}/${total} • ${unanswered} unanswered • ${marked} marked`;
+}
+
+function getStreakFlavorText() {
+    const streak = state.currentStreak;
+    if (streak >= 15) return "Boss energy";
+    if (streak >= 10) return "On fire";
+    if (streak >= 6) return "Combo locked";
+    if (streak >= 3) return "Momentum building";
+    if (streak >= 1) return "Combo started";
+    return "Combo warming up";
+}
+
+function renderStreakMeter() {
+    const panel = getEl("streak-panel");
+    const label = getEl("streak-label");
+    const best = getEl("streak-best");
+    const flavor = getEl("streak-flavor");
+    const fill = getEl("streak-fill");
+    if (!panel || !label || !best || !flavor || !fill) return;
+
+    const streak = Math.max(0, Number(state.currentStreak) || 0);
+    const bestStreak = Math.max(0, Number(state.bestStreak) || 0);
+    const fillPercent = Math.min(100, streak <= 0 ? 0 : 14 + (Math.min(streak, 12) / 12) * 86);
+
+    label.textContent = `Streak ${streak}`;
+    best.textContent = `Best ${bestStreak}`;
+    flavor.textContent = getStreakFlavorText();
+    fill.style.width = `${fillPercent}%`;
+    panel.classList.toggle("hot", streak >= 3);
+}
+
+function applyStreakOutcome(isCorrect) {
+    if (isCorrect) {
+        state.currentStreak += 1;
+        state.bestStreak = Math.max(state.bestStreak, state.currentStreak);
+    } else {
+        state.currentStreak = 0;
+    }
+
+    renderStreakMeter();
+}
+
+function renderFooterActions(q) {
+    const checkBtn = getEl("check");
+    const nextBtn = getEl("next");
+    const checkAllBtn = getEl("check-all");
+    const isLastQuestion = state.index === state.questions.length - 1;
+    const unansweredCount = getUnansweredCount();
+    const unseenCount = Math.max(0, state.questions.length - getSeenCount());
+    const canCheckAllHere = isLastQuestion && hasSeenAllQuestions() && unansweredCount > 0;
+    const reviewRoundComplete = isReviewRoundComplete();
+    const perfectReviewRound = isPerfectReviewRoundComplete();
+
+    if (checkBtn) {
+        checkBtn.classList.toggle("hidden", !!q._answered);
+        checkBtn.textContent = canCheckAllHere ? "Check This Answer" : "Check Answer";
+    }
+
+    if (nextBtn) {
+        nextBtn.classList.toggle("hidden", !q._answered);
+        nextBtn.style.background = "";
+        nextBtn.style.boxShadow = "";
+        nextBtn.style.letterSpacing = "";
+        nextBtn.style.textTransform = "";
+
+        if (!q._answered) {
+            nextBtn.textContent = "Next →";
+        } else if (perfectReviewRound) {
+            nextBtn.textContent = "Replay Round";
+            nextBtn.style.background = "linear-gradient(135deg, #0f766e 0%, #0891b2 100%)";
+            nextBtn.style.boxShadow = "0 12px 30px rgba(8, 145, 178, 0.28)";
+            nextBtn.style.letterSpacing = "0.08em";
+            nextBtn.style.textTransform = "uppercase";
+        } else if (reviewRoundComplete) {
+            nextBtn.textContent = "See Review Results";
+        } else if (!isLastQuestion) {
+            nextBtn.textContent = "Next →";
+        } else if (unseenCount > 0) {
+            nextBtn.textContent = unseenCount === 1 ? "Review 1 Unseen Question" : `Review ${unseenCount} Unseen Questions`;
+        } else if (unansweredCount > 0) {
+            nextBtn.textContent = "Check All Answers & Finish";
+        } else {
+            nextBtn.textContent = "Finish Quiz";
+        }
+    }
+
+    if (checkAllBtn) {
+        checkAllBtn.classList.toggle("hidden", !canCheckAllHere || !!q._answered);
+        checkAllBtn.textContent = "Check All Answers & Finish";
+    }
+}
 
 function syncQuizThemeAffordances(isDark) {
     const helpBtn = getEl("help-shortcuts");
@@ -214,6 +407,19 @@ const DRUG_ANSWER_ALIAS_GROUPS = [
     ]
 ];
 
+// Keep this list curated and high-confidence so brand matching stays helpful
+// without becoming overly loose.
+const EXTRA_BRAND_ACCEPTABLE_ANSWERS = Object.freeze({
+    naproxen: ["Naprosyn"],
+    albuterol: ["Proventil", "Proventil HFA", "Ventolin HFA", "ProAir HFA"],
+    nitrofurantoin: ["Macrodantin"],
+    tadalafil: ["Adcirca"],
+    prednisone: ["Rayos"],
+    diltiazem: ["Tiazac"],
+    omeprazole: ["Prilosec OTC"],
+    esomeprazole: ["Nexium 24HR"]
+});
+
 const DRUG_ANSWER_ALIAS_LOOKUP = (() => {
     const normalizeAliasKey = (value) => String(value ?? "")
         .toLowerCase()
@@ -238,6 +444,27 @@ function getDrugAnswerAliasForms(value) {
     return DRUG_ANSWER_ALIAS_LOOKUP.lookup.get(key) || [];
 }
 
+function getExtraBrandAcceptableAnswers(drug) {
+    const genericKey = normalizeDrugKey(drug?.generic);
+    return EXTRA_BRAND_ACCEPTABLE_ANSWERS[genericKey] || [];
+}
+
+function getAcceptedBrandAnswersForDrug(drug, options = {}) {
+    const restrictToVariant = Boolean(options?.restrictToVariant);
+    const brandVariant = options?.brandVariant || "";
+    const rawValues = restrictToVariant && brandVariant
+        ? [brandVariant]
+        : [...splitBrandNames(drug?.brand), ...getExtraBrandAcceptableAnswers(drug)];
+
+    const seen = new Set();
+    return rawValues.filter((value) => {
+        const key = normalizeDrugKey(value);
+        if (!key || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    });
+}
+
 function isFullTopDrugsFinalAttempt(questions = state.questions) {
     return quizId === FINAL_EXAM_ID && Array.isArray(questions) && questions.length === FINAL_EXAM_TOTAL;
 }
@@ -246,7 +473,19 @@ function isTrueExamMode() {
     return quizId === FINAL_EXAM_ID && examModeParam;
 }
 
+function isBossRoundMode() {
+    return !!state.bossMode;
+}
+
+function isRestrictedAttemptMode() {
+    return isTrueExamMode() || isBossRoundMode();
+}
+
 function getHistoryModeLabel() {
+    if (state.bossMode) {
+        return "boss";
+    }
+
     if (quizId === FINAL_EXAM_ID) {
         return isTrueExamMode() ? "exam" : "practice";
     }
@@ -254,11 +493,31 @@ function getHistoryModeLabel() {
     return modeParam;
 }
 
-function applyTrueExamModeUI() {
-    const active = isTrueExamMode();
+function applyAttemptModeUI() {
+    const active = isRestrictedAttemptMode();
+    const title = getEl("mode-banner-title");
+    const copy = getEl("mode-banner-copy");
+    const banner = getEl("mode-banner");
+    const shortcutNote = getEl("restricted-shortcut-note");
 
-    getEl("mode-banner")?.classList.toggle("hidden", !active);
-    getEl("exam-shortcut-note")?.classList.toggle("hidden", !active);
+    if (title) {
+        title.textContent = isBossRoundMode() ? "Boss Round" : "True Exam Mode";
+    }
+
+    if (copy) {
+        copy.textContent = isBossRoundMode()
+            ? "Hints and answer reveals are locked. Clear the challenge clean to beat the boss."
+            : "Hints and answer reveals are disabled for this attempt.";
+    }
+
+    banner?.classList.toggle("hidden", !active);
+    shortcutNote?.classList.toggle("hidden", !active);
+
+    if (shortcutNote) {
+        shortcutNote.textContent = isBossRoundMode()
+            ? "Boss Round removes the hint and reveal shortcuts for this run."
+            : "True Exam Mode removes the hint and reveal shortcuts for this run.";
+    }
 
     document.querySelectorAll("[data-exam-hidden='true']").forEach((el) => {
         el.classList.toggle("hidden", active);
@@ -639,6 +898,114 @@ function buildWeakAreaRetakeQuestions(questions) {
     }
 
     return picked.slice(0, Math.min(20, picked.length));
+}
+
+function getBossRoundTargetCount(answeredCount) {
+    if (answeredCount >= 80) return 10;
+    if (answeredCount >= 40) return 8;
+    if (answeredCount >= 20) return 6;
+    return Math.min(5, answeredCount);
+}
+
+function getBossRoundTimerSeconds(questionCount) {
+    return Math.max(180, questionCount * 50);
+}
+
+function getBossRoundCandidateScore(question, weakAreaLookup) {
+    if (!question?._answered) return -Infinity;
+
+    let score = 0;
+    if (!question._correct) score += 7.5;
+    if (question._user === "Revealed") score += 2.5;
+    if (question._hintUsed) score += 1.35;
+
+    if (question.type === "short" || question.type === "open") score += 0.45;
+    if (question.type === "mcq-multiple") score += 0.3;
+
+    const weakArea = weakAreaLookup.get(getQuestionFocusArea(question));
+    if (weakArea) {
+        score += Math.max(0.6, 2.2 - (weakArea.rank * 0.55));
+        score += Math.min(1.8, weakArea.missed * 0.18);
+    }
+
+    return score;
+}
+
+function buildBossRoundQuestions(questions) {
+    const answeredQuestions = (questions || []).filter((question) => question?._answered);
+    if (answeredQuestions.length < 4) return [];
+
+    const breakdown = buildFinalPerformanceBreakdown(questions);
+    const weakAreaLookup = new Map((breakdown?.weakAreas || []).map((area, index) => [
+        area.key,
+        { rank: index, missed: area.missed }
+    ]));
+    const targetCount = getBossRoundTargetCount(answeredQuestions.length);
+    const seen = new Set();
+    const picked = [];
+    const addQuestion = (question) => {
+        if (!question) return;
+        const identity = normalizeQuizValue(`${question.prompt || ""}||${JSON.stringify(getCorrectAnswerValue(question))}`);
+        if (!identity || seen.has(identity)) return;
+        seen.add(identity);
+        picked.push(cloneQuestionForGeneratedQuiz(question));
+    };
+
+    answeredQuestions
+        .map((question) => ({
+            question,
+            score: getBossRoundCandidateScore(question, weakAreaLookup)
+        }))
+        .sort((a, b) => b.score - a.score || Number(a.question?._correct) - Number(b.question?._correct))
+        .forEach(({ question }) => {
+            if (picked.length < targetCount) addQuestion(question);
+        });
+
+    if (picked.length < targetCount) {
+        buildWeakAreaRetakeQuestions(questions).forEach((question) => {
+            if (picked.length < targetCount) addQuestion(question);
+        });
+    }
+
+    return picked.slice(0, targetCount);
+}
+
+function getBossRoundTitle(questions) {
+    const breakdown = buildFinalPerformanceBreakdown(questions);
+    const focusLabel = (breakdown?.focusAreas || [])
+        .map(getFinalFocusAreaLabel)
+        .join(" + ");
+
+    if (focusLabel) {
+        return `Boss Round — ${focusLabel}`;
+    }
+
+    return "Boss Round — Toughest Misses";
+}
+
+function launchBossRound() {
+    const bossQuestions = buildBossRoundQuestions(state.questions);
+    if (!bossQuestions.length) {
+        alert("Finish a few questions first so the boss round has something real to challenge you with.");
+        return;
+    }
+
+    const payload = {
+        id: "custom-quiz",
+        title: getBossRoundTitle(state.questions),
+        metadata: {
+            generatedFrom: quizId || getHistoryQuizId(),
+            sourceTitle: state.title || "Quiz",
+            kind: "boss-round",
+            createdAt: Date.now(),
+            timerSeconds: getBossRoundTimerSeconds(bossQuestions.length),
+            bossRoundSize: bossQuestions.length
+        },
+        questions: bossQuestions
+    };
+
+    localStorage.setItem(CUSTOM_QUIZ_KEY, JSON.stringify(payload));
+    location.href = "quiz.html?id=custom-quiz";
 }
 
 function launchWeakAreaRetake() {
@@ -1732,8 +2099,10 @@ function selectFinalExamDrugs(pool) {
 function showHint() {
     const q = state.questions[state.index];
     if (!q || q._answered) return;
-    if (isTrueExamMode()) {
-        alert("True Exam Mode disables hints for this attempt.");
+    if (isRestrictedAttemptMode()) {
+        alert(isBossRoundMode()
+            ? "Boss Round disables hints for this challenge."
+            : "True Exam Mode disables hints for this attempt.");
         return;
     }
 
@@ -1746,6 +2115,7 @@ function showHint() {
 
         q._hintUsed = true;
         state.hintsUsed++;
+        queueQuizProgressSave(100);
         alert(conceptHint);
         return;
     }
@@ -1778,6 +2148,7 @@ function showHint() {
     // Mark hint as used and increment counter
     q._hintUsed = true;
     state.hintsUsed++;
+    queueQuizProgressSave(100);
     
     alert(hintText);
 }
@@ -1786,8 +2157,10 @@ function showHint() {
 function revealAnswer() {
     const q = state.questions[state.index];
     if (!q || q._answered) return;
-    if (isTrueExamMode()) {
-        alert("True Exam Mode disables answer reveals for this attempt.");
+    if (isRestrictedAttemptMode()) {
+        alert(isBossRoundMode()
+            ? "Boss Round disables answer reveals for this challenge."
+            : "True Exam Mode disables answer reveals for this attempt.");
         return;
     }
     scoreCurrent("Revealed");
@@ -1795,14 +2168,262 @@ function revealAnswer() {
 
 function getHistoryQuizId() {
     if (quizId) return quizId;
-    if (weekParam) return `week-${weekParam}`;
-    if (weeksParam) return `weeks-${weeksParam}`;
-    if (tagParam) return `tag-${tagParam.toLowerCase()}`;
+    if (weekParam) return `lab-${labParam}-week-${weekParam}`;
+    if (weeksParam) return `lab-${labParam}-weeks-${weeksParam}`;
+    if (tagParam) return params.has("lab")
+        ? `lab-${labParam}-tag-${tagParam.toLowerCase()}`
+        : `tag-${tagParam.toLowerCase()}`;
     return "quiz";
 }
 
+function getScoreStorageKey() {
+    if (state.bossMode && quizId) {
+        return `pharmlet.${quizId}.boss`;
+    }
+
+    if (weekParam) {
+        return `pharmlet.lab${labParam}.week${weekParam}.easy`;
+    }
+
+    if (weeksParam) {
+        return `pharmlet.lab${labParam}.weeks${weeksParam}.easy`;
+    }
+
+    if (tagParam) {
+        return params.has("lab")
+            ? `pharmlet.lab${labParam}.tag-${tagParam.toLowerCase()}.easy`
+            : `pharmlet.tag-${tagParam.toLowerCase()}.easy`;
+    }
+
+    if (!quizId) return null;
+
+    if (quizId === FINAL_EXAM_ID || getConceptQuizConfig(quizId)) {
+        return `pharmlet.${quizId}.easy`;
+    }
+
+    return `pharmlet.${quizId}.${modeParam}`;
+}
+
+function getQuizProgressRouteId() {
+    if (weekParam) return `week-${labParam}-${weekParam}`;
+    if (weeksParam) return `weeks-${labParam}-${weeksParam}`;
+    if (tagParam) return params.has("lab")
+        ? `tag-${labParam}-${tagParam.toLowerCase()}`
+        : `tag-all-${tagParam.toLowerCase()}`;
+    if (quizId) {
+        const generatedSignature = GENERATED_QUIZ_IDS.has(quizId)
+            ? `${state.bossMode ? "boss" : "standard"}-${state.questions.length}-${state.questions.reduce((hash, question) => {
+                const text = normalizeQuizValue(stripHtmlTags(question?.prompt || ""));
+                for (const char of text) {
+                    hash = ((hash << 5) - hash + char.charCodeAt(0)) | 0;
+                }
+                return hash;
+            }, 0)}`
+            : "";
+
+        return `id-${quizId}-${modeParam}-${isTrueExamMode() ? "exam" : "practice"}${generatedSignature ? `-${generatedSignature}` : ""}`;
+    }
+    return `route-${location.search || "quiz"}`;
+}
+
+function getQuizProgressKey() {
+    return `${QUIZ_PROGRESS_PREFIX}${getQuizProgressRouteId()}`;
+}
+
+function getQuizSessionNoteElements() {
+    return {
+        wrap: getEl("quiz-session-note"),
+        text: getEl("quiz-session-note-text")
+    };
+}
+
+function showQuizSessionNote(message, tone = "good") {
+    const { wrap, text } = getQuizSessionNoteElements();
+    if (!wrap || !text || !message) return;
+
+    wrap.classList.remove("hidden");
+    text.textContent = message;
+
+    if (tone === "accent") {
+        wrap.style.borderColor = "rgba(139, 30, 63, 0.2)";
+        wrap.style.background = "rgba(139, 30, 63, 0.08)";
+        wrap.style.color = "#8b1e3f";
+    } else if (tone === "muted") {
+        wrap.style.borderColor = "var(--ring)";
+        wrap.style.background = "color-mix(in oklab, var(--card) 82%, transparent)";
+        wrap.style.color = "var(--text)";
+    } else {
+        wrap.style.borderColor = "rgba(16, 185, 129, 0.2)";
+        wrap.style.background = "rgba(16, 185, 129, 0.1)";
+        wrap.style.color = "rgb(4, 120, 87)";
+    }
+}
+
+function hideQuizSessionNote() {
+    const { wrap, text } = getQuizSessionNoteElements();
+    if (!wrap || !text) return;
+    wrap.classList.add("hidden");
+    text.textContent = "";
+}
+
+function clearQueuedQuizProgressSave() {
+    if (!state.autosaveTimeout) return;
+    clearTimeout(state.autosaveTimeout);
+    state.autosaveTimeout = null;
+}
+
+function serializeQuizProgress() {
+    if (!state.questions.length || !state.progressKey) return null;
+
+    syncCurrentDraftFromDom();
+
+    return {
+        version: 1,
+        routeId: getQuizProgressRouteId(),
+        savedAt: Date.now(),
+        title: state.title,
+        index: state.index,
+        score: state.score,
+        timerSeconds: Math.max(0, Number(state.timerSeconds) || 0),
+        timerPaused: !!state.timerPaused,
+        currentStreak: Math.max(0, Number(state.currentStreak) || 0),
+        bestStreak: Math.max(0, Number(state.bestStreak) || 0),
+        hintsUsed: state.hintsUsed,
+        timedOut: !!state.timedOut,
+        reviewMode: !!state.reviewMode,
+        bossMode: !!state.bossMode,
+        generatedTimerSeconds: Math.max(0, Number(state.generatedTimerSeconds) || 0),
+        currentScale: Number(state.currentScale) || 1,
+        marked: [...state.marked],
+        seen: [...state.seen],
+        questions: state.questions,
+        originalQuestions: state.originalQuestions,
+        quizConfigId: state.quizConfig?.id || null
+    };
+}
+
+function persistQuizProgress(force = false) {
+    if (!state.progressKey || !state.questions.length || state.progressCompleted) return;
+    if (force) clearQueuedQuizProgressSave();
+
+    const now = Date.now();
+    if (!force && now - state.lastAutosaveAt < 250) return;
+
+    const snapshot = serializeQuizProgress();
+    if (!snapshot) return;
+
+    try {
+        localStorage.setItem(state.progressKey, JSON.stringify(snapshot));
+        state.lastAutosaveAt = now;
+    } catch (error) {
+        console.warn("Unable to save quiz progress:", error);
+    }
+}
+
+function queueQuizProgressSave(delay = 250) {
+    if (!state.progressKey || !state.questions.length) return;
+    clearQueuedQuizProgressSave();
+    state.autosaveTimeout = setTimeout(() => {
+        state.autosaveTimeout = null;
+        persistQuizProgress();
+    }, delay);
+}
+
+function clearQuizProgress() {
+    clearQueuedQuizProgressSave();
+    state.lastAutosaveAt = 0;
+    if (!state.progressKey) return;
+
+    try {
+        localStorage.removeItem(state.progressKey);
+    } catch (error) {
+        console.warn("Unable to clear quiz progress:", error);
+    }
+}
+
+function loadSavedQuizProgress() {
+    if (!state.progressKey) return null;
+
+    const saved = safeReadStorageJson(state.progressKey, null);
+    if (!saved || typeof saved !== "object") return null;
+    if (saved.routeId !== getQuizProgressRouteId()) return null;
+
+    const savedAt = Number(saved.savedAt) || 0;
+    if (!savedAt || (Date.now() - savedAt) > QUIZ_PROGRESS_MAX_AGE_MS) {
+        clearQuizProgress();
+        return null;
+    }
+
+    if (!Array.isArray(saved.questions) || !saved.questions.length) {
+        clearQuizProgress();
+        return null;
+    }
+
+    return saved;
+}
+
+function restoreSavedQuizProgress(snapshot) {
+    if (!snapshot) return false;
+
+    state.questions = snapshot.questions.map((question, index) => ({
+        ...question,
+        _id: Number(question?._id) === index ? question._id : index
+    }));
+    state.originalQuestions = Array.isArray(snapshot.originalQuestions) ? snapshot.originalQuestions.map((question) => ({ ...question })) : [];
+    state.index = Math.min(Math.max(0, Number(snapshot.index) || 0), Math.max(0, state.questions.length - 1));
+    state.score = Math.max(0, Number(snapshot.score) || 0);
+    state.hintsUsed = Math.max(0, Number(snapshot.hintsUsed) || 0);
+    state.timerSeconds = Math.max(0, Number(snapshot.timerSeconds) || 0);
+    state.timerPaused = !!snapshot.timerPaused;
+    state.currentStreak = Math.max(0, Number(snapshot.currentStreak) || 0);
+    state.bestStreak = Math.max(0, Number(snapshot.bestStreak) || 0);
+    state.timedOut = !!snapshot.timedOut;
+    state.reviewMode = !!snapshot.reviewMode;
+    state.bossMode = !!snapshot.bossMode;
+    state.generatedTimerSeconds = Math.max(0, Number(snapshot.generatedTimerSeconds) || 0);
+    state.progressCompleted = false;
+    state.currentScale = Number(snapshot.currentScale) || 1;
+    state.marked = new Set(Array.isArray(snapshot.marked) ? snapshot.marked : []);
+    state.seen = new Set(Array.isArray(snapshot.seen) ? snapshot.seen : []);
+    state.title = String(snapshot.title || state.title || "Quiz");
+    state.resultsRecorded = false;
+    state.signalsRecorded = false;
+    state.finalBreakdown = null;
+
+    document.body.style.zoom = state.currentScale;
+    document.documentElement.style.setProperty("--quiz-size", `${state.currentScale}rem`);
+
+    if (getEl("quiz-title")) getEl("quiz-title").textContent = state.title;
+    if (getEl("qtotal")) getEl("qtotal").textContent = state.questions.length;
+    renderStreakMeter();
+
+    const savedAt = Number(snapshot.savedAt) || Date.now();
+    const minutesAgo = Math.max(0, Math.round((Date.now() - savedAt) / 60000));
+    const when = minutesAgo < 1 ? "just now" : minutesAgo === 1 ? "1 minute ago" : `${minutesAgo} minutes ago`;
+    showQuizSessionNote(`Saved progress restored from ${when}. Answers, marks, and timer are back where you left them.`);
+    return true;
+}
+
+function startRestoredTimer() {
+    if (state.timerHandle) clearInterval(state.timerHandle);
+    state.timerHandle = null;
+
+    const readout = getEl("timer-readout");
+    if (readout) {
+        const mins = Math.floor(state.timerSeconds / 60);
+        const secs = state.timerSeconds % 60;
+        readout.textContent = `${mins}:${secs.toString().padStart(2, "0")}`;
+        readout.classList.toggle("opacity-30", !!state.timerPaused);
+        readout.classList.toggle("animate-pulse", !!state.timerPaused);
+    }
+
+    if (!state.timerPaused && state.timerSeconds > 0) {
+        state.timerHandle = setInterval(timerTick, 1000);
+    }
+}
+
 function saveQuizHistory() {
-    if (state.resultsRecorded) return;
+    if (state.resultsRecorded || state.reviewMode) return;
 
     try {
         const raw = localStorage.getItem(HISTORY_KEY);
@@ -1816,7 +2437,7 @@ function saveQuizHistory() {
             title: state.title || FINAL_EXAM_TITLE,
             score: state.score,
             total: state.questions.length,
-            bestStreak: 0,
+            bestStreak: state.bestStreak,
             timestamp: Date.now(),
             examMode: isTrueExamMode(),
             hintsUsed: state.hintsUsed,
@@ -1861,8 +2482,138 @@ function getLetterGradeInfoForQuiz(score, total) {
 // --- RESTART WITH CONFIRMATION ---
 function restartQuiz() {
     if (confirm("🔄 Restart this quiz? Your progress will be lost.")) {
+        state.progressCompleted = true;
+        clearQuizProgress();
         location.reload();
     }
+}
+
+function buildFreshReviewRoundQuestions(sourceQuestions = []) {
+    return sourceQuestions.map((q, i) => {
+        const nextQuestion = { ...q, _id: i, _answered: false, _correct: false, _user: null };
+        delete nextQuestion._hintUsed;
+        return nextQuestion;
+    });
+}
+
+function restoreQuestionCardShell() {
+    const card = getEl("question-card");
+    if (!card) return;
+
+    card.innerHTML = `
+        <div id="drug-context" class="text-[10px] uppercase tracking-widest text-[#8b1e3f] font-black mb-3 opacity-60 h-4"></div>
+        <h2 id="prompt" class="text-xl sm:text-2xl lg:text-3xl font-bold leading-tight mb-8">Loading...</h2>
+        <div id="options" class="space-y-4"></div>
+        <div id="short-wrap" class="mt-8 hidden">
+            <input id="short-input" class="w-full rounded-2xl border border-[var(--ring)] bg-[var(--bg)] px-5 py-5 text-xl outline-[#8b1e3f]" placeholder="Type answer...">
+        </div>
+        <div id="explain" class="mt-8"></div>
+    `;
+}
+
+function replayCurrentReviewRound() {
+    if (!state.reviewMode || !state.originalQuestions.length) {
+        showResults();
+        return;
+    }
+
+    state.questions = buildFreshReviewRoundQuestions(state.originalQuestions);
+    state.progressKey = getQuizProgressKey();
+    state.index = 0;
+    state.score = 0;
+    state.hintsUsed = 0;
+    state.currentStreak = 0;
+    state.bestStreak = 0;
+    state.marked.clear();
+    state.seen.clear();
+    state.timedOut = false;
+    state.resultsRecorded = false;
+    state.signalsRecorded = false;
+    state.finalBreakdown = null;
+    state.progressCompleted = false;
+    state.title = `Review: ${state.originalQuestions.length} Missed`;
+
+    restoreQuestionCardShell();
+    if (getEl("quiz-title")) getEl("quiz-title").textContent = state.title;
+    if (getEl("qtotal")) getEl("qtotal").textContent = state.questions.length;
+    applyAttemptModeUI();
+    render();
+}
+
+function checkAllAnswersAndFinish() {
+    syncCurrentDraftFromDom();
+
+    const firstUnseen = getFirstUnseenQuestionIndex();
+    if (firstUnseen >= 0) {
+        jumpToQuestion(firstUnseen);
+        alert(`Review question ${firstUnseen + 1} before finishing this run.`);
+        return;
+    }
+
+    state.questions.forEach((question) => {
+        if (!question || question._answered) return;
+        applyAnswerToQuestion(question, question._user);
+    });
+
+    showResults();
+}
+
+function finishQuizDueToTimeout() {
+    if (state.timedOut) return;
+
+    syncCurrentDraftFromDom();
+    state.timedOut = true;
+
+    if (state.timerHandle) {
+        clearInterval(state.timerHandle);
+        state.timerHandle = null;
+    }
+
+    state.timerSeconds = 0;
+    state.timerPaused = true;
+    const readout = getEl("timer-readout");
+    if (readout) {
+        readout.textContent = "0:00";
+        readout.classList.add("opacity-30");
+    }
+
+    state.questions.forEach((question) => {
+        if (!question || question._answered) return;
+        applyAnswerToQuestion(question, question._user);
+    });
+
+    showResults();
+}
+
+function handleNextAction() {
+    if (isPerfectReviewRoundComplete()) {
+        replayCurrentReviewRound();
+        return;
+    }
+
+    if (isReviewRoundComplete()) {
+        showResults();
+        return;
+    }
+
+    if (state.index < state.questions.length - 1) {
+        jumpToQuestion(state.index + 1);
+        return;
+    }
+
+    const firstUnseen = getFirstUnseenQuestionIndex();
+    if (firstUnseen >= 0) {
+        jumpToQuestion(firstUnseen);
+        alert(`You still have ${state.questions.length - getSeenCount()} unseen question${state.questions.length - getSeenCount() === 1 ? "" : "s"} to review before finishing.`);
+        return;
+    }
+
+    if (getUnansweredCount() > 0) {
+        checkAllAnswersAndFinish();
+        return;
+    }
+
+    showResults();
 }
 
 // --- REVIEW MISSED QUESTIONS ---
@@ -1875,38 +2626,41 @@ function reviewMissed() {
     }
     
     // Reset state for review mode
-    state.questions = missed.map((q, i) => ({ ...q, _answered: false, _user: null, _correct: false, _id: i }));
+    state.reviewMode = true;
+    state.bossMode = false;
+    state.generatedTimerSeconds = 0;
+    state.originalQuestions = missed.map((q) => ({ ...q }));
+    state.questions = buildFreshReviewRoundQuestions(state.originalQuestions);
+    state.progressKey = getQuizProgressKey();
     state.index = 0;
     state.score = 0;
     state.hintsUsed = 0;
+    state.currentStreak = 0;
+    state.bestStreak = 0;
     state.marked.clear();
+    state.seen.clear();
+    state.timedOut = false;
+    state.resultsRecorded = false;
+    state.signalsRecorded = false;
+    state.finalBreakdown = null;
+    state.progressCompleted = false;
     state.title = `Review: ${missed.length} Missed`;
     
     if (getEl("quiz-title")) getEl("quiz-title").textContent = state.title;
     if (getEl("qtotal")) getEl("qtotal").textContent = state.questions.length;
     
-    // CRITICAL FIX: Restore question card structure (showResults replaced it)
-    const card = getEl("question-card");
-    if (card) {
-        card.innerHTML = `
-            <div id="drug-context" class="text-[10px] uppercase tracking-widest text-[#8b1e3f] font-black mb-3 opacity-60 h-4"></div>
-            <h2 id="prompt" class="text-xl sm:text-2xl lg:text-3xl font-bold leading-tight mb-8">Loading...</h2>
-            <div id="options" class="space-y-4"></div>
-            <div id="short-wrap" class="mt-8 hidden">
-                <input id="short-input" class="w-full rounded-2xl border border-[var(--ring)] bg-[var(--bg)] px-5 py-5 text-xl outline-[#8b1e3f]" placeholder="Type answer...">
-            </div>
-            <div id="explain" class="mt-8"></div>
-        `;
-    }
-    
-    startSmartTimer();
+    // Restore the quiz shell but keep the same countdown running for arcade-style retries.
+    restoreQuestionCardShell();
+    applyAttemptModeUI();
     render();
 }
 
 // Expose to global scope for inline onclick handlers
 window.reviewMissed = reviewMissed;
 window.launchWeakAreaRetake = launchWeakAreaRetake;
+window.launchBossRound = launchBossRound;
 window.reportCurrentQuestion = reportCurrentQuestion;
+window.restartQuiz = restartQuiz;
 
 // --- 2. DATA PIPELINE ---
 async function smartFetch(fileName) {
@@ -2001,6 +2755,77 @@ function loadGeneratedQuizFromStorage(expectedId) {
     }
 }
 
+function isTopDrugsPlaylistPayload(data) {
+    return Boolean(
+        data?.metadata?.generator === "top-drugs-playlist"
+        && Array.isArray(data?.items)
+        && data.items.length
+    );
+}
+
+function getTopDrugsPlaylistFocusScores(drug, signals) {
+    return {
+        brand: splitBrandNames(drug?.brand).length ? getBrandWeaknessScore(drug, signals) + 0.35 : -Infinity,
+        class: drug?.class ? getWeaknessScore(getCounterValue(signals.seenClasses, drug?.class), getCounterValue(signals.missedClasses, drug?.class)) + (getDrugWeaknessScore(drug, signals) * 0.18) : -Infinity,
+        category: drug?.category ? getWeaknessScore(getCounterValue(signals.seenCategories, drug?.category), getCounterValue(signals.missedCategories, drug?.category)) + (getDrugWeaknessScore(drug, signals) * 0.16) : -Infinity,
+        moa: drug?.moa ? getDrugWeaknessScore(drug, signals) + (getCounterValue(signals.missedDrugs, drug?.generic) * 0.18) : -Infinity
+    };
+}
+
+function buildAdaptiveTopDrugsPlaylistQuestion(drug, fullPool, signals) {
+    const focusScores = getTopDrugsPlaylistFocusScores(drug, signals);
+    const focusOrder = Object.entries(focusScores)
+        .sort((a, b) => b[1] - a[1])
+        .map(([focus]) => focus);
+
+    const builders = {
+        brand: () => buildFinalGenericToBrandQuestion(drug, signals),
+        class: () => buildFinalDrugToFieldQuestion(drug, fullPool, "class", "Class"),
+        category: () => buildFinalDrugToFieldQuestion(drug, fullPool, "category", "Category"),
+        moa: () => buildFinalDrugToFieldQuestion(drug, fullPool, "moa", "MOA")
+    };
+
+    for (const focus of focusOrder) {
+        const built = builders[focus]?.();
+        if (built) return built;
+    }
+
+    return createQuestionFromItem(drug, fullPool);
+}
+
+function buildTopDrugsPlaylistQuestionForDrug(drug, fullPool, playlistKey, signals) {
+    switch (playlistKey) {
+        case "brand-recovery":
+            return buildFinalGenericToBrandQuestion(drug, signals) || buildAdaptiveTopDrugsPlaylistQuestion(drug, fullPool, signals);
+        case "class-recovery":
+            return buildFinalDrugToFieldQuestion(drug, fullPool, "class", "Class") || buildAdaptiveTopDrugsPlaylistQuestion(drug, fullPool, signals);
+        case "category-recovery":
+            return buildFinalDrugToFieldQuestion(drug, fullPool, "category", "Category") || buildAdaptiveTopDrugsPlaylistQuestion(drug, fullPool, signals);
+        case "moa-recovery":
+            return buildFinalDrugToFieldQuestion(drug, fullPool, "moa", "MOA") || buildAdaptiveTopDrugsPlaylistQuestion(drug, fullPool, signals);
+        case "most-missed-mix":
+        default:
+            return buildAdaptiveTopDrugsPlaylistQuestion(drug, fullPool, signals);
+    }
+}
+
+function buildTopDrugsPlaylistQuestions(data, fullPool) {
+    const items = Array.isArray(data?.items) ? data.items : [];
+    const playlistKey = String(data?.metadata?.playlistKey || "most-missed-mix");
+    const signals = loadTopDrugsSignals();
+
+    return items
+        .map((drug) => {
+            const question = buildTopDrugsPlaylistQuestionForDrug(drug, fullPool, playlistKey, signals);
+            if (!question) return null;
+            return {
+                ...question,
+                _playlistKey: playlistKey
+            };
+        })
+        .filter(Boolean);
+}
+
 function isConceptEntry(item) {
     return Boolean(item && (
         item.concept_type ||
@@ -2048,6 +2873,7 @@ function getQuestionIdentity(item) {
 }
 
 function saveMissedQuestionsToReviewQueue(questions) {
+    const reviewQueueStore = window.PharmletReviewQueueStore;
     const missedEntries = (questions || [])
         .filter(question => question?._answered && !question?._correct)
         .map(question => ({
@@ -2063,13 +2889,45 @@ function saveMissedQuestionsToReviewQueue(questions) {
         }))
         .filter(entry => entry.prompt && (entry.answer || Array.isArray(entry.answer)));
 
-    if (!missedEntries.length) return;
+    if (!missedEntries.length || !reviewQueueStore) return;
 
     try {
         const existing = safeReadStorageJson(REVIEW_KEY, []);
-        localStorage.setItem(REVIEW_KEY, JSON.stringify([...existing, ...missedEntries].slice(-500)));
+        const nextQueue = reviewQueueStore.mergeMissedEntries(existing, missedEntries);
+        localStorage.setItem(REVIEW_KEY, JSON.stringify(nextQueue));
     } catch (error) {
         console.warn("Failed to save review queue:", error);
+    }
+}
+
+function saveReviewRoundResultsToReviewQueue(questions) {
+    const reviewQueueStore = window.PharmletReviewQueueStore;
+    if (!reviewQueueStore) return;
+
+    const reviewResults = (questions || [])
+        .filter(question => question?._answered)
+        .map(question => ({
+            quizId: question?.sourceQuizId || getHistoryQuizId(),
+            title: question?.sourceTitle || state.title || "",
+            type: question?.type || "mcq",
+            prompt: question?.prompt || "",
+            choices: Array.isArray(question?.choices) ? question.choices : undefined,
+            answer: getCorrectAnswerValue(question),
+            answerText: question?.answerText,
+            userAnswer: Array.isArray(question?._user) ? question._user : (question?._user ?? ""),
+            correct: !!question?._correct,
+            timestamp: new Date().toISOString()
+        }))
+        .filter(entry => entry.prompt && (entry.answer || Array.isArray(entry.answer)));
+
+    if (!reviewResults.length) return;
+
+    try {
+        const existing = safeReadStorageJson(REVIEW_KEY, []);
+        const nextQueue = reviewQueueStore.applyReviewResults(existing, reviewResults);
+        localStorage.setItem(REVIEW_KEY, JSON.stringify(nextQueue));
+    } catch (error) {
+        console.warn("Failed to update review queue after review round:", error);
     }
 }
 
@@ -4334,16 +5192,18 @@ function render() {
         ? (Array.isArray(q.choices) && q.choices.length ? q.choices : ["True", "False"])
         : q.choices;
 
+    markCurrentQuestionSeen();
     if (getEl("drug-context")) getEl("drug-context").textContent = getQuestionContextLabel(q);
     if (getEl("qnum")) getEl("qnum").textContent = state.index + 1;
     if (getEl("prompt")) getEl("prompt").innerHTML = q.prompt;
+    renderQuizStatus();
+    renderStreakMeter();
+    renderFooterActions(q);
     
     const optCont = getEl("options");
     if (optCont) optCont.innerHTML = "";
     if (getEl("short-wrap")) getEl("short-wrap").classList.add("hidden");
     if (getEl("explain")) { getEl("explain").classList.remove("show"); getEl("explain").innerHTML = ""; }
-    if (getEl("check")) getEl("check").classList.toggle("hidden", !!q._answered);
-    if (getEl("next")) getEl("next").classList.toggle("hidden", !q._answered);
 
     if (singleChoiceTypes.has(q.type) && renderedChoices && optCont) {
         optCont.style.touchAction = 'manipulation';
@@ -4419,6 +5279,12 @@ function render() {
             input.value = q._user || "";
             input.placeholder = q.type === "open" ? "Type response..." : "Type answer...";
             q._answered ? input.setAttribute("disabled", "true") : input.removeAttribute("disabled");
+            input.oninput = () => {
+                if (!q._answered) {
+                    q._user = input.value;
+                    queueQuizProgressSave(400);
+                }
+            };
         }
     }
     
@@ -4456,6 +5322,7 @@ function render() {
     }
     renderNavMap(); 
     if (getEl("score")) getEl("score").textContent = state.score;
+    queueQuizProgressSave(150);
 }
 
 function renderNavMap() {
@@ -4469,10 +5336,12 @@ function renderNavMap() {
             colorClass = q._correct ? "bg-green-500 text-white" : "bg-red-500 text-white";
         } else if (state.marked.has(i)) {
             colorClass = "bg-yellow-400 text-black ring-2 ring-yellow-600";
+        } else if (state.seen.has(i)) {
+            colorClass = "bg-slate-200 text-slate-800 border border-slate-400";
         }
         btn.className = `w-8 h-8 rounded-lg text-xs font-bold transition-all ${i === state.index ? 'ring-2 ring-blue-500 scale-110' : ''} ${colorClass}`;
         btn.textContent = i + 1;
-        btn.onclick = () => { state.index = i; render(); };
+        btn.onclick = () => { jumpToQuestion(i); };
         nav.appendChild(btn);
     });
 }
@@ -4482,13 +5351,13 @@ function wireEvents() {
     const handlers = {
         "timer-readout": toggleTimer,
         "mark": toggleMark,
-        "help-shortcuts": () => { getEl("shortcuts-modal").style.display="flex"; getEl("shortcuts-modal").classList.remove("hidden"); },
-        "close-shortcuts": () => { getEl("shortcuts-modal").style.display="none"; getEl("shortcuts-modal").classList.add("hidden"); },
+        "help-shortcuts": openShortcutsModal,
+        "close-shortcuts": closeShortcutsModal,
         "font-increase": () => changeZoom('in'),
         "font-decrease": () => changeZoom('out'),
-        "restart": () => location.reload(),
-        "next": () => { if (state.index < state.questions.length - 1) { state.index++; render(); } else showResults(); },
-        "prev": () => { if (state.index > 0) { state.index--; render(); } },
+        "restart": restartQuiz,
+        "next": handleNextAction,
+        "prev": () => { if (state.index > 0) jumpToQuestion(state.index - 1); },
         "check": () => {
             const q = state.questions[state.index];
             if (!q) return;
@@ -4504,13 +5373,14 @@ function wireEvents() {
 
             if (Array.isArray(val) ? val.length > 0 : val) scoreCurrent(val);
         },
+        "check-all": checkAllAnswersAndFinish,
         "reveal-solution": revealAnswer,
         "theme-toggle": toggleQuizTheme,
         "hint-btn": showHint,
         "mark-mobile": toggleMark,
         "hint-btn-mobile": showHint,
         "reveal-solution-mobile": revealAnswer,
-        "restart-mobile": () => location.reload(),
+        "restart-mobile": restartQuiz,
     };
 
     Object.entries(handlers).forEach(([id, fn]) => {
@@ -4519,10 +5389,21 @@ function wireEvents() {
     });
 
     window.onkeydown = (e) => {
+        const key = e.key.toLowerCase();
+
+        if (e.key === "?") {
+            e.preventDefault();
+            openShortcutsModal();
+            return;
+        }
+
+        if (key === "escape") {
+            closeShortcutsModal();
+            return;
+        }
+
         // Prevent typing shortcuts inside the short-answer input
         if (document.activeElement.tagName === 'INPUT' && e.key !== 'Enter') return;
-        
-        const key = e.key.toLowerCase();
 
         // --- NEW: ASDF Shortcuts for MCQ Option Selection ---
         const mcqMap = { 'a': 0, 's': 1, 'd': 2, 'f': 3 };
@@ -4537,11 +5418,11 @@ function wireEvents() {
 
         if (key === "t") toggleTimer();
         if (key === "m") toggleMark();
-        if (key === "arrowright") { if (state.index < state.questions.length - 1) { state.index++; render(); } }
-        if (key === "arrowleft") { if (state.index > 0) { state.index--; render(); } }
+        if (key === "arrowright") { if (state.index < state.questions.length - 1) jumpToQuestion(state.index + 1); }
+        if (key === "arrowleft") { if (state.index > 0) jumpToQuestion(state.index - 1); }
         if (key >= '1' && key <= '9') {
             const idx = parseInt(key) - 1;
-            if (state.questions[idx]) { state.index = idx; render(); }
+            if (state.questions[idx]) jumpToQuestion(idx);
         }
         if (key === "enter") {
             const q = state.questions[state.index];
@@ -4551,24 +5432,36 @@ function wireEvents() {
         
         // --- NEW: R/X/H Keyboard Shortcuts ---
         if (key === "r") restartQuiz();           // R = Restart with confirm
-        if (key === "x" && !isTrueExamMode()) revealAnswer();          // X = Give Up / Reveal
-        if (key === "h" && !isTrueExamMode()) showHint();              // H = Show Hint
+        if (key === "x" && !isRestrictedAttemptMode()) revealAnswer();          // X = Give Up / Reveal
+        if (key === "h" && !isRestrictedAttemptMode()) showHint();              // H = Show Hint
     };
 }
 
 function timerTick() {
-    if (state.timerSeconds <= 0) { clearInterval(state.timerHandle); return; }
+    if (state.timerSeconds <= 0) {
+        finishQuizDueToTimeout();
+        return;
+    }
+
     state.timerSeconds--;
     const mins = Math.floor(state.timerSeconds / 60);
     const secs = state.timerSeconds % 60;
     const readout = getEl("timer-readout");
     if (readout) readout.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+
+    if (state.timerSeconds % TIMER_AUTOSAVE_INTERVAL_SECONDS === 0) {
+        persistQuizProgress();
+    }
+
+    if (state.timerSeconds <= 0) {
+        finishQuizDueToTimeout();
+    }
 }
 
 function startSmartTimer() {
     if (state.timerHandle) clearInterval(state.timerHandle);
     const count = state.questions.length;
-    const configuredTimerSeconds = Number(state.quizConfig?.timerSeconds || 0);
+    const configuredTimerSeconds = Number(state.generatedTimerSeconds || state.quizConfig?.timerSeconds || 0);
     const isEndocrineQuiz = Boolean(state.quizConfig) || quizId === CONCEPT_QUIZ_ID || state.questions.some(q => q?._mode === "concept");
     const isFinalExam = quizId === FINAL_EXAM_ID;
     state.timerSeconds = configuredTimerSeconds > 0
@@ -4576,24 +5469,24 @@ function startSmartTimer() {
         : isEndocrineQuiz
         ? 600
         : (isFinalExam ? FINAL_EXAM_TIMER_SECONDS : (weekParam ? 600 : (count <= 20 ? 900 : (count <= 50 ? 2700 : 7200))));
+    state.timerPaused = false;
     state.timerHandle = setInterval(timerTick, 1000);
 }
 
-function scoreCurrent(val) {
-    const q = state.questions[state.index];
-    if (!q) return;
+function isBlankAnswerValue(value) {
+    if (Array.isArray(value)) {
+        return value.length === 0 || value.every(item => !String(item ?? "").trim());
+    }
+
+    return String(value ?? "").trim() === "";
+}
+
+function evaluateAnswerForQuestion(q, val) {
+    if (!q || val === "Revealed" || isBlankAnswerValue(val)) return false;
 
     const raw = getCorrectAnswerValue(q);
     const correctAnswer = Array.isArray(raw) ? raw[0] : raw;
     const normalizeWhitespace = s => String(s).replace(/\s+/g, ' ').trim().toLowerCase();
-
-    if (val === "Revealed") {
-        q._answered = true;
-        q._user = val;
-        q._correct = false;
-        render();
-        return;
-    }
 
     const normalizeLoose = s => normalizeWhitespace(s).replace(/[\s\-\/.,;]+/g, '');
     const userNorm = normalizeWhitespace(Array.isArray(val) ? val.join(", ") : val);
@@ -4603,16 +5496,9 @@ function scoreCurrent(val) {
     if (q.type === "mcq-multiple") {
         const expected = [...new Set((Array.isArray(raw) ? raw : [raw]).map(normalizeWhitespace).filter(Boolean))].sort();
         const selected = [...new Set((Array.isArray(val) ? val : [val]).map(normalizeWhitespace).filter(Boolean))].sort();
-        const isCorrect = selected.length > 0
+        return selected.length > 0
             && expected.length === selected.length
             && expected.every((answer, index) => answer === selected[index]);
-
-        q._answered = true;
-        q._user = Array.isArray(val) ? val : [val];
-        q._correct = isCorrect;
-        if (isCorrect) state.score++;
-        render();
-        return;
     }
 
     const acceptedAnswers = new Set();
@@ -4665,9 +5551,10 @@ function scoreCurrent(val) {
     rawAnswers.forEach(answer => addAcceptedForms(answer, true));
 
     if (q.drugRef?.brand && allowLooseBrandForms) {
-        const brandAnswers = q._restrictBrandVariantAnswers && q._brandVariant
-            ? [q._brandVariant]
-            : splitBrandNames(q.drugRef.brand);
+        const brandAnswers = getAcceptedBrandAnswersForDrug(q.drugRef, {
+            restrictToVariant: q._restrictBrandVariantAnswers,
+            brandVariant: q._brandVariant
+        });
 
         brandAnswers.forEach(answer => addAcceptedForms(answer, true));
     }
@@ -4709,10 +5596,35 @@ function scoreCurrent(val) {
         }
     }
 
+    return !!isCorrect;
+}
+
+function applyAnswerToQuestion(q, val) {
+    if (!q || q._answered) return false;
+
+    if (val === "Revealed") {
+        q._answered = true;
+        q._user = val;
+        q._correct = false;
+        applyStreakOutcome(false);
+        return false;
+    }
+
+    const storedValue = Array.isArray(val) ? [...val] : (val ?? "");
+    const isCorrect = evaluateAnswerForQuestion(q, storedValue);
     q._answered = true;
-    q._user = val;
+    q._user = storedValue;
     q._correct = !!isCorrect;
     if (isCorrect) state.score++;
+    applyStreakOutcome(!!isCorrect);
+    return isCorrect;
+}
+
+function scoreCurrent(val) {
+    const q = state.questions[state.index];
+    if (!q) return;
+
+    applyAnswerToQuestion(q, val);
     render();
 }
 
@@ -4773,6 +5685,7 @@ function buildFinalBreakdownMarkup(breakdown) {
                     </div>
                     <div class="flex flex-wrap gap-2">
                         ${retakeButton}
+                        <a href="stats.html#weak-area-playlists-section" class="px-5 py-3 rounded-xl border border-[var(--ring)] font-bold">🧠 Open Playlists</a>
                         <a href="top-drugs-trends.html" class="px-5 py-3 rounded-xl border border-[var(--ring)] font-bold">📈 View Trends</a>
                         <a href="top-drugs-quicksheet.html" class="px-5 py-3 rounded-xl border border-[var(--ring)] font-bold">🧾 Open Quicksheet</a>
                     </div>
@@ -4786,28 +5699,34 @@ function buildFinalBreakdownMarkup(breakdown) {
 }
 
 function showResults() {
-    saveQuizHistory();
-    saveMissedQuestionsToReviewQueue(state.questions);
+    if (state.timerHandle) {
+        clearInterval(state.timerHandle);
+        state.timerHandle = null;
+    }
+    state.timerPaused = true;
+    state.progressCompleted = true;
 
-    if (!state.signalsRecorded) {
+    const shouldPersistResults = !state.reviewMode;
+    clearQuizProgress();
+
+    if (state.reviewMode) {
+        saveReviewRoundResultsToReviewQueue(state.questions);
+    }
+
+    if (shouldPersistResults) {
+        saveQuizHistory();
+        saveMissedQuestionsToReviewQueue(state.questions);
+    }
+
+    if (shouldPersistResults && !state.signalsRecorded) {
         recordTopDrugsSignalsFromQuestions(state.questions);
         state.signalsRecorded = true;
     }
 
     // Save high score to localStorage (only if it's better than existing)
-    let storageKey = null;
-    if (weekParam) {
-        storageKey = `pharmlet.week${weekParam}.easy`;
-    } else if (weeksParam) {
-        const [startWeek, endWeek] = weeksParam.split('-').map(n => parseInt(n, 10));
-        storageKey = `pharmlet.weeks${startWeek}-${endWeek}.easy`;
-    } else if (tagParam) {
-        storageKey = `pharmlet.tag-${tagParam.toLowerCase()}.easy`;
-    } else if (quizId) {
-        storageKey = `pharmlet.${quizId}.easy`;
-    }
+    const storageKey = getScoreStorageKey();
     
-    if (storageKey) {
+    if (shouldPersistResults && storageKey) {
         try {
             const existing = JSON.parse(localStorage.getItem(storageKey) || '{}');
             const existingScore = existing.score || 0;
@@ -4831,9 +5750,35 @@ function showResults() {
     const reviewBtn = missed.length > 0 
         ? `<button onclick="reviewMissed()" class="mt-4 px-6 py-3 bg-red-600 text-white rounded-xl font-bold">🔄 Review ${missed.length} Missed</button>` 
         : `<p class="text-green-600 font-bold mt-4">🎉 Perfect Score!</p>`;
-    const letterGradeInfo = getLetterGradeInfoForQuiz(state.score, state.questions.length);
-    const finalBreakdown = buildFinalPerformanceBreakdown(state.questions);
+    const bossQuestions = !state.reviewMode && !state.bossMode ? buildBossRoundQuestions(state.questions) : [];
+    const bossBtn = state.bossMode
+        ? `<button onclick="restartQuiz()" class="px-8 py-4 rounded-2xl font-bold text-white" style="background:linear-gradient(135deg, #0f172a 0%, #8b1e3f 100%)">⚡ Retry Boss Round</button>`
+        : bossQuestions.length > 0
+        ? `<button onclick="launchBossRound()" class="px-8 py-4 rounded-2xl font-bold text-white" style="background:linear-gradient(135deg, #111827 0%, #8b1e3f 100%)">⚡ Boss Round (${bossQuestions.length})</button>`
+        : "";
+    const letterGradeInfo = shouldPersistResults ? getLetterGradeInfoForQuiz(state.score, state.questions.length) : null;
+    const finalBreakdown = shouldPersistResults ? buildFinalPerformanceBreakdown(state.questions) : null;
     state.finalBreakdown = finalBreakdown;
+    const resultsHeading = state.bossMode
+        ? (missed.length === 0 ? "Boss Cleared!" : "Boss Round Complete!")
+        : state.reviewMode
+        ? "Review Round Complete!"
+        : "Quiz Complete!";
+    const resultsSubheading = state.bossMode
+        ? `Challenge score: ${state.score} / ${state.questions.length}`
+        : state.reviewMode
+        ? `Cleared ${state.score} / ${state.questions.length} in this review round`
+        : `Final Score: ${state.score} / ${state.questions.length}`;
+    const reviewModeNote = state.reviewMode
+        ? `<p class="text-sm opacity-70 mt-2">Review rounds do not overwrite saved history, high scores, or adaptive weak-area stats. They do update review-queue mastery progress.</p>`
+        : "";
+    const bossModeNote = state.bossMode
+        ? `<p class="text-sm opacity-70 mt-2">Boss Round locked hints and answer reveals for this challenge.</p>`
+        : "";
+    const timeoutNote = state.timedOut
+        ? `<p class="text-sm font-semibold text-red-600 mt-2">Time expired, so any unanswered items were counted incorrect.</p>`
+        : "";
+    const streakNote = `<p class="text-sm opacity-70 mt-2">🔥 Best streak this run: <span class="font-semibold">${state.bestStreak}</span>${state.currentStreak > 0 ? ` • current combo ended at ${state.currentStreak}` : ""}</p>`;
     const letterGradeMarkup = letterGradeInfo
         ? `<div class="mt-4 rounded-2xl border border-[var(--ring)] bg-[var(--card)] px-5 py-4">
             <p class="text-sm font-semibold uppercase tracking-[0.2em] opacity-70">Letter Grade</p>
@@ -4844,17 +5789,25 @@ function showResults() {
     const examModeMarkup = isTrueExamMode()
         ? `<p class="text-sm opacity-70 mt-2">True Exam Mode was active for this attempt.</p>`
         : "";
+    const restartBtnMarkup = state.bossMode
+        ? ""
+        : `<button onclick="restartQuiz()" class="px-8 py-4 bg-maroon text-white rounded-2xl font-bold">🔁 Restart Quiz</button>`;
     const breakdownMarkup = buildFinalBreakdownMarkup(finalBreakdown);
     
     if (card) card.innerHTML = `<div class="text-center py-10">
-        <h2 class="text-4xl font-black mb-4">Quiz Complete!</h2>
-        <p class="text-2xl">Final Score: ${state.score} / ${state.questions.length}</p>
+        <h2 class="text-4xl font-black mb-4">${resultsHeading}</h2>
+        <p class="text-2xl">${resultsSubheading}</p>
+        ${reviewModeNote}
+        ${bossModeNote}
+        ${timeoutNote}
+        ${streakNote}
         ${letterGradeMarkup}
         ${examModeMarkup}
         ${hintsNote}
         <div class="flex flex-col gap-3 items-center mt-6">
             ${reviewBtn}
-            <button onclick="location.reload()" class="px-8 py-4 bg-maroon text-white rounded-2xl font-bold">🔁 Restart Quiz</button>
+            ${bossBtn}
+            ${restartBtnMarkup}
         </div>
         ${breakdownMarkup}
     </div>`;
@@ -4866,6 +5819,8 @@ async function main() {
     try {
         applyStoredQuizTheme();
         state.quizConfig = null;
+        state.bossMode = false;
+        state.generatedTimerSeconds = 0;
 
         let filteredPool = [];
         let fullPool = [];
@@ -5021,7 +5976,9 @@ async function main() {
                 (d.category && d.category.toLowerCase().includes(tagLower))
             );
             state.title = `${tagParam} Review`;
-            storageKey = `pharmlet.tag-${tagParam.toLowerCase()}.easy`;
+            storageKey = params.has("lab")
+                ? `pharmlet.lab${labParam}.tag-${tagParam.toLowerCase()}.easy`
+                : `pharmlet.tag-${tagParam.toLowerCase()}.easy`;
         }
         else if (quizId === FINAL_EXAM_ID) {
             fullPool = await smartFetch("master_pool.json");
@@ -5065,6 +6022,28 @@ async function main() {
             if (!data) {
                 throw new Error(`Quiz "${quizId}" is not available. Try recreating it from the source page.`);
             }
+
+            state.bossMode = Boolean(data?.metadata?.kind === "boss-round" || data?.metadata?.bossRound);
+            state.generatedTimerSeconds = Math.max(0, Number(data?.metadata?.timerSeconds) || 0);
+
+            if (isTopDrugsPlaylistPayload(data)) {
+                fullPool = await smartFetch("master_pool.json");
+                updateTopDrugsVersionBadge(fullPool);
+                state.title = data.title || "Weak Area Playlist";
+                state.questions = buildTopDrugsPlaylistQuestions(data, fullPool).map((question, i) => ({
+                    ...question,
+                    _id: i
+                }));
+                storageKey = `pharmlet.${quizId}.${modeParam}`;
+
+                if (!state.questions.length) {
+                    throw new Error("This weak-area playlist did not have enough valid drug prompts to build a quiz yet.");
+                }
+
+                finishSetup(storageKey);
+                return;
+            }
+
             const pool = buildQuestionPoolFromQuizData(data, modeParam);
 
             if (pool.length > 0 && pool.some(isConceptEntry)) {
@@ -5176,26 +6155,59 @@ async function main() {
 
 // Helper function to complete quiz setup
 function finishSetup(storageKey) {
+    state.progressKey = getQuizProgressKey();
+    hideQuizSessionNote();
+
     if (getEl("quiz-title")) getEl("quiz-title").textContent = state.title;
     if (getEl("qtotal")) getEl("qtotal").textContent = state.questions.length;
+    state.index = 0;
+    state.score = 0;
+    state.hintsUsed = 0;
+    state.currentStreak = 0;
+    state.bestStreak = 0;
+    state.marked = new Set();
+    state.seen = new Set();
+    state.originalQuestions = [];
+    state.reviewMode = false;
+    state.timedOut = false;
     state.resultsRecorded = false;
+    state.signalsRecorded = false;
     state.finalBreakdown = null;
+    state.timerPaused = false;
+    state.progressCompleted = false;
+    state.currentScale = 1.0;
+    document.body.style.zoom = state.currentScale;
+    document.documentElement.style.setProperty("--quiz-size", `${state.currentScale}rem`);
     
     // Initialize high score storage ONLY if it doesn't exist yet
     if (storageKey && !localStorage.getItem(storageKey)) {
         localStorage.setItem(storageKey, JSON.stringify({ score: 0, total: state.questions.length, date: Date.now() }));
     }
-    
-    startSmartTimer();
+
+    const restored = restoreSavedQuizProgress(loadSavedQuizProgress());
+
+    if (restored) {
+        startRestoredTimer();
+    } else {
+        startSmartTimer();
+    }
+
     wireEvents();
-    applyTrueExamModeUI();
+    applyAttemptModeUI();
+
+    if (!state.progressLifecycleBound) {
+        const persistNow = () => persistQuizProgress(true);
+        window.addEventListener("pagehide", persistNow);
+        window.addEventListener("beforeunload", persistNow);
+        state.progressLifecycleBound = true;
+    }
     
     // Save last quiz for quick resume (include lab param for week-based modes)
-    const labSuffix = (weekParam || weeksParam) ? `&lab=${labParam}` : '';
+    const labSuffix = (weekParam || weeksParam || (tagParam && params.has("lab"))) ? `&lab=${labParam}` : '';
     const examSuffix = isTrueExamMode() ? "&exam=1" : "";
     const lastQuizParam = weekParam ? `?week=${weekParam}${labSuffix}` 
                         : weeksParam ? `?weeks=${weeksParam}${labSuffix}`
-                        : tagParam ? `?tag=${tagParam}`
+                        : tagParam ? `?tag=${tagParam}${labSuffix}`
                         : `?id=${quizId}${examSuffix}`;
     localStorage.setItem("pharmlet.last-quiz", lastQuizParam);
     

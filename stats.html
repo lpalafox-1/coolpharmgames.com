@@ -80,6 +80,23 @@
       </div>
     </section>
 
+    <section id="weak-area-playlists-section" class="mb-8">
+      <h2 class="text-2xl font-bold mb-4">Weak-Area Playlists</h2>
+      <div class="card p-4">
+        <p class="text-sm mb-4" style="color:var(--muted)">
+          Launch focused playlists from your weak spots instead of starting from the full library every time.
+        </p>
+        <p id="playlist-status" class="text-sm mb-4" style="color:var(--muted)">
+          Building playlist recommendations from your saved progress...
+        </p>
+        <div id="weak-area-playlists" class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div class="rounded-xl border border-[var(--ring)] p-4" style="background:var(--accent-light, rgba(139,30,63,0.06)); color:var(--muted)">
+            Loading playlists...
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Performance by Quiz -->
     <section class="mb-8">
       <h2 class="text-2xl font-bold mb-4">Performance by Quiz</h2>
@@ -171,6 +188,8 @@
     </section>
   </main>
 
-  <script src="assets/js/stats.js?v=20260419b" defer></script>
+  <script src="assets/js/top-drugs-data.js?v=20260419a"></script>
+  <script src="assets/js/review-queue-store.js?v=20260423a"></script>
+  <script src="assets/js/stats.js?v=20260423a" defer></script>
 </body>
 </html>
