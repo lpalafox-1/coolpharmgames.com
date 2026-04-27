@@ -274,14 +274,13 @@ function renderAdaptiveFinalBanner() {
 
     const summary = state.adaptiveSummary;
     const adaptiveActive = Boolean(summary?.active);
+    wrap.dataset.state = adaptiveActive ? "active" : "warming";
 
     title.textContent = adaptiveActive ? "Adaptive Final Active" : "Adaptive Final Warming Up";
     copy.textContent = getAdaptiveSummaryBannerCopy(summary);
-    wrap.style.borderColor = adaptiveActive ? "rgba(14, 116, 144, 0.22)" : "rgba(139, 30, 63, 0.18)";
-    wrap.style.background = adaptiveActive
-        ? "linear-gradient(135deg, rgba(14,116,144,0.10), rgba(8,145,178,0.06))"
-        : "rgba(139, 30, 63, 0.08)";
-    wrap.style.color = adaptiveActive ? "#0f172a" : "";
+    wrap.style.borderColor = "";
+    wrap.style.background = "";
+    wrap.style.color = "";
 }
 
 function renderFooterActions(q) {
