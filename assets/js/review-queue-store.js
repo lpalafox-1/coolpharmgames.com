@@ -2,6 +2,8 @@
   const STORAGE_VERSION = 2;
   const MAX_QUEUE_ITEMS = 500;
   const MASTERED_STREAK_TARGET = 3;
+  const MASTERED_REFRESH_DAYS = 21;
+  const MASTERED_REFRESH_MS = MASTERED_REFRESH_DAYS * 24 * 60 * 60 * 1000;
 
   function toPlainText(value) {
     const div = document.createElement("div");
@@ -47,6 +49,29 @@
   function getTimestamp(value) {
     const timestamp = new Date(value || 0).getTime();
     return Number.isNaN(timestamp) ? 0 : timestamp;
+  }
+
+  function getMasteredTimestamp(entry) {
+    return Math.max(
+      getTimestamp(entry?.masteredAt),
+      getTimestamp(entry?.lastReviewedAt),
+      getTimestamp(entry?.lastMissedAt),
+      getTimestamp(entry?.createdAt),
+      0
+    );
+  }
+
+  function getMasteryAgeMs(entry, now = Date.now()) {
+    const masteredTimestamp = getMasteredTimestamp(entry);
+    if (!masteredTimestamp) return 0;
+    return Math.max(0, now - masteredTimestamp);
+  }
+
+  function isMasteryRefreshDue(entry, now = Date.now()) {
+    const clearStreak = Math.max(0, Number(entry?.clearStreak) || 0);
+    const mastered = Boolean(entry?.archived) || clearStreak >= MASTERED_STREAK_TARGET;
+    if (!mastered) return false;
+    return getMasteryAgeMs(entry, now) >= MASTERED_REFRESH_MS;
   }
 
   function getLaterIso(a, b) {
@@ -185,10 +210,21 @@
   }
 
   function sortQueue(entries) {
+    const now = Date.now();
+
     return [...entries].sort((a, b) => {
-      const aActive = a.archived ? 1 : 0;
-      const bActive = b.archived ? 1 : 0;
+      const aRefreshDue = isMasteryRefreshDue(a, now);
+      const bRefreshDue = isMasteryRefreshDue(b, now);
+      const aActive = (!a.archived || aRefreshDue) ? 0 : 1;
+      const bActive = (!b.archived || bRefreshDue) ? 0 : 1;
       if (aActive !== bActive) return aActive - bActive;
+
+      if (aRefreshDue !== bRefreshDue) return Number(bRefreshDue) - Number(aRefreshDue);
+
+      if (aRefreshDue && bRefreshDue) {
+        const ageDiff = getMasteryAgeMs(b, now) - getMasteryAgeMs(a, now);
+        if (ageDiff !== 0) return ageDiff;
+      }
 
       if (a.clearStreak !== b.clearStreak) return a.clearStreak - b.clearStreak;
 
@@ -355,13 +391,28 @@
   function getMasterySummary(entry) {
     const clearStreak = Math.max(0, Number(entry?.clearStreak) || 0);
     const mastered = Boolean(entry?.archived) || clearStreak >= MASTERED_STREAK_TARGET;
+    const refreshDue = isMasteryRefreshDue(entry);
+    const masteryAgeDays = Math.max(0, Math.floor(getMasteryAgeMs(entry) / (24 * 60 * 60 * 1000)));
+
+    if (mastered && refreshDue) {
+      return {
+        clearStreak,
+        target: MASTERED_STREAK_TARGET,
+        mastered: false,
+        refreshDue: true,
+        masteryAgeDays,
+        label: `Refresh due (${Math.max(1, masteryAgeDays)}d)`
+      };
+    }
 
     if (mastered) {
       return {
         clearStreak,
         target: MASTERED_STREAK_TARGET,
         mastered: true,
-        label: "Mastered"
+        refreshDue: false,
+        masteryAgeDays,
+        label: masteryAgeDays > 0 ? `Mastered (${masteryAgeDays}d)` : "Mastered"
       };
     }
 
@@ -370,6 +421,7 @@
         clearStreak,
         target: MASTERED_STREAK_TARGET,
         mastered: false,
+        refreshDue: false,
         label: "Fresh miss"
       };
     }
@@ -378,17 +430,22 @@
       clearStreak,
       target: MASTERED_STREAK_TARGET,
       mastered: false,
+      refreshDue: false,
       label: `${clearStreak}/${MASTERED_STREAK_TARGET} clean reviews`
     };
   }
 
   function getActiveEntries(rawQueue) {
-    return normalizeQueue(rawQueue).filter((entry) => !entry.archived);
+    const now = Date.now();
+    return normalizeQueue(rawQueue).filter((entry) => !entry.archived || isMasteryRefreshDue(entry, now));
   }
 
   function getDisplayTitle(entry, titleMap) {
     const titles = titleMap && typeof titleMap === "object" ? titleMap : {};
-    return entry?.title || titles[entry?.quizId] || entry?.quizId || "Review Queue";
+    const quizId = String(entry?.quizId || "").trim();
+    const quizCatalog = global.PharmletQuizCatalog;
+    const catalogTitle = quizCatalog?.getEntry?.(quizId)?.title || quizCatalog?.buildDynamicQuizLabel?.(quizId) || "";
+    return entry?.title || titles[quizId] || catalogTitle || quizId || "Review Queue";
   }
 
   function getMostMissedQuestions(rawQueue) {
@@ -439,6 +496,7 @@
   global.PharmletReviewQueueStore = {
     STORAGE_VERSION,
     MASTERED_STREAK_TARGET,
+    MASTERED_REFRESH_DAYS,
     MAX_QUEUE_ITEMS,
     toPlainText,
     serializeAnswerValue,
@@ -446,6 +504,8 @@
     mergeMissedEntries,
     applyReviewResults,
     getActiveEntries,
+    isMasteryRefreshDue,
+    getMasteryAgeMs,
     getEntryMissCount,
     getLatestActivityTimestamp,
     getCommonWrongAnswer,

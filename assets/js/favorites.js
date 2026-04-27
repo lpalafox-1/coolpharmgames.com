@@ -3,44 +3,7 @@
 
 const THEME_KEY = "pharmlet.theme";
 const FAVORITES_KEY = "pharmlet.favorites";
-
-// Quiz metadata mapping (id -> {title, category})
-const QUIZ_METADATA = {
-  "chapter1-review": { title: "Chapter 1 Review", category: "chapter" },
-  "chapter2-review": { title: "Chapter 2 Review", category: "chapter" },
-  "chapter3-review": { title: "Chapter 3 Review", category: "chapter" },
-  "chapter4-review": { title: "Chapter 4 Review", category: "chapter" },
-  "chapter5-review": { title: "Chapter 5 Review", category: "chapter" },
-  "practice-e1-exam1-prep-ch1-4": { title: "Practice E1 — Exam 1 Prep (Ch 1-4)", category: "practice" },
-  "practice-e2a-exam2-prep-ch1-5": { title: "Practice E2A — Exam 2 Prep (Ch 1-5)", category: "practice" },
-  "lab-quiz1-antihypertensives": { title: "Lab Quiz 1 — Antihypertensives", category: "lab" },
-  "lab-quiz2-antihypertensives": { title: "Lab Quiz 2 — Antihypertensives", category: "lab" },
-  "lab-quiz3-antilipemics": { title: "Lab Quiz 3 — Antilipemics", category: "lab" },
-  "lab-quiz4-anticoagulants": { title: "Lab Quiz 4 — Anticoagulants", category: "lab" },
-  "lab-quiz5-antiarrhythmics": { title: "Lab Quiz 5 — Antiarrhythmics", category: "lab" },
-  "cumulative-quiz1-2": { title: "Cumulative Quiz 1–2", category: "cumulative" },
-  "cumulative-quiz1-3": { title: "Cumulative Quiz 1–3", category: "cumulative" },
-  "cumulative-quiz1-4": { title: "Cumulative Quiz 1–4", category: "cumulative" },
-  "cumulative-quiz1-5": { title: "Cumulative Quiz 1–5", category: "cumulative" },
-  "top-drugs-final-mockA": { title: "Top Drugs Final Mock A", category: "final", modes: ["easy"] },
-  "top-drugs-final-mockB": { title: "Top Drugs Final Mock B", category: "final", modes: ["easy"] },
-  "top-drugs-final-mockC": { title: "Top Drugs Final Mock C", category: "final", modes: ["easy"] },
-  "top-drugs-final-mockD": { title: "Top Drugs Final Mock D", category: "final", modes: ["easy"] },
-  "top-drugs-final-mockE": { title: "Top Drugs Final Mock E", category: "final", modes: ["easy"] },
-  "log-lab-final-2": { title: "Top Drugs Final Lab 2", category: "final", modes: ["easy"] },
-  "bdt-unit10-quiz8": { title: "Basis II Quiz 8 — Endocrine System", category: "practice", modes: ["easy"] },
-  "bdt-unit10-exam4": { title: "Basis II Exam 4 — Endocrine Draft", category: "practice", modes: ["easy"] },
-  "bdt-unit10-exam4-high-yield": { title: "Basis II Exam 4 — High-Yield Draft", category: "practice", modes: ["easy"] },
-  "popp-practice-exam1": { title: "POPP Practice Exam 1", category: "practice" },
-  "popp-practice-law": { title: "POPP Practice Law", category: "practice" },
-  "popp-practice-mock-E1": { title: "POPP Practice Mock E1", category: "practice" },
-  "basis-practice-exam1": { title: "Basis Practice Exam 1", category: "practice" },
-  "basis-practice-mock-E1": { title: "Basis Practice Mock E1", category: "practice" },
-  "ceutics-practice-1": { title: "Pharmaceutics Practice Q1", category: "practice" },
-  "ceutics-practice-2": { title: "Pharmaceutics Practice Q2", category: "practice" },
-  "sig-wildcards": { title: "SIG Wildcards", category: "fun" },
-  "latin-fun": { title: "Latin Fun", category: "fun" }
-};
+const quizCatalog = window.PharmletQuizCatalog;
 
 document.addEventListener("DOMContentLoaded", () => {
   // Theme toggle
@@ -89,9 +52,9 @@ function loadFavorites() {
   // Build quiz list with metadata
   let quizzes = favorites.map(id => ({
     id,
-    title: QUIZ_METADATA[id]?.title || id,
-    category: QUIZ_METADATA[id]?.category || "other",
-    modes: QUIZ_METADATA[id]?.modes || ["easy", "hard"]
+    title: quizCatalog?.getEntry?.(id)?.title || quizCatalog?.buildDynamicQuizLabel?.(id) || id,
+    category: quizCatalog?.resolveFavoriteCategory?.(id) || "other",
+    modes: quizCatalog?.getEntry?.(id)?.modes || ["easy", "hard"]
   }));
 
   // Filter by category
@@ -122,7 +85,9 @@ function loadFavorites() {
     div.className = "favorite-item";
     const modeButtons = quiz.modes.map(mode => {
       const label = mode.charAt(0).toUpperCase() + mode.slice(1);
-      return `<a href="quiz.html?id=${quiz.id}&mode=${mode}&limit=20" class="btn btn-blue flex-1 text-center">${label}</a>`;
+      const href = quizCatalog?.buildQuizHref?.(quiz.id, mode)
+        || `quiz.html?id=${encodeURIComponent(quiz.id)}&mode=${encodeURIComponent(mode)}`;
+      return `<a href="${href}" class="btn btn-blue flex-1 text-center">${label}</a>`;
     }).join("");
 
     div.innerHTML = `
@@ -171,16 +136,7 @@ function clearAllFavorites() {
 }
 
 function getCategoryLabel(category) {
-  const labels = {
-    chapter: "Chapter Review",
-    practice: "Exam Practice",
-    lab: "Lab Quiz",
-    cumulative: "Cumulative",
-    final: "Final Review",
-    fun: "Fun Mode",
-    other: "Other"
-  };
-  return labels[category] || "Other";
+  return quizCatalog?.getFavoriteCategoryLabel?.(category) || "Other";
 }
 
 function sanitize(str) {

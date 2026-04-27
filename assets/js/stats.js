@@ -6,14 +6,19 @@ const HISTORY_KEY = "pharmlet.history";
 const REVIEW_KEY = "pharmlet.review-queue";
 const TOP_DRUGS_SIGNALS_KEY = "pharmlet.topDrugs.signals";
 const FINAL_RECENT_RUNS_KEY = "pharmlet.finalLab2.recentRuns";
+const FINAL_EXAM_ID = "log-lab-final-2";
+const FINAL_EXAM_TOTAL = 110;
 const QUESTION_REPORTS_KEY = "pharmlet.question-reports";
 const LAST_ROUND_PREFIX = "pharmlet.session.lastRound.";
 const PROGRESS_KEY_PREFIX = "pharmlet.";
 const PROGRESS_BACKUP_VERSION = 2;
 const CUSTOM_QUIZ_KEY = "pharmlet.custom-quiz";
 const PLAYLIST_LOOKBACK_DAYS = 7;
+const WARMUP_REVIEW_LOOKBACK_DAYS = 14;
 const reviewQueueStore = window.PharmletReviewQueueStore;
+const quizCatalog = window.PharmletQuizCatalog;
 let weakAreaPlaylistState = null;
+let morningWarmupState = null;
 
 // Theme toggle
 document.addEventListener("DOMContentLoaded", () => {
@@ -62,6 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("import-progress-file")?.addEventListener("change", handleProgressBackupFile);
   document.getElementById("export-question-reports")?.addEventListener("click", exportQuestionReports);
   document.getElementById("clear-question-reports")?.addEventListener("click", clearQuestionReports);
+  document.getElementById("morning-warmups")?.addEventListener("click", handleMorningWarmupClick);
   document.getElementById("weak-area-playlists")?.addEventListener("click", handleWeakPlaylistClick);
 });
 
@@ -167,6 +173,21 @@ function setQuestionReportStatus(message, tone = "muted") {
 
 function setPlaylistStatus(message, tone = "muted") {
   const el = document.getElementById("playlist-status");
+  if (!el) return;
+
+  const colors = {
+    muted: "var(--muted)",
+    good: "var(--good)",
+    bad: "var(--bad)",
+    accent: "var(--accent)"
+  };
+
+  el.textContent = message;
+  el.style.color = colors[tone] || colors.muted;
+}
+
+function setWarmupStatus(message, tone = "muted") {
+  const el = document.getElementById("warmup-status");
   if (!el) return;
 
   const colors = {
@@ -438,20 +459,239 @@ function buildWeakAreaPlaylistModels(pool, signals, reviewQueue) {
   }));
 }
 
-async function renderWeakAreaPlaylists(reviewQueue) {
+async function loadTopDrugsPoolState() {
+  try {
+    const loader = window.TopDrugsData?.loadPool;
+    if (typeof loader !== "function") {
+      throw new Error("Top Drugs pool loader is unavailable.");
+    }
+
+    const loaded = await loader();
+    return {
+      pool: Array.isArray(loaded?.data) ? loaded.data : [],
+      poolLoadFailed: false
+    };
+  } catch (error) {
+    console.warn("Unable to load Top Drugs pool for stats:", error);
+    return {
+      pool: [],
+      poolLoadFailed: true
+    };
+  }
+}
+
+function getWarmupButtonSpecs(count, preferredSizes) {
+  const available = Math.max(0, Number(count) || 0);
+  if (!available) return [];
+
+  const unique = new Set();
+  const specs = [];
+
+  preferredSizes.forEach((size) => {
+    const numericSize = Number(size) || 0;
+    if (numericSize > 0 && available >= numericSize && !unique.has(numericSize)) {
+      unique.add(numericSize);
+      specs.push({ size: numericSize, label: `Play ${numericSize}` });
+    }
+  });
+
+  if (!unique.has(available)) {
+    unique.add(available);
+    specs.push({ size: available, label: "Play All" });
+  }
+
+  return specs;
+}
+
+function getLatestCompletedFinalAttempt(history) {
+  return [...history]
+    .filter((entry) => entry?.quizId === FINAL_EXAM_ID && Number(entry?.total) === FINAL_EXAM_TOTAL)
+    .sort((a, b) => Number(b?.timestamp || 0) - Number(a?.timestamp || 0))[0] || null;
+}
+
+function buildMorningWarmupDrugCandidates(pool, signals, latestFinalAttempt) {
+  const weakAreas = Array.isArray(latestFinalAttempt?.finalSummary?.weakAreas)
+    ? latestFinalAttempt.finalSummary.weakAreas
+    : [];
+
+  return pool
+    .map((drug) => {
+      const brandScore = getBrandWeaknessScore(drug, signals);
+      const classScore = getFieldWeaknessScore(signals, "class", drug?.class);
+      const categoryScore = getFieldWeaknessScore(signals, "category", drug?.category);
+      const moaScore = drug?.moa
+        ? getDrugWeaknessScore(drug, signals) + (getCounterValue(signals.missedDrugs, drug?.generic) * 0.18)
+        : 0;
+      const genericScore = getFieldWeaknessScore(signals, "generic", drug?.generic);
+      const focusScores = {
+        brand: brandScore,
+        class: classScore,
+        category: categoryScore,
+        moa: moaScore,
+        generic: genericScore
+      };
+
+      let score = (getDrugWeaknessScore(drug, signals) * 0.7) + (brandScore * 0.3) + (genericScore * 0.25);
+      weakAreas.forEach((area, index) => {
+        const weight = index === 0 ? 0.95 : index === 1 ? 0.62 : 0.4;
+        score += Math.max(0, Number(focusScores[area?.key]) || 0) * weight;
+      });
+
+      score += Math.max(brandScore, classScore, categoryScore, moaScore, 0) * 0.16;
+
+      return {
+        drug,
+        score,
+        focusScores,
+        missed: getCounterValue(signals.missedDrugs, drug?.generic)
+      };
+    })
+    .filter((candidate) => candidate.score > 0)
+    .sort((a, b) => b.score - a.score || b.missed - a.missed || a.drug.generic.localeCompare(b.drug.generic));
+}
+
+function buildMorningWarmupReviewEntries(reviewQueue) {
+  const activeEntries = reviewQueueStore ? reviewQueueStore.getActiveEntries(reviewQueue) : reviewQueue;
+  const recentCutoff = Date.now() - (WARMUP_REVIEW_LOOKBACK_DAYS * 24 * 60 * 60 * 1000);
+  const getMissCount = (entry) => reviewQueueStore
+    ? reviewQueueStore.getEntryMissCount(entry)
+    : Math.max(0, Number(entry?.missCount) || 0);
+  const getLatestActivity = (entry) => reviewQueueStore
+    ? reviewQueueStore.getLatestActivityTimestamp(entry)
+    : new Date(entry?.lastMissedAt || entry?.createdAt || 0).getTime();
+
+  return activeEntries
+    .filter((entry) => {
+      const prompt = reviewQueueStore ? reviewQueueStore.toPlainText(entry.prompt) : toPlainText(entry.prompt);
+      return Boolean(prompt);
+    })
+    .sort((a, b) => {
+      const aRecent = getLatestActivity(a) >= recentCutoff;
+      const bRecent = getLatestActivity(b) >= recentCutoff;
+      if (aRecent !== bRecent) return Number(bRecent) - Number(aRecent);
+
+      const missDiff = getMissCount(b) - getMissCount(a);
+      if (missDiff !== 0) return missDiff;
+
+      return getLatestActivity(b) - getLatestActivity(a);
+    });
+}
+
+function buildMorningWarmupModels(pool, signals, reviewQueue, history) {
+  const latestFinalAttempt = getLatestCompletedFinalAttempt(history);
+  const weakAreas = Array.isArray(latestFinalAttempt?.finalSummary?.weakAreas)
+    ? latestFinalAttempt.finalSummary.weakAreas
+    : [];
+  const warmupCandidates = buildMorningWarmupDrugCandidates(pool, signals, latestFinalAttempt);
+  const reviewEntries = buildMorningWarmupReviewEntries(reviewQueue);
+  const focusText = weakAreas.length
+    ? weakAreas.slice(0, 2).map((area) => area.label || area.key || "Focus").join(" + ")
+    : "adaptive weak-drug memory";
+
+  return [
+    {
+      key: "adaptive-final-warmup",
+      type: "top-drugs",
+      promptFocus: weakAreas[0]?.key || "mixed",
+      title: "Adaptive Final Warm-Up",
+      description: `Short mixed Top Drugs prep leaning into ${focusText} before you start a longer run.`,
+      items: warmupCandidates.map((candidate) => candidate.drug),
+      preview: getPlaylistPreview(warmupCandidates, (candidate) => candidate.drug.generic),
+      availableCount: warmupCandidates.length,
+      buttonSpecs: getWarmupButtonSpecs(warmupCandidates.length, [15, 25])
+    },
+    {
+      key: "rapid-cleanup-warmup",
+      type: "review-queue",
+      promptFocus: "review",
+      title: "Rapid Cleanup",
+      description: `Clear your highest-friction missed questions and tempting wrong answers from the last ${WARMUP_REVIEW_LOOKBACK_DAYS} days.`,
+      items: reviewEntries,
+      preview: getPlaylistPreview(reviewEntries, (entry) => {
+        const prompt = reviewQueueStore ? reviewQueueStore.toPlainText(entry.prompt) : toPlainText(entry.prompt);
+        return prompt.length > 28 ? `${prompt.slice(0, 28)}...` : prompt;
+      }),
+      availableCount: reviewEntries.length,
+      buttonSpecs: getWarmupButtonSpecs(reviewEntries.length, [10, 20])
+    }
+  ];
+}
+
+function renderMorningWarmups(reviewQueue, history, poolState) {
+  const container = document.getElementById("morning-warmups");
+  if (!container) return;
+
+  const { pool = [], poolLoadFailed = false } = poolState || {};
+  const signals = loadTopDrugsSignals();
+  const models = buildMorningWarmupModels(pool, signals, reviewQueue, history);
+  morningWarmupState = { models };
+
+  const liveModels = models.filter((model) => model.availableCount > 0);
+  if (!liveModels.length) {
+    container.innerHTML = `
+      <div class="rounded-xl border border-[var(--ring)] p-4 md:col-span-2" style="background:var(--accent-light, rgba(139,30,63,0.06)); color:var(--muted)">
+        Finish a few more quizzes first. Morning warm-ups unlock once the site has enough weak-area or missed-question data to target.
+      </div>
+    `;
+    setWarmupStatus(poolLoadFailed ? "Top Drugs warm-up data is offline right now, so only review-driven warm-ups were checked." : "No morning warm-ups are ready yet.", poolLoadFailed ? "bad" : "muted");
+    return;
+  }
+
+  container.innerHTML = "";
+  models.forEach((model) => {
+    const card = document.createElement("div");
+    card.className = "rounded-xl border border-[var(--ring)] p-4";
+    card.style.background = "linear-gradient(135deg, rgba(15, 23, 42, 0.03) 0%, rgba(139, 30, 63, 0.08) 100%)";
+
+    const countLabel = model.availableCount > 0
+      ? `${model.availableCount} ready`
+      : "Need more data";
+    const preview = model.preview
+      ? `<div class="text-xs mt-3" style="color:var(--muted)">Preview: ${sanitize(model.preview)}</div>`
+      : "";
+    const buttonMarkup = model.buttonSpecs.length
+      ? model.buttonSpecs.map((spec) => `
+          <button
+            type="button"
+            class="btn btn-blue"
+            data-warmup-key="${sanitize(model.key)}"
+            data-warmup-size="${spec.size}"
+          >
+            ${sanitize(spec.label)}
+          </button>
+        `).join("")
+      : `<button type="button" class="btn btn-ghost opacity-60 cursor-not-allowed" disabled>Locked</button>`;
+
+    card.innerHTML = `
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <div class="text-[10px] font-black uppercase tracking-[0.18em] opacity-60">${model.type === "review-queue" ? "Fast Cleanup" : "Adaptive Top Drugs"}</div>
+          <h3 class="text-lg font-semibold mt-1">${sanitize(model.title)}</h3>
+        </div>
+        <div class="text-xs font-semibold whitespace-nowrap" style="color:var(--muted)">${sanitize(countLabel)}</div>
+      </div>
+      <p class="text-sm mt-3" style="color:var(--muted)">${sanitize(model.description)}</p>
+      ${preview}
+      <div class="flex flex-wrap gap-2 mt-4">
+        ${buttonMarkup}
+      </div>
+    `;
+    container.appendChild(card);
+  });
+
+  const reviewCount = models.find((model) => model.key === "rapid-cleanup-warmup")?.availableCount || 0;
+  const topDrugsCount = models.find((model) => model.key === "adaptive-final-warmup")?.availableCount || 0;
+  const statusMessage = poolLoadFailed
+    ? `Warm-up mode is partially ready. Review cleanup is available, but Top Drugs pool data could not be loaded for the adaptive warm-up.`
+    : `Ready: ${liveModels.length} warm-up track${liveModels.length === 1 ? "" : "s"} using ${topDrugsCount} adaptive Top Drugs targets and ${reviewCount} cleanup cards.`;
+  setWarmupStatus(statusMessage, poolLoadFailed ? "accent" : "good");
+}
+
+async function renderWeakAreaPlaylists(reviewQueue, poolState) {
   const container = document.getElementById("weak-area-playlists");
   if (!container) return;
 
-  let pool = [];
-  let poolLoadFailed = false;
-
-  try {
-    const loaded = await window.TopDrugsData?.loadPool?.();
-    pool = Array.isArray(loaded?.data) ? loaded.data : [];
-  } catch (error) {
-    console.warn("Unable to load Top Drugs pool for playlists:", error);
-    poolLoadFailed = true;
-  }
+  const { pool = [], poolLoadFailed = false } = poolState || {};
 
   const signals = loadTopDrugsSignals();
   const playlists = buildWeakAreaPlaylistModels(pool, signals, reviewQueue);
@@ -538,6 +778,11 @@ function buildReviewQueuePlaylistSolution(entry) {
 }
 
 function buildReviewQueuePlaylistQuestion(entry) {
+  const quizId = String(entry?.quizId || "").trim();
+  const sourceTitle = reviewQueueStore?.getDisplayTitle
+    ? reviewQueueStore.getDisplayTitle(entry)
+    : (entry.title || quizCatalog?.getEntry?.(quizId)?.title || quizCatalog?.buildDynamicQuizLabel?.(quizId) || quizId || "Review Queue");
+
   return {
     type: entry.type,
     prompt: entry.prompt,
@@ -545,7 +790,7 @@ function buildReviewQueuePlaylistQuestion(entry) {
     answer: entry.answer,
     answerText: entry.answerText ?? entry.answer,
     sourceQuizId: entry.quizId || "",
-    sourceTitle: reviewQueueStore ? reviewQueueStore.getDisplayTitle(entry, {}) : (entry.title || entry.quizId || "Review Queue"),
+    sourceTitle,
     hint: reviewQueueStore
       ? `Mastery progress: ${reviewQueueStore.getMasterySummary(entry).label}.`
       : "Review your previous answer carefully.",
@@ -557,6 +802,56 @@ function resolvePlaylistSize(playlist, requestedSize) {
   const available = Math.max(0, Number(playlist?.availableCount) || 0);
   const numericSize = Number(requestedSize) || available;
   return Math.min(available, Math.max(1, numericSize));
+}
+
+function launchMorningWarmup(warmupKey, requestedSize) {
+  const model = morningWarmupState?.models?.find((item) => item.key === warmupKey);
+  if (!model || !model.availableCount) return;
+
+  const size = resolvePlaylistSize(model, requestedSize);
+  if (!size) return;
+
+  if (model.type === "review-queue") {
+    const questions = model.items
+      .slice(0, size)
+      .map(buildReviewQueuePlaylistQuestion);
+
+    const payload = {
+      id: "custom-quiz",
+      title: `${model.title} - ${size} Question${size === 1 ? "" : "s"}`,
+      metadata: {
+        generatedFrom: "stats",
+        kind: "morning-warmup",
+        generator: "review-queue-warmup",
+        playlistKey: model.key,
+        createdAt: Date.now(),
+        requestedSize: size
+      },
+      questions
+    };
+
+    localStorage.setItem(CUSTOM_QUIZ_KEY, JSON.stringify(payload));
+    window.location.href = "quiz.html?id=custom-quiz";
+    return;
+  }
+
+  const payload = {
+    id: "custom-quiz",
+    title: `${model.title} - ${size} Question${size === 1 ? "" : "s"}`,
+    metadata: {
+      generatedFrom: "stats",
+      kind: "morning-warmup",
+      generator: "top-drugs-playlist",
+      playlistKey: model.key,
+      promptFocus: model.promptFocus,
+      createdAt: Date.now(),
+      requestedSize: size
+    },
+    items: model.items.slice(0, size)
+  };
+
+  localStorage.setItem(CUSTOM_QUIZ_KEY, JSON.stringify(payload));
+  window.location.href = "quiz.html?id=custom-quiz";
 }
 
 function launchWeakAreaPlaylist(playlistKey, requestedSize) {
@@ -618,6 +913,17 @@ function handleWeakPlaylistClick(event) {
   if (!playlistKey) return;
 
   launchWeakAreaPlaylist(playlistKey, playlistSize);
+}
+
+function handleMorningWarmupClick(event) {
+  const button = event.target.closest("[data-warmup-key]");
+  if (!button) return;
+
+  const warmupKey = button.getAttribute("data-warmup-key");
+  const warmupSize = button.getAttribute("data-warmup-size");
+  if (!warmupKey) return;
+
+  launchMorningWarmup(warmupKey, warmupSize);
 }
 
 function collectProgressBackupData() {
@@ -764,10 +1070,12 @@ async function loadStats() {
   const history = getHistory();
   const reviewQueue = getReviewQueue();
   const questionReports = getQuestionReports();
+  const poolState = await loadTopDrugsPoolState();
 
   renderMostMissedQuestions(reviewQueue);
   renderQuestionReports(questionReports);
-  await renderWeakAreaPlaylists(reviewQueue);
+  renderMorningWarmups(reviewQueue, history, poolState);
+  await renderWeakAreaPlaylists(reviewQueue, poolState);
   
   if (history.length === 0) {
     return; // Show default empty state
@@ -1062,18 +1370,7 @@ function getHistory() {
 }
 
 function getCategoryFromQuizId(quizId) {
-  if (quizId.startsWith("bdt-")) return "Basis";
-  if (quizId.startsWith("chapter")) return "Chapter Reviews";
-  if (quizId.startsWith("practice-")) return "Exam Practice";
-  if (quizId.startsWith("lab-quiz")) return "Lab Quizzes";
-  if (quizId.startsWith("week") || quizId.startsWith("weeks")) return "Top Drugs";
-  if (quizId.startsWith("cumulative")) return "Cumulative";
-  if (quizId.startsWith("popp")) return "POPP";
-  if (quizId.startsWith("basis")) return "Basis";
-  if (quizId.startsWith("ceutics")) return "Pharmaceutics";
-  if (quizId.includes("final") || quizId.includes("top-drugs")) return "Final Review";
-  if (quizId.includes("latin") || quizId.includes("sig")) return "Fun Modes";
-  return "Other";
+  return quizCatalog?.resolveStatsCategory?.(quizId) || "Other";
 }
 
 function getTimeAgo(date) {

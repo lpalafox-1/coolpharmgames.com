@@ -3,6 +3,7 @@
 
 const THEME_KEY = "pharmlet.theme";
 const CUSTOM_QUIZ_KEY = "pharmlet.custom-quiz";
+const quizCatalog = window.PharmletQuizCatalog;
 
 const state = {
   availableQuizzes: [],
@@ -37,43 +38,37 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function loadAvailableQuizzes() {
-  // Hardcoded list of available quizzes (could be generated dynamically)
-  const quizIds = [
-    "chapter1-review", "chapter2-review", "chapter3-review", "chapter4-review", "chapter5-review",
-    "practice-e1-exam1-prep-ch1-4", "practice-e2a-exam2-prep-ch1-5",
-    "lab-quiz1-antihypertensives", "lab-quiz2-antihypertensives", "lab-quiz3-antilipemics",
-    "lab-quiz4-anticoagulants", "lab-quiz5-antiarrhythmics",
-    "cumulative-quiz1-2", "cumulative-quiz1-3", "cumulative-quiz1-4", "cumulative-quiz1-5",
-    "popp-practice-exam1", "popp-practice-law", "popp-practice-mock-E1",
-    "basis-practice-exam1", "basis-practice-mock-E1",
-    "top-drugs-final-mockA", "top-drugs-final-mockB", "top-drugs-final-mockC",
-    "top-drugs-final-mockD", "top-drugs-final-mockE",
-    "sig-wildcards", "latin-fun"
-  ];
-
   const quizList = document.getElementById("quiz-list");
   quizList.innerHTML = "";
+  state.availableQuizzes = [];
 
-  for (const quizId of quizIds) {
+  const builderEntries = quizCatalog?.listCustomBuilderEntries?.() || [];
+  if (!builderEntries.length) {
+    quizList.innerHTML = '<div class="text-center py-8" style="color:var(--muted)">Quiz catalog unavailable.</div>';
+    return;
+  }
+
+  for (const entry of builderEntries) {
     try {
       const data = await (async () => {
-        const res = await fetch(`quizzes/${quizId}.json`, { cache: "no-store" });
+        const res = await fetch(entry.sourcePath, { cache: "no-store" });
         if (!res.ok) return null;
         return res.json();
       })();
       if (!data) continue;
       
       const quizInfo = {
-        id: quizId,
-        title: data.title || quizId,
+        id: entry.id,
+        title: data.title || entry.title || entry.id,
         pools: data.pools || {},
-        questionCount: calculateQuestionCount(data)
+        questionCount: calculateQuestionCount(data),
+        sourcePath: entry.sourcePath
       };
       
       state.availableQuizzes.push(quizInfo);
       renderQuizCard(quizInfo);
     } catch (e) {
-      console.warn(`Failed to load ${quizId}:`, e);
+      console.warn(`Failed to load ${entry.id}:`, e);
     }
   }
 
@@ -186,8 +181,11 @@ async function startCustomQuiz() {
   const quizTitles = [];
   
   for (const quizId of state.selectedQuizzes) {
+    const selectedQuiz = state.availableQuizzes.find((quiz) => quiz.id === quizId);
+    const sourcePath = selectedQuiz?.sourcePath || `quizzes/${quizId}.json`;
+
     try {
-      const res = await fetch(`quizzes/${quizId}.json`, { cache: "no-store" });
+      const res = await fetch(sourcePath, { cache: "no-store" });
       if (!res.ok) continue;
       const data = await res.json();
       

@@ -15,6 +15,34 @@ function forceShowMenu() {
   if (menu) menu.style.display = "";
 }
 
+function safeReadStorageJson(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (error) {
+    console.warn(`Ignoring malformed storage value for ${key}:`, error);
+    return null;
+  }
+}
+
+function getWeekMasteryStats(weekNumber) {
+  const candidateKeys = [
+    `pharmlet.lab2.week${weekNumber}.easy`,
+    `pharmlet.week${weekNumber}.easy`
+  ];
+
+  for (const key of candidateKeys) {
+    const parsed = safeReadStorageJson(key);
+    const score = Number(parsed?.score);
+    const total = Number(parsed?.total);
+    if (!Number.isFinite(score) || !Number.isFinite(total) || total <= 0) continue;
+    return { score, total };
+  }
+
+  return null;
+}
+
 function runHome() {
   // 1) Theme toggle
   const THEME_KEY = "pharmlet.theme";
@@ -55,12 +83,9 @@ function runHome() {
 
 // 3) Progress Tracking: Lab II Mastery
   for (let w = 1; w <= 11; w++) {
-    const scoreKey = `pharmlet.week${w}.easy`; 
-    const savedData = localStorage.getItem(scoreKey);
-    
-    if (savedData) {
-      const stats = JSON.parse(savedData);
-      const percent = Math.round((stats.score / stats.total) * 100);
+    const stats = getWeekMasteryStats(w);
+    if (stats) {
+      const percent = Math.max(0, Math.min(100, Math.round((stats.score / stats.total) * 100)));
       
       const bar = document.getElementById(`prog-week-${w}`);
       if (bar) bar.style.width = `${percent}%`;
@@ -84,7 +109,7 @@ function runHome() {
   const lastQuiz = localStorage.getItem("pharmlet.last-quiz");
   if (resumeLink && resumeWrap) {
     if (lastQuiz) {
-      resumeLink.href = `quiz.html${lastQuiz}`;
+      resumeLink.href = buildResumeQuizHref(lastQuiz);
       resumeWrap.style.display = "";
     } else {
       resumeWrap.style.display = "none";
@@ -98,4 +123,15 @@ function runHome() {
   });
 
   if (menu && menu.style.display === "none" && !showWelcome) menu.style.display = "";
+}
+
+function buildResumeQuizHref(lastQuiz) {
+  try {
+    const target = new URL(`quiz.html${lastQuiz}`, window.location.origin);
+    target.searchParams.set("resume", "1");
+    return `${target.pathname}${target.search}`;
+  } catch (error) {
+    console.warn("Unable to build resume URL:", error);
+    return `quiz.html${lastQuiz}`;
+  }
 }

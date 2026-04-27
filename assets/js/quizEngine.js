@@ -8,6 +8,7 @@ const quizId = params.get("id");
 const modeParam = params.get("mode") || "easy";
 const limitParam = parseInt(params.get("limit") || "", 10);
 const examModeParam = params.get("exam") === "1";
+const resumeRequestedParam = params.get("resume") === "1";
 const HISTORY_KEY = "pharmlet.history";
 const CUSTOM_QUIZ_KEY = "pharmlet.custom-quiz";
 const REVIEW_KEY = "pharmlet.review-queue";
@@ -15,7 +16,7 @@ const QUESTION_REPORTS_KEY = "pharmlet.question-reports";
 const THEME_KEY = "pharmlet.theme";
 const QUIZ_PROGRESS_PREFIX = "pharmlet.quiz-progress.";
 const MAX_QUESTION_REPORTS = 200;
-const QUIZ_PROGRESS_MAX_AGE_MS = 1000 * 60 * 60 * 24 * 7;
+const QUIZ_PROGRESS_MAX_AGE_MS = 1000 * 60 * 60 * 12;
 const TIMER_AUTOSAVE_INTERVAL_SECONDS = 15;
 
 const state = { 
@@ -35,20 +36,24 @@ const state = {
     resultsRecorded: false,
     signalsRecorded: false,
     finalBreakdown: null,
+    adaptiveSummary: null,
     quizConfig: null,
     progressKey: "",
     autosaveTimeout: null,
     lastAutosaveAt: 0,
     saveStatusMessage: "",
     progressLifecycleBound: false,
-    progressCompleted: false
+    progressCompleted: false,
+    generatedAttemptIdentity: null
 };
 
 // --- 1. CORE ACTIONS ---
 function toggleMark() {
     if (state.marked.has(state.index)) state.marked.delete(state.index);
     else state.marked.add(state.index);
+    queueQuizProgressSave(100);
     renderQuizStatus();
+    renderMarkControls();
     renderNavMap();
 }
 
@@ -154,7 +159,23 @@ function renderQuizStatus() {
     const seen = getSeenCount();
     const unanswered = getUnansweredCount();
     const marked = state.marked.size;
-    status.textContent = `Seen ${seen}/${total} • ${unanswered} unanswered • ${marked} marked`;
+    const notes = [];
+
+    if (state.saveStatusMessage) {
+        notes.push(state.saveStatusMessage);
+    }
+
+    if (state.bossMode) {
+        notes.push("Boss mode active");
+    } else if (!state.reviewMode) {
+        const answeredCount = state.questions.reduce((count, question) => count + (question?._answered ? 1 : 0), 0);
+        if (answeredCount >= 4) {
+            notes.push(`Boss ready ${getBossRoundTargetCount(answeredCount)}`);
+        }
+    }
+
+    const suffix = notes.length ? ` • ${notes.join(" • ")}` : "";
+    status.textContent = `Seen ${seen}/${total} • ${unanswered} unanswered • ${marked} marked${suffix}`;
 }
 
 function getStreakFlavorText() {
@@ -195,6 +216,72 @@ function applyStreakOutcome(isCorrect) {
     }
 
     renderStreakMeter();
+}
+
+function renderMarkControls() {
+    const isMarked = state.marked.has(state.index);
+    const configs = [
+        { id: "mark", idle: "🚩 Mark (M)", active: "🚩 Marked (M)" },
+        { id: "mark-mobile", idle: "🚩 Mark", active: "🚩 Marked" }
+    ];
+
+    configs.forEach(({ id, idle, active }) => {
+        const button = getEl(id);
+        if (!button) return;
+
+        button.textContent = isMarked ? active : idle;
+        button.style.background = isMarked ? "#facc15" : "";
+        button.style.borderColor = isMarked ? "#ca8a04" : "";
+        button.style.color = isMarked ? "#111827" : "";
+    });
+}
+
+function getAdaptiveSummaryFocusText(summary) {
+    if (!summary?.topFocusLabels?.length) return "";
+    return summary.topFocusLabels.join(", ");
+}
+
+function getAdaptiveSummaryBannerCopy(summary) {
+    if (!summary?.active) {
+        return "This final is using the balanced 110-question blueprint now. Complete a few more full finals on this browser to sharpen the adaptive memory.";
+    }
+
+    const runText = `${summary.runCount} completed final run${summary.runCount === 1 ? "" : "s"}`;
+    const signalText = `${summary.signalCount} tracked weak point${summary.signalCount === 1 ? "" : "s"}`;
+    const anchorText = summary.targetedDrugCount > 0
+        ? `${summary.targetedDrugCount} selected drug${summary.targetedDrugCount === 1 ? "" : "s"} were boosted by your weak-area memory.`
+        : "Weak-area memory is active across the current selection.";
+    const focusText = getAdaptiveSummaryFocusText(summary);
+    const repeatText = summary.repeatPenaltyCount > 0
+        ? `Repeat guard softened ${summary.repeatPenaltyCount} recently used drug${summary.repeatPenaltyCount === 1 ? "" : "s"}.`
+        : "Repeat guard is active.";
+    const legacyText = summary.legacyRecoveredCount > 0
+        ? `Recovered ${summary.legacyRecoveredCount} older completed run${summary.legacyRecoveredCount === 1 ? "" : "s"} from your saved history.`
+        : "";
+
+    return `Using ${runText} and ${signalText}. Strongest push: ${focusText || "mixed review"}. ${anchorText} ${repeatText}${legacyText ? ` ${legacyText}` : ""}`;
+}
+
+function renderAdaptiveFinalBanner() {
+    const wrap = getEl("adaptive-final-banner");
+    const title = getEl("adaptive-final-title");
+    const copy = getEl("adaptive-final-copy");
+    if (!wrap || !title || !copy) return;
+
+    const active = quizId === FINAL_EXAM_ID && !state.reviewMode && !state.bossMode;
+    wrap.classList.toggle("hidden", !active);
+    if (!active) return;
+
+    const summary = state.adaptiveSummary;
+    const adaptiveActive = Boolean(summary?.active);
+
+    title.textContent = adaptiveActive ? "Adaptive Final Active" : "Adaptive Final Warming Up";
+    copy.textContent = getAdaptiveSummaryBannerCopy(summary);
+    wrap.style.borderColor = adaptiveActive ? "rgba(14, 116, 144, 0.22)" : "rgba(139, 30, 63, 0.18)";
+    wrap.style.background = adaptiveActive
+        ? "linear-gradient(135deg, rgba(14,116,144,0.10), rgba(8,145,178,0.06))"
+        : "rgba(139, 30, 63, 0.08)";
+    wrap.style.color = adaptiveActive ? "#0f172a" : "";
 }
 
 function renderFooterActions(q) {
@@ -321,13 +408,15 @@ const FINAL_EXAM_TIMER_SECONDS = 90 * 60;
 const FINAL_RECENT_RUNS_KEY = "pharmlet.finalLab2.recentRuns";
 const TOP_DRUGS_SIGNALS_KEY = "pharmlet.topDrugs.signals";
 const FINAL_RECENT_RUN_LOOKBACK_MS = 14 * 24 * 60 * 60 * 1000;
+const FINAL_LEGACY_RUN_MATCH_WINDOW_MS = 6 * 60 * 60 * 1000;
 const GENERATED_QUIZ_IDS = new Set(["custom-quiz", "review-quiz"]);
 const FINAL_FOCUS_AREAS = ["brand", "class", "category", "moa"];
 const FINAL_FOCUS_AREA_LABELS = {
     brand: "Brand",
     class: "Class",
     category: "Category",
-    moa: "MOA"
+    moa: "MOA",
+    generic: "Generic"
 };
 
 const FINAL_BLUEPRINT_FAMILY_WEIGHTS = [
@@ -391,6 +480,50 @@ function getGenericBrandPromptLabel(drug, brandValue) {
     }
 
     return `${generic} ${qualifier}`;
+}
+
+function getSpecificGenericAnswerForBrand(drug, brandValue) {
+    const generic = String(drug?.generic ?? "").trim();
+    const qualifier = getBrandQualifier(brandValue);
+    if (!generic || !qualifier) return generic;
+
+    const genericKey = normalizeDrugKey(generic);
+    const qualifierKey = normalizeDrugKey(qualifier);
+    if (genericKey && qualifierKey && genericKey.includes(qualifierKey)) {
+        return generic;
+    }
+
+    return `${generic} ${qualifier}`.trim();
+}
+
+function getAcceptedGenericAnswersForBrand(drug, brandValue) {
+    const accepted = [];
+    const pushUnique = (value) => {
+        const trimmed = String(value ?? "").trim();
+        if (!trimmed) return;
+        if (accepted.some((entry) => normalizeDrugKey(entry) === normalizeDrugKey(trimmed))) return;
+        accepted.push(trimmed);
+    };
+
+    pushUnique(getSpecificGenericAnswerForBrand(drug, brandValue));
+    pushUnique(drug?.generic);
+
+    return accepted;
+}
+
+function buildBrandToGenericQuestion(drug, brandValue) {
+    const acceptedAnswers = getAcceptedGenericAnswersForBrand(drug, brandValue);
+    if (!brandValue || !acceptedAnswers.length) return null;
+
+    const [answer, ...extraAcceptedAnswers] = acceptedAnswers;
+    return {
+        type: "short",
+        prompt: `Generic for <b>${brandValue}</b>?`,
+        answer,
+        drugRef: drug,
+        _brandVariant: brandValue,
+        _acceptedAnswers: extraAcceptedAnswers
+    };
 }
 
 const DRUG_ANSWER_ALIAS_GROUPS = [
@@ -482,6 +615,10 @@ function isRestrictedAttemptMode() {
 }
 
 function getHistoryModeLabel() {
+    if (state.generatedAttemptIdentity?.modeLabel) {
+        return state.generatedAttemptIdentity.modeLabel;
+    }
+
     if (state.bossMode) {
         return "boss";
     }
@@ -658,16 +795,49 @@ function saveTopDrugsSignals(signals) {
     }
 }
 
-function loadRecentFinalRuns() {
-    const parsed = safeReadStorageJson(FINAL_RECENT_RUNS_KEY, []);
+function loadCompletedFinalAttemptTimestampsFromHistory() {
+    const parsed = safeReadStorageJson(HISTORY_KEY, []);
     if (!Array.isArray(parsed)) return [];
 
     return parsed
-        .filter(run => run && typeof run === "object")
+        .filter((entry) => entry?.quizId === FINAL_EXAM_ID && Number(entry?.total) === FINAL_EXAM_TOTAL)
+        .map((entry) => Number(entry?.timestamp) || 0)
+        .filter(Boolean)
+        .sort((a, b) => a - b);
+}
+
+function claimLegacyFinalRunHistoryMatch(runTimestamp, completedAttemptTimestamps, usedAttemptIndexes) {
+    if (!runTimestamp || !completedAttemptTimestamps.length) return false;
+
+    for (let index = 0; index < completedAttemptTimestamps.length; index += 1) {
+        if (usedAttemptIndexes.has(index)) continue;
+        if (Math.abs(completedAttemptTimestamps[index] - runTimestamp) > FINAL_LEGACY_RUN_MATCH_WINDOW_MS) continue;
+        usedAttemptIndexes.add(index);
+        return true;
+    }
+
+    return false;
+}
+
+function loadRecentFinalRuns() {
+    const parsed = safeReadStorageJson(FINAL_RECENT_RUNS_KEY, []);
+    if (!Array.isArray(parsed)) return [];
+    const completedAttemptTimestamps = loadCompletedFinalAttemptTimestampsFromHistory();
+    const usedAttemptIndexes = new Set();
+
+    return parsed
+        .filter((run) => {
+            if (!run || typeof run !== "object") return false;
+            if (run.completed === true) return true;
+
+            const timestamp = Number(run?.timestamp || 0);
+            return claimLegacyFinalRunHistoryMatch(timestamp, completedAttemptTimestamps, usedAttemptIndexes);
+        })
         .map(run => ({
             timestamp: Number(run.timestamp) || 0,
             generics: Array.isArray(run.generics) ? run.generics.map(normalizeDrugKey).filter(Boolean) : [],
-            familiesByGeneric: run.familiesByGeneric && typeof run.familiesByGeneric === "object" ? run.familiesByGeneric : {}
+            familiesByGeneric: run.familiesByGeneric && typeof run.familiesByGeneric === "object" ? run.familiesByGeneric : {},
+            legacyRecovered: run.completed !== true
         }))
         .slice(-10);
 }
@@ -1654,6 +1824,7 @@ function pickRealBrandCategoryDistractors(drug, allPool, signals, count = 2, tar
             brandKey: normalizeDrugKey(candidateBrand),
             categoryKey: candidateCategoryKey,
             pairKey: normalizeDrugKey(`${candidateBrand} / ${candidateCategory}`),
+            sameCategory,
             bucket,
             score
         });
@@ -1665,7 +1836,15 @@ function pickRealBrandCategoryDistractors(drug, allPool, signals, count = 2, tar
     });
 
     const plausibleRanked = ranked.filter(item => item.bucket <= 4);
-    const rankedPool = plausibleRanked.length >= count ? plausibleRanked : ranked;
+    const preferredWithoutSameCategory = plausibleRanked.filter(item => !item.sameCategory);
+    const fallbackWithoutSameCategory = ranked.filter(item => !item.sameCategory);
+    const rankedPool = preferredWithoutSameCategory.length >= count
+        ? preferredWithoutSameCategory
+        : fallbackWithoutSameCategory.length >= count
+        ? fallbackWithoutSameCategory
+        : plausibleRanked.length >= count
+        ? plausibleRanked
+        : ranked;
 
     const usedPairs = new Set();
     const usedBrands = new Set();
@@ -1860,7 +2039,7 @@ function buildTopDrugsBrandCategoryQuestion(drug, allPool, options = {}) {
 
     return {
         type: "mcq",
-        prompt: `Identify <b>Brand & Category</b> for <b>${drug.generic}</b>?`,
+        prompt: `Which exact <b>Brand / Category</b> pair belongs to <b>${drug.generic}</b>?`,
         choices: shuffled(optionCandidates.slice(0, 4)),
         answer: correct,
         drugRef: drug,
@@ -1907,10 +2086,39 @@ function getBrandWeaknessScore(drug, signals) {
     return maxScore;
 }
 
+function getFinalAdaptiveFocusScores(drug, signals) {
+    const genericKey = normalizeDrugKey(drug?.generic);
+    const classKey = normalizeDrugKey(drug?.class);
+    const categoryKey = normalizeDrugKey(drug?.category);
+
+    const generic = getWeaknessScore(getCounterValue(signals.seenDrugs, genericKey), getCounterValue(signals.missedDrugs, genericKey));
+    const classScore = getWeaknessScore(getCounterValue(signals.seenClasses, classKey), getCounterValue(signals.missedClasses, classKey));
+    const categoryScore = getWeaknessScore(getCounterValue(signals.seenCategories, categoryKey), getCounterValue(signals.missedCategories, categoryKey));
+    const brand = getBrandWeaknessScore(drug, signals);
+    const moa = drug?.moa ? (generic * 0.68) + (classScore * 0.24) + (categoryScore * 0.08) : 0;
+
+    return {
+        brand,
+        class: classScore,
+        category: categoryScore,
+        moa,
+        generic
+    };
+}
+
+function getDominantFinalAdaptiveFocusKey(drug, signals) {
+    const focusScores = getFinalAdaptiveFocusScores(drug, signals);
+    return Object.entries(focusScores)
+        .sort((a, b) => b[1] - a[1])
+        .find(([, score]) => score > 0)?.[0] || "";
+}
+
 function buildRecentFinalUsageContext(runs) {
     const now = Date.now();
     const recentGenericUsage = {};
     const recentFamilyUsageByGeneric = {};
+    let runCount = 0;
+    let legacyRecoveredCount = 0;
 
     for (const run of runs) {
         const timestamp = Number(run?.timestamp || 0);
@@ -1920,6 +2128,8 @@ function buildRecentFinalUsageContext(runs) {
         if (ageMs < 0 || ageMs > FINAL_RECENT_RUN_LOOKBACK_MS) continue;
 
         const recencyWeight = Math.max(0.2, 1 - (ageMs / FINAL_RECENT_RUN_LOOKBACK_MS));
+        runCount += 1;
+        if (run?.legacyRecovered) legacyRecoveredCount += 1;
 
         for (const genericKey of run.generics || []) {
             incrementCounter(recentGenericUsage, genericKey, recencyWeight);
@@ -1935,7 +2145,7 @@ function buildRecentFinalUsageContext(runs) {
         }
     }
 
-    return { recentGenericUsage, recentFamilyUsageByGeneric };
+    return { recentGenericUsage, recentFamilyUsageByGeneric, runCount, legacyRecoveredCount };
 }
 
 function createFinalSelectionState() {
@@ -1968,12 +2178,16 @@ function scoreFinalDrugCandidate(drug, state, context) {
     const genericKey = normalizeDrugKey(drug?.generic);
     const classKey = normalizeDrugKey(drug?.class);
     const categoryKey = normalizeDrugKey(drug?.category);
+    const focusScores = getFinalAdaptiveFocusScores(drug, signals);
+    const adaptivePeak = Math.max(focusScores.brand, focusScores.class, focusScores.category, focusScores.moa, focusScores.generic, 0);
 
-    let score = Math.random() * 0.35;
+    let score = Math.random() * 0.18;
     score += getDrugWeaknessScore(drug, signals) * 0.35;
     score += getBrandWeaknessScore(drug, signals) * 0.12;
+    score += adaptivePeak * 0.26;
 
-    const recentGenericPenalty = Number(context.recentGenericUsage[genericKey] || 0) * 0.95;
+    const recentPenaltyScale = Math.max(0.45, 0.95 - (adaptivePeak * 0.1));
+    const recentGenericPenalty = Number(context.recentGenericUsage[genericKey] || 0) * recentPenaltyScale;
     score -= recentGenericPenalty;
 
     const classCount = Number(state.classCounts[classKey] || 0);
@@ -1993,8 +2207,28 @@ function pickBestFinalDrugFromCandidates(candidates, state, context) {
         .map(drug => ({ drug, score: scoreFinalDrugCandidate(drug, state, context) }))
         .sort((a, b) => b.score - a.score);
 
-    const topSlice = ranked.slice(0, Math.min(4, ranked.length));
-    return topSlice[Math.floor(Math.random() * topSlice.length)]?.drug || ranked[0]?.drug || null;
+    const topSlice = ranked.slice(0, Math.min(5, ranked.length));
+    if (!topSlice.length) return ranked[0]?.drug || null;
+
+    const secondScore = Number(topSlice[1]?.score || 0);
+    if (topSlice[0].score >= secondScore + 0.9) {
+        return topSlice[0].drug;
+    }
+
+    const floorScore = topSlice[topSlice.length - 1].score;
+    const weightedPool = topSlice.map((entry, index) => ({
+        drug: entry.drug,
+        weight: Math.max(0.08, (entry.score - floorScore) + 0.32 + ((topSlice.length - index) * 0.02))
+    }));
+    const totalWeight = weightedPool.reduce((sum, entry) => sum + entry.weight, 0);
+    let roll = Math.random() * totalWeight;
+
+    for (const entry of weightedPool) {
+        roll -= entry.weight;
+        if (roll <= 0) return entry.drug;
+    }
+
+    return weightedPool[0]?.drug || ranked[0]?.drug || null;
 }
 
 function selectFromFinalBucket({ bucket, lab, limit, respectBucketLimit, state, targetCounts, context }) {
@@ -2128,15 +2362,15 @@ function showHint() {
     
     let hintText = "";
     const prompt = q.prompt.toLowerCase();
+    const targetedBrand = q._brandVariant || splitBrandNames(drug?.brand)[0] || String(drug?.brand || "").split(/[,/;]/)[0]?.trim() || "?";
     
     // Determine hint based on question type
     if (prompt.includes("brand")) {
         // Asking for Brand → Show first letter
-        const brand = drug.brand?.split(/[,/;]/)[0]?.trim() || "?";
-        hintText = `💡 First letter: "${brand.charAt(0).toUpperCase()}..."\n📦 Category: ${drug.category || "N/A"}`;
+        hintText = `💡 First letter: "${targetedBrand.charAt(0).toUpperCase()}..."\n📦 Category: ${drug.category || "N/A"}`;
     } else if (prompt.includes("generic")) {
         // Asking for Generic → Show brand as hint
-        hintText = `💡 Brand: ${drug.brand || "N/A"}\n📦 Category: ${drug.category || "N/A"}`;
+        hintText = `💡 Brand: ${targetedBrand || "N/A"}\n📦 Category: ${drug.category || "N/A"}`;
     } else if (prompt.includes("class") || prompt.includes("moa")) {
         // Asking for Class/MOA → Show category
         hintText = `💡 Category: ${drug.category || "N/A"}\n💊 Generic: ${drug.generic || "N/A"}`;
@@ -2166,7 +2400,59 @@ function revealAnswer() {
     scoreCurrent("Revealed");
 }
 
+function normalizeStorageKeySegment(value, fallback = "na") {
+    const normalized = String(value ?? "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 48);
+
+    return normalized || fallback;
+}
+
+function buildGeneratedAttemptIdentity(data) {
+    const metadata = data?.metadata && typeof data.metadata === "object" ? data.metadata : {};
+    const questionCount = Array.isArray(data?.questions)
+        ? data.questions.length
+        : Array.isArray(data?.items)
+        ? data.items.length
+        : 0;
+
+    const quizSegment = normalizeStorageKeySegment(quizId || data?.id || "generated");
+    const kindSegment = normalizeStorageKeySegment(metadata.kind || (state.bossMode ? "boss-round" : "generated"));
+    const sourceSegment = normalizeStorageKeySegment(metadata.generatedFrom || metadata.sourceQuizId || metadata.sourceTitle || "");
+    const generatorSegment = normalizeStorageKeySegment(metadata.generator || "");
+    const playlistSegment = normalizeStorageKeySegment(metadata.playlistKey || "");
+    const focusSegment = normalizeStorageKeySegment(metadata.promptFocus || "");
+    const titleSegment = normalizeStorageKeySegment(data?.title || "");
+
+    const parts = [quizSegment, kindSegment];
+    if (sourceSegment !== "na") parts.push(`from-${sourceSegment}`);
+    if (generatorSegment !== "na") parts.push(`gen-${generatorSegment}`);
+    if (playlistSegment !== "na") parts.push(`list-${playlistSegment}`);
+    if (focusSegment !== "na") parts.push(`focus-${focusSegment}`);
+    if (questionCount > 0) parts.push(`q${questionCount}`);
+    if (parts.length <= 2 && titleSegment !== "na") parts.push(titleSegment);
+
+    const identity = `generated-${parts.join("-")}`;
+    const modeLabel = state.bossMode
+        ? "boss"
+        : kindSegment === "weak-area-playlist"
+        ? "playlist"
+        : modeParam;
+
+    return {
+        historyQuizId: identity,
+        modeLabel,
+        scoreStorageKey: `pharmlet.${identity}.${modeLabel}`
+    };
+}
+
 function getHistoryQuizId() {
+    if (state.generatedAttemptIdentity?.historyQuizId) {
+        return state.generatedAttemptIdentity.historyQuizId;
+    }
+
     if (quizId) return quizId;
     if (weekParam) return `lab-${labParam}-week-${weekParam}`;
     if (weeksParam) return `lab-${labParam}-weeks-${weeksParam}`;
@@ -2177,6 +2463,10 @@ function getHistoryQuizId() {
 }
 
 function getScoreStorageKey() {
+    if (state.generatedAttemptIdentity?.scoreStorageKey) {
+        return state.generatedAttemptIdentity.scoreStorageKey;
+    }
+
     if (state.bossMode && quizId) {
         return `pharmlet.${quizId}.boss`;
     }
@@ -2266,6 +2556,26 @@ function hideQuizSessionNote() {
     text.textContent = "";
 }
 
+function formatSavedSessionAge(savedAt) {
+    const elapsedMs = Math.max(0, Date.now() - (Number(savedAt) || 0));
+    const minutes = Math.round(elapsedMs / 60000);
+    if (minutes < 1) return "just now";
+    if (minutes === 1) return "1 minute ago";
+    if (minutes < 60) return `${minutes} minutes ago`;
+
+    const hours = Math.round(minutes / 60);
+    if (hours === 1) return "1 hour ago";
+    return `${hours} hours ago`;
+}
+
+function getSavedSessionPromptLabel(snapshot) {
+    if (!snapshot || typeof snapshot !== "object") return "this saved quiz";
+    if (snapshot.bossMode) return "this saved Boss Round";
+    if (snapshot.reviewMode) return "this saved review round";
+    if (snapshot.title) return `"${snapshot.title}"`;
+    return "this saved quiz";
+}
+
 function clearQueuedQuizProgressSave() {
     if (!state.autosaveTimeout) return;
     clearTimeout(state.autosaveTimeout);
@@ -2293,6 +2603,7 @@ function serializeQuizProgress() {
         reviewMode: !!state.reviewMode,
         bossMode: !!state.bossMode,
         generatedTimerSeconds: Math.max(0, Number(state.generatedTimerSeconds) || 0),
+        adaptiveSummary: state.adaptiveSummary,
         currentScale: Number(state.currentScale) || 1,
         marked: [...state.marked],
         seen: [...state.seen],
@@ -2315,6 +2626,10 @@ function persistQuizProgress(force = false) {
     try {
         localStorage.setItem(state.progressKey, JSON.stringify(snapshot));
         state.lastAutosaveAt = now;
+        const saveLabel = force ? "Saved" : "Autosaved";
+        const saveTime = new Date(now).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+        state.saveStatusMessage = `${saveLabel} ${saveTime}`;
+        renderQuizStatus();
     } catch (error) {
         console.warn("Unable to save quiz progress:", error);
     }
@@ -2332,6 +2647,7 @@ function queueQuizProgressSave(delay = 250) {
 function clearQuizProgress() {
     clearQueuedQuizProgressSave();
     state.lastAutosaveAt = 0;
+    state.saveStatusMessage = "";
     if (!state.progressKey) return;
 
     try {
@@ -2381,6 +2697,9 @@ function restoreSavedQuizProgress(snapshot) {
     state.reviewMode = !!snapshot.reviewMode;
     state.bossMode = !!snapshot.bossMode;
     state.generatedTimerSeconds = Math.max(0, Number(snapshot.generatedTimerSeconds) || 0);
+    state.adaptiveSummary = snapshot.adaptiveSummary && typeof snapshot.adaptiveSummary === "object"
+        ? snapshot.adaptiveSummary
+        : null;
     state.progressCompleted = false;
     state.currentScale = Number(snapshot.currentScale) || 1;
     state.marked = new Set(Array.isArray(snapshot.marked) ? snapshot.marked : []);
@@ -2396,10 +2715,12 @@ function restoreSavedQuizProgress(snapshot) {
     if (getEl("quiz-title")) getEl("quiz-title").textContent = state.title;
     if (getEl("qtotal")) getEl("qtotal").textContent = state.questions.length;
     renderStreakMeter();
+    renderAdaptiveFinalBanner();
 
     const savedAt = Number(snapshot.savedAt) || Date.now();
-    const minutesAgo = Math.max(0, Math.round((Date.now() - savedAt) / 60000));
-    const when = minutesAgo < 1 ? "just now" : minutesAgo === 1 ? "1 minute ago" : `${minutesAgo} minutes ago`;
+    const when = formatSavedSessionAge(savedAt);
+    state.saveStatusMessage = `Restored ${when}`;
+    renderQuizStatus();
     showQuizSessionNote(`Saved progress restored from ${when}. Answers, marks, and timer are back where you left them.`);
     return true;
 }
@@ -2870,6 +3191,35 @@ function getQuestionIdentity(item) {
     }
 
     return normalizeQuizValue(item?.generic || item?.id || item?.brand || item?.class || item?.category || item?.moa);
+}
+
+function getTemptingWrongAnswerInsight(question) {
+    const reviewQueueStore = window.PharmletReviewQueueStore;
+    if (!reviewQueueStore || !question) return null;
+
+    const targetPrompt = normalizeQuizValue(toPlainText(question.prompt || ""));
+    const answerValue = question?.answerText !== undefined ? question.answerText : getCorrectAnswerValue(question);
+    const targetAnswer = normalizeQuizValue(reviewQueueStore.serializeAnswerValue(answerValue));
+    if (!targetPrompt || !targetAnswer) return null;
+
+    const sourceQuizId = normalizeQuizValue(question?.sourceQuizId || getHistoryQuizId());
+    const queue = reviewQueueStore.normalizeQueue(safeReadStorageJson(REVIEW_KEY, []));
+    const matched = queue.find((entry) => {
+        const entryPrompt = normalizeQuizValue(reviewQueueStore.toPlainText(entry.prompt || entry.promptText || ""));
+        const entryAnswer = normalizeQuizValue(reviewQueueStore.serializeAnswerValue(entry.answerText !== undefined ? entry.answerText : entry.answer));
+        if (entryPrompt !== targetPrompt || entryAnswer !== targetAnswer) return false;
+
+        if (!sourceQuizId) return true;
+        return normalizeQuizValue(entry.quizId) === sourceQuizId;
+    });
+
+    if (!matched) return null;
+
+    const commonWrong = reviewQueueStore.getCommonWrongAnswer(matched);
+    const commonWrongCount = reviewQueueStore.getCommonWrongAnswerCount(matched);
+    if (!commonWrong || commonWrongCount <= 0) return null;
+
+    return { commonWrong, commonWrongCount };
 }
 
 function saveMissedQuestionsToReviewQueue(questions) {
@@ -4169,12 +4519,7 @@ function createQuestion(drug, all) {
     // Brand → Generic (Short Answer) (15% for both)
     const brandGenericThreshold = isLab2Quiz ? 0.65 : 0.75;
     if (r < brandGenericThreshold) {
-        return { 
-            type: "short", 
-            prompt: `Generic for <b>${singleBrand}</b>?`, 
-            answer: drug.generic, 
-            drugRef: drug 
-        };
+        return buildBrandToGenericQuestion(drug, singleBrand);
     }
     
     // Negative MCQ ("Which is NOT...?") (15% for both)
@@ -4183,12 +4528,7 @@ function createQuestion(drug, all) {
         const negMCQ = createNegativeMCQ();
         if (negMCQ) return negMCQ;
         // Fallback if negative MCQ can't be created
-        return { 
-            type: "short", 
-            prompt: `Generic for <b>${singleBrand}</b>?`, 
-            answer: drug.generic, 
-            drugRef: drug 
-        };
+        return buildBrandToGenericQuestion(drug, singleBrand);
     }
     
     // Correctly Paired Class MCQ (10% Lab 2 only)
@@ -4207,12 +4547,7 @@ function createQuestion(drug, all) {
     
     if (mcqTypes.length === 0) {
         // Fallback to brand → generic
-        return { 
-            type: "short", 
-            prompt: `Generic for <b>${singleBrand}</b>?`, 
-            answer: drug.generic, 
-            drugRef: drug 
-        };
+        return buildBrandToGenericQuestion(drug, singleBrand);
     }
     
     const t = mcqTypes[Math.floor(Math.random() * mcqTypes.length)];
@@ -4334,20 +4669,53 @@ function getFinalQuestionFamilyCandidates(drug, poolStats) {
         .filter(family => canBuildFinalQuestionFamily(drug, family, poolStats));
 }
 
-function scoreFinalFamilyChoice(drug, family, currentCounts, targetCounts, context) {
-    const genericKey = normalizeDrugKey(drug?.generic);
-    const deficit = Math.max(0, (targetCounts[family] || 0) - (currentCounts[family] || 0));
-    const familyRecentPenalty = Number(context.recentFamilyUsageByGeneric?.[genericKey]?.[family] || 0);
-    const genericRecentPenalty = Number(context.recentGenericUsage?.[genericKey] || 0);
+function getFinalQuestionFamilyFocusKey(family) {
+    switch (family) {
+        case "generic_to_brand":
+        case "brand_to_generic":
+            return "brand";
+        case "brand_class_pair":
+        case "drug_to_class":
+        case "class_to_drug":
+        case "paired_med_class":
+            return "class";
+        case "brand_category_pair":
+        case "drug_to_category":
+        case "category_to_drug":
+        case "paired_med_category":
+            return "category";
+        case "drug_to_moa":
+        case "moa_to_drug":
+            return "moa";
+        case "negative_mcq":
+            return "generic";
+        default:
+            return "";
+    }
+}
+
+function getFinalFamilyAdaptiveBonus(drug, family, context) {
+    const focusScores = getFinalAdaptiveFocusScores(drug, context.signals);
+    const focusKey = getFinalQuestionFamilyFocusKey(family);
+    const dominantFocus = getDominantFinalAdaptiveFocusKey(drug, context.signals);
     const comboGeneric = isCombinationGenericName(drug?.generic);
     const comboContraceptive = isContraceptiveCombinationDrug(drug);
 
-    let score = Math.random() * 0.25;
-    score += deficit * 1.1;
-    score += getDrugWeaknessScore(drug, context.signals) * 0.12;
+    let score = 0;
+    if (focusKey && focusScores[focusKey]) {
+        score += focusScores[focusKey] * 0.46;
+    }
 
-    if (family === "generic_to_brand" || family === "brand_to_generic" || family === "brand_class_pair" || family === "brand_category_pair") {
-        score += getBrandWeaknessScore(drug, context.signals) * 0.22;
+    if (dominantFocus && focusKey && dominantFocus === focusKey) {
+        score += 0.42;
+    }
+
+    if (focusKey === "brand" && focusScores.generic > 0) {
+        score += focusScores.generic * 0.08;
+    }
+
+    if (focusKey === "moa" && focusScores.generic > 0) {
+        score += focusScores.generic * 0.12;
     }
 
     if (comboGeneric && [
@@ -4376,8 +4744,22 @@ function scoreFinalFamilyChoice(drug, family, currentCounts, targetCounts, conte
         score += 0.38;
     }
 
-    score -= familyRecentPenalty * 1.35;
-    score -= genericRecentPenalty * 0.2;
+    return score;
+}
+
+function scoreFinalFamilyChoice(drug, family, currentCounts, targetCounts, context) {
+    const genericKey = normalizeDrugKey(drug?.generic);
+    const deficit = Math.max(0, (targetCounts[family] || 0) - (currentCounts[family] || 0));
+    const familyRecentPenalty = Number(context.recentFamilyUsageByGeneric?.[genericKey]?.[family] || 0);
+    const genericRecentPenalty = Number(context.recentGenericUsage?.[genericKey] || 0);
+
+    let score = Math.random() * 0.16;
+    score += deficit * 1.1;
+    score += getDrugWeaknessScore(drug, context.signals) * 0.12;
+    score += getFinalFamilyAdaptiveBonus(drug, family, context);
+
+    score -= familyRecentPenalty * 1.2;
+    score -= genericRecentPenalty * 0.16;
     return score;
 }
 
@@ -4682,14 +5064,7 @@ function buildFinalGenericToBrandQuestion(drug, signals) {
 function buildFinalBrandToGenericQuestion(drug, signals) {
     const brand = pickBrandVariantForFinal(drug, signals);
     if (!brand) return null;
-
-    return {
-        type: "short",
-        prompt: `Generic for <b>${brand}</b>?`,
-        answer: drug.generic,
-        drugRef: drug,
-        _brandVariant: brand
-    };
+    return buildBrandToGenericQuestion(drug, brand);
 }
 
 function buildFinalPairedClassQuestion(drug, allPool, poolStats) {
@@ -5006,13 +5381,7 @@ function buildLegacyFinalFallbackQuestion(drug, fullPool, usedFocusSignatures, m
     if (brandVariants.length) {
         const brand = brandVariants[0];
         return {
-            question: {
-                type: "short",
-                prompt: `Generic for <b>${brand}</b>?`,
-                answer: drug.generic,
-                drugRef: drug,
-                _brandVariant: brand
-            },
+            question: buildBrandToGenericQuestion(drug, brand),
             focusSignature: null
         };
     }
@@ -5065,13 +5434,65 @@ function buildFinalExamQuestionFromFamily(drug, allPool, family, context, poolSt
     }
 }
 
+function countPositiveCounterKeys(counter) {
+    if (!counter || typeof counter !== "object") return 0;
+    return Object.values(counter).filter((value) => Number(value) > 0).length;
+}
+
+function buildFinalAdaptiveSummary(selectedDrugs, context, assignmentInfo) {
+    const signals = context.signals || createEmptyTopDrugsSignals();
+    const focusTotals = { brand: 0, class: 0, category: 0, moa: 0, generic: 0 };
+    let targetedDrugCount = 0;
+    let repeatPenaltyCount = 0;
+
+    for (const drug of selectedDrugs) {
+        const focusScores = getFinalAdaptiveFocusScores(drug, signals);
+        const peak = Math.max(focusScores.brand, focusScores.class, focusScores.category, focusScores.moa, focusScores.generic, 0);
+        if (peak >= 0.9) targetedDrugCount += 1;
+
+        const genericKey = normalizeDrugKey(drug?.generic);
+        if (genericKey && Number(context.recentGenericUsage?.[genericKey] || 0) > 0) {
+            repeatPenaltyCount += 1;
+        }
+
+        Object.entries(focusScores).forEach(([key, value]) => {
+            focusTotals[key] = (focusTotals[key] || 0) + Math.max(0, Number(value) || 0);
+        });
+    }
+
+    const topFocusLabels = Object.entries(focusTotals)
+        .filter(([, value]) => value > 0)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([key]) => FINAL_FOCUS_AREA_LABELS[key] || (key.charAt(0).toUpperCase() + key.slice(1)));
+
+    const signalCount =
+        countPositiveCounterKeys(signals.missedDrugs) +
+        countPositiveCounterKeys(signals.missedClasses) +
+        countPositiveCounterKeys(signals.missedCategories) +
+        countPositiveCounterKeys(signals.missedBrands);
+
+    return {
+        active: Boolean(signalCount || context.runCount),
+        runCount: Math.max(0, Number(context.runCount) || 0),
+        legacyRecoveredCount: Math.max(0, Number(context.legacyRecoveredCount) || 0),
+        signalCount,
+        targetedDrugCount,
+        repeatPenaltyCount,
+        topFocusLabels,
+        familyCounts: assignmentInfo?.currentCounts || {}
+    };
+}
+
 function buildFinalExamQuestions(selectedDrugs, fullPool) {
     const signals = loadTopDrugsSignals();
     const recentUsageContext = buildRecentFinalUsageContext(loadRecentFinalRuns());
     const context = {
         signals,
         recentGenericUsage: recentUsageContext.recentGenericUsage,
-        recentFamilyUsageByGeneric: recentUsageContext.recentFamilyUsageByGeneric
+        recentFamilyUsageByGeneric: recentUsageContext.recentFamilyUsageByGeneric,
+        runCount: recentUsageContext.runCount,
+        legacyRecoveredCount: recentUsageContext.legacyRecoveredCount
     };
 
     const poolStats = buildFinalPoolStats(fullPool);
@@ -5119,7 +5540,10 @@ function buildFinalExamQuestions(selectedDrugs, fullPool) {
         });
     }
 
-    return shuffled(questions);
+    return {
+        questions: shuffled(questions),
+        adaptiveSummary: buildFinalAdaptiveSummary(selectedDrugs, context, assignmentInfo)
+    };
 }
 
 function saveFinalRunSnapshot(questions) {
@@ -5136,6 +5560,7 @@ function saveFinalRunSnapshot(questions) {
 
     runs.push({
         timestamp: Date.now(),
+        completed: true,
         generics: [...new Set(generics)],
         familiesByGeneric
     });
@@ -5198,6 +5623,8 @@ function render() {
     if (getEl("prompt")) getEl("prompt").innerHTML = q.prompt;
     renderQuizStatus();
     renderStreakMeter();
+    renderAdaptiveFinalBanner();
+    renderMarkControls();
     renderFooterActions(q);
     
     const optCont = getEl("options");
@@ -5294,6 +5721,17 @@ function render() {
             const raw = getCorrectAnswerValue(q) || "N/A";
             const displayAnswer = Array.isArray(raw) ? raw.join(", ") : raw;
             exp.innerHTML = `<div class="p-3 rounded-lg ${q._correct ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}"><b>${q._correct ? 'Correct!' : 'Answer:'}</b> <b>${displayAnswer}</b></div>`;
+
+            if (!q._correct) {
+                const temptingWrong = getTemptingWrongAnswerInsight(q);
+                if (temptingWrong) {
+                    const insight = document.createElement("div");
+                    insight.className = "mt-2 p-3 rounded-lg bg-yellow-50 text-yellow-900 border border-yellow-200";
+                    insight.innerHTML = `<b>Tempting wrong pattern:</b> ${escapeHtml(temptingWrong.commonWrong)} (${temptingWrong.commonWrongCount}x in your history)`;
+                    exp.appendChild(insight);
+                }
+            }
+
             const reportWrap = document.createElement("div");
             reportWrap.className = "mt-3 flex flex-wrap items-center gap-2";
 
@@ -5331,16 +5769,20 @@ function renderNavMap() {
     nav.innerHTML = "";
     state.questions.forEach((q, i) => {
         const btn = document.createElement("button");
+        const isMarked = state.marked.has(i);
         let colorClass = "bg-white text-black border border-gray-300";
         if (q._answered) {
             colorClass = q._correct ? "bg-green-500 text-white" : "bg-red-500 text-white";
-        } else if (state.marked.has(i)) {
+        } else if (isMarked) {
             colorClass = "bg-yellow-400 text-black ring-2 ring-yellow-600";
         } else if (state.seen.has(i)) {
             colorClass = "bg-slate-200 text-slate-800 border border-slate-400";
         }
         btn.className = `w-8 h-8 rounded-lg text-xs font-bold transition-all ${i === state.index ? 'ring-2 ring-blue-500 scale-110' : ''} ${colorClass}`;
         btn.textContent = i + 1;
+        btn.title = isMarked ? `Question ${i + 1} marked for review` : `Question ${i + 1}`;
+        btn.style.outline = isMarked ? "2px solid #facc15" : "";
+        btn.style.outlineOffset = isMarked ? "2px" : "";
         btn.onclick = () => { jumpToQuestion(i); };
         nav.appendChild(btn);
     });
@@ -5402,8 +5844,9 @@ function wireEvents() {
             return;
         }
 
-        // Prevent typing shortcuts inside the short-answer input
-        if (document.activeElement.tagName === 'INPUT' && e.key !== 'Enter') return;
+        // Prevent most typing shortcuts inside the short-answer input,
+        // but still allow marking after an answer has been checked.
+        if (document.activeElement?.tagName === "INPUT" && key !== "enter" && key !== "m") return;
 
         // --- NEW: ASDF Shortcuts for MCQ Option Selection ---
         const mcqMap = { 'a': 0, 's': 1, 'd': 2, 'f': 3 };
@@ -5549,6 +5992,10 @@ function evaluateAnswerForQuestion(q, val) {
 
     const rawAnswers = Array.isArray(raw) ? raw : [raw];
     rawAnswers.forEach(answer => addAcceptedForms(answer, true));
+
+    if (Array.isArray(q._acceptedAnswers)) {
+        q._acceptedAnswers.forEach(answer => addAcceptedForms(answer, true));
+    }
 
     if (q.drugRef?.brand && allowLooseBrandForms) {
         const brandAnswers = getAcceptedBrandAnswersForDrug(q.drugRef, {
@@ -5707,10 +6154,15 @@ function showResults() {
     state.progressCompleted = true;
 
     const shouldPersistResults = !state.reviewMode;
+    const shouldRecordAttemptArtifacts = shouldPersistResults && !state.resultsRecorded;
     clearQuizProgress();
 
     if (state.reviewMode) {
         saveReviewRoundResultsToReviewQueue(state.questions);
+    }
+
+    if (shouldRecordAttemptArtifacts && isFullTopDrugsFinalAttempt(state.questions)) {
+        saveFinalRunSnapshot(state.questions);
     }
 
     if (shouldPersistResults) {
@@ -5775,6 +6227,13 @@ function showResults() {
     const bossModeNote = state.bossMode
         ? `<p class="text-sm opacity-70 mt-2">Boss Round locked hints and answer reveals for this challenge.</p>`
         : "";
+    const adaptiveFinalNote = (!state.reviewMode && quizId === FINAL_EXAM_ID && !state.bossMode)
+        ? `<div class="mt-3 rounded-2xl border border-sky-200 bg-sky-50/80 px-4 py-3 text-left text-sm text-slate-800">
+            <div class="font-black uppercase tracking-[0.18em] text-sky-800">Adaptive Final Memory</div>
+            <div class="mt-1">${escapeHtml(getAdaptiveSummaryBannerCopy(state.adaptiveSummary))}</div>
+            <div class="mt-1 opacity-75">This completed run is now feeding the next final you launch on this browser.</div>
+          </div>`
+        : "";
     const timeoutNote = state.timedOut
         ? `<p class="text-sm font-semibold text-red-600 mt-2">Time expired, so any unanswered items were counted incorrect.</p>`
         : "";
@@ -5799,6 +6258,7 @@ function showResults() {
         <p class="text-2xl">${resultsSubheading}</p>
         ${reviewModeNote}
         ${bossModeNote}
+        ${adaptiveFinalNote}
         ${timeoutNote}
         ${streakNote}
         ${letterGradeMarkup}
@@ -5821,6 +6281,8 @@ async function main() {
         state.quizConfig = null;
         state.bossMode = false;
         state.generatedTimerSeconds = 0;
+        state.generatedAttemptIdentity = null;
+        state.adaptiveSummary = null;
 
         let filteredPool = [];
         let fullPool = [];
@@ -5984,16 +6446,16 @@ async function main() {
             fullPool = await smartFetch("master_pool.json");
             updateTopDrugsVersionBadge(fullPool);
             const selectedDrugs = selectFinalExamDrugs(fullPool);
-            const finalQuestions = buildFinalExamQuestions(selectedDrugs, fullPool);
+            const { questions: finalQuestions, adaptiveSummary } = buildFinalExamQuestions(selectedDrugs, fullPool);
 
             state.title = isTrueExamMode()
                 ? `${FINAL_EXAM_TITLE} (True Exam Mode)`
                 : FINAL_EXAM_TITLE;
+            state.adaptiveSummary = adaptiveSummary;
             state.questions = finalQuestions.map((question, i) => ({
                 ...question,
                 _id: i
             }));
-            saveFinalRunSnapshot(state.questions);
             storageKey = `pharmlet.${quizId}.easy`;
 
             finishSetup(storageKey);
@@ -6025,6 +6487,9 @@ async function main() {
 
             state.bossMode = Boolean(data?.metadata?.kind === "boss-round" || data?.metadata?.bossRound);
             state.generatedTimerSeconds = Math.max(0, Number(data?.metadata?.timerSeconds) || 0);
+            state.generatedAttemptIdentity = GENERATED_QUIZ_IDS.has(quizId)
+                ? buildGeneratedAttemptIdentity(data)
+                : null;
 
             if (isTopDrugsPlaylistPayload(data)) {
                 fullPool = await smartFetch("master_pool.json");
@@ -6034,7 +6499,7 @@ async function main() {
                     ...question,
                     _id: i
                 }));
-                storageKey = `pharmlet.${quizId}.${modeParam}`;
+                storageKey = state.generatedAttemptIdentity?.scoreStorageKey || `pharmlet.${quizId}.${modeParam}`;
 
                 if (!state.questions.length) {
                     throw new Error("This weak-area playlist did not have enough valid drug prompts to build a quiz yet.");
@@ -6050,11 +6515,11 @@ async function main() {
                 filteredPool = pool.filter(isConceptEntry);
                 fullPool = filteredPool;
                 state.title = data.title || "Endocrine Concept Practice";
-                storageKey = `pharmlet.${quizId}.${modeParam}`;
+                storageKey = state.generatedAttemptIdentity?.scoreStorageKey || `pharmlet.${quizId}.${modeParam}`;
             } else {
                 state.title = data.title || "Quiz";
                 state.questions = shuffled(applyQuestionLimit(pool)).map((q, i) => ({ ...q, _id: i }));
-                storageKey = `pharmlet.${quizId}.${modeParam}`;
+                storageKey = state.generatedAttemptIdentity?.scoreStorageKey || `pharmlet.${quizId}.${modeParam}`;
 
                 // Skip to render for legacy quizzes
                 finishSetup(storageKey);
@@ -6175,6 +6640,7 @@ function finishSetup(storageKey) {
     state.finalBreakdown = null;
     state.timerPaused = false;
     state.progressCompleted = false;
+    state.saveStatusMessage = "";
     state.currentScale = 1.0;
     document.body.style.zoom = state.currentScale;
     document.documentElement.style.setProperty("--quiz-size", `${state.currentScale}rem`);
@@ -6184,7 +6650,23 @@ function finishSetup(storageKey) {
         localStorage.setItem(storageKey, JSON.stringify({ score: 0, total: state.questions.length, date: Date.now() }));
     }
 
-    const restored = restoreSavedQuizProgress(loadSavedQuizProgress());
+    const savedSnapshot = loadSavedQuizProgress();
+    let restored = false;
+
+    if (savedSnapshot && resumeRequestedParam) {
+        restored = restoreSavedQuizProgress(savedSnapshot);
+    } else if (savedSnapshot) {
+        const ageLabel = formatSavedSessionAge(savedSnapshot.savedAt);
+        const promptLabel = getSavedSessionPromptLabel(savedSnapshot);
+        const resumeSaved = confirm(`Resume ${promptLabel} from ${ageLabel}?\n\nChoose OK to resume it, or Cancel to start a fresh run and clear the saved session.`);
+
+        if (resumeSaved) {
+            restored = restoreSavedQuizProgress(savedSnapshot);
+        } else {
+            clearQuizProgress();
+            showQuizSessionNote(`Starting fresh. The older saved session from ${ageLabel} was cleared for this new run.`, "accent");
+        }
+    }
 
     if (restored) {
         startRestoredTimer();

@@ -133,8 +133,10 @@
     </section>
 
     <main id="main-content" class="max-w-5xl mx-auto px-4 pb-16">
-      <div class="grid sm:grid-cols-2 lg:grid-cols-8 gap-3 sm:gap-4 mb-6">
+      <div class="grid sm:grid-cols-2 lg:grid-cols-10 gap-3 sm:gap-4 mb-6">
         <a href="stats.html" class="card p-4 hover:border-[var(--accent)] transition-colors text-center">📊 Stats</a>
+        <a href="stats.html#morning-warmup-section" class="card p-4 hover:border-[var(--accent)] transition-colors text-center">⚡ Warm-Up</a>
+        <a href="stats.html#weak-area-playlists-section" class="card p-4 hover:border-[var(--accent)] transition-colors text-center">🧠 Playlists</a>
         <a href="favorites.html" class="card p-4 hover:border-[var(--accent)] transition-colors text-center">⭐ Favorites</a>
         <a href="review-queue.html" class="card p-4 hover:border-[var(--accent)] transition-colors text-center">🎯 Review</a>
         <a href="study-timer.html" class="card p-4 hover:border-[var(--accent)] transition-colors text-center">⏱️ Timer</a>
@@ -278,12 +280,6 @@
     </main>
   </section>
 
-  <script src="assets/js/home.js" defer></script>
-  <script>
-    const lastQuiz = localStorage.getItem("pharmlet.last-quiz");
-    if (lastQuiz) {
-        document.getElementById("resume-link").href = `quiz.html${lastQuiz}`;
-    }
-  </script>
+  <script src="assets/js/home.js?v=20260427a" defer></script>
 </body>
 </html>

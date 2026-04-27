@@ -80,6 +80,23 @@
       </div>
     </section>
 
+    <section id="morning-warmup-section" class="mb-8">
+      <h2 class="text-2xl font-bold mb-4">Morning Warm-Up</h2>
+      <div class="card p-4">
+        <p class="text-sm mb-4" style="color:var(--muted)">
+          Quick prep sets for the morning of an exam: one adaptive Top Drugs run and one rapid cleanup run from your highest-friction misses.
+        </p>
+        <p id="warmup-status" class="text-sm mb-4" style="color:var(--muted)">
+          Building warm-up tracks from your saved progress...
+        </p>
+        <div id="morning-warmups" class="grid gap-4 md:grid-cols-2">
+          <div class="rounded-xl border border-[var(--ring)] p-4" style="background:var(--accent-light, rgba(139,30,63,0.06)); color:var(--muted)">
+            Loading warm-up tracks...
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section id="weak-area-playlists-section" class="mb-8">
       <h2 class="text-2xl font-bold mb-4">Weak-Area Playlists</h2>
       <div class="card p-4">
@@ -188,8 +205,9 @@
     </section>
   </main>
 
+  <script src="assets/js/quiz-catalog.js?v=20260427c"></script>
   <script src="assets/js/top-drugs-data.js?v=20260419a"></script>
-  <script src="assets/js/review-queue-store.js?v=20260423a"></script>
-  <script src="assets/js/stats.js?v=20260423a" defer></script>
+  <script src="assets/js/review-queue-store.js?v=20260427c"></script>
+  <script src="assets/js/stats.js?v=20260427c" defer></script>
 </body>
 </html>

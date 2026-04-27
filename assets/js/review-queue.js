@@ -4,34 +4,7 @@
 const THEME_KEY = "pharmlet.theme";
 const REVIEW_KEY = "pharmlet.review-queue";
 const reviewQueueStore = window.PharmletReviewQueueStore;
-
-const QUIZ_TITLES = {
-  "chapter1-review": "Chapter 1 Review",
-  "chapter2-review": "Chapter 2 Review",
-  "chapter3-review": "Chapter 3 Review",
-  "chapter4-review": "Chapter 4 Review",
-  "chapter5-review": "Chapter 5 Review",
-  "practice-e1-exam1-prep-ch1-4": "Practice E1",
-  "practice-e2a-exam2-prep-ch1-5": "Practice E2A",
-  "lab-quiz1-antihypertensives": "Lab Quiz 1",
-  "lab-quiz2-antihypertensives": "Lab Quiz 2",
-  "lab-quiz3-antilipemics": "Lab Quiz 3",
-  "lab-quiz4-anticoagulants": "Lab Quiz 4",
-  "lab-quiz5-antiarrhythmics": "Lab Quiz 5",
-  "cumulative-quiz1-2": "Cumulative 1–2",
-  "cumulative-quiz1-3": "Cumulative 1–3",
-  "cumulative-quiz1-4": "Cumulative 1–4",
-  "cumulative-quiz1-5": "Cumulative 1–5",
-  "top-drugs-final-mockA": "Final Mock A",
-  "top-drugs-final-mockB": "Final Mock B",
-  "top-drugs-final-mockC": "Final Mock C",
-  "top-drugs-final-mockD": "Final Mock D",
-  "top-drugs-final-mockE": "Final Mock E",
-  "log-lab-final-2": "Top Drugs Final Lab 2",
-  "bdt-unit10-quiz8": "Basis II Quiz 8 — Endocrine System",
-  "bdt-unit10-exam4": "Basis II Exam 4 — Endocrine Draft",
-  "bdt-unit10-exam4-high-yield": "Basis II Exam 4 — High-Yield Draft"
-};
+const quizCatalog = window.PharmletQuizCatalog;
 
 document.addEventListener("DOMContentLoaded", () => {
   // Theme toggle
@@ -66,7 +39,7 @@ function loadReviewQueue() {
   const activeQueue = reviewQueueStore ? reviewQueueStore.getActiveEntries(queue) : queue;
   const filterQuizId = document.getElementById("filter-quiz")?.value || "";
 
-  populateQuizFilter(queue, filterQuizId);
+  populateQuizFilter(activeQueue, filterQuizId);
 
   if (activeQueue.length === 0) {
     const masteredCount = Math.max(0, queue.length);
@@ -126,7 +99,7 @@ function loadReviewQueue() {
     const section = document.createElement("div");
     section.className = "card p-4";
     
-    const title = reviewQueueStore ? reviewQueueStore.getDisplayTitle(questions[0], QUIZ_TITLES) : (QUIZ_TITLES[quizId] || quizId);
+    const title = getQuizDisplayTitle(questions[0]);
     section.innerHTML = `
       <div class="flex justify-between items-center mb-3">
         <h4 class="font-semibold text-lg">${sanitize(title)}</h4>
@@ -146,15 +119,18 @@ function loadReviewQueue() {
       const timeAgo = getTimeAgo(new Date(q.lastMissedAt || q.createdAt || Date.now()));
       const mastery = reviewQueueStore ? reviewQueueStore.getMasterySummary(q) : { label: "Fresh miss" };
       const commonWrong = reviewQueueStore ? reviewQueueStore.getCommonWrongAnswer(q) : "";
+      const commonWrongCount = reviewQueueStore ? reviewQueueStore.getCommonWrongAnswerCount(q) : 0;
       const missCount = reviewQueueStore ? reviewQueueStore.getEntryMissCount(q) : 1;
+      const masteryLabel = sanitize(mastery.label || "Fresh miss");
+      const masteryStyle = mastery.refreshDue ? ` style="color:var(--accent);font-weight:600"` : "";
       
       div.innerHTML = `
         <div class="font-medium">${sanitize(promptPreview)}</div>
         <div class="mt-1 flex flex-wrap gap-x-3 gap-y-1" style="color:var(--muted)">
           <span>${timeAgo}</span>
           <span>${missCount} miss${missCount === 1 ? "" : "es"}</span>
-          <span>${sanitize(mastery.label)}</span>
-          ${commonWrong ? `<span>Tempting wrong answer: ${sanitize(commonWrong)}</span>` : ""}
+          <span${masteryStyle}>${masteryLabel}</span>
+          ${commonWrong ? `<span>Tempting wrong answer: ${sanitize(commonWrong)}${commonWrongCount > 0 ? ` (${commonWrongCount}x)` : ""}</span>` : ""}
         </div>
       `;
       questionsContainer.appendChild(div);
@@ -205,7 +181,7 @@ function startReviewQuiz(limit) {
   const customQuiz = {
     id: "review-quiz",
     title: filterQuizId && questions[0]
-      ? `Review Quiz — ${reviewQueueStore ? reviewQueueStore.getDisplayTitle(questions[0], QUIZ_TITLES) : (QUIZ_TITLES[filterQuizId] || filterQuizId)}`
+      ? `Review Quiz — ${getQuizDisplayTitle(questions[0])}`
       : "Review Quiz — Missed Questions",
     pools: {
       easy: questions.map(q => ({
@@ -215,7 +191,7 @@ function startReviewQuiz(limit) {
         answer: q.answer,
         answerText: q.answerText ?? q.answer,
         sourceQuizId: q.quizId || q.sourceQuizId || "",
-        sourceTitle: reviewQueueStore ? reviewQueueStore.getDisplayTitle(q, QUIZ_TITLES) : (QUIZ_TITLES[q.quizId] || q.title || q.quizId || "Review Queue"),
+        sourceTitle: getQuizDisplayTitle(q),
         hint: reviewQueueStore
           ? `Mastery progress: ${reviewQueueStore.getMasterySummary(q).label}.`
           : "Review your previous answer carefully.",
@@ -237,7 +213,7 @@ function populateQuizFilter(queue, selectedValue) {
 
   queue.forEach((entry) => {
     if (!entry?.quizId || quizMap.has(entry.quizId)) return;
-    const label = reviewQueueStore ? reviewQueueStore.getDisplayTitle(entry, QUIZ_TITLES) : (QUIZ_TITLES[entry.quizId] || entry.quizId);
+    const label = getQuizDisplayTitle(entry);
     quizMap.set(entry.quizId, label);
   });
 
@@ -265,6 +241,21 @@ function buildReviewSolutionText(entry) {
 
   parts.push(`Missed ${missCount} time${missCount === 1 ? "" : "s"}`);
   return parts.join(" • ");
+}
+
+function getQuizDisplayTitle(entryOrQuizId) {
+  if (typeof entryOrQuizId === "string") {
+    const quizId = String(entryOrQuizId || "").trim();
+    return quizCatalog?.getEntry?.(quizId)?.title || quizCatalog?.buildDynamicQuizLabel?.(quizId) || quizId || "Review Queue";
+  }
+
+  const entry = entryOrQuizId && typeof entryOrQuizId === "object" ? entryOrQuizId : {};
+  if (reviewQueueStore?.getDisplayTitle) {
+    return reviewQueueStore.getDisplayTitle(entry);
+  }
+
+  const quizId = String(entry.quizId || "").trim();
+  return entry.title || quizCatalog?.getEntry?.(quizId)?.title || quizCatalog?.buildDynamicQuizLabel?.(quizId) || quizId || "Review Queue";
 }
 
 function clearQueue() {
