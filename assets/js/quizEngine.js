@@ -5843,9 +5843,16 @@ function wireEvents() {
             return;
         }
 
-        // Prevent most typing shortcuts inside the short-answer input,
-        // but still allow marking after an answer has been checked.
-        if (document.activeElement?.tagName === "INPUT" && key !== "enter" && key !== "m") return;
+        // Keep typing natural inside answer fields and other editable targets.
+        const activeEl = document.activeElement;
+        const isEditableTarget = activeEl
+            && (
+                activeEl.tagName === "INPUT"
+                || activeEl.tagName === "TEXTAREA"
+                || activeEl.tagName === "SELECT"
+                || activeEl.isContentEditable
+            );
+        if (isEditableTarget && key !== "enter") return;
 
         // --- NEW: ASDF Shortcuts for MCQ Option Selection ---
         const mcqMap = { 'a': 0, 's': 1, 'd': 2, 'f': 3 };
