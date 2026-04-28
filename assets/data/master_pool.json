@@ -800,6 +800,22 @@
     "metadata": { "lab": 1, "week": 2, "is_new": false }
   },
   {
+    "generic": "Spironolactone",
+    "brand": "Aldactone",
+    "class": "Potassium Sparing Diuretic; Aldosterone Receptor Antagonist",
+    "category": "Antihypertensive",
+    "moa": "Competes with aldosterone in the distal renal tubules, increasing sodium and water excretion while conserving potassium and hydrogen ions.",
+    "metadata": { "lab": 1, "week": 2, "is_new": false }
+  },
+  {
+    "generic": "Chlorthalidone",
+    "brand": "Hemiclor, Thalitone",
+    "class": "Thiazide Diuretic",
+    "category": "Antihypertensive",
+    "moa": "Inhibits sodium reabsorption in the distal tubules causing increased excretion of sodium and water.",
+    "metadata": { "lab": 1, "week": 2, "is_new": false }
+  },
+  {
     "generic": "Simvastatin",
     "brand": "Zocor",
     "class": "HMG-CoA Reductase Inhibitor",

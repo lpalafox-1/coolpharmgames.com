@@ -1,5 +1,5 @@
 {
-  "auditedAt" : "2026-04-19T23:51:35Z",
+  "auditedAt" : "2026-04-28T14:47:20Z",
   "flaggedEntries" : [
     {
       "generic" : "Sumatriptan",
@@ -11,7 +11,7 @@
     }
   ],
   "flaggedEntriesCount" : 2,
-  "lab1Entries" : 85,
+  "lab1Entries" : 87,
   "lab2Entries" : 82,
   "missingBrandAliases" : [
 
@@ -21,7 +21,7 @@
 
   ],
   "missingGenericsCount" : 0,
-  "poolEntries" : 167,
+  "poolEntries" : 169,
   "sourceDocuments" : {
     "lab1" : "Top Drugs List final.pdf",
     "lab2" : "Top drugs final 2.pdf"
