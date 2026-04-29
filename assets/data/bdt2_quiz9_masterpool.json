@@ -30,19 +30,15 @@
       {
         "id": "basis2-q9-e002",
         "type": "fitb",
-        "question": "The two pituitary hormones released in response to GnRH are ____ and ____.",
+        "question": "GnRH stimulates the pituitary to release FSH and ______.",
         "answer": [
-          "FSH",
           "LH"
         ],
         "acceptableAnswers": [
-          "FSH",
           "LH",
-          "follicle stimulating hormone",
-          "luteinizing hormone",
-          "FSH and LH"
+          "luteinizing hormone"
         ],
-        "explanation": "Pulsatile GnRH stimulates the anterior pituitary to release the gonadotropins FSH and LH.",
+        "explanation": "GnRH stimulates the anterior pituitary to release the gonadotropins FSH and LH.",
         "tags": [
           "HPO axis",
           "pituitary"
@@ -52,7 +48,7 @@
       {
         "id": "basis2-q9-e003",
         "type": "fitb",
-        "question": "Which hormone slows the GnRH pulse frequency during the luteal phase? ____.",
+        "question": "Which hormone slows the GnRH pulse frequency during the luteal phase? ______.",
         "answer": [
           "progesterone"
         ],
@@ -69,7 +65,7 @@
       {
         "id": "basis2-q9-e004",
         "type": "fitb",
-        "question": "Which hormone increases GnRH pulse frequency in the late follicular phase? ____.",
+        "question": "Which hormone increases GnRH pulse frequency in the late follicular phase? ______.",
         "answer": [
           "estradiol"
         ],
@@ -376,8 +372,7 @@
           "hCG"
         ],
         "acceptableAnswers": [
-          "hCG",
-          "human chorionic gonadotropin"
+          "hCG"
         ],
         "explanation": "Urine and serum pregnancy tests detect human chorionic gonadotropin (hCG) produced by the embryo.",
         "tags": [
@@ -391,12 +386,12 @@
         "type": "mcq",
         "question": "During early pregnancy, which structure provides progesterone and estrogen before the placenta takes over?",
         "choices": [
-          "Ovary/corpus luteum",
+          "Corpus luteum",
           "Hypothalamus",
           "Anterior pituitary",
           "Thyroid"
         ],
-        "answer": "Ovary/corpus luteum",
+        "answer": "Corpus luteum",
         "explanation": "In early pregnancy, the corpus luteum remains the main source of progesterone and estrogen until the placenta becomes the dominant hormone source.",
         "tags": [
           "pregnancy",
@@ -570,15 +565,15 @@
       },
       {
         "id": "basis2-q9-h008",
-        "type": "fitb",
-        "question": "The process by which progesterone prepares the uterine lining for implantation and the early embryo attaches is called ______.",
-        "answer": [
-          "decidualization"
+        "type": "mcq",
+        "question": "Progesterone changes the uterine lining into a secretory, implantation-receptive state. This process is called:",
+        "choices": [
+          "Decidualization",
+          "Luteinization",
+          "Atresia",
+          "Parturition"
         ],
-        "acceptableAnswers": [
-          "decidualization",
-          "decidualisation"
-        ],
+        "answer": "Decidualization",
         "explanation": "Decidualization refers to the progesterone-driven transformation of the endometrium into a secretory, implantation-receptive state.",
         "tags": [
           "pregnancy",
@@ -607,15 +602,15 @@
       {
         "id": "basis2-q9-h010",
         "type": "mcq",
-        "question": "Which of the following is NOT a systemic effect of estrogen?",
+        "question": "Which systemic effect is most associated with estrogen?",
         "choices": [
           "Inhibits osteoclasts to maintain bone density",
-          "Raises HDL and lowers LDL",
-          "Has a pro-coagulant effect in the liver",
-          "Raises the hypothalamic set point and slows GnRH pulse frequency"
+          "Blocks prolactin's lactation effect during pregnancy",
+          "Raises basal body temperature after ovulation",
+          "Slows GnRH pulse frequency during the luteal phase"
         ],
-        "answer": "Raises the hypothalamic set point and slows GnRH pulse frequency",
-        "explanation": "Estrogen generally lowers the hypothalamic thermoneutral set point and speeds GnRH pulses; raising the set point and slowing pulses are effects of progesterone.",
+        "answer": "Inhibits osteoclasts to maintain bone density",
+        "explanation": "Estrogen helps maintain bone density by inhibiting osteoclast activity. Progesterone is more associated with raising basal body temperature and slowing GnRH pulse frequency.",
         "tags": [
           "systemic effects",
           "estrogen"
@@ -642,18 +637,19 @@
       {
         "id": "basis2-q9-h012",
         "type": "mcq",
-        "question": "Which hormone mediates lactational amenorrhea by inhibiting GnRH pulses?",
+        "question": "During lactation, elevated prolactin suppresses ovulation mainly by disrupting release of which hormone?",
         "choices": [
+          "GnRH",
           "Oxytocin",
-          "Prolactin",
-          "Progesterone",
-          "Estradiol"
+          "hCG",
+          "Progesterone"
         ],
-        "answer": "Prolactin",
-        "explanation": "Suckling triggers a neuroendocrine reflex that inhibits hypothalamic dopamine, leading to prolactin surges; elevated prolactin disrupts GnRH pulsatility and suppresses ovulation.",
+        "answer": "GnRH",
+        "explanation": "Elevated prolactin disrupts pulsatile GnRH secretion, which prevents the normal FSH rise and midcycle LH surge needed for ovulation.",
         "tags": [
           "lactation",
-          "amenorrhea"
+          "prolactin",
+          "GnRH"
         ],
         "difficulty": "hard"
       },
@@ -695,15 +691,15 @@
       },
       {
         "id": "basis2-q9-h015",
-        "type": "fitb",
-        "question": "The LH-driven transformation of the post-ovulatory follicle into a progesterone-secreting structure is called ______.",
-        "answer": [
-          "luteinization"
+        "type": "mcq",
+        "question": "The LH-driven transformation of the post-ovulatory follicle into a progesterone-secreting structure is called:",
+        "choices": [
+          "Luteinization",
+          "Decidualization",
+          "Atresia",
+          "Fertilization"
         ],
-        "acceptableAnswers": [
-          "luteinization",
-          "luteinisation"
-        ],
+        "answer": "Luteinization",
         "explanation": "LH triggers luteinization, the process by which the post-ovulatory follicle becomes the progesterone-secreting corpus luteum.",
         "tags": [
           "luteal phase",
