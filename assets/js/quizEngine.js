@@ -649,7 +649,7 @@ function isFullTopDrugsFinalAttempt(questions = state.questions) {
 }
 
 function isTrueExamMode() {
-    return quizId === FINAL_EXAM_ID && examModeParam;
+    return !!quizId && examModeParam;
 }
 
 function isBossRoundMode() {
@@ -669,8 +669,12 @@ function getHistoryModeLabel() {
         return "boss";
     }
 
+    if (isTrueExamMode()) {
+        return "exam";
+    }
+
     if (quizId === FINAL_EXAM_ID) {
-        return isTrueExamMode() ? "exam" : "practice";
+        return "practice";
     }
 
     return modeParam;
@@ -2543,6 +2547,10 @@ function getScoreStorageKey() {
     }
 
     if (!quizId) return null;
+
+    if (isTrueExamMode()) {
+        return `pharmlet.${quizId}.${modeParam}.exam`;
+    }
 
     if (quizId === FINAL_EXAM_ID || getConceptQuizConfig(quizId)) {
         return `pharmlet.${quizId}.easy`;

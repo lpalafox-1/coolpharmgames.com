@@ -439,24 +439,6 @@
           "prolactin"
         ],
         "difficulty": "easy"
-      },
-      {
-        "id": "basis2-q9-e025",
-        "type": "fitb",
-        "question": "Elevated prolactin disrupts pulsatile GnRH secretion and suppresses ovulation, resulting in ______.",
-        "answer": [
-          "lactational amenorrhea"
-        ],
-        "acceptableAnswers": [
-          "lactational amenorrhea",
-          "amenorrhea"
-        ],
-        "explanation": "High prolactin levels inhibit GnRH secretion, suppressing FSH and LH and leading to lactational amenorrhea.",
-        "tags": [
-          "lactation",
-          "amenorrhea"
-        ],
-        "difficulty": "easy"
       }
     ],
     "hard": [
