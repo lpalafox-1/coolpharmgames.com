@@ -46,7 +46,7 @@
     { id: "test-sample-3", title: "Sample 3-question quiz (hints & calc)", favoriteCategory: "other", statsCategory: "Other", modes: ["easy"], sourceType: "quiz-json", sourcePath: "quizzes/test-sample-3.json", customBuilder: false },
     { id: "log-lab-final-2", title: "Top Drugs Final Lab 2", favoriteCategory: "final", statsCategory: "Final Review", modes: ["easy"], sourceType: "virtual", customBuilder: false },
     { id: "bdt-unit10-quiz8", title: "Basis II Quiz 8 - Endocrine System", favoriteCategory: "practice", statsCategory: "Basis", modes: ["easy"], sourceType: "concept-route", customBuilder: false },
-    { id: "basis2-quiz9", title: "Basis II Quiz 9 - Unit 11 Female Reproductive Physiology", favoriteCategory: "practice", statsCategory: "Basis", modes: ["easy", "hard"], sourceType: "quiz-json", sourcePath: "assets/data/bdt2_quiz9_masterpool.json", customBuilder: true },
+    { id: "basis2-quiz9", title: "Basis II Quiz 9: Unit 11 - Female Reproductive Physiology", favoriteCategory: "practice", statsCategory: "Basis", modes: ["easy", "hard"], sourceType: "quiz-json", sourcePath: "assets/data/bdt2_quiz9_masterpool.json", customBuilder: true },
     { id: "bdt-unit10-exam4", title: "Basis II Exam 4 - Endocrine Draft", favoriteCategory: "practice", statsCategory: "Basis", modes: ["easy"], sourceType: "concept-route", customBuilder: false },
     { id: "bdt-unit10-exam4-high-yield", title: "Basis II Exam 4 - High-Yield Draft", favoriteCategory: "practice", statsCategory: "Basis", modes: ["easy"], sourceType: "concept-route", customBuilder: false }
   ]);
