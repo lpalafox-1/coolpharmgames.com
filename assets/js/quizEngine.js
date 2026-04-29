@@ -22,118 +22,56 @@ const TIMER_AUTOSAVE_INTERVAL_SECONDS = 15;
 const quizCatalog = window.PharmletQuizCatalog || null;
 const CEUTICS2_FINAL_ID = "ceutics2-final";
 
-const state = { 
-    questions: [], index: 0, score: 0, title: "",
+const state = {
+    questions: [],
+    index: 0,
+    score: 0,
+    title: "",
+
     pointScore: 0,
     totalPoints: 0,
-        const q = state.questions[state.index];
-        if (!q || q._answered) return;
-        const activeModeKey = normalizeQuizValue(state.activeModeConfig?._modeKey || state.configuredModeKey || "");
-        const hintsEnabled = state.activeModeConfig?.hintsEnabled;
-        if (hintsEnabled === false) {
-            alert("Hints are disabled for this mode.");
-            return;
-        }
-        if (isRestrictedAttemptMode()) {
-            alert(isBossRoundMode()
-                ? "Boss Round disables hints for this challenge."
-                : "True Exam Mode disables hints for this attempt.");
-            return;
-        }
 
-        const isCalculationHint = q.questionKind === "calculation"
-            || (q.type === "short" && (q.formula || q.units || q.tolerance !== undefined));
-        if (isCalculationHint) {
-            const formula = String(q.formula || "").trim();
-            const units = String(q.units || "").trim();
-            const hintLines = [];
-            if (formula) hintLines.push(`Formula: ${formula}`);
-            if (units) hintLines.push(`Units: ${units}`);
-            if (!hintLines.length) {
-                alert("No hint available for this question.");
-                return;
-            }
+    hintsUsed: 0,
+    currentStreak: 0,
+    bestStreak: 0,
 
-            q._hintUsed = true;
-            state.hintsUsed++;
-            queueQuizProgressSave(100);
-            alert(hintLines.join("\n"));
-            return;
-        }
+    marked: new Set(),
+    seen: new Set(),
+    originalQuestions: [],
 
-        if (q._mode === "concept" || q.conceptRef) {
-            const conceptHint = buildConceptHintText(q);
-            if (!conceptHint) {
-                alert("No hint available for this question.");
-                return;
-            }
+    reviewMode: false,
+    bossMode: false,
+    timedOut: false,
 
-            q._hintUsed = true;
-            state.hintsUsed++;
-            queueQuizProgressSave(100);
-            alert(conceptHint);
-            return;
-        }
+    resultsRecorded: false,
+    signalsRecorded: false,
+    finalBreakdown: null,
 
-        if (activeModeKey === "adaptive") {
-            let hintText = "";
-            if (Array.isArray(q.choices) && typeof q.answer === "string") {
-                const wrongChoice = q.choices.find((choice) => choice !== q.answer);
-                hintText = wrongChoice
-                    ? `Hint: One wrong choice is "${wrongChoice}".`
-                    : "Hint: Focus on the most precise choice.";
-            } else if (q.answer) {
-                const answerText = String(q.answer).trim();
-                const firstLetter = answerText.charAt(0).toUpperCase();
-                const wordCount = answerText ? answerText.split(/\s+/).length : 0;
-                hintText = answerText
-                    ? `Hint: Answer starts with "${firstLetter}" and is ${wordCount} word${wordCount === 1 ? "" : "s"}.`
-                    : "Hint: Re-read the prompt for the core concept.";
-            } else {
-                hintText = "Hint: Re-read the prompt for the core concept.";
-            }
+    timerSeconds: 0,
+    timerPaused: false,
+    timerHandle: null,
 
-            q._hintUsed = true;
-            state.hintsUsed++;
-            queueQuizProgressSave(100);
-            alert(hintText);
-            return;
-        }
-    
-        const drug = q.drugRef;
-        if (!drug) {
-            alert("No hint available for this question.");
-            return;
-        }
-    
-        let hintText = "";
-        const prompt = q.prompt.toLowerCase();
-        const targetedBrand = q._brandVariant || splitBrandNames(drug?.brand)[0] || String(drug?.brand || "").split(/[,/;]/)[0]?.trim() || "?";
-    
-        // Determine hint based on question type
-        if (prompt.includes("brand")) {
-            // Asking for Brand → Show first letter
-            hintText = `💡 First letter: "${targetedBrand.charAt(0).toUpperCase()}..."\n📦 Category: ${drug.category || "N/A"}`;
-        } else if (prompt.includes("generic")) {
-            // Asking for Generic → Show brand as hint
-            hintText = `💡 Brand: ${targetedBrand || "N/A"}\n📦 Category: ${drug.category || "N/A"}`;
-        } else if (prompt.includes("class") || prompt.includes("moa")) {
-            // Asking for Class/MOA → Show category
-            hintText = `💡 Category: ${drug.category || "N/A"}\n💊 Generic: ${drug.generic || "N/A"}`;
-        } else {
-            // Fallback: Show category and class
-            hintText = `💡 Category: ${drug.category || "N/A"}\n🏷️ Class: ${drug.class || "N/A"}`;
-        }
-    
-        // Mark hint as used and increment counter
-        q._hintUsed = true;
-        state.hintsUsed++;
-        queueQuizProgressSave(100);
-    
-        alert(hintText);
-    }
-    queueQuizProgressSave(100);
-}
+    generatedTimerSeconds: 0,
+    generatedQuestionLimit: 0,
+    generatedAttemptIdentity: null,
+
+    adaptiveSummary: null,
+    quizConfig: null,
+    activeModeConfig: null,
+    configuredModeKey: "",
+
+    placeholderQuiz: false,
+    modeNotice: "",
+
+    progressKey: "",
+    progressCompleted: false,
+    progressLifecycleBound: false,
+    autosaveTimeout: null,
+    lastAutosaveAt: 0,
+    saveStatusMessage: "",
+
+    currentScale: 1.0
+};
 
 function changeZoom(dir) {
     state.currentScale += (dir === 'in' ? 0.1 : -0.1);
