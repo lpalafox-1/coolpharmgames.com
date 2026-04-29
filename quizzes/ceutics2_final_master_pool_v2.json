@@ -6,7 +6,7 @@
     "course": "Pharmaceutics II",
     "semester": "Spring 2026",
     "exam": "Final",
-    "notes": "Integrated from the provided ceutics2_final_master_pool.json source without adding new academic question content."
+    "notes": "Integrated from the provided ceutics2_final_master_pool_v2.json source without adding new academic question content."
   },
   "settings": {
     "defaultMode": "trueExam",
