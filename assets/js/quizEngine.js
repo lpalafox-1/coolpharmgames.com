@@ -732,9 +732,9 @@ function getQuizModeConfigs(data) {
 function normalizeConfiguredModeRequest(value) {
     const normalized = normalizeQuizValue(value);
     if (!normalized) return "";
-    if (normalized === "hard" || normalized === "quickhard" || normalized === "quick-hard") return "quickHard";
+    if (normalized === "hard" || normalized === "quickhard" || normalized === "quick-hard" || normalized === "quickquiz" || normalized === "quick-quiz" || normalized === "quick") return "quickQuiz";
     if (normalized === "trueexam" || normalized === "true-exam" || normalized === "exam") return "trueExam";
-    if (normalized === "pkgenerator" || normalized === "pk-generator" || normalized === "pkgen") return "pkGenerator";
+    if (normalized === "pkgenerator" || normalized === "pk-generator" || normalized === "pkgen" || normalized === "pkquiz" || normalized === "pk-quiz" || normalized === "pk") return "pkQuiz";
     if (normalized === "masterpool" || normalized === "master-pool" || normalized === "master") return "masterPool";
     return String(value || "").trim();
 }

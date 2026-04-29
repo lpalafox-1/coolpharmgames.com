@@ -105,8 +105,8 @@ function validateCeuticsFinalBlueprint(quiz, errors) {
   }
 
   const examMode = modeConfigs.trueExam || modeConfigs.exam;
-  const hardMode = modeConfigs.quickHard || modeConfigs.hard;
-  const pkMode = modeConfigs.pkGenerator || modeConfigs["pk-generator"];
+  const hardMode = modeConfigs.quickQuiz || modeConfigs.quickHard || modeConfigs.hard;
+  const pkMode = modeConfigs.pkQuiz || modeConfigs.pkGenerator || modeConfigs["pk-generator"];
   const masterPoolMode = modeConfigs.masterPool;
 
   if (!examMode || typeof examMode !== "object") {
@@ -142,14 +142,14 @@ function validateCeuticsFinalBlueprint(quiz, errors) {
   }
 
   if (!hardMode || typeof hardMode !== "object") {
-    errors.push(`ceutics2-final: settings.modeConfigs.quickHard is required`);
+    errors.push(`ceutics2-final: settings.modeConfigs.quickQuiz is required`);
   } else {
     if (Number(hardMode.questionLimit) !== 10) errors.push(`ceutics2-final: hard mode questionLimit must be 10`);
     if (Number(hardMode.timerSeconds) !== 600) errors.push(`ceutics2-final: hard mode timerSeconds must be 600`);
   }
 
   if (!pkMode || typeof pkMode !== "object") {
-    errors.push(`ceutics2-final: settings.modeConfigs.pkGenerator is required`);
+    errors.push(`ceutics2-final: settings.modeConfigs.pkQuiz is required`);
   } else {
     if (Number(pkMode.questionLimit) !== 16) errors.push(`ceutics2-final: pk-generator questionLimit must be 16`);
     const rules = Array.isArray(pkMode?.selection?.rules) ? pkMode.selection.rules : [];

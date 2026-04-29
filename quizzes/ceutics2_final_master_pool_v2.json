@@ -22,8 +22,8 @@
       "pharmacokineticsCalculations": 45
     },
     "modeConfigs": {
-      "quickHard": {
-        "title": "Pharmaceutics II Final Exam - Quick Hard",
+      "quickQuiz": {
+        "title": "Pharmaceutics II Final Exam - Quick Quiz",
         "questionLimit": 10,
         "timerSeconds": 600,
         "selection": {
@@ -124,8 +124,8 @@
           ]
         }
       },
-      "pkGenerator": {
-        "title": "Pharmaceutics II Final Exam - PK Generator",
+      "pkQuiz": {
+        "title": "Pharmaceutics II Final Exam - PK Quiz",
         "questionLimit": 16,
         "timerSeconds": 2700,
         "selection": {
