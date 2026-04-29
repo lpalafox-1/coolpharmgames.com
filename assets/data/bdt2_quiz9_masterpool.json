@@ -434,6 +434,133 @@
           "prolactin"
         ],
         "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e025",
+        "type": "fitb",
+        "question": "Withdrawal of progesterone and estradiol at the end of the cycle triggers ______.",
+        "answer": [
+          "menses"
+        ],
+        "acceptableAnswers": [
+          "menses",
+          "menstruation"
+        ],
+        "explanation": "Falling progesterone and estradiol remove support for the endometrium and trigger menses.",
+        "tags": [
+          "sequence",
+          "menses"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e026",
+        "type": "mcq",
+        "question": "Which hormone is dominant during most of the follicular phase?",
+        "choices": [
+          "Estradiol",
+          "Progesterone",
+          "Prolactin",
+          "hCG"
+        ],
+        "answer": "Estradiol",
+        "explanation": "Estradiol rises through the follicular phase and is the dominant ovarian hormone before ovulation.",
+        "tags": [
+          "follicular vs luteal",
+          "sequence",
+          "estradiol"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e027",
+        "type": "mcq",
+        "question": "Sustained high estradiol late in the follicular phase most directly triggers the:",
+        "choices": [
+          "LH surge",
+          "Progesterone withdrawal",
+          "Menses",
+          "hCG rise"
+        ],
+        "answer": "LH surge",
+        "explanation": "Sustained high estradiol switches feedback to positive and triggers the LH surge.",
+        "tags": [
+          "sequence",
+          "ovulation",
+          "LH surge"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e028",
+        "type": "fitb",
+        "question": "During the follicular phase, the endometrium is primarily ______.",
+        "answer": [
+          "proliferative"
+        ],
+        "acceptableAnswers": [
+          "proliferative"
+        ],
+        "explanation": "Estradiol drives proliferative growth of the endometrium during the follicular phase.",
+        "tags": [
+          "follicular vs luteal",
+          "endometrium"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e029",
+        "type": "fitb",
+        "question": "During the luteal phase, the endometrium is primarily ______.",
+        "answer": [
+          "secretory"
+        ],
+        "acceptableAnswers": [
+          "secretory"
+        ],
+        "explanation": "Progesterone converts the endometrium into a secretory lining during the luteal phase.",
+        "tags": [
+          "follicular vs luteal",
+          "endometrium"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e030",
+        "type": "fitb",
+        "question": "In early pregnancy, hCG rescues the ______.",
+        "answer": [
+          "corpus luteum"
+        ],
+        "acceptableAnswers": [
+          "corpus luteum"
+        ],
+        "explanation": "hCG acts like LH to rescue the corpus luteum in early pregnancy.",
+        "tags": [
+          "pregnancy rescue",
+          "hCG",
+          "corpus luteum"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e031",
+        "type": "mcq",
+        "question": "Which change helps explain why menses does not occur in early pregnancy?",
+        "choices": [
+          "hCG maintains corpus luteum hormone production",
+          "Oxytocin blocks the endometrium from shedding",
+          "FSH rises above LH",
+          "GnRH pulse frequency increases sharply"
+        ],
+        "answer": "hCG maintains corpus luteum hormone production",
+        "explanation": "hCG maintains the corpus luteum, so progesterone and estrogen remain elevated and menses does not occur.",
+        "tags": [
+          "pregnancy rescue",
+          "sequence",
+          "hCG"
+        ],
+        "difficulty": "easy"
       }
     ],
     "hard": [
@@ -704,6 +831,133 @@
         "tags": [
           "luteal phase",
           "corpus luteum"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "basis2-q9-h016",
+        "type": "mcq",
+        "question": "Which sequence best describes a normal menstrual cycle?",
+        "choices": [
+          "FSH recruits follicles -> estradiol rises -> LH surge -> ovulation/luteinization -> progesterone dominates -> hormone withdrawal triggers menses",
+          "LH surge -> FSH recruits follicles -> progesterone rises -> estradiol falls -> hCG rises -> menses occurs",
+          "Progesterone rises first -> estradiol causes menses -> LH rescues corpus luteum -> FSH falls",
+          "hCG rises first -> LH falls -> ovulation occurs -> progesterone withdrawal triggers implantation"
+        ],
+        "answer": "FSH recruits follicles -> estradiol rises -> LH surge -> ovulation/luteinization -> progesterone dominates -> hormone withdrawal triggers menses",
+        "explanation": "That is the normal sequence from follicle recruitment through luteal support and eventual menstrual shedding.",
+        "tags": [
+          "sequence",
+          "cycle"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "basis2-q9-h017",
+        "type": "mcq",
+        "question": "Which set best describes the luteal phase?",
+        "choices": [
+          "Progesterone dominant, secretory endometrium, thick cervical mucus, higher basal body temperature",
+          "Estradiol dominant, proliferative endometrium, thin cervical mucus, lower basal body temperature",
+          "hCG dominant, proliferative endometrium, thin cervical mucus, lower basal body temperature",
+          "FSH dominant, secretory endometrium, alkaline mucus, falling basal body temperature"
+        ],
+        "answer": "Progesterone dominant, secretory endometrium, thick cervical mucus, higher basal body temperature",
+        "explanation": "The luteal phase is progesterone dominant and is associated with a secretory endometrium, thick mucus, and a higher basal body temperature.",
+        "tags": [
+          "follicular vs luteal",
+          "luteal phase"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "basis2-q9-h018",
+        "type": "mcq",
+        "question": "Which set best describes the follicular phase?",
+        "choices": [
+          "Rising estradiol, proliferative endometrium, thinner cervical mucus, lower basal body temperature",
+          "Progesterone dominance, secretory endometrium, thick cervical mucus, higher basal body temperature",
+          "hCG rescue, secretory endometrium, absent LH receptors, higher basal body temperature",
+          "Prolactin dominance, decidualized endometrium, thick cervical mucus, suppressed implantation"
+        ],
+        "answer": "Rising estradiol, proliferative endometrium, thinner cervical mucus, lower basal body temperature",
+        "explanation": "The follicular phase is characterized by rising estradiol, proliferative endometrium, more favorable cervical mucus, and a lower basal body temperature than the luteal phase.",
+        "tags": [
+          "follicular vs luteal",
+          "follicular phase"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "basis2-q9-h019",
+        "type": "fitb",
+        "question": "During menopause, pituitary ______ levels rise because ovarian feedback declines.",
+        "answer": [
+          "FSH"
+        ],
+        "acceptableAnswers": [
+          "FSH"
+        ],
+        "explanation": "With declining ovarian feedback, FSH levels rise markedly during menopause.",
+        "tags": [
+          "menopause",
+          "FSH"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "basis2-q9-h020",
+        "type": "mcq",
+        "question": "Which symptom pattern is most associated with falling or erratic estrogen levels in menopause?",
+        "choices": [
+          "Hot flashes and night sweats",
+          "Milk ejection and uterine cramping",
+          "Midcycle pelvic pain and thin cervical mucus",
+          "Persistent hCG elevation and amenorrhea"
+        ],
+        "answer": "Hot flashes and night sweats",
+        "explanation": "Vasomotor symptoms such as hot flashes and night sweats are strongly associated with menopausal estrogen decline.",
+        "tags": [
+          "menopause",
+          "vasomotor symptoms"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "basis2-q9-h021",
+        "type": "mcq",
+        "question": "Combination oral contraceptives prevent ovulation most directly by preventing the LH:",
+        "choices": [
+          "Surge",
+          "Receptor",
+          "Catabolism",
+          "Transport"
+        ],
+        "answer": "Surge",
+        "explanation": "Combination oral contraceptives suppress the LH surge that is required for ovulation.",
+        "tags": [
+          "contraception",
+          "LH surge",
+          "sequence"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "basis2-q9-h022",
+        "type": "mcq",
+        "question": "hCG most closely acts like which hormone in early pregnancy?",
+        "choices": [
+          "LH",
+          "FSH",
+          "Prolactin",
+          "Oxytocin"
+        ],
+        "answer": "LH",
+        "explanation": "hCG acts like LH to rescue the corpus luteum in early pregnancy.",
+        "tags": [
+          "pregnancy rescue",
+          "hCG",
+          "LH"
         ],
         "difficulty": "hard"
       }
