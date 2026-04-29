@@ -33,6 +33,7 @@ const state = {
     timedOut: false,
     bossMode: false,
     generatedTimerSeconds: 0,
+    generatedQuestionLimit: 0,
     hintsUsed: 0,           // Track hints for stats
     resultsRecorded: false,
     signalsRecorded: false,
@@ -2650,6 +2651,7 @@ function serializeQuizProgress() {
         reviewMode: !!state.reviewMode,
         bossMode: !!state.bossMode,
         generatedTimerSeconds: Math.max(0, Number(state.generatedTimerSeconds) || 0),
+        generatedQuestionLimit: Math.max(0, Number(state.generatedQuestionLimit) || 0),
         adaptiveSummary: state.adaptiveSummary,
         currentScale: Number(state.currentScale) || 1,
         marked: [...state.marked],
@@ -2722,6 +2724,16 @@ function loadSavedQuizProgress() {
         return null;
     }
 
+    const savedTimerSeconds = Math.max(0, Number(saved.generatedTimerSeconds) || 0);
+    const savedQuestionLimit = Math.max(0, Number(saved.generatedQuestionLimit) || 0);
+    const currentTimerSeconds = Math.max(0, Number(state.generatedTimerSeconds) || 0);
+    const currentQuestionLimit = Math.max(0, Number(state.generatedQuestionLimit) || 0);
+
+    if (savedTimerSeconds !== currentTimerSeconds || savedQuestionLimit !== currentQuestionLimit) {
+        clearQuizProgress();
+        return null;
+    }
+
     return saved;
 }
 
@@ -2744,6 +2756,7 @@ function restoreSavedQuizProgress(snapshot) {
     state.reviewMode = !!snapshot.reviewMode;
     state.bossMode = !!snapshot.bossMode;
     state.generatedTimerSeconds = Math.max(0, Number(snapshot.generatedTimerSeconds) || 0);
+    state.generatedQuestionLimit = Math.max(0, Number(snapshot.generatedQuestionLimit) || 0);
     state.adaptiveSummary = snapshot.adaptiveSummary && typeof snapshot.adaptiveSummary === "object"
         ? snapshot.adaptiveSummary
         : null;
@@ -3257,8 +3270,11 @@ function buildQuestionPoolFromQuizData(data, requestedMode = "easy") {
 
 function applyQuestionLimit(items) {
     if (!Array.isArray(items)) return [];
-    if (!Number.isFinite(limitParam) || limitParam <= 0) return items;
-    return shuffled(items).slice(0, Math.min(limitParam, items.length));
+    const configuredLimit = Number.isFinite(limitParam) && limitParam > 0
+        ? limitParam
+        : Math.max(0, Number(state.generatedQuestionLimit) || 0);
+    if (!configuredLimit) return items;
+    return shuffled(items).slice(0, Math.min(configuredLimit, items.length));
 }
 
 function getCorrectAnswerValue(question) {
@@ -6521,6 +6537,7 @@ async function main() {
         state.quizConfig = null;
         state.bossMode = false;
         state.generatedTimerSeconds = 0;
+        state.generatedQuestionLimit = 0;
         state.generatedAttemptIdentity = null;
         state.adaptiveSummary = null;
 
@@ -6727,6 +6744,7 @@ async function main() {
 
             state.bossMode = Boolean(data?.metadata?.kind === "boss-round" || data?.metadata?.bossRound);
             state.generatedTimerSeconds = Math.max(0, Number(data?.metadata?.timerSeconds) || 0);
+            state.generatedQuestionLimit = Math.max(0, Number(data?.metadata?.questionLimit) || 0);
             state.generatedAttemptIdentity = GENERATED_QUIZ_IDS.has(quizId)
                 ? buildGeneratedAttemptIdentity(data)
                 : null;

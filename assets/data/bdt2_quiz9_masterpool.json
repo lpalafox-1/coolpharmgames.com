@@ -4,6 +4,10 @@
   "course": "Basis for Drug Therapy II",
   "unit": 11,
   "topic": "Female Reproductive Physiology",
+  "metadata": {
+    "timerSeconds": 600,
+    "questionLimit": 10
+  },
   "pools": {
     "easy": [
       {
