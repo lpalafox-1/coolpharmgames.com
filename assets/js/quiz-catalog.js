@@ -12,12 +12,14 @@
     easy: "Easy",
     hard: "Hard",
     expert: "Expert",
-    quickHard: "Quick Quiz",
-    quickQuiz: "Quick Quiz",
+    quickHard: "Quick Hard",
+    quickQuiz: "Quick Hard",
     trueExam: "True Exam",
     exam: "True Exam",
-    pkGenerator: "PK Quiz",
-    pkQuiz: "PK Quiz",
+    pkGenerator: "PK Math",
+    pkQuiz: "PK Math",
+    pkMath: "PK Math",
+    adaptive: "Adaptive",
     masterPool: "Master Pool"
   });
   const CEUTICS2_FINAL_ID = "ceutics2-final";
@@ -49,7 +51,7 @@
     { id: "basis-practice-mock-E1", title: "Practice Mock Exam 1 (BDT-I Handouts 1-7)", favoriteCategory: "practice", statsCategory: "Basis", modes: ["easy", "hard"], sourceType: "quiz-json", sourcePath: "quizzes/basis-practice-mock-E1.json", customBuilder: true },
     { id: "ceutics-practice-1", title: "PSCI 71303 Pharmaceutics", favoriteCategory: "practice", statsCategory: "Pharmaceutics", modes: ["easy", "hard"], sourceType: "quiz-json", sourcePath: "quizzes/ceutics-practice-1.json", customBuilder: true },
     { id: "ceutics-practice-2", title: "PSCI 71303 Pharmaceutics - Quiz 2 Practice (Classes 9-15, LO25-60)", favoriteCategory: "practice", statsCategory: "Pharmaceutics", modes: ["easy", "hard"], sourceType: "quiz-json", sourcePath: "quizzes/ceutics-practice-2.json", customBuilder: true },
-    { id: "ceutics2-final", title: "Pharmaceutics II Final Exam", favoriteCategory: "final", statsCategory: "Pharmaceutics", modes: ["quickQuiz", "trueExam", "pkQuiz"], sourceType: "quiz-json", sourcePath: "quizzes/ceutics2_final_master_pool_v2.json", customBuilder: false },
+    { id: "ceutics2-final", title: "Pharmaceutics II Final Exam", favoriteCategory: "final", statsCategory: "Pharmaceutics", modes: ["quickHard", "trueExam", "pkMath", "adaptive"], sourceType: "quiz-json", sourcePath: "quizzes/ceutics2_final_master_pool_v2.json", customBuilder: false },
     { id: "sig-wildcards", title: "SIG Wildcards - Latin to English Practice", favoriteCategory: "fun", statsCategory: "Fun Modes", modes: ["easy", "hard"], sourceType: "quiz-json", sourcePath: "quizzes/sig-wildcards.json", customBuilder: true },
     { id: "latin-fun", title: "Latin Fun - English to Latin Practice", favoriteCategory: "fun", statsCategory: "Fun Modes", modes: ["easy", "hard"], sourceType: "quiz-json", sourcePath: "quizzes/latin-fun.json", customBuilder: true },
     { id: "top-drugs-final-mockA", title: "Top Drugs Final Mock A - 88 Questions", favoriteCategory: "final", statsCategory: "Final Review", modes: ["easy"], sourceType: "quiz-json", sourcePath: "quizzes/top-drugs-final-mockA.json", customBuilder: true },

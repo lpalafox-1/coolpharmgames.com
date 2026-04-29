@@ -42,6 +42,10 @@ func stripTrailingQualifier(_ value: String) -> String {
     ).trimmingCharacters(in: .whitespacesAndNewlines)
 }
 
+func verifiedSourceBrandExceptionKey(generic: String, brand: String) -> String {
+    "\(normalize(generic))::\(normalize(brand))"
+}
+
 func genericAppearsInPDF(_ generic: String, normalizedPDFText: String) -> Bool {
     let normalizedGeneric = normalize(generic)
     if normalizedPDFText.contains(normalizedGeneric) {
@@ -157,6 +161,11 @@ do {
     let entries = try loadPoolEntries(from: poolPath)
     let lab1Text = normalize(try extractPDFText(at: lab1Path))
     let lab2Text = normalize(try extractPDFText(at: lab2Path))
+    let verifiedSourceBrandExceptions = Set([
+        // The faculty Lab 2 source omits the brand line for Rocuronium.
+        // Keep the repo's verified brand while suppressing this known source-document omission.
+        verifiedSourceBrandExceptionKey(generic: "Rocuronium", brand: "Zemuron")
+    ])
 
     var missingGenerics: [(Int, String)] = []
     var missingBrands: [(Int, String, String)] = []
@@ -171,7 +180,8 @@ do {
         for brand in splitBrands(entry.brand) {
             let stripped = stripTrailingQualifier(brand)
             guard !stripped.isEmpty else { continue }
-            if !pdfText.contains(normalize(stripped)) {
+            let exceptionKey = verifiedSourceBrandExceptionKey(generic: entry.generic, brand: stripped)
+            if !pdfText.contains(normalize(stripped)) && !verifiedSourceBrandExceptions.contains(exceptionKey) {
                 missingBrands.append((entry.lab, entry.generic, stripped))
             }
         }

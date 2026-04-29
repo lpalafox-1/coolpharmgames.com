@@ -32,6 +32,7 @@ function readJson(filePath) {
 }
 
 function countQuizQuestions(quiz) {
+  if (quiz?.meta?.placeholder === true) return 0;
   const questions = Array.isArray(quiz?.questions) ? quiz.questions.length : 0;
   const pools = quiz?.pools && typeof quiz.pools === "object"
     ? Object.values(quiz.pools).reduce((sum, pool) => sum + (Array.isArray(pool) ? pool.length : 0), 0)

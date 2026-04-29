@@ -594,7 +594,7 @@
   {
     "generic": "Sumatriptan",
     "brand": "Imitrex; Tosymra",
-    "class": "Serotonin 5-HT1B, 2D Receptor Agonist",
+    "class": "Serotonin 5-HT1B/1D Receptor Agonist",
     "category": "Antimigraine",
     "moa": "Selective agonist for serotonin on intracranial blood vessels to cause vasoconstriction and reduce inflammation",
     "metadata": { "lab": 2, "week": 11, "is_new": true }
@@ -602,7 +602,7 @@
   {
     "generic": "Rizatriptan",
     "brand": "Maxalt; Maxalt-MLT",
-    "class": "Serotonin 5-HT1B, 2D Receptor Agonist",
+    "class": "Serotonin 5-HT1B/1D Receptor Agonist",
     "category": "Antimigraine",
     "moa": "Selective agonist for serotonin on intracranial blood vessels to cause vasoconstriction and reduce inflammation",
     "metadata": { "lab": 2, "week": 11, "is_new": true }
@@ -633,10 +633,10 @@
   },
   {
     "generic": "Rocuronium",
-    "brand": "",
-    "class": "Nondepolarizing Neuromuscular Blocker Agent",
+    "brand": "Zemuron",
+    "class": "Nondepolarizing Neuromuscular Blocking Agent",
     "category": "Neuromuscular Blocker",
-    "moa": "Blocks acetylcholine from binding to receptors on the motor endplate to inhibit depolarization",
+    "moa": "Blocks acetylcholine from binding to receptors on the motor endplate to inhibit depolarization.",
     "metadata": { "lab": 2, "week": 11, "is_new": true }
   },
   {
@@ -1068,7 +1068,7 @@
     "brand": "Actos",
     "class": "Thiazolidinedione",
     "category": "Antidiabetic",
-    "moa": "Increases insulin sensitivity by binding to peroxisome proliferator-activated receptor-gamma (PPAR- ).",
+    "moa": "Increases insulin sensitivity by binding to peroxisome proliferator-activated receptor-gamma (PPAR-gamma).",
     "metadata": { "lab": 1, "week": 7, "is_new": false }
   },
   {

@@ -152,6 +152,9 @@
             "medium": 2,
             "hard": 3
           },
+          "stopWhenStable": true,
+          "minQuestionsBeforeStability": 6,
+          "stabilityWindow": 4,
           "rules": [
             {
               "sourceSection": "pharmacokineticsCalculations",

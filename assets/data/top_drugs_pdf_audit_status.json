@@ -1,16 +1,9 @@
 {
-  "auditedAt" : "2026-04-28T14:47:20Z",
+  "auditedAt" : "2026-04-28T14:59:35Z",
   "flaggedEntries" : [
-    {
-      "generic" : "Sumatriptan",
-      "lab" : 2
-    },
-    {
-      "generic" : "Rizatriptan",
-      "lab" : 2
-    }
+
   ],
-  "flaggedEntriesCount" : 2,
+  "flaggedEntriesCount" : 0,
   "lab1Entries" : 87,
   "lab2Entries" : 82,
   "missingBrandAliases" : [
@@ -26,9 +19,9 @@
     "lab1" : "Top Drugs List final.pdf",
     "lab2" : "Top drugs final 2.pdf"
   },
-  "statusBadge" : "PDF Audit Notes",
-  "statusLabel" : "Notes",
-  "statusSummary" : "Core coverage checks passed, but cleanup phrases are still flagged for review.",
+  "statusBadge" : "PDF Audit Clean",
+  "statusLabel" : "Clean",
+  "statusSummary" : "No missing generics, missing brand aliases, or cleanup phrases were flagged in this audit.",
   "suspectPhrases" : [
     "Horomone Replacement",
     "degredation",

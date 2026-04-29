@@ -105,9 +105,17 @@ function validateCeuticsFinalBlueprint(quiz, errors) {
   }
 
   const examMode = modeConfigs.trueExam || modeConfigs.exam;
-  const hardMode = modeConfigs.quickQuiz || modeConfigs.quickHard || modeConfigs.hard;
-  const pkMode = modeConfigs.pkQuiz || modeConfigs.pkGenerator || modeConfigs["pk-generator"];
+  const hardMode = modeConfigs.quickHard || modeConfigs.quickQuiz || modeConfigs.hard;
+  const pkMode = modeConfigs.pkMath || modeConfigs.pkQuiz || modeConfigs.pkGenerator || modeConfigs["pk-generator"];
+  const adaptiveMode = modeConfigs.adaptive;
   const masterPoolMode = modeConfigs.masterPool;
+  const ruleUsesDifficulty = (rule) => {
+    const explicitDifficulty = normalizeLooseText(rule?.difficulty);
+    if (explicitDifficulty) return true;
+
+    return Array.isArray(rule?.difficulties)
+      && rule.difficulties.some((value) => normalizeLooseText(value));
+  };
 
   if (!examMode || typeof examMode !== "object") {
     errors.push(`ceutics2-final: settings.modeConfigs.trueExam is required`);
@@ -139,29 +147,58 @@ function validateCeuticsFinalBlueprint(quiz, errors) {
     if (Number(pointsByKind.openresponse) !== 4) errors.push(`ceutics2-final: exam mode open response points must be 4`);
     if (Number(pointsByKind.calculation) !== 3) errors.push(`ceutics2-final: exam mode calculation points must be 3`);
     if (weightedTotal !== 150) errors.push(`ceutics2-final: exam mode weighted total must equal 150 points`);
-  }
 
-  if (!hardMode || typeof hardMode !== "object") {
-    errors.push(`ceutics2-final: settings.modeConfigs.quickQuiz is required`);
-  } else {
-    if (Number(hardMode.questionLimit) !== 10) errors.push(`ceutics2-final: hard mode questionLimit must be 10`);
-    if (Number(hardMode.timerSeconds) !== 600) errors.push(`ceutics2-final: hard mode timerSeconds must be 600`);
-  }
-
-  if (!pkMode || typeof pkMode !== "object") {
-    errors.push(`ceutics2-final: settings.modeConfigs.pkQuiz is required`);
-  } else {
-    if (Number(pkMode.questionLimit) !== 16) errors.push(`ceutics2-final: pk-generator questionLimit must be 16`);
-    const rules = Array.isArray(pkMode?.selection?.rules) ? pkMode.selection.rules : [];
-    const invalidRule = rules.find((rule) => normalizeLooseText(rule?.questionKind) !== "calculation" || normalizeLooseText(rule?.sourceSection) !== "pharmacokineticscalculations");
-    if (invalidRule) {
-      errors.push(`ceutics2-final: pk-generator rules must only target pharmacokinetics calculations`);
+    if (rules.some(ruleUsesDifficulty)) {
+      errors.push(`ceutics2-final: trueExam must not filter by difficulty`);
     }
   }
 
-  if (!masterPoolMode || typeof masterPoolMode !== "object") {
-    errors.push(`ceutics2-final: settings.modeConfigs.masterPool is required`);
-  } else if (Number(masterPoolMode.questionLimit) !== 100) {
+  if (!hardMode || typeof hardMode !== "object") {
+    errors.push(`ceutics2-final: settings.modeConfigs.quickHard is required`);
+  } else {
+    if (Number(hardMode.questionLimit) !== 10) errors.push(`ceutics2-final: hard mode questionLimit must be 10`);
+    if (Number(hardMode.timerSeconds) !== 600) errors.push(`ceutics2-final: hard mode timerSeconds must be 600`);
+    const rules = Array.isArray(hardMode?.selection?.rules) ? hardMode.selection.rules : [];
+    if (rules.some(ruleUsesDifficulty)) {
+      errors.push(`ceutics2-final: quickHard must not filter by difficulty`);
+    }
+  }
+
+  if (!pkMode || typeof pkMode !== "object") {
+    errors.push(`ceutics2-final: settings.modeConfigs.pkMath is required`);
+  } else {
+    if (Number(pkMode.questionLimit) !== 16) errors.push(`ceutics2-final: pkMath questionLimit must be 16`);
+    const rules = Array.isArray(pkMode?.selection?.rules) ? pkMode.selection.rules : [];
+    const invalidRule = rules.find((rule) => normalizeLooseText(rule?.questionKind) !== "calculation" || normalizeLooseText(rule?.sourceSection) !== "pharmacokineticscalculations");
+    if (invalidRule) {
+      errors.push(`ceutics2-final: pkMath rules must only target pharmacokinetics calculations`);
+    }
+    if (rules.some(ruleUsesDifficulty)) {
+      errors.push(`ceutics2-final: pkMath must not filter by difficulty`);
+    }
+  }
+
+  if (!adaptiveMode || typeof adaptiveMode !== "object") {
+    errors.push(`ceutics2-final: settings.modeConfigs.adaptive is required`);
+  } else {
+    if (Number(adaptiveMode.questionLimit) !== 10) errors.push(`ceutics2-final: adaptive questionLimit must default to 10`);
+    if (Number(adaptiveMode.timerSeconds) !== 600) errors.push(`ceutics2-final: adaptive timerSeconds must default to 600`);
+    if (adaptiveMode?.selection?.useDifficulty !== true) {
+      errors.push(`ceutics2-final: adaptive mode must set selection.useDifficulty = true`);
+    }
+    const weights = adaptiveMode?.selection?.difficultyWeights || {};
+    if (Number(weights.easy) !== 1 || Number(weights.medium) !== 2 || Number(weights.hard) !== 3) {
+      errors.push(`ceutics2-final: adaptive mode must define difficultyWeights of 1/2/3 for easy/medium/hard`);
+    }
+    if (adaptiveMode?.selection?.stopWhenStable !== true) {
+      errors.push(`ceutics2-final: adaptive mode must enable stopWhenStable`);
+    }
+    if (Number(adaptiveMode?.selection?.minQuestionsBeforeStability) < 6) {
+      errors.push(`ceutics2-final: adaptive mode must require at least 6 questions before stopping early`);
+    }
+  }
+
+  if (masterPoolMode && typeof masterPoolMode === "object" && Number(masterPoolMode.questionLimit) !== 100) {
     errors.push(`ceutics2-final: masterPool questionLimit must be 100`);
   }
 }
