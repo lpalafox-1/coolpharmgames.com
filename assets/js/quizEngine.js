@@ -18,6 +18,7 @@ const QUIZ_PROGRESS_PREFIX = "pharmlet.quiz-progress.";
 const MAX_QUESTION_REPORTS = 200;
 const QUIZ_PROGRESS_MAX_AGE_MS = 1000 * 60 * 60 * 12;
 const TIMER_AUTOSAVE_INTERVAL_SECONDS = 15;
+const quizCatalog = window.PharmletQuizCatalog || null;
 
 const state = { 
     questions: [], index: 0, score: 0, title: "",
@@ -525,6 +526,51 @@ function buildBrandToGenericQuestion(drug, brandValue) {
     };
 }
 
+function findBrandVariantInText(value, drug) {
+    const text = normalizeDrugKey(toPlainText(value));
+    if (!text) return "";
+
+    const rankedBrands = splitBrandNames(drug?.brand)
+        .map((brand) => {
+            const exactKey = normalizeDrugKey(brand);
+            const strippedKey = normalizeDrugKey(stripBrandQualifier(brand));
+            return {
+                brand,
+                exactKey,
+                strippedKey,
+                matchLength: Math.max(exactKey.length, strippedKey.length)
+            };
+        })
+        .sort((a, b) => b.matchLength - a.matchLength);
+
+    for (const entry of rankedBrands) {
+        if (entry.exactKey && text.includes(entry.exactKey)) return entry.brand;
+        if (entry.strippedKey && entry.strippedKey !== entry.exactKey && text.includes(entry.strippedKey)) return entry.brand;
+    }
+
+    return "";
+}
+
+function resolveQuestionBrandVariant(question, drug) {
+    const explicitBrand = String(question?._brandVariant || "").trim();
+    if (explicitBrand) return explicitBrand;
+
+    const brandAnswers = splitBrandNames(drug?.brand);
+    if (!brandAnswers.length) return "";
+
+    const answerText = String(question?.answerText ?? question?.answer ?? "").trim();
+    const answerBrandCandidate = String(answerText.split("/")[0] || "").trim();
+    if (answerBrandCandidate) {
+        const matchedAnswerBrand = brandAnswers.find((brand) => normalizeDrugKey(brand) === normalizeDrugKey(answerBrandCandidate));
+        if (matchedAnswerBrand) return matchedAnswerBrand;
+    }
+
+    const promptBrand = findBrandVariantInText(question?.prompt, drug);
+    if (promptBrand) return promptBrand;
+
+    return brandAnswers.length === 1 ? brandAnswers[0] : "";
+}
+
 const DRUG_ANSWER_ALIAS_GROUPS = [
     ["Hormone Replacement", "Horomone Replacement"],
     ["Beta Blocker", "Beta-Blocker"],
@@ -836,6 +882,7 @@ function loadRecentFinalRuns() {
             timestamp: Number(run.timestamp) || 0,
             generics: Array.isArray(run.generics) ? run.generics.map(normalizeDrugKey).filter(Boolean) : [],
             familiesByGeneric: run.familiesByGeneric && typeof run.familiesByGeneric === "object" ? run.familiesByGeneric : {},
+            brandsByGeneric: run.brandsByGeneric && typeof run.brandsByGeneric === "object" ? run.brandsByGeneric : {},
             legacyRecovered: run.completed !== true
         }))
         .slice(-10);
@@ -1672,7 +1719,7 @@ function getPlausibleWrongCategoriesForDrug(drug, allPool, maxCount = 4) {
     return ranked.slice(0, maxCount).map(item => item.categoryName);
 }
 
-function pickRealBrandClassDistractors(drug, allPool, signals, count = 2, targetBrand = "") {
+function pickRealBrandClassDistractors(drug, allPool, signals, count = 2, targetBrand = "", options = {}) {
     const targetClass = String(drug?.class || "").trim();
     const targetClassKey = normalizeDrugKey(targetClass);
     const targetCategoryKey = normalizeDrugKey(drug?.category);
@@ -1690,7 +1737,7 @@ function pickRealBrandClassDistractors(drug, allPool, signals, count = 2, target
         if (!candidate || candidate === drug || !candidate?.class || !candidate?.generic) continue;
         if (normalizeDrugKey(candidate?.generic) === normalizeDrugKey(drug?.generic)) continue;
 
-        const candidateBrand = pickBrandVariantForFinal(candidate, signals) || splitBrandNames(candidate?.brand)[0];
+        const candidateBrand = pickBrandVariantForFinal(candidate, signals, options) || splitBrandNames(candidate?.brand)[0];
         if (!candidateBrand) continue;
         if (targetBrandKey && normalizeDrugKey(candidateBrand) === targetBrandKey) continue;
 
@@ -1778,7 +1825,7 @@ function pickRealBrandClassDistractors(drug, allPool, signals, count = 2, target
     return picks;
 }
 
-function pickRealBrandCategoryDistractors(drug, allPool, signals, count = 2, targetBrand = "") {
+function pickRealBrandCategoryDistractors(drug, allPool, signals, count = 2, targetBrand = "", options = {}) {
     const targetCategory = String(drug?.category || "").trim();
     const targetCategoryKey = normalizeDrugKey(targetCategory);
     const targetClassKey = normalizeDrugKey(drug?.class);
@@ -1789,7 +1836,7 @@ function pickRealBrandCategoryDistractors(drug, allPool, signals, count = 2, tar
         if (!candidate || candidate === drug || !candidate?.category || !candidate?.generic) continue;
         if (normalizeDrugKey(candidate?.generic) === normalizeDrugKey(drug?.generic)) continue;
 
-        const candidateBrand = pickBrandVariantForFinal(candidate, signals) || splitBrandNames(candidate?.brand)[0];
+        const candidateBrand = pickBrandVariantForFinal(candidate, signals, options) || splitBrandNames(candidate?.brand)[0];
         if (!candidateBrand) continue;
         if (targetBrandKey && normalizeDrugKey(candidateBrand) === targetBrandKey) continue;
 
@@ -1879,7 +1926,7 @@ function buildTopDrugsBrandClassQuestion(drug, allPool, options = {}) {
     if (!drug?.class) return null;
 
     const signals = options?.signals || loadTopDrugsSignals();
-    const targetBrand = options?.targetBrand || pickBrandVariantForFinal(drug, signals) || splitBrandNames(drug?.brand)[0];
+    const targetBrand = options?.targetBrand || pickBrandVariantForFinal(drug, signals, options) || splitBrandNames(drug?.brand)[0];
     if (!targetBrand) return null;
 
     const wrongClasses = getPlausibleWrongClassesForDrug(drug, allPool, 6);
@@ -1904,7 +1951,7 @@ function buildTopDrugsBrandClassQuestion(drug, allPool, options = {}) {
     const secondaryWrongClass = secondaryNearbyWrongClass
         || plausibleWrongClasses.find(className => normalizeDrugKey(className) !== primaryWrongKey);
 
-    const decoyPairs = pickRealBrandClassDistractors(drug, allPool, signals, 4, targetBrand);
+    const decoyPairs = pickRealBrandClassDistractors(drug, allPool, signals, 4, targetBrand, options);
     if (!primaryWrongClass || !decoyPairs.length) return null;
 
     const optionCandidates = [];
@@ -1975,7 +2022,7 @@ function buildTopDrugsBrandCategoryQuestion(drug, allPool, options = {}) {
     if (!drug?.category) return null;
 
     const signals = options?.signals || loadTopDrugsSignals();
-    const targetBrand = options?.targetBrand || pickBrandVariantForFinal(drug, signals) || splitBrandNames(drug?.brand)[0];
+    const targetBrand = options?.targetBrand || pickBrandVariantForFinal(drug, signals, options) || splitBrandNames(drug?.brand)[0];
     if (!targetBrand) return null;
 
     const wrongCategories = getPlausibleWrongCategoriesForDrug(drug, allPool, 6);
@@ -1985,7 +2032,7 @@ function buildTopDrugsBrandCategoryQuestion(drug, allPool, options = {}) {
     const primaryWrongKey = normalizeDrugKey(primaryWrongCategory || "");
     const secondaryWrongCategory = wrongCategories.find(categoryName => normalizeDrugKey(categoryName) !== primaryWrongKey);
 
-    const decoyPairs = pickRealBrandCategoryDistractors(drug, allPool, signals, 4, targetBrand);
+    const decoyPairs = pickRealBrandCategoryDistractors(drug, allPool, signals, 4, targetBrand, options);
     if (!primaryWrongCategory || !decoyPairs.length) return null;
 
     const optionCandidates = [];
@@ -2116,6 +2163,7 @@ function buildRecentFinalUsageContext(runs) {
     const now = Date.now();
     const recentGenericUsage = {};
     const recentFamilyUsageByGeneric = {};
+    const recentBrandUsageByGeneric = {};
     let runCount = 0;
     let legacyRecoveredCount = 0;
 
@@ -2142,9 +2190,18 @@ function buildRecentFinalUsageContext(runs) {
             if (!recentFamilyUsageByGeneric[genericKey]) recentFamilyUsageByGeneric[genericKey] = {};
             recentFamilyUsageByGeneric[genericKey][family] = (Number(recentFamilyUsageByGeneric[genericKey][family]) || 0) + recencyWeight;
         }
+
+        for (const [genericKeyRaw, brandRaw] of Object.entries(run.brandsByGeneric || {})) {
+            const genericKey = normalizeDrugKey(genericKeyRaw);
+            const brandKey = normalizeDrugKey(brandRaw);
+            if (!genericKey || !brandKey) continue;
+
+            if (!recentBrandUsageByGeneric[genericKey]) recentBrandUsageByGeneric[genericKey] = {};
+            recentBrandUsageByGeneric[genericKey][brandKey] = (Number(recentBrandUsageByGeneric[genericKey][brandKey]) || 0) + recencyWeight;
+        }
     }
 
-    return { recentGenericUsage, recentFamilyUsageByGeneric, runCount, legacyRecoveredCount };
+    return { recentGenericUsage, recentFamilyUsageByGeneric, recentBrandUsageByGeneric, runCount, legacyRecoveredCount };
 }
 
 function createFinalSelectionState() {
@@ -2532,20 +2589,10 @@ function showQuizSessionNote(message, tone = "good") {
 
     wrap.classList.remove("hidden");
     text.textContent = message;
-
-    if (tone === "accent") {
-        wrap.style.borderColor = "rgba(139, 30, 63, 0.2)";
-        wrap.style.background = "rgba(139, 30, 63, 0.08)";
-        wrap.style.color = "#8b1e3f";
-    } else if (tone === "muted") {
-        wrap.style.borderColor = "var(--ring)";
-        wrap.style.background = "color-mix(in oklab, var(--card) 82%, transparent)";
-        wrap.style.color = "var(--text)";
-    } else {
-        wrap.style.borderColor = "rgba(16, 185, 129, 0.2)";
-        wrap.style.background = "rgba(16, 185, 129, 0.1)";
-        wrap.style.color = "rgb(4, 120, 87)";
-    }
+    wrap.dataset.tone = tone === "accent" || tone === "muted" ? tone : "good";
+    wrap.style.borderColor = "";
+    wrap.style.background = "";
+    wrap.style.color = "";
 }
 
 function hideQuizSessionNote() {
@@ -2553,6 +2600,7 @@ function hideQuizSessionNote() {
     if (!wrap || !text) return;
     wrap.classList.add("hidden");
     text.textContent = "";
+    delete wrap.dataset.tone;
 }
 
 function formatSavedSessionAge(savedAt) {
@@ -3005,6 +3053,42 @@ async function smartFetch(fileName) {
     throw new Error(`File not found: ${fileName}`);
 }
 
+async function fetchJsonFromSourcePath(sourcePath) {
+    if (!sourcePath) {
+        throw new Error("Missing source path for quiz.");
+    }
+
+    let res;
+    try {
+        res = await fetch(sourcePath, { cache: "no-store" });
+    } catch (error) {
+        throw new Error(`Unable to fetch ${sourcePath}: ${error.message}`);
+    }
+
+    if (!res.ok) {
+        throw new Error(`Unable to fetch ${sourcePath}: HTTP ${res.status}`);
+    }
+
+    try {
+        return await res.json();
+    } catch (error) {
+        throw new Error(`Invalid JSON in ${sourcePath}: ${error.message}`);
+    }
+}
+
+async function loadQuizDataForId(quizIdentifier) {
+    const entry = quizCatalog?.getEntry?.(quizIdentifier);
+    if (entry?.sourceType === "quiz-json" && entry.sourcePath) {
+        try {
+            return await fetchJsonFromSourcePath(entry.sourcePath);
+        } catch (catalogError) {
+            console.warn(`Catalog load failed for ${quizIdentifier}:`, catalogError);
+        }
+    }
+
+    return smartFetch(`${quizIdentifier}.json`);
+}
+
 function normalizeQuizValue(value) {
     return String(value ?? "").replace(/\s+/g, " ").trim().toLowerCase();
 }
@@ -3016,23 +3100,156 @@ function flattenPoolData(data) {
     return [];
 }
 
+function computeQuizInitialism(value) {
+    return String(value ?? "")
+        .match(/[A-Za-z]+/g)
+        ?.map((segment) => segment[0])
+        .join("")
+        .toLowerCase() || "";
+}
+
+function buildCompositeAnswerVariants(parts, acceptableAnswers = []) {
+    const cleanParts = parts
+        .map((part) => String(part ?? "").trim())
+        .filter(Boolean);
+
+    if (!cleanParts.length) return [];
+
+    const normalizeCompact = (value) => normalizeQuizValue(value).replace(/[^a-z0-9]+/g, "");
+    const addUnique = (bucket, seen, value) => {
+        const trimmed = String(value ?? "").trim();
+        if (!trimmed) return;
+        const key = normalizeCompact(trimmed);
+        if (!key || seen.has(key)) return;
+        seen.add(key);
+        bucket.push(trimmed);
+    };
+
+    const synonymsByPart = cleanParts.map((part) => {
+        const partValues = [];
+        const partSeen = new Set();
+        addUnique(partValues, partSeen, part);
+        return { values: partValues, seen: partSeen };
+    });
+
+    const singleAcceptableAnswers = acceptableAnswers
+        .map((answer) => String(answer ?? "").trim())
+        .filter(Boolean)
+        .filter((answer) => !/[,&/]/.test(answer) && !/\band\b/i.test(answer));
+
+    cleanParts.forEach((part, index) => {
+        const partKey = normalizeCompact(part);
+        const synonymBucket = synonymsByPart[index];
+
+        singleAcceptableAnswers.forEach((answer) => {
+            const answerKey = normalizeCompact(answer);
+            const answerInitialism = computeQuizInitialism(answer);
+
+            if (answerKey === partKey || (partKey.length <= 5 && answerInitialism === partKey)) {
+                addUnique(synonymBucket.values, synonymBucket.seen, answer);
+            }
+        });
+    });
+
+    const variants = [];
+    const seen = new Set();
+    const delimiters = [" and ", " & ", ", ", " "];
+
+    if (cleanParts.length === 2) {
+        const [left, right] = synonymsByPart;
+        left.values.forEach((leftValue) => {
+            right.values.forEach((rightValue) => {
+                delimiters.forEach((delimiter) => {
+                    addUnique(variants, seen, `${leftValue}${delimiter}${rightValue}`);
+                    addUnique(variants, seen, `${rightValue}${delimiter}${leftValue}`);
+                });
+            });
+        });
+    } else {
+        delimiters.forEach((delimiter) => {
+            addUnique(variants, seen, cleanParts.join(delimiter));
+        });
+    }
+
+    acceptableAnswers.forEach((answer) => {
+        const candidate = String(answer ?? "").trim();
+        if (!candidate) return;
+        if (/[,&/]/.test(candidate) || /\band\b/i.test(candidate)) {
+            addUnique(variants, seen, candidate);
+        }
+    });
+
+    return variants;
+}
+
+function normalizeLoadedQuizQuestion(item) {
+    if (!item || typeof item !== "object" || Array.isArray(item) || isConceptEntry(item)) {
+        return item;
+    }
+
+    const rawType = normalizeQuizValue(item.type);
+    const normalizedType = rawType === "fitb" ? "short" : (item.type || "mcq");
+    const prompt = String(item.prompt ?? item.question ?? "").trim();
+    const normalized = {
+        ...item,
+        type: normalizedType,
+        prompt
+    };
+
+    const acceptableAnswers = Array.isArray(item.acceptableAnswers)
+        ? item.acceptableAnswers.map((answer) => String(answer ?? "").trim()).filter(Boolean)
+        : [];
+
+    if ((normalizedType === "short" || normalizedType === "open") && Array.isArray(item.answer)) {
+        const answers = item.answer.map((answer) => String(answer ?? "").trim()).filter(Boolean);
+        if (answers.length === 1) {
+            normalized.answer = answers[0];
+
+            const extraAcceptedAnswers = acceptableAnswers.filter((answer) => normalizeQuizValue(answer) !== normalizeQuizValue(answers[0]));
+            if (extraAcceptedAnswers.length) {
+                normalized._acceptedAnswers = [...new Set(extraAcceptedAnswers)];
+            }
+        } else if (answers.length > 1) {
+            const compositeAnswers = buildCompositeAnswerVariants(answers, acceptableAnswers);
+            normalized.answer = compositeAnswers[0] || answers.join(" and ");
+
+            const extraAcceptedAnswers = compositeAnswers.slice(1);
+            if (extraAcceptedAnswers.length) {
+                normalized._acceptedAnswers = extraAcceptedAnswers;
+            }
+        }
+    } else if ((normalizedType === "short" || normalizedType === "open") && normalized.answer === undefined && acceptableAnswers.length) {
+        normalized.answer = acceptableAnswers[0];
+        if (acceptableAnswers.length > 1) {
+            normalized._acceptedAnswers = acceptableAnswers.slice(1);
+        }
+    }
+
+    delete normalized.acceptableAnswers;
+    return normalized;
+}
+
+function normalizeLoadedQuizQuestions(items) {
+    return Array.isArray(items) ? items.map(normalizeLoadedQuizQuestion) : [];
+}
+
 function buildQuestionPoolFromQuizData(data, requestedMode = "easy") {
-    if (Array.isArray(data?.questions)) return data.questions;
+    if (Array.isArray(data?.questions)) return normalizeLoadedQuizQuestions(data.questions);
 
     const pools = data?.pools && typeof data.pools === "object" ? data.pools : {};
     const availablePools = Object.entries(pools).filter(([, items]) => Array.isArray(items) && items.length > 0);
     if (!availablePools.length) return [];
 
     if (requestedMode === "mix") {
-        return availablePools.flatMap(([, items]) => items);
+        return normalizeLoadedQuizQuestions(availablePools.flatMap(([, items]) => items));
     }
 
     if (Array.isArray(pools[requestedMode]) && pools[requestedMode].length > 0) {
-        return pools[requestedMode];
+        return normalizeLoadedQuizQuestions(pools[requestedMode]);
     }
 
     if (availablePools.length === 1) {
-        return availablePools[0][1];
+        return normalizeLoadedQuizQuestions(availablePools[0][1]);
     }
 
     throw new Error(`Mode "${requestedMode}" is not available for this quiz.`);
@@ -3099,7 +3316,7 @@ function buildAdaptiveTopDrugsPlaylistQuestion(drug, fullPool, signals) {
         .map(([focus]) => focus);
 
     const builders = {
-        brand: () => buildFinalGenericToBrandQuestion(drug, signals),
+        brand: () => buildFinalGenericToBrandQuestion(drug, { signals }),
         class: () => buildFinalDrugToFieldQuestion(drug, fullPool, "class", "Class"),
         category: () => buildFinalDrugToFieldQuestion(drug, fullPool, "category", "Category"),
         moa: () => buildFinalDrugToFieldQuestion(drug, fullPool, "moa", "MOA")
@@ -3116,7 +3333,7 @@ function buildAdaptiveTopDrugsPlaylistQuestion(drug, fullPool, signals) {
 function buildTopDrugsPlaylistQuestionForDrug(drug, fullPool, playlistKey, signals) {
     switch (playlistKey) {
         case "brand-recovery":
-            return buildFinalGenericToBrandQuestion(drug, signals) || buildAdaptiveTopDrugsPlaylistQuestion(drug, fullPool, signals);
+            return buildFinalGenericToBrandQuestion(drug, { signals }) || buildAdaptiveTopDrugsPlaylistQuestion(drug, fullPool, signals);
         case "class-recovery":
             return buildFinalDrugToFieldQuestion(drug, fullPool, "class", "Class") || buildAdaptiveTopDrugsPlaylistQuestion(drug, fullPool, signals);
         case "category-recovery":
@@ -4899,15 +5116,27 @@ function getFinalFieldDistractors(drug, allPool, key, maxCount = 3) {
     return selected.slice(0, maxCount);
 }
 
-function pickBrandVariantForFinal(drug, signals) {
+function pickBrandVariantForFinal(drug, signals, options = {}) {
     const brands = splitBrandNames(drug?.brand);
     if (!brands.length) return null;
+    if (brands.length === 1) return brands[0];
+
+    const genericKey = normalizeDrugKey(drug?.generic);
+    const recentBrandUsage = genericKey && options?.recentBrandUsageByGeneric?.[genericKey]
+        ? options.recentBrandUsageByGeneric[genericKey]
+        : {};
 
     const ranked = brands
         .map(brand => {
             const seen = getCounterValue(signals.seenBrands, brand);
             const missed = getCounterValue(signals.missedBrands, brand);
-            const score = (missed * 1.2) - (seen * 0.35) + (Math.max(0, 3 - seen) * 0.2) + (Math.random() * 0.1);
+            const recentPenalty = Number(recentBrandUsage?.[normalizeDrugKey(brand)] || 0);
+            const score =
+                (missed * 1.2) -
+                (seen * 0.35) -
+                (recentPenalty * 0.95) +
+                (Math.max(0, 3 - seen) * 0.2) +
+                (Math.random() * 0.1);
             return { brand, score };
         })
         .sort((a, b) => b.score - a.score);
@@ -5045,8 +5274,8 @@ function buildFinalFieldToDrugQuestion(drug, allPool, key, label) {
     };
 }
 
-function buildFinalGenericToBrandQuestion(drug, signals) {
-    const brand = pickBrandVariantForFinal(drug, signals);
+function buildFinalGenericToBrandQuestion(drug, context) {
+    const brand = pickBrandVariantForFinal(drug, context.signals, context);
     if (!brand) return null;
     const brandPromptLabel = getGenericBrandPromptLabel(drug, brand);
 
@@ -5060,8 +5289,8 @@ function buildFinalGenericToBrandQuestion(drug, signals) {
     };
 }
 
-function buildFinalBrandToGenericQuestion(drug, signals) {
-    const brand = pickBrandVariantForFinal(drug, signals);
+function buildFinalBrandToGenericQuestion(drug, context) {
+    const brand = pickBrandVariantForFinal(drug, context.signals, context);
     if (!brand) return null;
     return buildBrandToGenericQuestion(drug, brand);
 }
@@ -5359,7 +5588,7 @@ function getFinalQuestionFocusSignature(question) {
     return `${fieldKey}:${fieldValue}`;
 }
 
-function buildLegacyFinalFallbackQuestion(drug, fullPool, usedFocusSignatures, maxAttempts = 8) {
+function buildLegacyFinalFallbackQuestion(drug, fullPool, usedFocusSignatures, context, maxAttempts = 8) {
     let fallback = null;
 
     for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
@@ -5378,7 +5607,7 @@ function buildLegacyFinalFallbackQuestion(drug, fullPool, usedFocusSignatures, m
 
     const brandVariants = splitBrandNames(drug?.brand);
     if (brandVariants.length) {
-        const brand = brandVariants[0];
+        const brand = pickBrandVariantForFinal(drug, context?.signals || loadTopDrugsSignals(), context || {}) || brandVariants[0];
         return {
             question: buildBrandToGenericQuestion(drug, brand),
             focusSignature: null
@@ -5403,13 +5632,13 @@ function buildLegacyFinalFallbackQuestion(drug, fullPool, usedFocusSignatures, m
 function buildFinalExamQuestionFromFamily(drug, allPool, family, context, poolStats) {
     switch (family) {
         case "generic_to_brand":
-            return buildFinalGenericToBrandQuestion(drug, context.signals);
+            return buildFinalGenericToBrandQuestion(drug, context);
         case "brand_to_generic":
-            return buildFinalBrandToGenericQuestion(drug, context.signals);
+            return buildFinalBrandToGenericQuestion(drug, context);
         case "brand_class_pair":
-            return buildTopDrugsBrandClassQuestion(drug, allPool, { signals: context.signals });
+            return buildTopDrugsBrandClassQuestion(drug, allPool, context);
         case "brand_category_pair":
-            return buildTopDrugsBrandCategoryQuestion(drug, allPool, { signals: context.signals });
+            return buildTopDrugsBrandCategoryQuestion(drug, allPool, context);
         case "drug_to_class":
             return buildFinalDrugToFieldQuestion(drug, allPool, "class", "Class");
         case "drug_to_category":
@@ -5490,6 +5719,7 @@ function buildFinalExamQuestions(selectedDrugs, fullPool) {
         signals,
         recentGenericUsage: recentUsageContext.recentGenericUsage,
         recentFamilyUsageByGeneric: recentUsageContext.recentFamilyUsageByGeneric,
+        recentBrandUsageByGeneric: recentUsageContext.recentBrandUsageByGeneric,
         runCount: recentUsageContext.runCount,
         legacyRecoveredCount: recentUsageContext.legacyRecoveredCount
     };
@@ -5526,7 +5756,7 @@ function buildFinalExamQuestions(selectedDrugs, fullPool) {
         }
 
         if (!builtQuestion) {
-            const legacyFallback = buildLegacyFinalFallbackQuestion(drug, fullPool, usedFocusSignatures);
+            const legacyFallback = buildLegacyFinalFallbackQuestion(drug, fullPool, usedFocusSignatures, context);
             builtQuestion = legacyFallback?.question || createQuestion(drug, fullPool);
             usedFocusSignature = legacyFallback?.focusSignature || getFinalQuestionFocusSignature(builtQuestion);
         }
@@ -5549,19 +5779,24 @@ function saveFinalRunSnapshot(questions) {
     const runs = loadRecentFinalRuns();
     const generics = [];
     const familiesByGeneric = {};
+    const brandsByGeneric = {};
 
     for (const question of questions) {
-        const genericKey = normalizeDrugKey(question?.drugRef?.generic);
+        const drug = question?.drugRef;
+        const genericKey = normalizeDrugKey(drug?.generic);
         if (!genericKey) continue;
         generics.push(genericKey);
         if (question?._finalFamily) familiesByGeneric[genericKey] = question._finalFamily;
+        const brandVariant = resolveQuestionBrandVariant(question, drug);
+        if (brandVariant) brandsByGeneric[genericKey] = brandVariant;
     }
 
     runs.push({
         timestamp: Date.now(),
         completed: true,
         generics: [...new Set(generics)],
-        familiesByGeneric
+        familiesByGeneric,
+        brandsByGeneric
     });
 
     saveRecentFinalRuns(runs);
@@ -5594,9 +5829,8 @@ function recordTopDrugsSignalsFromQuestions(questions) {
         const familyBrandFocus = question?._finalFamily === "generic_to_brand" || question?._finalFamily === "brand_to_generic";
         if (!brandFocusedPrompt && !familyBrandFocus) continue;
 
-        const brandVariants = question?._brandVariant
-            ? [question._brandVariant]
-            : splitBrandNames(drug?.brand).slice(0, 1);
+        const resolvedBrand = resolveQuestionBrandVariant(question, drug);
+        const brandVariants = resolvedBrand ? [resolvedBrand] : [];
 
         for (const brand of brandVariants) {
             incrementCounter(signals.seenBrands, brand);
@@ -6486,7 +6720,7 @@ async function main() {
         else if (quizId) {
             const data = GENERATED_QUIZ_IDS.has(quizId)
                 ? loadGeneratedQuizFromStorage(quizId)
-                : await smartFetch(`${quizId}.json`);
+                : await loadQuizDataForId(quizId);
             if (!data) {
                 throw new Error(`Quiz "${quizId}" is not available. Try recreating it from the source page.`);
             }

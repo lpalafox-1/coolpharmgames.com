@@ -13,7 +13,7 @@
                  connect-src 'self' https:;">
 
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20260427d" />
+  <link rel="stylesheet" href="assets/css/styles.css?v=20260428a" />
   <script>
     tailwind.config = { darkMode: 'class', theme: { extend: { colors: { maroon: '#8b1e3f' } } } }
   </script>
@@ -88,8 +88,8 @@
       <div id="adaptive-final-copy" class="mt-1 opacity-80">Using saved final memory and weak-area signals for this run.</div>
     </div>
 
-    <div id="quiz-session-note" class="hidden mb-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm">
-      <div class="font-black uppercase tracking-[0.18em] text-emerald-700">Session Resume</div>
+    <div id="quiz-session-note" class="hidden mb-4 rounded-2xl border px-4 py-3 text-sm" data-tone="good">
+      <div id="quiz-session-note-title" class="font-black uppercase tracking-[0.18em]">Session Resume</div>
       <div id="quiz-session-note-text" class="mt-1 opacity-80">Saved progress restored.</div>
     </div>
 
@@ -174,8 +174,9 @@
     </div>
   </div>
 
+  <script src="assets/js/quiz-catalog.js?v=20260428d"></script>
   <script src="assets/js/top-drugs-data.js?v=20260419a"></script>
   <script src="assets/js/review-queue-store.js?v=20260427c"></script>
-  <script src="assets/js/quizEngine.js?v=20260427d"></script>
+  <script src="assets/js/quizEngine.js?v=20260428c"></script>
 </body>
 </html>

@@ -1,0 +1,730 @@
+{
+  "id": "basis2-quiz9",
+  "title": "Basis for Drug Therapy II - Quiz 9: Unit 11 - Female Reproductive Physiology",
+  "course": "Basis for Drug Therapy II",
+  "unit": 11,
+  "topic": "Female Reproductive Physiology",
+  "pools": {
+    "easy": [
+      {
+        "id": "basis2-q9-e001",
+        "type": "fitb",
+        "question": "Pulsatile GnRH is released from the ______.",
+        "answer": [
+          "hypothalamus"
+        ],
+        "acceptableAnswers": [
+          "hypothalamus"
+        ],
+        "explanation": "GnRH is secreted in pulses by the hypothalamus, which in turn stimulates the anterior pituitary to release FSH and LH.",
+        "tags": [
+          "HPO axis",
+          "GnRH"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e002",
+        "type": "fitb",
+        "question": "The two pituitary hormones released in response to GnRH are ____ and ____.",
+        "answer": [
+          "FSH",
+          "LH"
+        ],
+        "acceptableAnswers": [
+          "FSH",
+          "LH",
+          "follicle stimulating hormone",
+          "luteinizing hormone",
+          "FSH and LH"
+        ],
+        "explanation": "Pulsatile GnRH stimulates the anterior pituitary to release the gonadotropins FSH and LH.",
+        "tags": [
+          "HPO axis",
+          "pituitary"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e003",
+        "type": "fitb",
+        "question": "Which hormone slows the GnRH pulse frequency during the luteal phase? ____.",
+        "answer": [
+          "progesterone"
+        ],
+        "acceptableAnswers": [
+          "progesterone"
+        ],
+        "explanation": "Progesterone slows the frequency of GnRH pulses during the luteal phase to help set up FSH dominance in the next cycle.",
+        "tags": [
+          "HPO axis",
+          "progesterone"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e004",
+        "type": "fitb",
+        "question": "Which hormone increases GnRH pulse frequency in the late follicular phase? ____.",
+        "answer": [
+          "estradiol"
+        ],
+        "acceptableAnswers": [
+          "estradiol",
+          "estrogen"
+        ],
+        "explanation": "Estradiol increases GnRH pulse frequency late in the follicular phase, setting up the LH surge.",
+        "tags": [
+          "HPO axis",
+          "estradiol"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e005",
+        "type": "mcq",
+        "question": "Which two cell types in the ovarian follicle collaborate to produce estradiol?",
+        "choices": [
+          "Theca and granulosa cells",
+          "Theca and luteal cells",
+          "Oocyte and granulosa cells",
+          "Pituitary and theca cells"
+        ],
+        "answer": "Theca and granulosa cells",
+        "explanation": "LH stimulates theca cells to produce androgen substrate, while FSH stimulates granulosa cells to aromatize that substrate to estradiol.",
+        "tags": [
+          "follicular phase",
+          "cell types"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e006",
+        "type": "mcq",
+        "question": "Theca cells respond primarily to which hormone?",
+        "choices": [
+          "FSH",
+          "LH",
+          "hCG",
+          "Prolactin"
+        ],
+        "answer": "LH",
+        "explanation": "Theca cells have LH receptors and respond to LH by producing androgen substrate for estradiol synthesis.",
+        "tags": [
+          "follicular phase",
+          "cell types"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e007",
+        "type": "mcq",
+        "question": "Granulosa cells respond primarily to which hormone?",
+        "choices": [
+          "FSH",
+          "LH",
+          "hCG",
+          "TSH"
+        ],
+        "answer": "FSH",
+        "explanation": "Granulosa cells are stimulated by FSH to proliferate and aromatize androgen to estradiol.",
+        "tags": [
+          "follicular phase",
+          "cell types"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e008",
+        "type": "fitb",
+        "question": "After ovulation, the ruptured follicle transforms into the ______.",
+        "answer": [
+          "corpus luteum"
+        ],
+        "acceptableAnswers": [
+          "corpus luteum"
+        ],
+        "explanation": "The ruptured follicle luteinizes and forms the corpus luteum, a temporary endocrine gland that secretes progesterone.",
+        "tags": [
+          "luteal phase",
+          "corpus luteum"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e009",
+        "type": "mcq",
+        "question": "Which phase of the ovarian cycle varies in length?",
+        "choices": [
+          "Follicular phase",
+          "Luteal phase",
+          "Both phases",
+          "Neither phase"
+        ],
+        "answer": "Follicular phase",
+        "explanation": "The follicular phase can vary in length from cycle to cycle, whereas the luteal phase is relatively constant (about 14 days).",
+        "tags": [
+          "cycle",
+          "phases"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e010",
+        "type": "mcq",
+        "question": "Which hormone becomes dominant during the luteal phase?",
+        "choices": [
+          "Estrogen",
+          "Progesterone",
+          "FSH",
+          "hCG"
+        ],
+        "answer": "Progesterone",
+        "explanation": "After ovulation, the corpus luteum secretes large amounts of progesterone, making it the dominant hormone of the luteal phase.",
+        "tags": [
+          "luteal phase",
+          "hormones"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e011",
+        "type": "fitb",
+        "question": "Cervical mucus becomes thin, elastic and more alkaline before ovulation due to rising levels of ______.",
+        "answer": [
+          "estradiol"
+        ],
+        "acceptableAnswers": [
+          "estradiol",
+          "estrogen"
+        ],
+        "explanation": "Rising estradiol in the follicular phase makes cervical mucus more abundant, thin and elastic to facilitate sperm passage.",
+        "tags": [
+          "follicular phase",
+          "cervical mucus"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e012",
+        "type": "fitb",
+        "question": "Cervical mucus becomes thick and less abundant after ovulation due to the effects of ______.",
+        "answer": [
+          "progesterone"
+        ],
+        "acceptableAnswers": [
+          "progesterone"
+        ],
+        "explanation": "Progesterone secreted by the corpus luteum makes cervical mucus thick and tenacious, making sperm passage less favorable.",
+        "tags": [
+          "luteal phase",
+          "cervical mucus"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e013",
+        "type": "fitb",
+        "question": "The midcycle hormone surge that triggers ovulation is the ______ surge.",
+        "answer": [
+          "LH"
+        ],
+        "acceptableAnswers": [
+          "LH",
+          "luteinizing hormone"
+        ],
+        "explanation": "Sustained high estradiol in the late follicular phase switches feedback to positive and triggers an LH surge that induces ovulation.",
+        "tags": [
+          "ovulation",
+          "LH surge"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e014",
+        "type": "mcq",
+        "question": "Which event marks the midpoint between the follicular and luteal phases of the menstrual cycle?",
+        "choices": [
+          "Menstruation",
+          "Ovulation",
+          "Fertilization",
+          "Implantation"
+        ],
+        "answer": "Ovulation",
+        "explanation": "Ovulation is the midcycle release of the oocyte and marks the transition from the follicular phase to the luteal phase.",
+        "tags": [
+          "cycle",
+          "ovulation"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e015",
+        "type": "fitb",
+        "question": "Basal body temperature rises after ovulation due to the thermogenic effect of ______.",
+        "answer": [
+          "progesterone"
+        ],
+        "acceptableAnswers": [
+          "progesterone"
+        ],
+        "explanation": "Progesterone increases basal body temperature by about 0.5\u00b0F after ovulation.",
+        "tags": [
+          "luteal phase",
+          "basal temperature"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e016",
+        "type": "mcq",
+        "question": "What is the primary mechanism by which combination oral contraceptives prevent pregnancy?",
+        "choices": [
+          "They thicken cervical mucus",
+          "They suppress FSH and LH to prevent ovulation",
+          "They decrease sperm motility",
+          "They rescue the corpus luteum"
+        ],
+        "answer": "They suppress FSH and LH to prevent ovulation",
+        "explanation": "Combination oral contraceptives primarily suppress FSH and LH secretion to prevent ovulation.",
+        "tags": [
+          "contraception",
+          "mechanism"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e017",
+        "type": "mcq",
+        "question": "The secondary mechanism by which progestins in oral contraceptives help prevent pregnancy is:",
+        "choices": [
+          "Thickening cervical mucus",
+          "Inhibiting prostaglandin synthesis",
+          "Raising basal body temperature",
+          "Inhibiting oxytocin"
+        ],
+        "answer": "Thickening cervical mucus",
+        "explanation": "Progestins thicken cervical mucus, making it less permeable to sperm as a secondary mechanism of contraception.",
+        "tags": [
+          "contraception",
+          "mechanism"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e018",
+        "type": "mcq",
+        "question": "The tertiary mechanism of action of combination oral contraceptives is:",
+        "choices": [
+          "Endometrial changes reduce receptivity",
+          "Stimulating GnRH release",
+          "Inducing luteolysis",
+          "Inhibiting decidualization"
+        ],
+        "answer": "Endometrial changes reduce receptivity",
+        "explanation": "Progestins cause endometrial changes that make the uterine lining less receptive to implantation.",
+        "tags": [
+          "contraception",
+          "mechanism"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e019",
+        "type": "fitb",
+        "question": "Emergency contraception primarily works by preventing or delaying ______.",
+        "answer": [
+          "ovulation"
+        ],
+        "acceptableAnswers": [
+          "ovulation"
+        ],
+        "explanation": "Emergency contraceptive pills mainly prevent or delay ovulation and have little effect once ovulation has already occurred.",
+        "tags": [
+          "contraception",
+          "emergency"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e020",
+        "type": "mcq",
+        "question": "Which hormone acts like LH to rescue the corpus luteum in early pregnancy?",
+        "choices": [
+          "FSH",
+          "hCG",
+          "Prolactin",
+          "Progesterone"
+        ],
+        "answer": "hCG",
+        "explanation": "Human chorionic gonadotropin (hCG) secreted by the early embryo acts on LH receptors of the corpus luteum to prevent its regression.",
+        "tags": [
+          "pregnancy",
+          "hCG"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e021",
+        "type": "fitb",
+        "question": "Pregnancy tests detect the presence of ______.",
+        "answer": [
+          "hCG"
+        ],
+        "acceptableAnswers": [
+          "hCG",
+          "human chorionic gonadotropin"
+        ],
+        "explanation": "Urine and serum pregnancy tests detect human chorionic gonadotropin (hCG) produced by the embryo.",
+        "tags": [
+          "pregnancy",
+          "diagnosis"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e022",
+        "type": "mcq",
+        "question": "During early pregnancy, which structure provides progesterone and estrogen before the placenta takes over?",
+        "choices": [
+          "Ovary/corpus luteum",
+          "Hypothalamus",
+          "Anterior pituitary",
+          "Thyroid"
+        ],
+        "answer": "Ovary/corpus luteum",
+        "explanation": "In early pregnancy, the corpus luteum remains the main source of progesterone and estrogen until the placenta becomes the dominant hormone source.",
+        "tags": [
+          "pregnancy",
+          "hormone sources"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e023",
+        "type": "mcq",
+        "question": "Which hormone drives milk ejection from the breast postpartum?",
+        "choices": [
+          "Prolactin",
+          "Estrogen",
+          "Oxytocin",
+          "hCG"
+        ],
+        "answer": "Oxytocin",
+        "explanation": "Oxytocin released from the posterior pituitary causes contraction of myoepithelial cells, leading to milk ejection (let-down).",
+        "tags": [
+          "lactation",
+          "oxytocin"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e024",
+        "type": "mcq",
+        "question": "Which hormone is primarily responsible for milk synthesis after delivery?",
+        "choices": [
+          "Estradiol",
+          "Progesterone",
+          "Prolactin",
+          "hCG"
+        ],
+        "answer": "Prolactin",
+        "explanation": "Prolactin from the anterior pituitary stimulates milk protein and lipid synthesis in the mammary glands.",
+        "tags": [
+          "lactation",
+          "prolactin"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "basis2-q9-e025",
+        "type": "fitb",
+        "question": "Elevated prolactin disrupts pulsatile GnRH secretion and suppresses ovulation, resulting in ______.",
+        "answer": [
+          "lactational amenorrhea"
+        ],
+        "acceptableAnswers": [
+          "lactational amenorrhea",
+          "amenorrhea"
+        ],
+        "explanation": "High prolactin levels inhibit GnRH secretion, suppressing FSH and LH and leading to lactational amenorrhea.",
+        "tags": [
+          "lactation",
+          "amenorrhea"
+        ],
+        "difficulty": "easy"
+      }
+    ],
+    "hard": [
+      {
+        "id": "basis2-q9-h001",
+        "type": "mcq",
+        "question": "Which three hormones must fall to allow FSH to rise and recruit a cohort of follicles at the start of the follicular phase?",
+        "choices": [
+          "Estradiol, progesterone and inhibin",
+          "Estradiol, prolactin and oxytocin",
+          "hCG, testosterone and estriol",
+          "FSH, LH and TSH"
+        ],
+        "answer": "Estradiol, progesterone and inhibin",
+        "explanation": "Following corpus luteum regression, falling levels of estradiol, progesterone and inhibin relieve negative feedback on the pituitary, allowing FSH to rise and recruit follicles.",
+        "tags": [
+          "follicular phase",
+          "hormone regulation"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "basis2-q9-h002",
+        "type": "mcq",
+        "question": "In the two-cell, two-gonadotropin model of estradiol production, LH stimulates theca cells to produce androgen substrate while FSH stimulates granulosa cells to:",
+        "choices": [
+          "Aromatize androgen to estradiol",
+          "Convert progesterone to testosterone",
+          "Undergo luteinization",
+          "Release hCG"
+        ],
+        "answer": "Aromatize androgen to estradiol",
+        "explanation": "Granulosa cells contain aromatase and convert theca cell androgens to estradiol under FSH stimulation.",
+        "tags": [
+          "follicular phase",
+          "estradiol synthesis"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "basis2-q9-h003",
+        "type": "mcq",
+        "question": "Which of the following best describes the change in GnRH pulse frequency due to estradiol versus progesterone?",
+        "choices": [
+          "Estradiol slows pulses; progesterone speeds them",
+          "Estradiol speeds pulses; progesterone slows them",
+          "Both speed pulses",
+          "Both slow pulses"
+        ],
+        "answer": "Estradiol speeds pulses; progesterone slows them",
+        "explanation": "Estradiol increases the frequency of GnRH pulses, particularly late in the follicular phase, whereas progesterone slows GnRH pulse frequency during the luteal phase.",
+        "tags": [
+          "HPO axis",
+          "feedback"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "basis2-q9-h004",
+        "type": "mcq",
+        "question": "Under the influence of progesterone during the luteal phase, the basal body temperature:",
+        "choices": [
+          "Remains unchanged",
+          "Falls",
+          "Rises",
+          "Fluctuates unpredictably"
+        ],
+        "answer": "Rises",
+        "explanation": "Progesterone has a thermogenic effect that raises basal body temperature during the luteal phase.",
+        "tags": [
+          "luteal phase",
+          "thermogenesis"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "basis2-q9-h005",
+        "type": "mcq",
+        "question": "Which description best characterizes the endometrial changes during the luteal phase?",
+        "choices": [
+          "Proliferation with rapid cell division",
+          "Secretory transformation with glycogen storage and edema",
+          "Ischemia and breakdown of the functional layer",
+          "Implantation of the placenta"
+        ],
+        "answer": "Secretory transformation with glycogen storage and edema",
+        "explanation": "Progesterone converts the proliferative endometrium into a secretory lining characterized by tortuous glands, glycogen storage and edema.",
+        "tags": [
+          "luteal phase",
+          "endometrium"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "basis2-q9-h006",
+        "type": "mcq",
+        "question": "Which statement about corpus luteum regression is correct?",
+        "choices": [
+          "It occurs if no fertilization, causing estrogen and progesterone levels to rise",
+          "It occurs after 10-14 days, leading to decreased hormone support and initiation of menses",
+          "It occurs only in the presence of high hCG",
+          "It is triggered by an FSH surge"
+        ],
+        "answer": "It occurs after 10-14 days, leading to decreased hormone support and initiation of menses",
+        "explanation": "In the absence of pregnancy, the corpus luteum has a programmed lifespan of about 10-14 days. Its regression leads to a drop in progesterone and estradiol, triggering menstruation.",
+        "tags": [
+          "luteal phase",
+          "corpus luteum"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "basis2-q9-h007",
+        "type": "mcq",
+        "question": "Sustained high estradiol levels during the late follicular phase exert positive feedback and trigger which events?",
+        "choices": [
+          "Decreased LH",
+          "Suppression of FSH only",
+          "LH surge and FSH rise",
+          "hCG release from the embryo"
+        ],
+        "answer": "LH surge and FSH rise",
+        "explanation": "High estradiol sustained for about 48 hours reverses feedback to positive, causing a surge in LH and a lesser increase in FSH that triggers ovulation.",
+        "tags": [
+          "ovulation",
+          "positive feedback"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "basis2-q9-h008",
+        "type": "fitb",
+        "question": "The process by which progesterone prepares the uterine lining for implantation and the early embryo attaches is called ______.",
+        "answer": [
+          "decidualization"
+        ],
+        "acceptableAnswers": [
+          "decidualization",
+          "decidualisation"
+        ],
+        "explanation": "Decidualization refers to the progesterone-driven transformation of the endometrium into a secretory, implantation-receptive state.",
+        "tags": [
+          "pregnancy",
+          "endometrium"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "basis2-q9-h009",
+        "type": "mcq",
+        "question": "During pregnancy, high progesterone and estrogen levels suppress new follicle development by:",
+        "choices": [
+          "Enhancing GnRH pulses",
+          "Inhibiting FSH and LH release",
+          "Stimulating prolactin",
+          "Causing oxytocin release"
+        ],
+        "answer": "Inhibiting FSH and LH release",
+        "explanation": "Elevated levels of progesterone and estrogen provide strong negative feedback on the hypothalamus and pituitary, suppressing FSH and LH and preventing new follicle development during pregnancy.",
+        "tags": [
+          "pregnancy",
+          "hormone regulation"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "basis2-q9-h010",
+        "type": "mcq",
+        "question": "Which of the following is NOT a systemic effect of estrogen?",
+        "choices": [
+          "Inhibits osteoclasts to maintain bone density",
+          "Raises HDL and lowers LDL",
+          "Has a pro-coagulant effect in the liver",
+          "Raises the hypothalamic set point and slows GnRH pulse frequency"
+        ],
+        "answer": "Raises the hypothalamic set point and slows GnRH pulse frequency",
+        "explanation": "Estrogen generally lowers the hypothalamic thermoneutral set point and speeds GnRH pulses; raising the set point and slowing pulses are effects of progesterone.",
+        "tags": [
+          "systemic effects",
+          "estrogen"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "basis2-q9-h011",
+        "type": "fitb",
+        "question": "The finite supply of primordial follicles declines, leading to perimenopause and eventually ______.",
+        "answer": [
+          "menopause"
+        ],
+        "acceptableAnswers": [
+          "menopause"
+        ],
+        "explanation": "Loss of primordial follicles via atresia and ovulation over time results in menopause when the ovarian reserve is nearly exhausted.",
+        "tags": [
+          "menopause",
+          "follicle reserve"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "basis2-q9-h012",
+        "type": "mcq",
+        "question": "Which hormone mediates lactational amenorrhea by inhibiting GnRH pulses?",
+        "choices": [
+          "Oxytocin",
+          "Prolactin",
+          "Progesterone",
+          "Estradiol"
+        ],
+        "answer": "Prolactin",
+        "explanation": "Suckling triggers a neuroendocrine reflex that inhibits hypothalamic dopamine, leading to prolactin surges; elevated prolactin disrupts GnRH pulsatility and suppresses ovulation.",
+        "tags": [
+          "lactation",
+          "amenorrhea"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "basis2-q9-h013",
+        "type": "mcq",
+        "question": "Which of the following best describes the role of oxytocin postpartum?",
+        "choices": [
+          "Stimulates milk synthesis",
+          "Inhibits uterine contractions",
+          "Drives uterine contractions and milk let-down",
+          "Prevents corpus luteum regression"
+        ],
+        "answer": "Drives uterine contractions and milk let-down",
+        "explanation": "Oxytocin released from the posterior pituitary stimulates uterine contractions during labor and postpartum and triggers the milk-ejection reflex.",
+        "tags": [
+          "lactation",
+          "oxytocin"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "basis2-q9-h014",
+        "type": "mcq",
+        "question": "In menopause, FSH levels ______ and estradiol levels ______.",
+        "choices": [
+          "Decrease; increase gradually",
+          "Increase markedly; fall or fluctuate",
+          "Remain constant; remain constant",
+          "Decrease; remain constant"
+        ],
+        "answer": "Increase markedly; fall or fluctuate",
+        "explanation": "With loss of ovarian function, estradiol and progesterone fall. Negative feedback is removed, causing FSH (and to a lesser extent LH) to rise significantly.",
+        "tags": [
+          "menopause",
+          "hormones"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "basis2-q9-h015",
+        "type": "fitb",
+        "question": "The LH-driven transformation of the post-ovulatory follicle into a progesterone-secreting structure is called ______.",
+        "answer": [
+          "luteinization"
+        ],
+        "acceptableAnswers": [
+          "luteinization",
+          "luteinisation"
+        ],
+        "explanation": "LH triggers luteinization, the process by which the post-ovulatory follicle becomes the progesterone-secreting corpus luteum.",
+        "tags": [
+          "luteal phase",
+          "corpus luteum"
+        ],
+        "difficulty": "hard"
+      }
+    ]
+  }
+}
