@@ -181,8 +181,8 @@ function validateCeuticsFinalBlueprint(quiz, errors) {
   if (!adaptiveMode || typeof adaptiveMode !== "object") {
     errors.push(`ceutics2-final: settings.modeConfigs.adaptive is required`);
   } else {
-    if (Number(adaptiveMode.questionLimit) !== 10) errors.push(`ceutics2-final: adaptive questionLimit must default to 10`);
-    if (Number(adaptiveMode.timerSeconds) !== 600) errors.push(`ceutics2-final: adaptive timerSeconds must default to 600`);
+    if (Number(adaptiveMode.questionLimit) !== 65) errors.push(`ceutics2-final: adaptive questionLimit must default to 65`);
+    if (Number(adaptiveMode.timerSeconds) !== 6600) errors.push(`ceutics2-final: adaptive timerSeconds must default to 6600`);
     if (adaptiveMode?.selection?.useDifficulty !== true) {
       errors.push(`ceutics2-final: adaptive mode must set selection.useDifficulty = true`);
     }
@@ -190,12 +190,22 @@ function validateCeuticsFinalBlueprint(quiz, errors) {
     if (Number(weights.easy) !== 1 || Number(weights.medium) !== 2 || Number(weights.hard) !== 3) {
       errors.push(`ceutics2-final: adaptive mode must define difficultyWeights of 1/2/3 for easy/medium/hard`);
     }
-    if (adaptiveMode?.selection?.stopWhenStable !== true) {
-      errors.push(`ceutics2-final: adaptive mode must enable stopWhenStable`);
-    }
-    if (Number(adaptiveMode?.selection?.minQuestionsBeforeStability) < 6) {
-      errors.push(`ceutics2-final: adaptive mode must require at least 6 questions before stopping early`);
-    }
+
+    const adaptiveRules = Array.isArray(adaptiveMode?.selection?.rules) ? adaptiveMode.selection.rules : [];
+    const expectedWeights = {
+      pharmacokineticscalculations: 3,
+      pharmacokineticsconcepts: 4,
+      exam1review: 2,
+      exam2review: 1
+    };
+    adaptiveRules.forEach((rule) => {
+      const section = normalizeLooseText(rule?.sourceSection);
+      if (!section || !(section in expectedWeights)) return;
+      const weight = Number(rule?.countWeight || 0);
+      if (weight !== expectedWeights[section]) {
+        errors.push(`ceutics2-final: adaptive mode must keep ${section} countWeight at ${expectedWeights[section]}`);
+      }
+    });
   }
 
   if (masterPoolMode && typeof masterPoolMode === "object" && Number(masterPoolMode.questionLimit) !== 100) {

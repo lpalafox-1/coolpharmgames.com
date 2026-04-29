@@ -26,80 +26,111 @@ const state = {
     questions: [], index: 0, score: 0, title: "",
     pointScore: 0,
     totalPoints: 0,
-    timerSeconds: 0, timerHandle: null, marked: new Set(),
-    seen: new Set(),
-    currentScale: 1.0,
-    timerPaused: false,
-    currentStreak: 0,
-    bestStreak: 0,
-    originalQuestions: [],  // For restart with original pool
-    reviewMode: false,
-    timedOut: false,
-    bossMode: false,
-    generatedTimerSeconds: 0,
-    generatedQuestionLimit: 0,
-    hintsUsed: 0,           // Track hints for stats
-    resultsRecorded: false,
-    signalsRecorded: false,
-    finalBreakdown: null,
-    adaptiveSummary: null,
-    quizConfig: null,
-    progressKey: "",
-    autosaveTimeout: null,
-    lastAutosaveAt: 0,
-    saveStatusMessage: "",
-    progressLifecycleBound: false,
-    progressCompleted: false,
-    generatedAttemptIdentity: null,
-    activeModeConfig: null,
-    configuredModeKey: "",
-    modeNotice: "",
-    placeholderQuiz: false
-};
+        const q = state.questions[state.index];
+        if (!q || q._answered) return;
+        const activeModeKey = normalizeQuizValue(state.activeModeConfig?._modeKey || state.configuredModeKey || "");
+        const hintsEnabled = state.activeModeConfig?.hintsEnabled;
+        if (hintsEnabled === false) {
+            alert("Hints are disabled for this mode.");
+            return;
+        }
+        if (isRestrictedAttemptMode()) {
+            alert(isBossRoundMode()
+                ? "Boss Round disables hints for this challenge."
+                : "True Exam Mode disables hints for this attempt.");
+            return;
+        }
 
-function getQuestionPointValue(question) {
-    const numeric = Number(question?.points);
-    return Number.isFinite(numeric) && numeric > 0 ? numeric : 1;
-}
+        const isCalculationHint = q.questionKind === "calculation"
+            || (q.type === "short" && (q.formula || q.units || q.tolerance !== undefined));
+        if (isCalculationHint) {
+            const formula = String(q.formula || "").trim();
+            const units = String(q.units || "").trim();
+            const hintLines = [];
+            if (formula) hintLines.push(`Formula: ${formula}`);
+            if (units) hintLines.push(`Units: ${units}`);
+            if (!hintLines.length) {
+                alert("No hint available for this question.");
+                return;
+            }
 
-function getTotalQuestionPoints(questions = state.questions) {
-    return (questions || []).reduce((sum, question) => sum + getQuestionPointValue(question), 0);
-}
+            q._hintUsed = true;
+            state.hintsUsed++;
+            queueQuizProgressSave(100);
+            alert(hintLines.join("\n"));
+            return;
+        }
 
-function getEarnedQuestionPoints(questions = state.questions) {
-    return (questions || []).reduce((sum, question) => sum + (question?._correct ? getQuestionPointValue(question) : 0), 0);
-}
+        if (q._mode === "concept" || q.conceptRef) {
+            const conceptHint = buildConceptHintText(q);
+            if (!conceptHint) {
+                alert("No hint available for this question.");
+                return;
+            }
 
-function usesWeightedPointScoring(questions = state.questions) {
-    const totalQuestions = Array.isArray(questions) ? questions.length : 0;
-    return totalQuestions > 0 && getTotalQuestionPoints(questions) !== totalQuestions;
-}
+            q._hintUsed = true;
+            state.hintsUsed++;
+            queueQuizProgressSave(100);
+            alert(conceptHint);
+            return;
+        }
 
-function syncPointTotalsFromQuestions() {
-    state.totalPoints = getTotalQuestionPoints(state.questions);
-    state.pointScore = getEarnedQuestionPoints(state.questions);
-}
+        if (activeModeKey === "adaptive") {
+            let hintText = "";
+            if (Array.isArray(q.choices) && typeof q.answer === "string") {
+                const wrongChoice = q.choices.find((choice) => choice !== q.answer);
+                hintText = wrongChoice
+                    ? `Hint: One wrong choice is "${wrongChoice}".`
+                    : "Hint: Focus on the most precise choice.";
+            } else if (q.answer) {
+                const answerText = String(q.answer).trim();
+                const firstLetter = answerText.charAt(0).toUpperCase();
+                const wordCount = answerText ? answerText.split(/\s+/).length : 0;
+                hintText = answerText
+                    ? `Hint: Answer starts with "${firstLetter}" and is ${wordCount} word${wordCount === 1 ? "" : "s"}.`
+                    : "Hint: Re-read the prompt for the core concept.";
+            } else {
+                hintText = "Hint: Re-read the prompt for the core concept.";
+            }
 
-// --- 1. CORE ACTIONS ---
-function toggleMark() {
-    if (state.marked.has(state.index)) state.marked.delete(state.index);
-    else state.marked.add(state.index);
-    queueQuizProgressSave(100);
-    renderQuizStatus();
-    renderMarkControls();
-    renderNavMap();
-}
-
-function toggleTimer() {
-    if (state.timerHandle) {
-        clearInterval(state.timerHandle);
-        state.timerHandle = null;
-        state.timerPaused = true;
-        if (getEl("timer-readout")) getEl("timer-readout").classList.add("opacity-30", "animate-pulse");
-    } else {
-        state.timerHandle = setInterval(timerTick, 1000);
-        state.timerPaused = false;
-        if (getEl("timer-readout")) getEl("timer-readout").classList.remove("opacity-30", "animate-pulse");
+            q._hintUsed = true;
+            state.hintsUsed++;
+            queueQuizProgressSave(100);
+            alert(hintText);
+            return;
+        }
+    
+        const drug = q.drugRef;
+        if (!drug) {
+            alert("No hint available for this question.");
+            return;
+        }
+    
+        let hintText = "";
+        const prompt = q.prompt.toLowerCase();
+        const targetedBrand = q._brandVariant || splitBrandNames(drug?.brand)[0] || String(drug?.brand || "").split(/[,/;]/)[0]?.trim() || "?";
+    
+        // Determine hint based on question type
+        if (prompt.includes("brand")) {
+            // Asking for Brand → Show first letter
+            hintText = `💡 First letter: "${targetedBrand.charAt(0).toUpperCase()}..."\n📦 Category: ${drug.category || "N/A"}`;
+        } else if (prompt.includes("generic")) {
+            // Asking for Generic → Show brand as hint
+            hintText = `💡 Brand: ${targetedBrand || "N/A"}\n📦 Category: ${drug.category || "N/A"}`;
+        } else if (prompt.includes("class") || prompt.includes("moa")) {
+            // Asking for Class/MOA → Show category
+            hintText = `💡 Category: ${drug.category || "N/A"}\n💊 Generic: ${drug.generic || "N/A"}`;
+        } else {
+            // Fallback: Show category and class
+            hintText = `💡 Category: ${drug.category || "N/A"}\n🏷️ Class: ${drug.class || "N/A"}`;
+        }
+    
+        // Mark hint as used and increment counter
+        q._hintUsed = true;
+        state.hintsUsed++;
+        queueQuizProgressSave(100);
+    
+        alert(hintText);
     }
     queueQuizProgressSave(100);
 }
@@ -2505,6 +2536,26 @@ function showHint() {
         return;
     }
 
+    const isCalculationHint = q.questionKind === "calculation"
+        || (q.type === "short" && (q.formula || q.units || q.tolerance !== undefined));
+    if (isCalculationHint) {
+        const formula = String(q.formula || "").trim();
+        const units = String(q.units || "").trim();
+        const hintLines = [];
+        if (formula) hintLines.push(`Formula: ${formula}`);
+        if (units) hintLines.push(`Units: ${units}`);
+        if (!hintLines.length) {
+            alert("4a1 No hint available for this question.");
+            return;
+        }
+
+        q._hintUsed = true;
+        state.hintsUsed++;
+        queueQuizProgressSave(100);
+        alert(hintLines.join("\n"));
+        return;
+    }
+
     if (q._mode === "concept" || q.conceptRef) {
         const conceptHint = buildConceptHintText(q);
         if (!conceptHint) {
@@ -3623,8 +3674,41 @@ function buildConfiguredModeQuestions(data, modeConfig) {
         return picked;
     };
 
+    const effectiveTotal = Number.isFinite(limitParam) && limitParam > 0
+        ? limitParam
+        : Math.max(0, Number(modeConfig?.questionLimit) || 0);
+    const explicitTotal = rules.reduce((sum, rule) => sum + Math.max(0, Number(rule?.count) || 0), 0);
+    const weightedRules = rules.filter((rule) => !Number.isFinite(Number(rule?.count)) && Number(rule?.countWeight) > 0);
+    const totalWeight = weightedRules.reduce((sum, rule) => sum + Math.max(0, Number(rule?.countWeight) || 0), 0);
+    const weightedTotal = totalWeight > 0 && effectiveTotal > 0
+        ? Math.max(0, effectiveTotal - explicitTotal)
+        : 0;
+    const weightedCounts = new Map();
+
+    if (weightedRules.length && totalWeight > 0 && weightedTotal > 0) {
+        const allocations = weightedRules.map((rule) => {
+            const weight = Math.max(0, Number(rule?.countWeight) || 0);
+            const exact = (weightedTotal * weight) / totalWeight;
+            return {
+                rule,
+                base: Math.floor(exact),
+                fraction: exact - Math.floor(exact)
+            };
+        });
+
+        let remaining = weightedTotal - allocations.reduce((sum, entry) => sum + entry.base, 0);
+        allocations.sort((a, b) => b.fraction - a.fraction);
+        for (let i = 0; i < allocations.length && remaining > 0; i += 1) {
+            allocations[i].base += 1;
+            remaining -= 1;
+        }
+
+        allocations.forEach((entry) => weightedCounts.set(entry.rule, entry.base));
+    }
+
     for (const rule of rules) {
-        const targetCount = Math.max(0, Number(rule?.count) || 0);
+        const weightedCount = weightedCounts.get(rule);
+        const targetCount = Math.max(0, Number.isFinite(weightedCount) ? weightedCount : Number(rule?.count) || 0);
         if (!targetCount) continue;
 
         const candidates = shuffled(allQuestions.filter((question) => !seenQuestions.has(question) && matchesConfiguredRule(question, rule, { useDifficulty })));

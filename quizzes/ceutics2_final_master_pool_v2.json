@@ -26,6 +26,49 @@
         "title": "Pharmaceutics II Final Exam - Quick Hard",
         "questionLimit": 10,
         "timerSeconds": 600,
+        "hintsEnabled": false,
+        "selection": {
+          "allowPartial": false,
+          "rules": [
+            {
+              "sourceSection": "pharmacokineticsCalculations",
+              "questionKind": "calculation",
+              "count": 3
+            },
+            {
+              "sourceSection": "pharmacokineticsConcepts",
+              "questionKinds": [
+                "choice",
+                "fitb"
+              ],
+              "count": 4
+            },
+            {
+              "sourceSection": "exam1Review",
+              "questionKinds": [
+                "choice",
+                "fitb",
+                "openresponse"
+              ],
+              "count": 2
+            },
+            {
+              "sourceSection": "exam2Review",
+              "questionKinds": [
+                "choice",
+                "fitb",
+                "openresponse"
+              ],
+              "count": 1
+            }
+          ]
+        }
+      },
+      "quickQuiz": {
+        "title": "Pharmaceutics II Final Exam - Quick Hard",
+        "questionLimit": 10,
+        "timerSeconds": 600,
+        "hintsEnabled": false,
         "selection": {
           "allowPartial": false,
           "rules": [
@@ -67,6 +110,7 @@
         "title": "Pharmaceutics II Final Exam - True Exam",
         "questionLimit": 65,
         "timerSeconds": 6600,
+        "hintsEnabled": false,
         "pointsByQuestionKind": {
           "choice": 2,
           "fitb": 2,
@@ -128,6 +172,7 @@
         "title": "Pharmaceutics II Final Exam - PK Math",
         "questionLimit": 16,
         "timerSeconds": 2700,
+        "hintsEnabled": true,
         "selection": {
           "allowPartial": false,
           "rules": [
@@ -141,8 +186,9 @@
       },
       "adaptive": {
         "title": "Pharmaceutics II Final Exam - Adaptive",
-        "questionLimit": 10,
-        "timerSeconds": 600,
+        "questionLimit": 65,
+        "timerSeconds": 6600,
+        "hintsEnabled": true,
         "notice": "Adaptive mode uses difficulty tags to bias toward harder questions while keeping the quick quiz mix.",
         "selection": {
           "allowPartial": false,
@@ -152,14 +198,11 @@
             "medium": 2,
             "hard": 3
           },
-          "stopWhenStable": true,
-          "minQuestionsBeforeStability": 6,
-          "stabilityWindow": 4,
           "rules": [
             {
               "sourceSection": "pharmacokineticsCalculations",
               "questionKind": "calculation",
-              "count": 3
+              "countWeight": 3
             },
             {
               "sourceSection": "pharmacokineticsConcepts",
@@ -167,7 +210,7 @@
                 "choice",
                 "fitb"
               ],
-              "count": 4
+              "countWeight": 4
             },
             {
               "sourceSection": "exam1Review",
@@ -176,7 +219,7 @@
                 "fitb",
                 "openresponse"
               ],
-              "count": 2
+              "countWeight": 2
             },
             {
               "sourceSection": "exam2Review",
@@ -185,7 +228,7 @@
                 "fitb",
                 "openresponse"
               ],
-              "count": 1
+              "countWeight": 1
             }
           ]
         }
