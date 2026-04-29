@@ -43,14 +43,16 @@ function getWeekMasteryStats(weekNumber) {
   return null;
 }
 
-function getQuizMasteryStats(quizId, modes = ["easy"]) {
+function getQuizMasteryStats(quizId, modes = ["easy"], options = {}) {
   let best = null;
+  const expectedTotal = Number(options.expectedTotal);
 
   for (const mode of modes) {
     const parsed = safeReadStorageJson(`pharmlet.${quizId}.${mode}`);
     const score = Number(parsed?.score);
     const total = Number(parsed?.total);
     if (!Number.isFinite(score) || !Number.isFinite(total) || total <= 0) continue;
+    if (Number.isFinite(expectedTotal) && expectedTotal > 0 && total !== expectedTotal) continue;
 
     const percent = Math.max(0, Math.min(100, Math.round((score / total) * 100)));
     if (!best || percent > best.percent) {
@@ -64,7 +66,7 @@ function getQuizMasteryStats(quizId, modes = ["easy"]) {
 function renderQuizMastery(quizId, options = {}) {
   const bar = document.getElementById(options.barId || `prog-${quizId}`);
   const label = document.getElementById(options.labelId || `prog-${quizId}-label`);
-  const stats = getQuizMasteryStats(quizId, options.modes || ["easy"]);
+  const stats = getQuizMasteryStats(quizId, options.modes || ["easy"], options);
 
   if (bar) {
     bar.style.width = stats ? `${stats.percent}%` : "0%";
@@ -139,12 +141,14 @@ function runHome() {
 
   renderQuizMastery("bdt-unit10-quiz8", {
     modes: ["easy"],
+    expectedTotal: 10,
     barId: "prog-bdt-unit10-quiz8",
     labelId: "prog-bdt-unit10-quiz8-label"
   });
 
   renderQuizMastery("basis2-quiz9", {
     modes: ["easy", "hard"],
+    expectedTotal: 10,
     barId: "prog-basis2-quiz9",
     labelId: "prog-basis2-quiz9-label"
   });
