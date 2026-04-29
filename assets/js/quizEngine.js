@@ -732,9 +732,9 @@ function getQuizModeConfigs(data) {
 function normalizeConfiguredModeRequest(value) {
     const normalized = normalizeQuizValue(value);
     if (!normalized) return "";
-    if (normalized === "hard" || normalized === "quickhard" || normalized === "quick-hard" || normalized === "quickquiz" || normalized === "quick-quiz" || normalized === "quick") return "quickQuiz";
+    if (normalized === "hard" || normalized === "quickhard" || normalized === "quick-hard" || normalized === "quickquiz" || normalized === "quick-quiz" || normalized === "quick") return "quickHard";
     if (normalized === "trueexam" || normalized === "true-exam" || normalized === "exam") return "trueExam";
-    if (normalized === "pkgenerator" || normalized === "pk-generator" || normalized === "pkgen" || normalized === "pkquiz" || normalized === "pk-quiz" || normalized === "pk") return "pkQuiz";
+    if (normalized === "pkgenerator" || normalized === "pk-generator" || normalized === "pkgen" || normalized === "pkquiz" || normalized === "pk-quiz" || normalized === "pkmath" || normalized === "pk-math" || normalized === "pk") return "pkMath";
     if (normalized === "masterpool" || normalized === "master-pool" || normalized === "master") return "masterPool";
     return String(value || "").trim();
 }
@@ -3476,8 +3476,9 @@ function getConfiguredQuestionTagSet(question) {
     return new Set(values.map((value) => normalizeQuizValue(value)).filter(Boolean));
 }
 
-function matchesConfiguredRule(question, rule) {
+function matchesConfiguredRule(question, rule, options = {}) {
     if (!question || !rule) return false;
+    const useDifficulty = options.useDifficulty !== false;
 
     const sourceSection = getConfiguredQuestionSourceSection(question);
     const questionKind = getConfiguredQuestionKind(question);
@@ -3494,8 +3495,10 @@ function matchesConfiguredRule(question, rule) {
     const allowedTypes = toNormalizedValueList(rule.types ?? rule.type);
     if (allowedTypes.length && !allowedTypes.includes(questionType)) return false;
 
-    const allowedDifficulties = toNormalizedValueList(rule.difficulties ?? rule.difficulty);
-    if (allowedDifficulties.length && !allowedDifficulties.includes(difficulty)) return false;
+    if (useDifficulty) {
+        const allowedDifficulties = toNormalizedValueList(rule.difficulties ?? rule.difficulty);
+        if (allowedDifficulties.length && !allowedDifficulties.includes(difficulty)) return false;
+    }
 
     const requiredTags = toNormalizedValueList(rule.tags);
     if (requiredTags.length && !requiredTags.some((tag) => tags.has(tag))) return false;
@@ -3535,6 +3538,10 @@ function buildConfiguredModeQuestions(data, modeConfig) {
         : {};
     const rules = Array.isArray(selection.rules) ? selection.rules : [];
     const allowPartial = !!selection.allowPartial;
+    const useDifficulty = Boolean(selection.useDifficulty);
+    const difficultyWeights = selection?.difficultyWeights && typeof selection.difficultyWeights === "object"
+        ? selection.difficultyWeights
+        : null;
     const selected = [];
     const seenQuestions = new Set();
     const shortfalls = [];
@@ -3553,12 +3560,77 @@ function buildConfiguredModeQuestions(data, modeConfig) {
         };
     }
 
+    const pickWeightedDifficulty = (candidates, targetCount) => {
+        if (!difficultyWeights) return candidates.slice(0, Math.min(targetCount, candidates.length));
+
+        const normalizedWeights = Object.entries(difficultyWeights)
+            .map(([key, weight]) => [normalizeQuizValue(key), Number(weight) || 0])
+            .filter(([, weight]) => weight > 0);
+
+        if (!normalizedWeights.length) return candidates.slice(0, Math.min(targetCount, candidates.length));
+
+        const buckets = new Map();
+        const fallbackBucket = [];
+        const addToBucket = (key, question) => {
+            if (!buckets.has(key)) buckets.set(key, []);
+            buckets.get(key).push(question);
+        };
+
+        for (const question of candidates) {
+            const difficulty = getConfiguredQuestionDifficulty(question) || "medium";
+            addToBucket(difficulty, question);
+            fallbackBucket.push(question);
+        }
+
+        const pickDifficulty = (entries) => {
+            const totalWeight = entries.reduce((sum, [, weight]) => sum + weight, 0);
+            if (totalWeight <= 0) return entries[0]?.[0] || "";
+            let roll = Math.random() * totalWeight;
+            for (const [key, weight] of entries) {
+                roll -= weight;
+                if (roll <= 0) return key;
+            }
+            return entries[entries.length - 1][0];
+        };
+
+        const picked = [];
+        for (let i = 0; i < targetCount; i += 1) {
+            const availableEntries = normalizedWeights.filter(([key]) => (buckets.get(key) || []).length > 0);
+            const candidateEntries = availableEntries.length
+                ? availableEntries
+                : [...buckets.entries()].filter(([, items]) => items.length > 0).map(([key]) => [key, 1]);
+            if (!candidateEntries.length) break;
+
+            const selectedKey = pickDifficulty(candidateEntries);
+            const pool = buckets.get(selectedKey) || [];
+            const fallbackPool = pool.length ? pool : fallbackBucket;
+            if (!fallbackPool.length) break;
+
+            const index = Math.floor(Math.random() * fallbackPool.length);
+            const question = fallbackPool.splice(index, 1)[0];
+            if (!question) continue;
+
+            const questionKey = getConfiguredQuestionDifficulty(question) || "medium";
+            const bucket = buckets.get(questionKey);
+            if (bucket) {
+                const bucketIndex = bucket.indexOf(question);
+                if (bucketIndex >= 0) bucket.splice(bucketIndex, 1);
+            }
+
+            picked.push(question);
+        }
+
+        return picked;
+    };
+
     for (const rule of rules) {
         const targetCount = Math.max(0, Number(rule?.count) || 0);
         if (!targetCount) continue;
 
-        const candidates = shuffled(allQuestions.filter((question) => !seenQuestions.has(question) && matchesConfiguredRule(question, rule)));
-        const picked = candidates.slice(0, Math.min(targetCount, candidates.length));
+        const candidates = shuffled(allQuestions.filter((question) => !seenQuestions.has(question) && matchesConfiguredRule(question, rule, { useDifficulty })));
+        const picked = useDifficulty
+            ? pickWeightedDifficulty(candidates, targetCount)
+            : candidates.slice(0, Math.min(targetCount, candidates.length));
         picked.forEach((question) => addQuestion(question, rule));
 
         if (picked.length < targetCount) {
