@@ -8,6 +8,17 @@
     fun: "Fun Modes",
     other: "Other"
   });
+  const MODE_LABELS = Object.freeze({
+    easy: "Easy",
+    hard: "Hard",
+    expert: "Expert",
+    quickHard: "Quick Hard",
+    trueExam: "True Exam",
+    exam: "True Exam",
+    pkGenerator: "PK Generator",
+    masterPool: "Master Pool"
+  });
+  const CEUTICS2_FINAL_ID = "ceutics2-final";
 
   const QUIZ_CATALOG = Object.freeze([
     { id: "chapter1-review", title: "Chapter 1 Review", favoriteCategory: "chapter", statsCategory: "Chapter Reviews", modes: ["easy", "hard"], sourceType: "quiz-json", sourcePath: "quizzes/chapter1-review.json", customBuilder: true },
@@ -36,6 +47,7 @@
     { id: "basis-practice-mock-E1", title: "Practice Mock Exam 1 (BDT-I Handouts 1-7)", favoriteCategory: "practice", statsCategory: "Basis", modes: ["easy", "hard"], sourceType: "quiz-json", sourcePath: "quizzes/basis-practice-mock-E1.json", customBuilder: true },
     { id: "ceutics-practice-1", title: "PSCI 71303 Pharmaceutics", favoriteCategory: "practice", statsCategory: "Pharmaceutics", modes: ["easy", "hard"], sourceType: "quiz-json", sourcePath: "quizzes/ceutics-practice-1.json", customBuilder: true },
     { id: "ceutics-practice-2", title: "PSCI 71303 Pharmaceutics - Quiz 2 Practice (Classes 9-15, LO25-60)", favoriteCategory: "practice", statsCategory: "Pharmaceutics", modes: ["easy", "hard"], sourceType: "quiz-json", sourcePath: "quizzes/ceutics-practice-2.json", customBuilder: true },
+    { id: "ceutics2-final", title: "Pharmaceutics II Final Exam", favoriteCategory: "final", statsCategory: "Pharmaceutics", modes: ["quickHard", "trueExam", "pkGenerator", "masterPool"], sourceType: "quiz-json", sourcePath: "quizzes/ceutics2_final_master_pool.json", customBuilder: false },
     { id: "sig-wildcards", title: "SIG Wildcards - Latin to English Practice", favoriteCategory: "fun", statsCategory: "Fun Modes", modes: ["easy", "hard"], sourceType: "quiz-json", sourcePath: "quizzes/sig-wildcards.json", customBuilder: true },
     { id: "latin-fun", title: "Latin Fun - English to Latin Practice", favoriteCategory: "fun", statsCategory: "Fun Modes", modes: ["easy", "hard"], sourceType: "quiz-json", sourcePath: "quizzes/latin-fun.json", customBuilder: true },
     { id: "top-drugs-final-mockA", title: "Top Drugs Final Mock A - 88 Questions", favoriteCategory: "final", statsCategory: "Final Review", modes: ["easy"], sourceType: "quiz-json", sourcePath: "quizzes/top-drugs-final-mockA.json", customBuilder: true },
@@ -75,7 +87,7 @@
     return FAVORITE_CATEGORY_LABELS[categoryKey] || FAVORITE_CATEGORY_LABELS.other;
   }
 
-  function buildQuizHref(quizId, mode = "easy") {
+  function buildQuizHref(quizId, mode) {
     const value = String(quizId || "").trim();
     let match = value.match(/^lab-(\d+)-week-(\d+)$/);
     if (match) {
@@ -97,10 +109,27 @@
       return `quiz.html?tag=${encodeURIComponent(match[1])}`;
     }
 
+    if (value === CEUTICS2_FINAL_ID) {
+      const params = new URLSearchParams();
+      params.set("id", value);
+      const normalizedMode = String(mode || "").trim();
+      if (!normalizedMode || normalizedMode === "trueExam" || normalizedMode === "exam") {
+        return `quiz.html?${params.toString()}`;
+      }
+      params.set("mode", normalizedMode);
+      return `quiz.html?${params.toString()}`;
+    }
+
     const params = new URLSearchParams();
     params.set("id", value);
-    if (mode) params.set("mode", mode);
+    params.set("mode", mode ? String(mode).trim() : "easy");
     return `quiz.html?${params.toString()}`;
+  }
+
+  function getModeLabel(modeKey) {
+    const raw = String(modeKey || "").trim();
+    if (!raw) return "";
+    return MODE_LABELS[raw] || raw.charAt(0).toUpperCase() + raw.slice(1);
   }
 
   function buildDynamicQuizLabel(quizId) {
@@ -190,6 +219,7 @@
     getFavoriteCategoryLabel,
     resolveFavoriteCategory,
     buildQuizHref,
+    getModeLabel,
     buildDynamicQuizLabel,
     resolveStatsCategory
   };

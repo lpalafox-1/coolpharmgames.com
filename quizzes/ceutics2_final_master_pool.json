@@ -1,0 +1,2685 @@
+{
+  "id": "ceutics2-final",
+  "title": "Pharmaceutics II Final Exam",
+  "meta": {
+    "masterPoolId": "ceutics2-final-master",
+    "course": "Pharmaceutics II",
+    "semester": "Spring 2026",
+    "exam": "Final",
+    "notes": "Integrated from the provided ceutics2_final_master_pool.json source without adding new academic question content."
+  },
+  "settings": {
+    "defaultMode": "trueExam",
+    "actualExam": {
+      "questions": 65,
+      "points": 150,
+      "minutes": 110
+    },
+    "sourceCounts": {
+      "exam1Review": 15,
+      "exam2Review": 14,
+      "pharmacokineticsConcepts": 26,
+      "pharmacokineticsCalculations": 45
+    },
+    "modeConfigs": {
+      "quickHard": {
+        "title": "Pharmaceutics II Final Exam - Quick Hard",
+        "questionLimit": 10,
+        "timerSeconds": 600,
+        "selection": {
+          "allowPartial": false,
+          "rules": [
+            {
+              "sourceSection": "pharmacokineticsCalculations",
+              "questionKind": "calculation",
+              "count": 3
+            },
+            {
+              "sourceSection": "pharmacokineticsConcepts",
+              "questionKinds": [
+                "choice",
+                "fitb"
+              ],
+              "count": 4
+            },
+            {
+              "sourceSection": "exam1Review",
+              "questionKinds": [
+                "choice",
+                "fitb",
+                "openresponse"
+              ],
+              "count": 2
+            },
+            {
+              "sourceSection": "exam2Review",
+              "questionKinds": [
+                "choice",
+                "fitb",
+                "openresponse"
+              ],
+              "count": 1
+            }
+          ]
+        }
+      },
+      "trueExam": {
+        "title": "Pharmaceutics II Final Exam - True Exam",
+        "questionLimit": 65,
+        "timerSeconds": 6600,
+        "pointsByQuestionKind": {
+          "choice": 2,
+          "fitb": 2,
+          "openresponse": 4,
+          "calculation": 3
+        },
+        "selection": {
+          "allowPartial": false,
+          "rules": [
+            {
+              "sourceSection": "exam1Review",
+              "questionKind": "choice",
+              "count": 9
+            },
+            {
+              "sourceSection": "exam1Review",
+              "questionKind": "fitb",
+              "count": 2
+            },
+            {
+              "sourceSection": "exam1Review",
+              "questionKind": "openresponse",
+              "count": 1
+            },
+            {
+              "sourceSection": "exam2Review",
+              "questionKind": "choice",
+              "count": 8
+            },
+            {
+              "sourceSection": "exam2Review",
+              "questionKind": "fitb",
+              "count": 2
+            },
+            {
+              "sourceSection": "exam2Review",
+              "questionKind": "openresponse",
+              "count": 1
+            },
+            {
+              "sourceSection": "pharmacokineticsConcepts",
+              "questionKind": "choice",
+              "count": 22
+            },
+            {
+              "sourceSection": "pharmacokineticsConcepts",
+              "questionKind": "fitb",
+              "count": 4
+            },
+            {
+              "sourceSection": "pharmacokineticsCalculations",
+              "questionKind": "calculation",
+              "count": 16
+            }
+          ]
+        }
+      },
+      "pkGenerator": {
+        "title": "Pharmaceutics II Final Exam - PK Generator",
+        "questionLimit": 16,
+        "timerSeconds": 2700,
+        "selection": {
+          "allowPartial": false,
+          "rules": [
+            {
+              "sourceSection": "pharmacokineticsCalculations",
+              "questionKind": "calculation",
+              "count": 16
+            }
+          ]
+        }
+      },
+      "masterPool": {
+        "title": "Pharmaceutics II Final Exam - Master Pool",
+        "questionLimit": 100,
+        "timerSeconds": 7200,
+        "selection": {
+          "allowPartial": false,
+          "rules": []
+        }
+      }
+    }
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "Which of the following is an advantage of solid dosage forms compared with liquid forms?",
+      "difficulty": "easy",
+      "sourceSection": "exam1Review",
+      "tags": [
+        "exam1Review",
+        "mcq"
+      ],
+      "topicTags": [
+        "exam1Review"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "Faster onset of action",
+        "Improved chemical and physical stability",
+        "Ease of administration to unconscious patients",
+        "Lower risk of first-pass metabolism"
+      ],
+      "answer": "Improved chemical and physical stability",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q2",
+      "prompt": "Which USP classification corresponds to powders in which all particles pass through a No. 20 sieve and not more than 40% through a No. 60 sieve?",
+      "difficulty": "medium",
+      "sourceSection": "exam1Review",
+      "tags": [
+        "exam1Review",
+        "mcq"
+      ],
+      "topicTags": [
+        "exam1Review"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "Very fine",
+        "Moderately coarse",
+        "Moderately fine",
+        "Very coarse"
+      ],
+      "answer": "Moderately coarse",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q3",
+      "prompt": "Which microscopic diameter measurement is defined as the distance between two parallel tangents on opposite sides of the particle?",
+      "difficulty": "medium",
+      "sourceSection": "exam1Review",
+      "tags": [
+        "exam1Review",
+        "mcq"
+      ],
+      "topicTags": [
+        "exam1Review"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "Martin diameter",
+        "Feret diameter",
+        "Heywood diameter",
+        "Krummbein diameter"
+      ],
+      "answer": "Feret diameter",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q4",
+      "prompt": "An angle of repose of 50° would be classified as:",
+      "difficulty": "medium",
+      "sourceSection": "exam1Review",
+      "tags": [
+        "exam1Review",
+        "mcq"
+      ],
+      "topicTags": [
+        "exam1Review"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "Excellent flow",
+        "Good flow",
+        "Poor flow",
+        "Very poor flow"
+      ],
+      "answer": "Very poor flow",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q5",
+      "prompt": "Which statement about bulk density and true density is true?",
+      "difficulty": "medium",
+      "sourceSection": "exam1Review",
+      "tags": [
+        "exam1Review",
+        "mcq"
+      ],
+      "topicTags": [
+        "exam1Review"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "Bulk density is always greater than true density",
+        "True density includes interparticle voids",
+        "Bulk density is always less than true density",
+        "They are always equal for powders"
+      ],
+      "answer": "Bulk density is always less than true density",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q6",
+      "prompt": "Which granulation method is most appropriate for drugs sensitive to moisture or heat?",
+      "difficulty": "medium",
+      "sourceSection": "exam1Review",
+      "tags": [
+        "exam1Review",
+        "mcq"
+      ],
+      "topicTags": [
+        "exam1Review"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "Wet granulation",
+        "Slugging (dry granulation)",
+        "Spheronization",
+        "Freeze-drying"
+      ],
+      "answer": "Slugging (dry granulation)",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q7",
+      "prompt": "Which factor is most likely to cause bridging during powder flow from a hopper?",
+      "difficulty": "medium",
+      "sourceSection": "exam1Review",
+      "tags": [
+        "exam1Review",
+        "mcq"
+      ],
+      "topicTags": [
+        "exam1Review"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "Adequate lubrication",
+        "Cohesive forces between particles",
+        "Low compressibility",
+        "Vibrating the hopper"
+      ],
+      "answer": "Cohesive forces between particles",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q8",
+      "prompt": "Which veins in the rectum drain directly into the systemic circulation, bypassing the portal system?",
+      "difficulty": "medium",
+      "sourceSection": "exam1Review",
+      "tags": [
+        "exam1Review",
+        "mcq"
+      ],
+      "topicTags": [
+        "exam1Review"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "Superior rectal veins",
+        "Inferior and middle rectal veins",
+        "Mesenteric veins",
+        "Hepatic veins"
+      ],
+      "answer": "Inferior and middle rectal veins",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q9",
+      "prompt": "Which polymorph of cocoa butter is metastable and has the lowest melting point?",
+      "difficulty": "medium",
+      "sourceSection": "exam1Review",
+      "tags": [
+        "exam1Review",
+        "mcq"
+      ],
+      "topicTags": [
+        "exam1Review"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "Alpha",
+        "Beta",
+        "Gamma",
+        "Delta"
+      ],
+      "answer": "Gamma",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q10",
+      "prompt": "The instrument commonly used to measure the true density of powders is the __________ pycnometer.",
+      "difficulty": "easy",
+      "sourceSection": "exam1Review",
+      "tags": [
+        "exam1Review",
+        "fitb"
+      ],
+      "topicTags": [
+        "exam1Review"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "helium"
+      ],
+      "acceptableAnswers": [
+        "helium",
+        "helium gas"
+      ],
+      "questionKind": "fitb"
+    },
+    {
+      "id": "q11",
+      "prompt": "The porosity of a powder is defined as the fraction of the total volume occupied by ________.",
+      "difficulty": "easy",
+      "sourceSection": "exam1Review",
+      "tags": [
+        "exam1Review",
+        "fitb"
+      ],
+      "topicTags": [
+        "exam1Review"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "void spaces"
+      ],
+      "acceptableAnswers": [
+        "void spaces",
+        "void space",
+        "voids"
+      ],
+      "questionKind": "fitb"
+    },
+    {
+      "id": "q12",
+      "prompt": "Explain why certain modified-release tablets (such as controlled-release matrix tablets) should not be crushed or chewed before administration.",
+      "difficulty": "easy",
+      "sourceSection": "exam1Review",
+      "tags": [
+        "exam1Review",
+        "open"
+      ],
+      "topicTags": [
+        "exam1Review"
+      ],
+      "objectiveTags": [],
+      "type": "open",
+      "answer": [
+        "Crushing or chewing controlled-release tablets disrupts the formulation designed to release the drug slowly over time, leading to dose dumping and potential toxicity."
+      ],
+      "acceptableAnswers": [
+        "Crushing or chewing controlled-release tablets disrupts the formulation designed to release the drug slowly over time, leading to dose dumping and potential toxicity."
+      ],
+      "questionKind": "openresponse"
+    },
+    {
+      "id": "q13",
+      "prompt": "Which type of lozenge is designed to deliver active ingredients both systemically and locally and typically has a soft base such as gelatin or chocolate?",
+      "difficulty": "easy",
+      "sourceSection": "exam2Review",
+      "tags": [
+        "exam2Review",
+        "mcq"
+      ],
+      "topicTags": [
+        "exam2Review"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "Hard lozenge",
+        "Soft lozenge",
+        "Chewable tablet",
+        "Pastille"
+      ],
+      "answer": "Soft lozenge",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q14",
+      "prompt": "Which of the following is a disadvantage of lozenges?",
+      "difficulty": "easy",
+      "sourceSection": "exam2Review",
+      "tags": [
+        "exam2Review",
+        "mcq"
+      ],
+      "topicTags": [
+        "exam2Review"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "Suitable for pediatric and geriatric patients",
+        "Risk of being mistaken for candy and overconsumption",
+        "Circumvent first-pass metabolism",
+        "Deliver high doses of drugs"
+      ],
+      "answer": "Risk of being mistaken for candy and overconsumption",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q15",
+      "prompt": "The recommended pH range for hard sugar lozenges is:",
+      "difficulty": "easy",
+      "sourceSection": "exam2Review",
+      "tags": [
+        "exam2Review",
+        "mcq"
+      ],
+      "topicTags": [
+        "exam2Review"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "4–5",
+        "5–6",
+        "6–7",
+        "7–8"
+      ],
+      "answer": "5–6",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q16",
+      "prompt": "In nasal drug delivery, which volume per nostril is considered the upper limit to prevent leakage?",
+      "difficulty": "easy",
+      "sourceSection": "exam2Review",
+      "tags": [
+        "exam2Review",
+        "mcq"
+      ],
+      "topicTags": [
+        "exam2Review"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "0.05 mL",
+        "0.2 mL",
+        "1 mL",
+        "5 mL"
+      ],
+      "answer": "0.2 mL",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q17",
+      "prompt": "Which type of nasal dosage form is least commonly used due to the risk of cross-contamination and imprecise dosing?",
+      "difficulty": "easy",
+      "sourceSection": "exam2Review",
+      "tags": [
+        "exam2Review",
+        "mcq"
+      ],
+      "topicTags": [
+        "exam2Review"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "Nasal spray",
+        "Nasal drops",
+        "Nasal cream",
+        "Nasal solution"
+      ],
+      "answer": "Nasal cream",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q18",
+      "prompt": "For pulmonary drug delivery, what is the typical aerodynamic particle size range required for deep lung deposition?",
+      "difficulty": "easy",
+      "sourceSection": "exam2Review",
+      "tags": [
+        "exam2Review",
+        "mcq"
+      ],
+      "topicTags": [
+        "exam2Review"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "0.5–1 µm",
+        "1–5 µm",
+        "10–50 µm",
+        ">100 µm"
+      ],
+      "answer": "1–5 µm",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q19",
+      "prompt": "Which inhalation device does not require patient coordination between actuation and inhalation?",
+      "difficulty": "medium",
+      "sourceSection": "exam2Review",
+      "tags": [
+        "exam2Review",
+        "mcq"
+      ],
+      "topicTags": [
+        "exam2Review"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "Pressurized metered-dose inhaler (pMDI)",
+        "Dry powder inhaler (DPI)",
+        "Breath-actuated pMDI",
+        "Nebulizer"
+      ],
+      "answer": "Dry powder inhaler (DPI)",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q20",
+      "prompt": "Biologic products such as therapeutic proteins are most commonly administered by which route?",
+      "difficulty": "easy",
+      "sourceSection": "exam2Review",
+      "tags": [
+        "exam2Review",
+        "mcq"
+      ],
+      "topicTags": [
+        "exam2Review"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "Oral",
+        "Intravenous",
+        "Transdermal",
+        "Inhalation"
+      ],
+      "answer": "Intravenous",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q21",
+      "prompt": "Nasal drug delivery avoids the _________ metabolism associated with oral administration.",
+      "difficulty": "easy",
+      "sourceSection": "exam2Review",
+      "tags": [
+        "exam2Review",
+        "fitb"
+      ],
+      "topicTags": [
+        "exam2Review"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "first-pass"
+      ],
+      "acceptableAnswers": [
+        "first-pass",
+        "first pass",
+        "first-pass metabolism",
+        "first pass metabolism"
+      ],
+      "questionKind": "fitb"
+    },
+    {
+      "id": "q22",
+      "prompt": "Adding a ________ (e.g., Carbopol) to a nasal formulation can increase residence time.",
+      "difficulty": "easy",
+      "sourceSection": "exam2Review",
+      "tags": [
+        "exam2Review",
+        "fitb"
+      ],
+      "topicTags": [
+        "exam2Review"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "mucoadhesive"
+      ],
+      "acceptableAnswers": [
+        "mucoadhesive",
+        "mucoadhesive polymer"
+      ],
+      "questionKind": "fitb"
+    },
+    {
+      "id": "q23",
+      "prompt": "Describe two key differences between pressurized metered-dose inhalers (pMDIs) and dry powder inhalers (DPIs) with respect to formulation and patient use.",
+      "difficulty": "medium",
+      "sourceSection": "exam2Review",
+      "tags": [
+        "exam2Review",
+        "open"
+      ],
+      "topicTags": [
+        "exam2Review"
+      ],
+      "objectiveTags": [],
+      "type": "open",
+      "answer": [
+        "pMDIs deliver medication in a propellant-driven aerosol requiring coordination between actuation and inhalation, whereas DPIs deliver medication as a powder that is inhaled using the patient’s inspiratory effort without propellant; DPIs are breath-activated and do not require hand–breath coordination."
+      ],
+      "acceptableAnswers": [
+        "pMDIs deliver medication in a propellant-driven aerosol requiring coordination between actuation and inhalation, whereas DPIs deliver medication as a powder that is inhaled using the patient’s inspiratory effort without propellant; DPIs are breath-activated and do not require hand–breath coordination."
+      ],
+      "questionKind": "openresponse"
+    },
+    {
+      "id": "q24",
+      "prompt": "Pharmacokinetics is the study of what the ______ does to the ______:",
+      "difficulty": "medium",
+      "sourceSection": "pharmacokineticsConcepts",
+      "tags": [
+        "pharmacokineticsConcepts",
+        "mcq"
+      ],
+      "topicTags": [
+        "pharmacokineticsConcepts"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "body does to the drug",
+        "drug does to the body",
+        "environment does to the cell",
+        "receptor does to the ligand"
+      ],
+      "answer": "body does to the drug",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q25",
+      "prompt": "In the one-compartment model, drug distribution is assumed to be:",
+      "difficulty": "medium",
+      "sourceSection": "pharmacokineticsConcepts",
+      "tags": [
+        "pharmacokineticsConcepts",
+        "mcq"
+      ],
+      "topicTags": [
+        "pharmacokineticsConcepts"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "instantaneous throughout the body",
+        "sequential and slow",
+        "restricted to plasma only",
+        "occurring only in the central compartment"
+      ],
+      "answer": "instantaneous throughout the body",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q26",
+      "prompt": "Volume of distribution (Vd) is defined as:",
+      "difficulty": "medium",
+      "sourceSection": "pharmacokineticsConcepts",
+      "tags": [
+        "pharmacokineticsConcepts",
+        "mcq"
+      ],
+      "topicTags": [
+        "pharmacokineticsConcepts"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "The actual physiological volume of the body",
+        "The volume that would contain the drug at the same concentration as in plasma",
+        "Always equal to blood volume",
+        "The amount of drug excreted"
+      ],
+      "answer": "The volume that would contain the drug at the same concentration as in plasma",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q27",
+      "prompt": "Clearance (CL) is a measure of:",
+      "difficulty": "medium",
+      "sourceSection": "pharmacokineticsConcepts",
+      "tags": [
+        "pharmacokineticsConcepts",
+        "mcq"
+      ],
+      "topicTags": [
+        "pharmacokineticsConcepts"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "The rate of drug absorption",
+        "The volume of plasma completely cleared of drug per unit time",
+        "The fraction unbound in plasma",
+        "The half-life of the drug"
+      ],
+      "answer": "The volume of plasma completely cleared of drug per unit time",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q28",
+      "prompt": "Zero-order elimination is characterized by:",
+      "difficulty": "medium",
+      "sourceSection": "pharmacokineticsConcepts",
+      "tags": [
+        "pharmacokineticsConcepts",
+        "mcq"
+      ],
+      "topicTags": [
+        "pharmacokineticsConcepts"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "Elimination of a constant fraction of drug per unit time",
+        "Elimination of a constant amount of drug per unit time",
+        "Elimination rate proportional to drug concentration",
+        "A constant half-life"
+      ],
+      "answer": "Elimination of a constant amount of drug per unit time",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q29",
+      "prompt": "In first-order elimination, the half-life of a drug:",
+      "difficulty": "medium",
+      "sourceSection": "pharmacokineticsConcepts",
+      "tags": [
+        "pharmacokineticsConcepts",
+        "mcq"
+      ],
+      "topicTags": [
+        "pharmacokineticsConcepts"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "Increases as concentration increases",
+        "Decreases as concentration increases",
+        "Remains constant regardless of concentration",
+        "Is zero"
+      ],
+      "answer": "Remains constant regardless of concentration",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q30",
+      "prompt": "For a drug exhibiting first-order kinetics, the concentration–time profile is:",
+      "difficulty": "medium",
+      "sourceSection": "pharmacokineticsConcepts",
+      "tags": [
+        "pharmacokineticsConcepts",
+        "mcq"
+      ],
+      "topicTags": [
+        "pharmacokineticsConcepts"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "Linear",
+        "Hyperbolic",
+        "Exponential",
+        "Sinusoidal"
+      ],
+      "answer": "Exponential",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q31",
+      "prompt": "A drug with a large volume of distribution (>3 L/kg) is primarily located:",
+      "difficulty": "medium",
+      "sourceSection": "pharmacokineticsConcepts",
+      "tags": [
+        "pharmacokineticsConcepts",
+        "mcq"
+      ],
+      "topicTags": [
+        "pharmacokineticsConcepts"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "In the plasma",
+        "In extracellular fluid",
+        "Throughout tissues",
+        "Bound to red blood cells"
+      ],
+      "answer": "Throughout tissues",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q32",
+      "prompt": "The extraction ratio (E) of an organ is defined as:",
+      "difficulty": "medium",
+      "sourceSection": "pharmacokineticsConcepts",
+      "tags": [
+        "pharmacokineticsConcepts",
+        "mcq"
+      ],
+      "topicTags": [
+        "pharmacokineticsConcepts"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "CL × Q",
+        "CL/Q",
+        "Q/CL",
+        "ke × Vd"
+      ],
+      "answer": "CL/Q",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q33",
+      "prompt": "Which parameter does not affect the time to reach steady state during constant-rate infusion?",
+      "difficulty": "medium",
+      "sourceSection": "pharmacokineticsConcepts",
+      "tags": [
+        "pharmacokineticsConcepts",
+        "mcq"
+      ],
+      "topicTags": [
+        "pharmacokineticsConcepts"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "Infusion rate",
+        "Half-life",
+        "Elimination rate constant",
+        "None of the above"
+      ],
+      "answer": "Infusion rate",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q34",
+      "prompt": "For repeated dosing, the accumulation factor (R) is:",
+      "difficulty": "medium",
+      "sourceSection": "pharmacokineticsConcepts",
+      "tags": [
+        "pharmacokineticsConcepts",
+        "mcq"
+      ],
+      "topicTags": [
+        "pharmacokineticsConcepts"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "1/(1 - e^{-ke τ})",
+        "e^{-ke τ}",
+        "ke × τ",
+        "1 - e^{-ke τ}"
+      ],
+      "answer": "1/(1 - e^{-ke τ})",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q35",
+      "prompt": "If clearance increases while the dosing interval and bioavailability remain constant, the average steady-state concentration (Css,avg) will:",
+      "difficulty": "medium",
+      "sourceSection": "pharmacokineticsConcepts",
+      "tags": [
+        "pharmacokineticsConcepts",
+        "mcq"
+      ],
+      "topicTags": [
+        "pharmacokineticsConcepts"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "Increase",
+        "Decrease",
+        "Remain unchanged",
+        "Double"
+      ],
+      "answer": "Decrease",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q36",
+      "prompt": "The area under the plasma concentration–time curve (AUC) for an intravenous bolus dose is equal to:",
+      "difficulty": "medium",
+      "sourceSection": "pharmacokineticsConcepts",
+      "tags": [
+        "pharmacokineticsConcepts",
+        "mcq"
+      ],
+      "topicTags": [
+        "pharmacokineticsConcepts"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "CL × Dose",
+        "Vd/ke",
+        "Dose/CL",
+        "F × Dose"
+      ],
+      "answer": "Dose/CL",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q37",
+      "prompt": "In a two-compartment model, the initial rapid decline in the drug concentration–time curve represents the:",
+      "difficulty": "medium",
+      "sourceSection": "pharmacokineticsConcepts",
+      "tags": [
+        "pharmacokineticsConcepts",
+        "mcq"
+      ],
+      "topicTags": [
+        "pharmacokineticsConcepts"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "Elimination phase",
+        "Distribution phase",
+        "Absorption phase",
+        "Saturable metabolism phase"
+      ],
+      "answer": "Distribution phase",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q38",
+      "prompt": "A decrease in the elimination rate constant (ke) will result in:",
+      "difficulty": "medium",
+      "sourceSection": "pharmacokineticsConcepts",
+      "tags": [
+        "pharmacokineticsConcepts",
+        "mcq"
+      ],
+      "topicTags": [
+        "pharmacokineticsConcepts"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "An increased half-life",
+        "A decreased half-life",
+        "No change in half-life",
+        "An unpredictable effect"
+      ],
+      "answer": "An increased half-life",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q39",
+      "prompt": "The fraction of a drug dose that reaches systemic circulation unchanged is called:",
+      "difficulty": "medium",
+      "sourceSection": "pharmacokineticsConcepts",
+      "tags": [
+        "pharmacokineticsConcepts",
+        "mcq"
+      ],
+      "topicTags": [
+        "pharmacokineticsConcepts"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "Clearance",
+        "Bioavailability",
+        "Volume of distribution",
+        "Extraction ratio"
+      ],
+      "answer": "Bioavailability",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q40",
+      "prompt": "For an oral drug with a high extraction ratio, hepatic clearance will be primarily influenced by:",
+      "difficulty": "medium",
+      "sourceSection": "pharmacokineticsConcepts",
+      "tags": [
+        "pharmacokineticsConcepts",
+        "mcq"
+      ],
+      "topicTags": [
+        "pharmacokineticsConcepts"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "Intrinsic clearance",
+        "Plasma protein binding",
+        "Hepatic blood flow",
+        "Enzyme induction"
+      ],
+      "answer": "Hepatic blood flow",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q41",
+      "prompt": "The amount of drug eliminated per unit time at steady state during a constant-rate infusion is equal to:",
+      "difficulty": "medium",
+      "sourceSection": "pharmacokineticsConcepts",
+      "tags": [
+        "pharmacokineticsConcepts",
+        "mcq"
+      ],
+      "topicTags": [
+        "pharmacokineticsConcepts"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "Zero",
+        "The infusion rate",
+        "CL × Vd",
+        "ke × Vd"
+      ],
+      "answer": "The infusion rate",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q42",
+      "prompt": "The time required to reach approximately 97% of steady-state concentration during continuous infusion is about:",
+      "difficulty": "medium",
+      "sourceSection": "pharmacokineticsConcepts",
+      "tags": [
+        "pharmacokineticsConcepts",
+        "mcq"
+      ],
+      "topicTags": [
+        "pharmacokineticsConcepts"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "One half-life",
+        "Two half-lives",
+        "Five half-lives",
+        "Ten half-lives"
+      ],
+      "answer": "Five half-lives",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q43",
+      "prompt": "If a drug follows zero-order absorption (e.g., from a controlled-release formulation), the absorption rate is:",
+      "difficulty": "medium",
+      "sourceSection": "pharmacokineticsConcepts",
+      "tags": [
+        "pharmacokineticsConcepts",
+        "mcq"
+      ],
+      "topicTags": [
+        "pharmacokineticsConcepts"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "Proportional to the dose",
+        "Constant",
+        "Proportional to concentration",
+        "Dependent on clearance"
+      ],
+      "answer": "Constant",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q44",
+      "prompt": "According to the superposition principle, the plasma concentration after multiple IV bolus doses is equal to:",
+      "difficulty": "medium",
+      "sourceSection": "pharmacokineticsConcepts",
+      "tags": [
+        "pharmacokineticsConcepts",
+        "mcq"
+      ],
+      "topicTags": [
+        "pharmacokineticsConcepts"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "The sum of residual concentrations from each dose",
+        "The average concentration of all doses",
+        "The difference between the maximum and minimum concentrations",
+        "Unpredictable"
+      ],
+      "answer": "The sum of residual concentrations from each dose",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q45",
+      "prompt": "When the volume of distribution increases but clearance remains constant, the half-life will:",
+      "difficulty": "medium",
+      "sourceSection": "pharmacokineticsConcepts",
+      "tags": [
+        "pharmacokineticsConcepts",
+        "mcq"
+      ],
+      "topicTags": [
+        "pharmacokineticsConcepts"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "Increase",
+        "Decrease",
+        "Remain unchanged",
+        "Become zero"
+      ],
+      "answer": "Increase",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q46",
+      "prompt": "The half-life (t1/2) of a first-order drug is given by the equation t1/2 = ______.",
+      "difficulty": "easy",
+      "sourceSection": "pharmacokineticsConcepts",
+      "tags": [
+        "pharmacokineticsConcepts",
+        "fitb"
+      ],
+      "topicTags": [
+        "pharmacokineticsConcepts"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "0.693/ke"
+      ],
+      "acceptableAnswers": [
+        "0.693/ke",
+        "0.693 / ke"
+      ],
+      "questionKind": "fitb"
+    },
+    {
+      "id": "q47",
+      "prompt": "The average steady-state concentration for repeated oral dosing is Css,avg = (______ × Dose)/(CL × τ).",
+      "difficulty": "easy",
+      "sourceSection": "pharmacokineticsConcepts",
+      "tags": [
+        "pharmacokineticsConcepts",
+        "fitb"
+      ],
+      "topicTags": [
+        "pharmacokineticsConcepts"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "F"
+      ],
+      "acceptableAnswers": [
+        "F",
+        "bioavailability"
+      ],
+      "questionKind": "fitb"
+    },
+    {
+      "id": "q48",
+      "prompt": "The accumulation factor (R) for repeated dosing is R = ______.",
+      "difficulty": "easy",
+      "sourceSection": "pharmacokineticsConcepts",
+      "tags": [
+        "pharmacokineticsConcepts",
+        "fitb"
+      ],
+      "topicTags": [
+        "pharmacokineticsConcepts"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "1/(1 - e^{-ke τ})"
+      ],
+      "acceptableAnswers": [
+        "1/(1 - e^{-ke τ})",
+        "1/(1-e^{-ke τ})",
+        "1 / (1 - e^{-ke τ})",
+        "1/(1 - e^(-ke τ))"
+      ],
+      "questionKind": "fitb"
+    },
+    {
+      "id": "q49",
+      "prompt": "The extraction ratio of an organ is calculated as clearance divided by ________.",
+      "difficulty": "easy",
+      "sourceSection": "pharmacokineticsConcepts",
+      "tags": [
+        "pharmacokineticsConcepts",
+        "fitb"
+      ],
+      "topicTags": [
+        "pharmacokineticsConcepts"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "blood flow"
+      ],
+      "acceptableAnswers": [
+        "blood flow",
+        "organ blood flow",
+        "hepatic blood flow"
+      ],
+      "questionKind": "fitb"
+    },
+    {
+      "id": "q101",
+      "prompt": "A patient receives a 500 mg IV bolus dose of Drug X resulting in an initial plasma concentration (C0) of 8 mg/L. Calculate the volume of distribution (Vd).",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "62.5"
+      ],
+      "acceptableAnswers": [
+        "62.5"
+      ],
+      "questionKind": "calculation",
+      "units": "L",
+      "formula": "Vd = Dose / C0",
+      "tolerance": 0.1,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q102",
+      "prompt": "Drug Y exhibits first-order elimination. After an IV bolus dose, plasma concentration decreases from 15 mg/L immediately to 10 mg/L after 4 hours. Calculate the elimination rate constant (ke).",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "0.1013662770270411"
+      ],
+      "acceptableAnswers": [
+        "0.1013662770270411"
+      ],
+      "questionKind": "calculation",
+      "units": "h^-1",
+      "formula": "ke = ln(C1/C2) / Δt",
+      "tolerance": 0.001,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q103",
+      "prompt": "Using the ke from the previous problem, calculate the half-life (t1/2) of Drug Y.",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "6.836593197707468"
+      ],
+      "acceptableAnswers": [
+        "6.836593197707468"
+      ],
+      "questionKind": "calculation",
+      "units": "h",
+      "formula": "t1/2 = 0.693 / ke",
+      "tolerance": 0.01,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q104",
+      "prompt": "Drug Z has an initial concentration of 10 mg/L and an elimination rate constant of 0.1733 h^-1. Calculate its plasma concentration 6 hours after administration.",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "3.5352537996473683"
+      ],
+      "acceptableAnswers": [
+        "3.5352537996473683"
+      ],
+      "questionKind": "calculation",
+      "units": "mg/L",
+      "formula": "Ct = C0 × e^(-ke × t)",
+      "tolerance": 0.01,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q105",
+      "prompt": "The plasma concentration of Drug A is 4 mg/L at 6 hours after dosing. If the elimination rate constant is 0.14 h^-1, calculate the plasma concentration at 2 hours after dosing.",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "7.002690001184405"
+      ],
+      "acceptableAnswers": [
+        "7.002690001184405"
+      ],
+      "questionKind": "calculation",
+      "units": "mg/L",
+      "formula": "Cearlier = Clater × e^(ke × Δt)",
+      "tolerance": 0.01,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q106",
+      "prompt": "Calculate the dose required to achieve a target peak concentration of 15 mg/L for a drug with a volume of distribution of 70 L (assume 100% bioavailability).",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "1050"
+      ],
+      "acceptableAnswers": [
+        "1050"
+      ],
+      "questionKind": "calculation",
+      "units": "mg",
+      "formula": "Dose = target concentration × Vd / F",
+      "tolerance": 1.0,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q107",
+      "prompt": "A patient receives a 500 mg IV bolus dose of Drug B. The AUC from time zero to infinity is 80 mg·h/L. Calculate the total clearance (CL).",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "6.25"
+      ],
+      "acceptableAnswers": [
+        "6.25"
+      ],
+      "questionKind": "calculation",
+      "units": "L/h",
+      "formula": "CL = Dose / AUC",
+      "tolerance": 0.01,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q108",
+      "prompt": "The hepatic clearance of Drug C is 45 L/h, and hepatic blood flow is 90 L/h. Calculate the hepatic extraction ratio (E).",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "0.5"
+      ],
+      "acceptableAnswers": [
+        "0.5"
+      ],
+      "questionKind": "calculation",
+      "units": "unitless",
+      "formula": "Extraction ratio = CL / Q",
+      "tolerance": 0.001,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q109",
+      "prompt": "Drug D is administered by IV bolus. The dose is 100 mg, the elimination rate constant is 0.2 h^-1, the dosing interval (τ) is 8 hours, and the volume of distribution is 50 L. Calculate the peak (Cmax₂) and trough (Cmin₂) concentrations after the second dose at steady state.",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "Cmax₂ = 2.40 mg/L; Cmin₂ = 0.49 mg/L"
+      ],
+      "acceptableAnswers": [
+        "Cmax₂ = 2.40 mg/L; Cmin₂ = 0.49 mg/L"
+      ],
+      "questionKind": "calculation",
+      "units": "mg/L",
+      "formula": "Use IV bolus accumulation to find Cmax₂ and Cmin₂",
+      "tolerance": 0.01,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q110",
+      "prompt": "Drug E follows first-order elimination with ke = 0.1 h^-1. If a dose of 1000 mg is administered, how much drug remains in the body 10 hours later?",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "367.87944117144235"
+      ],
+      "acceptableAnswers": [
+        "367.87944117144235"
+      ],
+      "questionKind": "calculation",
+      "units": "mg",
+      "formula": "Amount remaining = Dose × e^(-ke × t)",
+      "tolerance": 1.0,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q111",
+      "prompt": "Calculate the loading dose required to achieve a target steady-state concentration of 10 mg/L for a drug with a volume of distribution of 60 L (assume F = 1).",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "600"
+      ],
+      "acceptableAnswers": [
+        "600"
+      ],
+      "questionKind": "calculation",
+      "units": "mg",
+      "formula": "Loading dose = target concentration × Vd / F",
+      "tolerance": 1.0,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q112",
+      "prompt": "For a drug with clearance of 3 L/h and elimination rate constant 0.1155 h^-1 (half-life 6 h), calculate the infusion rate necessary to achieve a steady-state concentration of 4 mg/L and estimate the time to reach 90% of steady state.",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "Infusion rate = 12 mg/h; Time to 90% ≈ 19.8 h"
+      ],
+      "acceptableAnswers": [
+        "Infusion rate = 12 mg/h; Time to 90% ≈ 19.8 h"
+      ],
+      "questionKind": "calculation",
+      "units": "mg/h and h",
+      "formula": "Infusion rate = Css × CL; t90 ≈ 3.32 × t1/2",
+      "tolerance": 0.1,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q113",
+      "prompt": "A continuous infusion of Drug F is given at a rate of 50 mg/h. If the drug clearance is 5 L/h, what is the steady-state concentration (Css)?",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "10.0"
+      ],
+      "acceptableAnswers": [
+        "10.0"
+      ],
+      "questionKind": "calculation",
+      "units": "mg/L",
+      "formula": "Css = infusion rate / CL",
+      "tolerance": 0.1,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q114",
+      "prompt": "Drug G is administered as an intermittent IV infusion: 2 g infused over 1 hour every 12 hours. Clearance is 6 L/h, volume of distribution is 30 L, and the elimination rate constant is 0.2 h^-1. Calculate the approximate peak (Cmax) and trough (Cmin) concentrations at steady state.",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "Cmax ≈ 66.45 mg/L; Cmin ≈ 7.36 mg/L"
+      ],
+      "acceptableAnswers": [
+        "Cmax ≈ 66.45 mg/L; Cmin ≈ 7.36 mg/L"
+      ],
+      "questionKind": "calculation",
+      "units": "mg/L",
+      "formula": "Use intermittent infusion accumulation equations for peak and trough",
+      "tolerance": 0.1,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q115",
+      "prompt": "Calculate the AUC for a 500 mg IV bolus dose of a drug with clearance of 7 L/h.",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "71.42857142857143"
+      ],
+      "acceptableAnswers": [
+        "71.42857142857143"
+      ],
+      "questionKind": "calculation",
+      "units": "mg·h/L",
+      "formula": "AUC = Dose / CL",
+      "tolerance": 0.1,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q116",
+      "prompt": "Drug H has a half-life of 4 hours. What percent of the steady-state concentration is achieved 9 hours after starting a constant-rate infusion?",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "78.97062676302866"
+      ],
+      "acceptableAnswers": [
+        "78.97062676302866"
+      ],
+      "questionKind": "calculation",
+      "units": "%",
+      "formula": "% steady state = (1 - e^(-ke × t)) × 100",
+      "tolerance": 0.1,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q117",
+      "prompt": "A patient receives a 400 mg IV bolus dose of Drug X resulting in an initial plasma concentration (C0) of 10 mg/L. Calculate the volume of distribution (Vd).",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "40.0"
+      ],
+      "acceptableAnswers": [
+        "40.0"
+      ],
+      "questionKind": "calculation",
+      "units": "L",
+      "formula": "Vd = Dose / C0",
+      "tolerance": 0.1,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q118",
+      "prompt": "Drug Y exhibits first-order elimination. After an IV bolus dose, plasma concentration decreases from 20 mg/L immediately to 8 mg/L after 5 hours. Calculate the elimination rate constant (ke).",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "0.183258146374831"
+      ],
+      "acceptableAnswers": [
+        "0.183258146374831"
+      ],
+      "questionKind": "calculation",
+      "units": "h^-1",
+      "formula": "ke = ln(C1/C2) / Δt",
+      "tolerance": 0.001,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q119",
+      "prompt": "Drug Z has an initial concentration of 12 mg/L and an elimination rate constant of 0.2 h^-1. Calculate its plasma concentration 8 hours after administration.",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "2.4227582159358647"
+      ],
+      "acceptableAnswers": [
+        "2.4227582159358647"
+      ],
+      "questionKind": "calculation",
+      "units": "mg/L",
+      "formula": "Ct = C0 × e^(-ke × t)",
+      "tolerance": 0.01,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q120",
+      "prompt": "The plasma concentration of Drug A is 3 mg/L at 6 hours after dosing. If the elimination rate constant is 0.18 h^-1, calculate the plasma concentration at 2 hours after dosing.",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "6.163299631931663"
+      ],
+      "acceptableAnswers": [
+        "6.163299631931663"
+      ],
+      "questionKind": "calculation",
+      "units": "mg/L",
+      "formula": "Cearlier = Clater × e^(ke × Δt)",
+      "tolerance": 0.01,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q121",
+      "prompt": "Calculate the dose required to achieve a target peak concentration of 12 mg/L for a drug with a volume of distribution of 65 L (assume 100% bioavailability).",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "780"
+      ],
+      "acceptableAnswers": [
+        "780"
+      ],
+      "questionKind": "calculation",
+      "units": "mg",
+      "formula": "Dose = target concentration × Vd / F",
+      "tolerance": 1.0,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q122",
+      "prompt": "A patient receives a 400 mg IV bolus dose of Drug B. The AUC from time zero to infinity is 50 mg·h/L. Calculate the total clearance (CL).",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "8.0"
+      ],
+      "acceptableAnswers": [
+        "8.0"
+      ],
+      "questionKind": "calculation",
+      "units": "L/h",
+      "formula": "CL = Dose / AUC",
+      "tolerance": 0.01,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q123",
+      "prompt": "The hepatic clearance of Drug C is 30 L/h, and hepatic blood flow is 90 L/h. Calculate the hepatic extraction ratio (E).",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "0.3333333333333333"
+      ],
+      "acceptableAnswers": [
+        "0.3333333333333333"
+      ],
+      "questionKind": "calculation",
+      "units": "unitless",
+      "formula": "Extraction ratio = CL / Q",
+      "tolerance": 0.001,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q124",
+      "prompt": "Drug D is administered by IV bolus. The dose is 150 mg, the elimination rate constant is 0.15 h^-1, the dosing interval (τ) is 6 hours, and the volume of distribution is 45 L. Calculate the peak (Cmax₂) and trough (Cmin₂) concentrations after the second dose at steady state.",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "Cmax₂ = 4.69 mg/L; Cmin₂ = 1.91 mg/L"
+      ],
+      "acceptableAnswers": [
+        "Cmax₂ = 4.69 mg/L; Cmin₂ = 1.91 mg/L"
+      ],
+      "questionKind": "calculation",
+      "units": "mg/L",
+      "formula": "Use IV bolus accumulation to find Cmax₂ and Cmin₂",
+      "tolerance": 0.01,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q125",
+      "prompt": "Drug E follows first-order elimination with ke = 0.08 h^-1. If a dose of 500 mg is administered, how much drug remains in the body 8 hours later?",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "263.64621202152426"
+      ],
+      "acceptableAnswers": [
+        "263.64621202152426"
+      ],
+      "questionKind": "calculation",
+      "units": "mg",
+      "formula": "Amount remaining = Dose × e^(-ke × t)",
+      "tolerance": 1.0,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q126",
+      "prompt": "Calculate the loading dose required to achieve a target steady-state concentration of 8 mg/L for a drug with a volume of distribution of 55 L (assume F = 1).",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "440"
+      ],
+      "acceptableAnswers": [
+        "440"
+      ],
+      "questionKind": "calculation",
+      "units": "mg",
+      "formula": "Loading dose = target concentration × Vd / F",
+      "tolerance": 1.0,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q127",
+      "prompt": "For a drug with clearance of 4 L/h and elimination rate constant 0.1 h^-1 (half-life 6.93 h), calculate the infusion rate necessary to achieve a steady-state concentration of 5 mg/L and estimate the time to reach 90% of steady state.",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "Infusion rate = 20 mg/h; Time to 90% ≈ 22.9 h"
+      ],
+      "acceptableAnswers": [
+        "Infusion rate = 20 mg/h; Time to 90% ≈ 22.9 h"
+      ],
+      "questionKind": "calculation",
+      "units": "mg/h and h",
+      "formula": "Infusion rate = Css × CL; t90 ≈ 3.32 × t1/2",
+      "tolerance": 0.1,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q128",
+      "prompt": "A continuous infusion of Drug F is given at a rate of 30 mg/h. If the drug clearance is 3 L/h, what is the steady-state concentration (Css)?",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "10.0"
+      ],
+      "acceptableAnswers": [
+        "10.0"
+      ],
+      "questionKind": "calculation",
+      "units": "mg/L",
+      "formula": "Css = infusion rate / CL",
+      "tolerance": 0.1,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q129",
+      "prompt": "Drug G is administered as an intermittent IV infusion: 1.5 g infused over 0.75 hour every 8 hours. Clearance is 5 L/h, volume of distribution is 25 L, and the elimination rate constant is 0.2 h^-1. Calculate the approximate peak (Cmax) and trough (Cmin) concentrations at steady state.",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "Cmax ≈ 69.81 mg/L; Cmin ≈ 16.38 mg/L"
+      ],
+      "acceptableAnswers": [
+        "Cmax ≈ 69.81 mg/L; Cmin ≈ 16.38 mg/L"
+      ],
+      "questionKind": "calculation",
+      "units": "mg/L",
+      "formula": "Use intermittent infusion accumulation equations for peak and trough",
+      "tolerance": 0.1,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q130",
+      "prompt": "Calculate the AUC for a 600 mg IV bolus dose of a drug with clearance of 10 L/h.",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "60.0"
+      ],
+      "acceptableAnswers": [
+        "60.0"
+      ],
+      "questionKind": "calculation",
+      "units": "mg·h/L",
+      "formula": "AUC = Dose / CL",
+      "tolerance": 0.1,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q131",
+      "prompt": "Drug H has a half-life of 3 hours. What percent of the steady-state concentration is achieved 12 hours after starting a constant-rate infusion?",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "93.74631940268291"
+      ],
+      "acceptableAnswers": [
+        "93.74631940268291"
+      ],
+      "questionKind": "calculation",
+      "units": "%",
+      "formula": "% steady state = (1 - e^(-ke × t)) × 100",
+      "tolerance": 0.1,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q132",
+      "prompt": "Which of the following is a disadvantage of liquid dosage forms compared with solid dosage forms?",
+      "difficulty": "medium",
+      "sourceSection": "exam1Review",
+      "tags": [
+        "exam1Review",
+        "mcq"
+      ],
+      "topicTags": [
+        "exam1Review"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "Better chemical stability",
+        "Easier to mask unpleasant taste",
+        "Less portability and shorter shelf-life",
+        "More accurate dosing"
+      ],
+      "answer": "Less portability and shorter shelf-life",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q133",
+      "prompt": "What is an advantage of suppositories as a route of administration?",
+      "difficulty": "easy",
+      "sourceSection": "exam1Review",
+      "tags": [
+        "exam1Review",
+        "mcq"
+      ],
+      "topicTags": [
+        "exam1Review"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "Avoidance of first-pass metabolism",
+        "High patient acceptability in all age groups",
+        "Precise dose measurement comparable to injections",
+        "No risk of melting during storage"
+      ],
+      "answer": "Avoidance of first-pass metabolism",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q134",
+      "prompt": "Which statement is a disadvantage of modified-release dosage forms?",
+      "difficulty": "medium",
+      "sourceSection": "exam1Review",
+      "tags": [
+        "exam1Review",
+        "mcq"
+      ],
+      "topicTags": [
+        "exam1Review"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "They are generally less expensive to manufacture",
+        "They cannot be crushed or chewed without compromising efficacy",
+        "They provide uniform drug release over time",
+        "They may improve patient adherence"
+      ],
+      "answer": "They cannot be crushed or chewed without compromising efficacy",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q135",
+      "prompt": "Which of the following is an advantage of nasal drug delivery compared with oral delivery?",
+      "difficulty": "easy",
+      "sourceSection": "exam2Review",
+      "tags": [
+        "exam2Review",
+        "mcq"
+      ],
+      "topicTags": [
+        "exam2Review"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "Larger dose capacity",
+        "Bypass of hepatic first-pass metabolism",
+        "Avoidance of local irritation",
+        "Longer residence time without formulation adjustments"
+      ],
+      "answer": "Bypass of hepatic first-pass metabolism",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q136",
+      "prompt": "Which statement best describes a disadvantage of dry powder inhalers (DPIs) compared with pressurized metered-dose inhalers (pMDIs)?",
+      "difficulty": "medium",
+      "sourceSection": "exam2Review",
+      "tags": [
+        "exam2Review",
+        "mcq"
+      ],
+      "topicTags": [
+        "exam2Review"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "DPIs require a propellant",
+        "DPIs may be less effective if the patient has a weak inspiratory flow",
+        "DPIs do not deliver high doses",
+        "DPIs require strict hand–breath coordination"
+      ],
+      "answer": "DPIs may be less effective if the patient has a weak inspiratory flow",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q137",
+      "prompt": "Which is an advantage of soft lozenges over hard lozenges?",
+      "difficulty": "easy",
+      "sourceSection": "exam2Review",
+      "tags": [
+        "exam2Review",
+        "mcq"
+      ],
+      "topicTags": [
+        "exam2Review"
+      ],
+      "objectiveTags": [],
+      "type": "mcq",
+      "choices": [
+        "Provide longer-lasting local effect",
+        "Have lower risk of dose dumping",
+        "Are less likely to crumble and easier to chew",
+        "Have a higher sugar content"
+      ],
+      "answer": "Are less likely to crumble and easier to chew",
+      "questionKind": "choice"
+    },
+    {
+      "id": "q138",
+      "prompt": "A tank contains 2 g of a drug distributed in a volume such that the resulting concentration is 0.25 g/L. Calculate the volume of distribution (Vd).",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "8"
+      ],
+      "acceptableAnswers": [
+        "8"
+      ],
+      "questionKind": "calculation",
+      "units": "L",
+      "formula": "Vd = Amount of drug / concentration",
+      "tolerance": 0.1,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q139",
+      "prompt": "If the elimination rate constant is 0.2 hr^-1, what percent of the drug is removed per hour?",
+      "difficulty": "medium",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "18%"
+      ],
+      "acceptableAnswers": [
+        "18%",
+        "18"
+      ],
+      "questionKind": "calculation",
+      "units": "%",
+      "formula": "% removed per hour = (1 - e^(-ke × 1 h)) × 100",
+      "tolerance": 0.5,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q140",
+      "prompt": "A 1,000 mg dose of a drug is initially present in the body. Two hours later 800 mg remains. Assuming first-order elimination, how much drug remains at hour 8?",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "414"
+      ],
+      "acceptableAnswers": [
+        "414"
+      ],
+      "questionKind": "calculation",
+      "units": "mg",
+      "formula": "Use first-order decay from the observed amount loss to project the remaining amount at 8 hours",
+      "tolerance": 2.0,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q141",
+      "prompt": "A plasma drug concentration of 25 mg/L is measured. If the elimination rate constant is 0.077 hr^-1, what was the concentration 3 hours earlier?",
+      "difficulty": "medium",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "30.9"
+      ],
+      "acceptableAnswers": [
+        "30.9"
+      ],
+      "questionKind": "calculation",
+      "units": "mg/L",
+      "formula": "Cearlier = Clater × e^(ke × Δt)",
+      "tolerance": 0.1,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q142",
+      "prompt": "Two drug levels are collected 6 hours apart: 48 mcg/mL initially and 12 mcg/mL at 6 hours. What is the half-life of the drug?",
+      "difficulty": "medium",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "3"
+      ],
+      "acceptableAnswers": [
+        "3"
+      ],
+      "questionKind": "calculation",
+      "units": "h",
+      "formula": "Find ke from the two concentrations, then t1/2 = 0.693 / ke",
+      "tolerance": 0.1,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q143",
+      "prompt": "A patient weighing 80 kg receives an IV bolus dose of a drug. The resulting initial concentration is 5 mg/L and the volume of distribution is 0.7 L/kg. Calculate the IV bolus dose.",
+      "difficulty": "medium",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "280"
+      ],
+      "acceptableAnswers": [
+        "280"
+      ],
+      "questionKind": "calculation",
+      "units": "mg",
+      "formula": "Dose = target concentration × (Vd/kg × body weight)",
+      "tolerance": 1.0,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q144",
+      "prompt": "Goal drug concentration is 30 mg/L in a 180-lb (81.6 kg) patient where Vd = 0.5 L/kg. Calculate the loading dose for IV administration.",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "1227"
+      ],
+      "acceptableAnswers": [
+        "1227"
+      ],
+      "questionKind": "calculation",
+      "units": "mg",
+      "formula": "Loading dose = target concentration × (Vd/kg × body weight)",
+      "tolerance": 2.0,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q145",
+      "prompt": "A 70-kg patient has a half-life of 12 hours and a Vd of 0.3 L/kg for Drug X. If the patient receives a 500 mg loading dose and a continuous infusion at 25 mg/hour, what will the plasma concentration be 24 hours later?",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "21.6"
+      ],
+      "acceptableAnswers": [
+        "21.6"
+      ],
+      "questionKind": "calculation",
+      "units": "mg/L",
+      "formula": "Total concentration = residual loading dose concentration + infusion build-up concentration",
+      "tolerance": 0.1,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q146",
+      "prompt": "A drug has an initial concentration of 120 mg/L and a half-life of 2.5 hours. What will the concentration be 12 hours later?",
+      "difficulty": "medium",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "4.3"
+      ],
+      "acceptableAnswers": [
+        "4.3"
+      ],
+      "questionKind": "calculation",
+      "units": "mg/L",
+      "formula": "Ct = C0 × e^(-ke × t) using ke = 0.693 / t1/2",
+      "tolerance": 0.1,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q147",
+      "prompt": "At steady state, two drug levels are collected for an infusion given over 2 hours every 12 hours: 40 mcg/mL at the end of infusion and 15 mcg/mL 10 hours later. Calculate the drug’s half-life.",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "7.1"
+      ],
+      "acceptableAnswers": [
+        "7.1"
+      ],
+      "questionKind": "calculation",
+      "units": "h",
+      "formula": "Use peak-to-trough decay at steady state to solve ke, then t1/2 = 0.693 / ke",
+      "tolerance": 0.1,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q148",
+      "prompt": "An adult patient has a half-life of 6 hours and Vd of 40 L for Drug X. If a continuous infusion of 35 mg/hour is administered, what will the plasma concentration be 12 hours later?",
+      "difficulty": "medium",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "5.7"
+      ],
+      "acceptableAnswers": [
+        "5.7"
+      ],
+      "questionKind": "calculation",
+      "units": "mg/L",
+      "formula": "Concentration during infusion = Css × (1 - e^(-ke × t))",
+      "tolerance": 0.1,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q149",
+      "prompt": "A patient on Drug RX receives infusions over 2 hours every 12 hours. At steady state with t1/2 = 3.6 hours, the peak concentration is 75 mcg/mL. What will the trough concentration be?",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "11.2"
+      ],
+      "acceptableAnswers": [
+        "11.2"
+      ],
+      "questionKind": "calculation",
+      "units": "mcg/mL",
+      "formula": "Trough = peak × e^(-ke × time from peak to trough)",
+      "tolerance": 0.1,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q150",
+      "prompt": "A patient has a plasma concentration of 33 mg/L and ke = 0.045 hr^-1. What will the concentration be 8 hours later?",
+      "difficulty": "medium",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "23"
+      ],
+      "acceptableAnswers": [
+        "23"
+      ],
+      "questionKind": "calculation",
+      "units": "mg/L",
+      "formula": "Ct = C0 × e^(-ke × t)",
+      "tolerance": 1.0,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    },
+    {
+      "id": "q151",
+      "prompt": "For the previous problem (initial concentration 33 mg/L, ke = 0.045 hr^-1), calculate the AUC.",
+      "difficulty": "hard",
+      "sourceSection": "pharmacokineticsCalculations",
+      "tags": [
+        "pharmacokineticsCalculations",
+        "calc"
+      ],
+      "topicTags": [
+        "pharmacokineticsCalculations"
+      ],
+      "objectiveTags": [],
+      "type": "short",
+      "answer": [
+        "733"
+      ],
+      "acceptableAnswers": [
+        "733"
+      ],
+      "questionKind": "calculation",
+      "units": "mg·h/L",
+      "formula": "AUC = C0 / ke for a one-compartment IV bolus model",
+      "tolerance": 1.0,
+      "givenValues": {
+        "fromPrompt": true
+      }
+    }
+  ]
+}

@@ -37,12 +37,46 @@
         "type": "object",
         "required": ["type", "prompt"],
         "properties": {
-          "type": { "enum": ["mcq", "mcq-multiple", "tf", "short"] },
+          "id": { "type": "string", "minLength": 1 },
+          "type": { "enum": ["mcq", "mcq-multiple", "tf", "short", "open"] },
           "prompt": { "type": "string", "minLength": 1 },
           "choices": {
             "type": "array",
             "items": { "type": "string" },
             "minItems": 2
+          },
+          "acceptableAnswers": {
+            "type": "array",
+            "items": { "type": "string" },
+            "minItems": 1
+          },
+          "questionKind": { "type": "string" },
+          "sourceSection": { "type": "string" },
+          "difficulty": { "type": "string" },
+          "points": { "type": "number", "minimum": 0 },
+          "units": { "type": "string" },
+          "formula": { "type": "string" },
+          "givenValues": {
+            "oneOf": [
+              { "type": "object", "additionalProperties": true },
+              { "type": "array" }
+            ]
+          },
+          "tags": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "topicTags": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "objectiveTags": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true
           },
           "answer": {
             "oneOf": [
@@ -113,7 +147,21 @@
           },
           {
             "if": { "properties": { "type": { "const": "short" } }, "required": ["type"] },
-            "then": { "required": ["answerText"] }
+            "then": {
+              "anyOf": [
+                { "required": ["answerText"] },
+                { "required": ["answer"] }
+              ]
+            }
+          },
+          {
+            "if": { "properties": { "type": { "const": "open" } }, "required": ["type"] },
+            "then": {
+              "anyOf": [
+                { "required": ["answerText"] },
+                { "required": ["answer"] }
+              ]
+            }
           }
         ]
       }

@@ -5,6 +5,7 @@ const weeksParam = params.get("weeks");                      // Cumulative range
 const tagParam = params.get("tag");                          // Topic mode: ?tag=Anticoagulants
 const labParam = parseInt(params.get("lab") || "2", 10);     // Lab isolation: &lab=1 or &lab=2 (default: 2)
 const quizId = params.get("id");
+const modeParamProvided = params.has("mode");
 const modeParam = params.get("mode") || "easy";
 const limitParam = parseInt(params.get("limit") || "", 10);
 const examModeParam = params.get("exam") === "1";
@@ -19,9 +20,12 @@ const MAX_QUESTION_REPORTS = 200;
 const QUIZ_PROGRESS_MAX_AGE_MS = 1000 * 60 * 60 * 12;
 const TIMER_AUTOSAVE_INTERVAL_SECONDS = 15;
 const quizCatalog = window.PharmletQuizCatalog || null;
+const CEUTICS2_FINAL_ID = "ceutics2-final";
 
 const state = { 
     questions: [], index: 0, score: 0, title: "",
+    pointScore: 0,
+    totalPoints: 0,
     timerSeconds: 0, timerHandle: null, marked: new Set(),
     seen: new Set(),
     currentScale: 1.0,
@@ -46,8 +50,35 @@ const state = {
     saveStatusMessage: "",
     progressLifecycleBound: false,
     progressCompleted: false,
-    generatedAttemptIdentity: null
+    generatedAttemptIdentity: null,
+    activeModeConfig: null,
+    configuredModeKey: "",
+    modeNotice: "",
+    placeholderQuiz: false
 };
+
+function getQuestionPointValue(question) {
+    const numeric = Number(question?.points);
+    return Number.isFinite(numeric) && numeric > 0 ? numeric : 1;
+}
+
+function getTotalQuestionPoints(questions = state.questions) {
+    return (questions || []).reduce((sum, question) => sum + getQuestionPointValue(question), 0);
+}
+
+function getEarnedQuestionPoints(questions = state.questions) {
+    return (questions || []).reduce((sum, question) => sum + (question?._correct ? getQuestionPointValue(question) : 0), 0);
+}
+
+function usesWeightedPointScoring(questions = state.questions) {
+    const totalQuestions = Array.isArray(questions) ? questions.length : 0;
+    return totalQuestions > 0 && getTotalQuestionPoints(questions) !== totalQuestions;
+}
+
+function syncPointTotalsFromQuestions() {
+    state.totalPoints = getTotalQuestionPoints(state.questions);
+    state.pointScore = getEarnedQuestionPoints(state.questions);
+}
 
 // --- 1. CORE ACTIONS ---
 function toggleMark() {
@@ -648,8 +679,17 @@ function isFullTopDrugsFinalAttempt(questions = state.questions) {
     return quizId === FINAL_EXAM_ID && Array.isArray(questions) && questions.length === FINAL_EXAM_TOTAL;
 }
 
+function isConfiguredTrueExamModeKey(modeKey) {
+    const normalized = normalizeQuizValue(modeKey);
+    return normalized === "trueexam" || normalized === "exam";
+}
+
+function getConfiguredModeStorageLabel() {
+    return String(state.configuredModeKey || "").trim();
+}
+
 function isTrueExamMode() {
-    return !!quizId && examModeParam;
+    return (!!quizId && examModeParam) || isConfiguredTrueExamModeKey(getConfiguredModeStorageLabel());
 }
 
 function isBossRoundMode() {
@@ -665,6 +705,10 @@ function getHistoryModeLabel() {
         return state.generatedAttemptIdentity.modeLabel;
     }
 
+    if (state.configuredModeKey) {
+        return state.configuredModeKey;
+    }
+
     if (state.bossMode) {
         return "boss";
     }
@@ -678,6 +722,66 @@ function getHistoryModeLabel() {
     }
 
     return modeParam;
+}
+
+function getQuizModeConfigs(data) {
+    const modeConfigs = data?.settings?.modeConfigs;
+    return modeConfigs && typeof modeConfigs === "object" ? modeConfigs : null;
+}
+
+function normalizeConfiguredModeRequest(value) {
+    const normalized = normalizeQuizValue(value);
+    if (!normalized) return "";
+    if (normalized === "hard" || normalized === "quickhard" || normalized === "quick-hard") return "quickHard";
+    if (normalized === "trueexam" || normalized === "true-exam" || normalized === "exam") return "trueExam";
+    if (normalized === "pkgenerator" || normalized === "pk-generator" || normalized === "pkgen") return "pkGenerator";
+    if (normalized === "masterpool" || normalized === "master-pool" || normalized === "master") return "masterPool";
+    return String(value || "").trim();
+}
+
+function getEffectiveQuizModeKey(data) {
+    const modeConfigs = getQuizModeConfigs(data);
+    if (!modeConfigs) {
+        return examModeParam ? "exam" : modeParam;
+    }
+
+    if (examModeParam) {
+        if (modeConfigs.trueExam) return "trueExam";
+        if (modeConfigs.exam) return "exam";
+    }
+
+    const requestedMode = normalizeConfiguredModeRequest(modeParam);
+    if (modeParamProvided && modeConfigs?.[requestedMode]) return requestedMode;
+
+    const defaultMode = normalizeConfiguredModeRequest(data?.settings?.defaultMode);
+    if (!modeParamProvided && !examModeParam && defaultMode && modeConfigs?.[defaultMode]) {
+        return defaultMode;
+    }
+
+    if (modeConfigs?.[requestedMode]) return requestedMode;
+    if (modeConfigs?.easy) return "easy";
+    return examModeParam ? "exam" : requestedMode || modeParam;
+}
+
+function getEffectiveQuizModeConfig(data) {
+    const modeConfigs = getQuizModeConfigs(data);
+    if (!modeConfigs) return null;
+
+    const modeKey = getEffectiveQuizModeKey(data);
+    const config = modeConfigs?.[modeKey];
+    if (config && typeof config === "object") {
+        return { ...config, _modeKey: modeKey };
+    }
+
+    return null;
+}
+
+function getConfiguredModeTitle(data, modeConfig) {
+    const baseTitle = data?.title || "Quiz";
+    if (modeConfig?.title) return String(modeConfig.title).trim();
+    if (modeConfig?.titleSuffix) return `${baseTitle} ${String(modeConfig.titleSuffix).trim()}`.trim();
+    if (isTrueExamMode()) return `${baseTitle} (True Exam Mode)`;
+    return baseTitle;
 }
 
 function applyAttemptModeUI() {
@@ -2528,6 +2632,8 @@ function getScoreStorageKey() {
         return state.generatedAttemptIdentity.scoreStorageKey;
     }
 
+    const configuredModeLabel = getConfiguredModeStorageLabel() || modeParam;
+
     if (state.bossMode && quizId) {
         return `pharmlet.${quizId}.boss`;
     }
@@ -2549,14 +2655,14 @@ function getScoreStorageKey() {
     if (!quizId) return null;
 
     if (isTrueExamMode()) {
-        return `pharmlet.${quizId}.${modeParam}.exam`;
+        return `pharmlet.${quizId}.${configuredModeLabel}.exam`;
     }
 
     if (quizId === FINAL_EXAM_ID || getConceptQuizConfig(quizId)) {
         return `pharmlet.${quizId}.easy`;
     }
 
-    return `pharmlet.${quizId}.${modeParam}`;
+    return `pharmlet.${quizId}.${configuredModeLabel}`;
 }
 
 function getQuizProgressRouteId() {
@@ -2575,8 +2681,9 @@ function getQuizProgressRouteId() {
                 return hash;
             }, 0)}`
             : "";
+        const modeLabel = getConfiguredModeStorageLabel() || modeParam;
 
-        return `id-${quizId}-${modeParam}-${isTrueExamMode() ? "exam" : "practice"}${generatedSignature ? `-${generatedSignature}` : ""}`;
+        return `id-${quizId}-${modeLabel}-${isTrueExamMode() ? "exam" : "practice"}${generatedSignature ? `-${generatedSignature}` : ""}`;
     }
     return `route-${location.search || "quiz"}`;
 }
@@ -2650,6 +2757,8 @@ function serializeQuizProgress() {
         title: state.title,
         index: state.index,
         score: state.score,
+        pointScore: state.pointScore,
+        totalPoints: state.totalPoints,
         timerSeconds: Math.max(0, Number(state.timerSeconds) || 0),
         timerPaused: !!state.timerPaused,
         currentStreak: Math.max(0, Number(state.currentStreak) || 0),
@@ -2666,7 +2775,10 @@ function serializeQuizProgress() {
         seen: [...state.seen],
         questions: state.questions,
         originalQuestions: state.originalQuestions,
-        quizConfigId: state.quizConfig?.id || null
+        quizConfigId: state.quizConfig?.id || null,
+        configuredModeKey: state.configuredModeKey || "",
+        placeholderQuiz: !!state.placeholderQuiz,
+        modeNotice: state.modeNotice || ""
     };
 }
 
@@ -2755,6 +2867,8 @@ function restoreSavedQuizProgress(snapshot) {
     state.originalQuestions = Array.isArray(snapshot.originalQuestions) ? snapshot.originalQuestions.map((question) => ({ ...question })) : [];
     state.index = Math.min(Math.max(0, Number(snapshot.index) || 0), Math.max(0, state.questions.length - 1));
     state.score = Math.max(0, Number(snapshot.score) || 0);
+    state.pointScore = Math.max(0, Number(snapshot.pointScore) || 0);
+    state.totalPoints = Math.max(0, Number(snapshot.totalPoints) || 0);
     state.hintsUsed = Math.max(0, Number(snapshot.hintsUsed) || 0);
     state.timerSeconds = Math.max(0, Number(snapshot.timerSeconds) || 0);
     state.timerPaused = !!snapshot.timerPaused;
@@ -2768,6 +2882,9 @@ function restoreSavedQuizProgress(snapshot) {
     state.adaptiveSummary = snapshot.adaptiveSummary && typeof snapshot.adaptiveSummary === "object"
         ? snapshot.adaptiveSummary
         : null;
+    state.configuredModeKey = String(snapshot.configuredModeKey || state.configuredModeKey || "");
+    state.placeholderQuiz = !!snapshot.placeholderQuiz;
+    state.modeNotice = String(snapshot.modeNotice || state.modeNotice || "");
     state.progressCompleted = false;
     state.currentScale = Number(snapshot.currentScale) || 1;
     state.marked = new Set(Array.isArray(snapshot.marked) ? snapshot.marked : []);
@@ -2776,6 +2893,7 @@ function restoreSavedQuizProgress(snapshot) {
     state.resultsRecorded = false;
     state.signalsRecorded = false;
     state.finalBreakdown = null;
+    syncPointTotalsFromQuestions();
 
     document.body.style.zoom = state.currentScale;
     document.documentElement.style.setProperty("--quiz-size", `${state.currentScale}rem`);
@@ -2826,6 +2944,8 @@ function saveQuizHistory() {
             title: state.title || FINAL_EXAM_TITLE,
             score: state.score,
             total: state.questions.length,
+            pointScore: state.pointScore,
+            pointTotal: state.totalPoints,
             bestStreak: state.bestStreak,
             timestamp: Date.now(),
             examMode: isTrueExamMode(),
@@ -2910,6 +3030,8 @@ function replayCurrentReviewRound() {
     state.progressKey = getQuizProgressKey();
     state.index = 0;
     state.score = 0;
+    state.pointScore = 0;
+    state.totalPoints = getTotalQuestionPoints(state.questions);
     state.hintsUsed = 0;
     state.currentStreak = 0;
     state.bestStreak = 0;
@@ -3023,6 +3145,8 @@ function reviewMissed() {
     state.progressKey = getQuizProgressKey();
     state.index = 0;
     state.score = 0;
+    state.pointScore = 0;
+    state.totalPoints = getTotalQuestionPoints(state.questions);
     state.hintsUsed = 0;
     state.currentStreak = 0;
     state.bestStreak = 0;
@@ -3209,12 +3333,40 @@ function normalizeLoadedQuizQuestion(item) {
     }
 
     const rawType = normalizeQuizValue(item.type);
-    const normalizedType = rawType === "fitb" ? "short" : (item.type || "mcq");
+    const normalizedType = rawType === "fitb"
+        ? "short"
+        : rawType === "calc"
+        ? "short"
+        : (item.type || "mcq");
     const prompt = String(item.prompt ?? item.question ?? "").trim();
+    const rawChoices = Array.isArray(item.choices)
+        ? item.choices
+        : (Array.isArray(item.options) ? item.options : null);
+    const stripChoiceLabel = (value) => String(value ?? "").replace(/^[A-Z]\.\s*/, "").trim();
+    const normalizedChoices = Array.isArray(rawChoices)
+        ? rawChoices.map((choice) => stripChoiceLabel(choice)).filter(Boolean)
+        : undefined;
+    const rawAnswerValue = item.answerText ?? item.answer ?? item.correct ?? item.ans;
+    let normalizedAnswer = rawAnswerValue;
+
+    if (normalizedChoices && typeof rawAnswerValue === "string" && /^[A-Z]$/i.test(rawAnswerValue.trim())) {
+        const answerIndex = rawAnswerValue.trim().toUpperCase().charCodeAt(0) - 65;
+        if (answerIndex >= 0 && answerIndex < normalizedChoices.length) {
+            normalizedAnswer = normalizedChoices[answerIndex];
+        }
+    }
+
+    const inferredQuestionKind = item.questionKind
+        || item.kind
+        || (rawType === "calc" ? "calculation" : (rawType === "fitb" ? "fitb" : undefined));
     const normalized = {
         ...item,
         type: normalizedType,
-        prompt
+        prompt,
+        answer: normalizedAnswer,
+        choices: normalizedChoices,
+        sourceSection: item.sourceSection ?? item.section ?? item.metadata?.sourceSection,
+        questionKind: inferredQuestionKind
     };
 
     const acceptableAnswers = Array.isArray(item.acceptableAnswers)
@@ -3246,7 +3398,17 @@ function normalizeLoadedQuizQuestion(item) {
         }
     }
 
+    if ((normalizedType === "short" || normalizedType === "open") && !Array.isArray(item.answer) && normalized.answer !== undefined && normalized.answer !== null && normalized.answer !== "") {
+        normalized.answer = String(normalized.answer).trim();
+
+        if (!acceptableAnswers.length && rawType === "fitb") {
+            normalized._acceptedAnswers = [normalized.answer];
+        }
+    }
+
     delete normalized.acceptableAnswers;
+    delete normalized.options;
+    delete normalized.section;
     return normalized;
 }
 
@@ -3274,6 +3436,174 @@ function buildQuestionPoolFromQuizData(data, requestedMode = "easy") {
     }
 
     throw new Error(`Mode "${requestedMode}" is not available for this quiz.`);
+}
+
+function toNormalizedValueList(value) {
+    if (Array.isArray(value)) {
+        return value.map((entry) => normalizeQuizValue(entry)).filter(Boolean);
+    }
+
+    const single = normalizeQuizValue(value);
+    return single ? [single] : [];
+}
+
+function getConfiguredQuestionKind(question) {
+    const explicit = normalizeQuizValue(question?.questionKind ?? question?.metadata?.questionKind);
+    if (explicit) return explicit;
+    if (question?.type === "calc") return "calculation";
+    if (question?.type === "open") return "openresponse";
+    if (question?.type === "short" && (question?.formula || question?.units || question?.tolerance !== undefined)) return "calculation";
+    if (question?.type === "short") return "fitb";
+    if (question?.type === "mcq" || question?.type === "tf" || question?.type === "mcq-multiple") return "choice";
+    return normalizeQuizValue(question?.type);
+}
+
+function getConfiguredQuestionSourceSection(question) {
+    return normalizeQuizValue(question?.sourceSection ?? question?.section ?? question?.metadata?.sourceSection);
+}
+
+function getConfiguredQuestionDifficulty(question) {
+    return normalizeQuizValue(question?.difficulty ?? question?.metadata?.difficulty);
+}
+
+function getConfiguredQuestionTagSet(question) {
+    const values = [
+        ...(Array.isArray(question?.tags) ? question.tags : []),
+        ...(Array.isArray(question?.topicTags) ? question.topicTags : []),
+        ...(Array.isArray(question?.objectiveTags) ? question.objectiveTags : [])
+    ];
+
+    return new Set(values.map((value) => normalizeQuizValue(value)).filter(Boolean));
+}
+
+function matchesConfiguredRule(question, rule) {
+    if (!question || !rule) return false;
+
+    const sourceSection = getConfiguredQuestionSourceSection(question);
+    const questionKind = getConfiguredQuestionKind(question);
+    const questionType = normalizeQuizValue(question?.type);
+    const difficulty = getConfiguredQuestionDifficulty(question);
+    const tags = getConfiguredQuestionTagSet(question);
+
+    const allowedSourceSections = toNormalizedValueList(rule.sourceSections ?? rule.sourceSection);
+    if (allowedSourceSections.length && !allowedSourceSections.includes(sourceSection)) return false;
+
+    const allowedKinds = toNormalizedValueList(rule.questionKinds ?? rule.questionKind);
+    if (allowedKinds.length && !allowedKinds.includes(questionKind)) return false;
+
+    const allowedTypes = toNormalizedValueList(rule.types ?? rule.type);
+    if (allowedTypes.length && !allowedTypes.includes(questionType)) return false;
+
+    const allowedDifficulties = toNormalizedValueList(rule.difficulties ?? rule.difficulty);
+    if (allowedDifficulties.length && !allowedDifficulties.includes(difficulty)) return false;
+
+    const requiredTags = toNormalizedValueList(rule.tags);
+    if (requiredTags.length && !requiredTags.some((tag) => tags.has(tag))) return false;
+
+    return true;
+}
+
+function applyModeConfigQuestionMetadata(question, modeConfig, rule) {
+    const clone = { ...question };
+    const questionKind = getConfiguredQuestionKind(clone);
+    const sourceSection = getConfiguredQuestionSourceSection(clone);
+
+    if (!clone.questionKind && questionKind) clone.questionKind = questionKind;
+    if (!clone.sourceSection && sourceSection) clone.sourceSection = sourceSection;
+
+    const explicitPoints = Number(clone?.points);
+    if (!Number.isFinite(explicitPoints) || explicitPoints <= 0) {
+        const rulePoints = Number(rule?.points);
+        const modePoints = Number(modeConfig?.pointsByQuestionKind?.[questionKind]);
+        const nextPoints = Number.isFinite(rulePoints) && rulePoints > 0
+            ? rulePoints
+            : (Number.isFinite(modePoints) && modePoints > 0 ? modePoints : 0);
+        if (nextPoints > 0) clone.points = nextPoints;
+    }
+
+    return clone;
+}
+
+function buildConfiguredModeQuestions(data, modeConfig) {
+    const allQuestions = normalizeLoadedQuizQuestions(data?.questions);
+    if (!allQuestions.length) {
+        throw new Error(`Quiz "${data?.id || quizId || "unknown"}" does not have any master questions yet.`);
+    }
+
+    const selection = modeConfig?.selection && typeof modeConfig.selection === "object"
+        ? modeConfig.selection
+        : {};
+    const rules = Array.isArray(selection.rules) ? selection.rules : [];
+    const allowPartial = !!selection.allowPartial;
+    const selected = [];
+    const seenQuestions = new Set();
+    const shortfalls = [];
+
+    const addQuestion = (question, rule) => {
+        if (!question || seenQuestions.has(question)) return;
+        seenQuestions.add(question);
+        selected.push(applyModeConfigQuestionMetadata(question, modeConfig, rule));
+    };
+
+    if (!rules.length) {
+        applyQuestionLimit(allQuestions).forEach((question) => addQuestion(question, null));
+        return {
+            questions: shuffled(selected),
+            shortfalls
+        };
+    }
+
+    for (const rule of rules) {
+        const targetCount = Math.max(0, Number(rule?.count) || 0);
+        if (!targetCount) continue;
+
+        const candidates = shuffled(allQuestions.filter((question) => !seenQuestions.has(question) && matchesConfiguredRule(question, rule)));
+        const picked = candidates.slice(0, Math.min(targetCount, candidates.length));
+        picked.forEach((question) => addQuestion(question, rule));
+
+        if (picked.length < targetCount) {
+            shortfalls.push({
+                rule,
+                expected: targetCount,
+                actual: picked.length
+            });
+        }
+    }
+
+    if (shortfalls.length && !allowPartial) {
+        const summary = shortfalls
+            .map(({ rule, expected, actual }) => {
+                const section = rule?.sourceSection || rule?.sourceSections?.join("/") || "any section";
+                const kind = rule?.questionKind || rule?.questionKinds?.join("/") || "any kind";
+                return `${expected - actual} short for ${kind} in ${section}`;
+            })
+            .join("; ");
+        throw new Error(`This quiz bank cannot build the requested mode yet: ${summary}.`);
+    }
+
+    return {
+        questions: applyQuestionLimit(selected),
+        shortfalls
+    };
+}
+
+function buildConfiguredModeNotice(data, modeConfig, buildResult) {
+    const titleBits = [];
+    if (data?.meta?.placeholder === true) {
+        titleBits.push("Placeholder scaffold active.");
+    }
+
+    if (Array.isArray(buildResult?.shortfalls) && buildResult.shortfalls.length) {
+        const requested = Math.max(0, Number(modeConfig?.questionLimit) || 0);
+        const built = Array.isArray(buildResult?.questions) ? buildResult.questions.length : 0;
+        titleBits.push(`This preview currently builds ${built}${requested ? ` of the requested ${requested}` : ""} questions.`);
+    }
+
+    if (modeConfig?.notice) {
+        titleBits.push(String(modeConfig.notice).trim());
+    }
+
+    return titleBits.join(" ");
 }
 
 function applyQuestionLimit(items) {
@@ -6188,6 +6518,14 @@ function isBlankAnswerValue(value) {
     return String(value ?? "").trim() === "";
 }
 
+function extractLooseNumericTokens(value) {
+    if (value === undefined || value === null) return [];
+    const matches = String(value).match(/-?\d+(?:\.\d+)?/g) || [];
+    return matches
+        .map((token) => Number(token))
+        .filter((token) => Number.isFinite(token));
+}
+
 function evaluateAnswerForQuestion(q, val) {
     if (!q || val === "Revealed" || isBlankAnswerValue(val)) return false;
 
@@ -6206,6 +6544,26 @@ function evaluateAnswerForQuestion(q, val) {
         return selected.length > 0
             && expected.length === selected.length
             && expected.every((answer, index) => answer === selected[index]);
+    }
+
+    const tolerance = Number(q?.tolerance);
+    if (Number.isFinite(tolerance) && tolerance >= 0) {
+        const expectedNumbers = Array.isArray(raw)
+            ? raw.flatMap(extractLooseNumericTokens)
+            : extractLooseNumericTokens(raw);
+        const userNumbers = Array.isArray(val)
+            ? val.flatMap(extractLooseNumericTokens)
+            : extractLooseNumericTokens(val);
+
+        if (expectedNumbers.length && userNumbers.length) {
+            if (expectedNumbers.length === 1 && userNumbers.length === 1) {
+                return Math.abs(userNumbers[0] - expectedNumbers[0]) <= tolerance;
+            }
+
+            if (expectedNumbers.length === userNumbers.length) {
+                return expectedNumbers.every((answer, index) => Math.abs(userNumbers[index] - answer) <= tolerance);
+            }
+        }
     }
 
     const acceptedAnswers = new Set();
@@ -6326,7 +6684,10 @@ function applyAnswerToQuestion(q, val) {
     q._answered = true;
     q._user = storedValue;
     q._correct = !!isCorrect;
-    if (isCorrect) state.score++;
+    if (isCorrect) {
+        state.score++;
+        state.pointScore += getQuestionPointValue(q);
+    }
     applyStreakOutcome(!!isCorrect);
     return isCorrect;
 }
@@ -6445,13 +6806,19 @@ function showResults() {
     if (shouldPersistResults && storageKey) {
         try {
             const existing = JSON.parse(localStorage.getItem(storageKey) || '{}');
-            const existingScore = existing.score || 0;
+            const compareByPoints = usesWeightedPointScoring();
+            const existingScore = compareByPoints
+                ? Number(existing.pointScore || 0)
+                : Number(existing.score || 0);
+            const candidateScore = compareByPoints ? state.pointScore : state.score;
             
             // Only update if new score is higher
-            if (state.score >= existingScore) {
+            if (candidateScore >= existingScore) {
                 localStorage.setItem(storageKey, JSON.stringify({
                     score: state.score,
                     total: state.questions.length,
+                    pointScore: state.pointScore,
+                    pointTotal: state.totalPoints,
                     date: Date.now()
                 }));
             }
@@ -6475,16 +6842,19 @@ function showResults() {
     const letterGradeInfo = shouldPersistResults ? getLetterGradeInfoForQuiz(state.score, state.questions.length) : null;
     const finalBreakdown = shouldPersistResults ? buildFinalPerformanceBreakdown(state.questions) : null;
     state.finalBreakdown = finalBreakdown;
+    const weightedSummary = usesWeightedPointScoring()
+        ? `${state.pointScore} / ${state.totalPoints} points • ${state.score} / ${state.questions.length} correct`
+        : `${state.score} / ${state.questions.length}`;
     const resultsHeading = state.bossMode
         ? (missed.length === 0 ? "Boss Cleared!" : "Boss Round Complete!")
         : state.reviewMode
         ? "Review Round Complete!"
         : "Quiz Complete!";
     const resultsSubheading = state.bossMode
-        ? `Challenge score: ${state.score} / ${state.questions.length}`
+        ? `Challenge score: ${weightedSummary}`
         : state.reviewMode
-        ? `Cleared ${state.score} / ${state.questions.length} in this review round`
-        : `Final Score: ${state.score} / ${state.questions.length}`;
+        ? `Cleared ${weightedSummary} in this review round`
+        : `Final Score: ${weightedSummary}`;
     const reviewModeNote = state.reviewMode
         ? `<p class="text-sm opacity-70 mt-2">Review rounds do not overwrite saved history, high scores, or adaptive weak-area stats. They do update review-queue mastery progress.</p>`
         : "";
@@ -6751,8 +7121,12 @@ async function main() {
             }
 
             state.bossMode = Boolean(data?.metadata?.kind === "boss-round" || data?.metadata?.bossRound);
-            state.generatedTimerSeconds = Math.max(0, Number(data?.metadata?.timerSeconds) || 0);
-            state.generatedQuestionLimit = Math.max(0, Number(data?.metadata?.questionLimit) || 0);
+            state.activeModeConfig = getEffectiveQuizModeConfig(data);
+            state.configuredModeKey = state.activeModeConfig?._modeKey || "";
+            state.placeholderQuiz = data?.meta?.placeholder === true;
+            state.modeNotice = "";
+            state.generatedTimerSeconds = Math.max(0, Number(state.activeModeConfig?.timerSeconds ?? data?.metadata?.timerSeconds) || 0);
+            state.generatedQuestionLimit = Math.max(0, Number(state.activeModeConfig?.questionLimit ?? data?.metadata?.questionLimit) || 0);
             state.generatedAttemptIdentity = GENERATED_QUIZ_IDS.has(quizId)
                 ? buildGeneratedAttemptIdentity(data)
                 : null;
@@ -6769,6 +7143,24 @@ async function main() {
 
                 if (!state.questions.length) {
                     throw new Error("This weak-area playlist did not have enough valid drug prompts to build a quiz yet.");
+                }
+
+                finishSetup(storageKey);
+                return;
+            }
+
+            if (state.activeModeConfig && Array.isArray(data?.questions)) {
+                const configuredBuild = buildConfiguredModeQuestions(data, state.activeModeConfig);
+                state.title = getConfiguredModeTitle(data, state.activeModeConfig);
+                state.modeNotice = buildConfiguredModeNotice(data, state.activeModeConfig, configuredBuild);
+                state.questions = shuffled(configuredBuild.questions).map((question, i) => ({
+                    ...question,
+                    _id: i
+                }));
+                storageKey = state.generatedAttemptIdentity?.scoreStorageKey || getScoreStorageKey() || `pharmlet.${quizId}.${modeParam}`;
+
+                if (!state.questions.length) {
+                    throw new Error(`Quiz "${quizId}" does not have enough placeholder items to build this mode yet.`);
                 }
 
                 finishSetup(storageKey);
@@ -6893,6 +7285,8 @@ function finishSetup(storageKey) {
     if (getEl("qtotal")) getEl("qtotal").textContent = state.questions.length;
     state.index = 0;
     state.score = 0;
+    state.pointScore = 0;
+    state.totalPoints = getTotalQuestionPoints(state.questions);
     state.hintsUsed = 0;
     state.currentStreak = 0;
     state.bestStreak = 0;
@@ -6913,7 +7307,13 @@ function finishSetup(storageKey) {
     
     // Initialize high score storage ONLY if it doesn't exist yet
     if (storageKey && !localStorage.getItem(storageKey)) {
-        localStorage.setItem(storageKey, JSON.stringify({ score: 0, total: state.questions.length, date: Date.now() }));
+        localStorage.setItem(storageKey, JSON.stringify({
+            score: 0,
+            total: state.questions.length,
+            pointScore: 0,
+            pointTotal: state.totalPoints,
+            date: Date.now()
+        }));
     }
 
     const savedSnapshot = loadSavedQuizProgress();
@@ -6940,6 +7340,13 @@ function finishSetup(storageKey) {
         startSmartTimer();
     }
 
+    if (state.modeNotice) {
+        const note = restored
+            ? `Saved progress restored. ${state.modeNotice}`
+            : state.modeNotice;
+        showQuizSessionNote(note, state.placeholderQuiz ? "accent" : "good");
+    }
+
     wireEvents();
     applyAttemptModeUI();
 
@@ -6952,11 +7359,16 @@ function finishSetup(storageKey) {
     
     // Save last quiz for quick resume (include lab param for week-based modes)
     const labSuffix = (weekParam || weeksParam || (tagParam && params.has("lab"))) ? `&lab=${labParam}` : '';
-    const examSuffix = isTrueExamMode() ? "&exam=1" : "";
+    const activeModeLabel = getConfiguredModeStorageLabel() || modeParam;
+    const omitModeSuffix = quizId === CEUTICS2_FINAL_ID && activeModeLabel === "trueExam";
+    const modeSuffix = activeModeLabel && activeModeLabel !== "easy" && !omitModeSuffix
+        ? `&mode=${encodeURIComponent(activeModeLabel)}`
+        : "";
+    const examSuffix = isTrueExamMode() && !omitModeSuffix ? "&exam=1" : "";
     const lastQuizParam = weekParam ? `?week=${weekParam}${labSuffix}` 
                         : weeksParam ? `?weeks=${weeksParam}${labSuffix}`
                         : tagParam ? `?tag=${tagParam}${labSuffix}`
-                        : `?id=${quizId}${examSuffix}`;
+                        : `?id=${quizId}${modeSuffix}${examSuffix}`;
     localStorage.setItem("pharmlet.last-quiz", lastQuizParam);
     
     render();

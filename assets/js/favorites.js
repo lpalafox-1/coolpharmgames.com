@@ -84,7 +84,7 @@ function loadFavorites() {
     const div = document.createElement("div");
     div.className = "favorite-item";
     const modeButtons = quiz.modes.map(mode => {
-      const label = mode.charAt(0).toUpperCase() + mode.slice(1);
+      const label = quizCatalog?.getModeLabel?.(mode) || (mode.charAt(0).toUpperCase() + mode.slice(1));
       const href = quizCatalog?.buildQuizHref?.(quiz.id, mode)
         || `quiz.html?id=${encodeURIComponent(quiz.id)}&mode=${encodeURIComponent(mode)}`;
       return `<a href="${href}" class="btn btn-blue flex-1 text-center">${label}</a>`;
