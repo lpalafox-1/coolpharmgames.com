@@ -238,6 +238,21 @@ function renderMarkControls() {
     });
 }
 
+function toggleMark() {
+    if (!state.questions[state.index]) return;
+
+    if (state.marked.has(state.index)) {
+        state.marked.delete(state.index);
+    } else {
+        state.marked.add(state.index);
+    }
+
+    renderMarkControls();
+    renderNavMap();
+    renderQuizStatus();
+    queueQuizProgressSave(150);
+}
+
 function getAdaptiveSummaryFocusText(summary) {
     if (!summary?.topFocusLabels?.length) return "";
     return summary.topFocusLabels.join(", ");
