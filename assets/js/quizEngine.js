@@ -6762,6 +6762,27 @@ function evaluateAnswerForQuestion(q, val) {
     return !!isCorrect;
 }
 
+function getQuestionPointValue(question) {
+    const points = Number(question?.points);
+    return Number.isFinite(points) && points > 0 ? points : 1;
+}
+
+function getTotalQuestionPoints(questions) {
+    if (!Array.isArray(questions)) return 0;
+    return questions.reduce((sum, question) => sum + getQuestionPointValue(question), 0);
+}
+
+function usesWeightedPointScoring() {
+    // Weighted points are enabled when a configured mode provides per-kind point values
+    // or when questions carry explicit point values.
+    if (state?.activeModeConfig?.pointsByQuestionKind) return true;
+    return Array.isArray(state?.questions) && state.questions.some((question) => Number.isFinite(Number(question?.points)) && Number(question.points) > 0 && Number(question.points) !== 1);
+}
+
+function syncPointTotalsFromQuestions() {
+    state.totalPoints = getTotalQuestionPoints(state.questions);
+}
+
 function applyAnswerToQuestion(q, val) {
     if (!q || q._answered) return false;
 
