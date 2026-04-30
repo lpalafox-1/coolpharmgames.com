@@ -1366,7 +1366,7 @@
     },
     {
       "id": "q103",
-      "prompt": "Using the ke from the previous problem, calculate the half-life (t1/2) of Drug Y.",
+      "prompt": "Drug Y has an elimination rate constant ke = 0.1013662770270411 h^-1. Calculate the half-life (t1/2).",
       "difficulty": "hard",
       "sourceSection": "pharmacokineticsCalculations",
       "tags": [
@@ -2681,7 +2681,7 @@
     },
     {
       "id": "q151",
-      "prompt": "For the previous problem (initial concentration 33 mg/L, ke = 0.045 hr^-1), calculate the AUC.",
+      "prompt": "A patient has an initial plasma concentration of 33 mg/L and ke = 0.045 hr^-1. Calculate the AUC.",
       "difficulty": "hard",
       "sourceSection": "pharmacokineticsCalculations",
       "tags": [
