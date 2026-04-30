@@ -523,7 +523,7 @@
     },
     {
       "id": "q19",
-      "prompt": "Which inhalation device does not require patient coordination between actuation and inhalation?",
+      "prompt": "Which inhalation device is breath-powered and does not use a propellant?",
       "difficulty": "medium",
       "sourceSection": "exam2Review",
       "tags": [
@@ -546,7 +546,7 @@
     },
     {
       "id": "q20",
-      "prompt": "Biologic products such as therapeutic proteins are most commonly administered by which route?",
+      "prompt": "Why are many therapeutic proteins not given orally?",
       "difficulty": "easy",
       "sourceSection": "exam2Review",
       "tags": [
@@ -559,12 +559,12 @@
       "objectiveTags": [],
       "type": "mcq",
       "choices": [
-        "Oral",
-        "Intravenous",
-        "Transdermal",
-        "Inhalation"
+        "They are degraded in the GI tract",
+        "They have too long a half-life for oral dosing",
+        "They are absorbed too rapidly from the stomach",
+        "They require a propellant for delivery"
       ],
-      "answer": "Intravenous",
+      "answer": "They are degraded in the GI tract",
       "questionKind": "choice"
     },
     {
@@ -1364,11 +1364,11 @@
       "objectiveTags": [],
       "type": "short",
       "answer": [
-        "7.00"
+        "5.29"
       ],
       "acceptableAnswers": [
-        "7.00",
-        "7.0"
+        "5.29",
+        "5.3"
       ],
       "questionKind": "calculation",
       "units": "mg/L",
@@ -1464,7 +1464,7 @@
     },
     {
       "id": "q109",
-      "prompt": "Drug D is administered by IV bolus. The dose is 100 mg, the elimination rate constant is 0.2 h^-1, the dosing interval (τ) is 8 hours, and the volume of distribution is 50 L. Calculate the peak (Cmax₂) and trough (Cmin₂) concentrations after the second dose at steady state.",
+      "prompt": "Drug D is administered by IV bolus. The dose is 100 mg, the elimination rate constant is 0.2 h^-1, the dosing interval (τ) is 8 hours, and the volume of distribution is 50 L. Calculate the peak (Cmax₂) and trough (Cmin₂) concentrations after the second dose.",
       "difficulty": "hard",
       "sourceSection": "pharmacokineticsCalculations",
       "tags": [
@@ -1786,10 +1786,11 @@
       "objectiveTags": [],
       "type": "short",
       "answer": [
-        "6.16"
+        "4.30"
       ],
       "acceptableAnswers": [
-        "6.16"
+        "4.30",
+        "4.3"
       ],
       "questionKind": "calculation",
       "units": "mg/L",
@@ -1885,7 +1886,7 @@
     },
     {
       "id": "q124",
-      "prompt": "Drug D is administered by IV bolus. The dose is 150 mg, the elimination rate constant is 0.15 h^-1, the dosing interval (τ) is 6 hours, and the volume of distribution is 45 L. Calculate the peak (Cmax₂) and trough (Cmin₂) concentrations after the second dose at steady state.",
+      "prompt": "Drug D is administered by IV bolus. The dose is 150 mg, the elimination rate constant is 0.15 h^-1, the dosing interval (τ) is 6 hours, and the volume of distribution is 45 L. Calculate the peak (Cmax₂) and trough (Cmin₂) concentrations after the second dose.",
       "difficulty": "hard",
       "sourceSection": "pharmacokineticsCalculations",
       "tags": [
