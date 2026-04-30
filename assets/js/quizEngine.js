@@ -6568,6 +6568,31 @@ function wireEvents() {
     };
 }
 
+function toggleTimer() {
+    if (!state.timerHandle && state.timerSeconds <= 0) return;
+
+    state.timerPaused = !state.timerPaused;
+    const readout = getEl("timer-readout");
+    if (readout) {
+        readout.classList.toggle("opacity-30", !!state.timerPaused);
+        readout.classList.toggle("animate-pulse", !!state.timerPaused);
+    }
+
+    if (state.timerPaused) {
+        if (state.timerHandle) {
+            clearInterval(state.timerHandle);
+            state.timerHandle = null;
+        }
+        queueQuizProgressSave(200);
+        return;
+    }
+
+    if (!state.timerHandle && state.timerSeconds > 0) {
+        state.timerHandle = setInterval(timerTick, 1000);
+    }
+    queueQuizProgressSave(200);
+}
+
 function timerTick() {
     if (state.timerSeconds <= 0) {
         finishQuizDueToTimeout();
