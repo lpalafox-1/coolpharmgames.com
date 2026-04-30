@@ -70,7 +70,8 @@ const state = {
     lastAutosaveAt: 0,
     saveStatusMessage: "",
 
-    currentScale: 1.0
+    currentScale: 1.0,
+    adaptiveSession: null
 };
 
 function changeZoom(dir) {
@@ -3543,6 +3544,7 @@ function buildConfiguredModeQuestions(data, modeConfig) {
     const rules = Array.isArray(selection.rules) ? selection.rules : [];
     const allowPartial = !!selection.allowPartial;
     const useDifficulty = Boolean(selection.useDifficulty);
+    const adaptiveEnabled = selection.adaptive === true;
     const difficultyWeights = selection?.difficultyWeights && typeof selection.difficultyWeights === "object"
         ? selection.difficultyWeights
         : null;
@@ -3560,7 +3562,102 @@ function buildConfiguredModeQuestions(data, modeConfig) {
         applyQuestionLimit(allQuestions).forEach((question) => addQuestion(question, null));
         return {
             questions: shuffled(selected),
-            shortfalls
+            shortfalls,
+            adaptiveSession: null
+        };
+    }
+
+    const normalizeDifficultyKey = (value) => {
+        const key = normalizeQuizValue(value);
+        if (key === "easy" || key === "medium" || key === "hard") return key;
+        return "medium";
+    };
+
+    const stepDifficulty = (current, correct) => {
+        const order = ["easy", "medium", "hard"];
+        const idx = Math.max(0, order.indexOf(normalizeDifficultyKey(current)));
+        const nextIdx = correct ? Math.min(order.length - 1, idx + 1) : Math.max(0, idx - 1);
+        return order[nextIdx];
+    };
+
+    const pickClosestDifficultyCandidate = (candidates, targetDifficulty) => {
+        if (!candidates.length) return null;
+        const target = normalizeDifficultyKey(targetDifficulty);
+        const buckets = { easy: [], medium: [], hard: [] };
+        for (const q of candidates) {
+            buckets[normalizeDifficultyKey(getConfiguredQuestionDifficulty(q))].push(q);
+        }
+
+        const order = target === "easy"
+            ? ["easy", "medium", "hard"]
+            : target === "hard"
+            ? ["hard", "medium", "easy"]
+            : ["medium", "easy", "hard"];
+
+        for (const key of order) {
+            const bucket = buckets[key];
+            if (!bucket.length) continue;
+            const idx = Math.floor(Math.random() * bucket.length);
+            return bucket[idx] || null;
+        }
+
+        return null;
+    };
+
+    const buildAdaptiveConfiguredSession = () => {
+        const questionLimit = Number.isFinite(limitParam) && limitParam > 0
+            ? limitParam
+            : Math.max(0, Number(modeConfig?.questionLimit) || 0);
+        const targetTotal = questionLimit > 0 ? questionLimit : 10;
+
+        // Create a shuffled slot list that mirrors the rule mix.
+        const slots = [];
+        for (const rule of rules) {
+            const count = Math.max(0, Number(rule?.count) || 0);
+            for (let i = 0; i < count; i += 1) slots.push(rule);
+        }
+        // If counts don't sum to the limit, trim/pad by repeating the last rule.
+        while (slots.length < targetTotal && rules.length) slots.push(rules[rules.length - 1]);
+        slots.splice(targetTotal);
+        const shuffledSlots = shuffled(slots);
+
+        const startDifficulty = normalizeDifficultyKey(selection.startDifficulty || "medium");
+        const session = {
+            slots: shuffledSlots,
+            cursor: 0,
+            difficulty: startDifficulty,
+            used: new Set()
+        };
+
+        const pickNext = (wasCorrect) => {
+            if (session.cursor >= session.slots.length) return null;
+            if (wasCorrect !== undefined) {
+                session.difficulty = stepDifficulty(session.difficulty, !!wasCorrect);
+            }
+
+            const rule = session.slots[session.cursor];
+            session.cursor += 1;
+
+            const candidates = allQuestions.filter((q) => !session.used.has(q) && matchesConfiguredRule(q, rule, { useDifficulty: false }));
+            const chosen = pickClosestDifficultyCandidate(candidates, session.difficulty) || candidates[0] || null;
+            if (!chosen) return null;
+            session.used.add(chosen);
+            return applyModeConfigQuestionMetadata(chosen, modeConfig, rule);
+        };
+
+        return { session, pickNext };
+    };
+
+    if (adaptiveEnabled) {
+        const { session, pickNext } = buildAdaptiveConfiguredSession();
+        const firstQuestion = pickNext(undefined);
+        if (!firstQuestion) {
+            throw new Error(`Quiz "${data?.id || quizId || "unknown"}" does not have enough items to build adaptive mode yet.`);
+        }
+        return {
+            questions: [firstQuestion],
+            shortfalls,
+            adaptiveSession: { ...session, _pickNext: pickNext }
         };
     }
 
@@ -3692,7 +3789,8 @@ function buildConfiguredModeQuestions(data, modeConfig) {
 
     return {
         questions: applyQuestionLimit(selected),
-        shortfalls
+        shortfalls,
+        adaptiveSession: null
     };
 }
 
@@ -6853,6 +6951,14 @@ function scoreCurrent(val) {
     if (!q) return;
 
     applyAnswerToQuestion(q, val);
+    if (state.adaptiveSession && state.index == state.questions.length - 1 && q._answered) {
+        const next = state.adaptiveSession._pickNext ? state.adaptiveSession._pickNext(!!q._correct) : null;
+        if (next) {
+            state.questions.push({ ...next, _id: state.questions.length });
+            syncPointTotalsFromQuestions();
+            if (getEl("qtotal")) getEl("qtotal").textContent = state.questions.length;
+        }
+    }
     render();
 }
 
@@ -7308,7 +7414,9 @@ async function main() {
                 const configuredBuild = buildConfiguredModeQuestions(data, state.activeModeConfig);
                 state.title = getConfiguredModeTitle(data, state.activeModeConfig);
                 state.modeNotice = buildConfiguredModeNotice(data, state.activeModeConfig, configuredBuild);
-                state.questions = shuffled(configuredBuild.questions).map((question, i) => ({
+                state.adaptiveSession = configuredBuild.adaptiveSession || null;
+                const builtQuestions = state.adaptiveSession ? configuredBuild.questions : shuffled(configuredBuild.questions);
+                state.questions = builtQuestions.map((question, i) => ({
                     ...question,
                     _id: i
                 }));

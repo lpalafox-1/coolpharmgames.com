@@ -142,6 +142,24 @@
           ]
         }
       },
+      "adaptive": {
+        "title": "Pharmaceutics II Final Exam - Adaptive",
+        "questionLimit": 10,
+        "timerSeconds": 600,
+        "hintsEnabled": true,
+        "notice": "Adaptive mode starts at medium difficulty and shifts easier/harder after each answer while keeping a PK-heavy mix.",
+        "selection": {
+          "adaptive": true,
+          "allowPartial": false,
+          "startDifficulty": "medium",
+          "rules": [
+            { "sourceSection": "pharmacokineticsCalculations", "questionKind": "calculation", "count": 3 },
+            { "sourceSection": "pharmacokineticsConcepts", "questionKinds": ["choice", "fitb"], "count": 4 },
+            { "sourceSection": "exam1Review", "questionKinds": ["choice", "fitb", "openresponse"], "count": 2 },
+            { "sourceSection": "exam2Review", "questionKinds": ["choice", "fitb", "openresponse"], "count": 1 }
+          ]
+        }
+      },
       "masterPool": {
         "title": "Pharmaceutics II Final Exam - Master Pool",
         "questionLimit": 100,
