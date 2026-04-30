@@ -64,48 +64,6 @@
           ]
         }
       },
-      "quickQuiz": {
-        "title": "Pharmaceutics II Final Exam - Quick Hard",
-        "questionLimit": 10,
-        "timerSeconds": 600,
-        "hintsEnabled": false,
-        "selection": {
-          "allowPartial": false,
-          "rules": [
-            {
-              "sourceSection": "pharmacokineticsCalculations",
-              "questionKind": "calculation",
-              "count": 3
-            },
-            {
-              "sourceSection": "pharmacokineticsConcepts",
-              "questionKinds": [
-                "choice",
-                "fitb"
-              ],
-              "count": 4
-            },
-            {
-              "sourceSection": "exam1Review",
-              "questionKinds": [
-                "choice",
-                "fitb",
-                "openresponse"
-              ],
-              "count": 2
-            },
-            {
-              "sourceSection": "exam2Review",
-              "questionKinds": [
-                "choice",
-                "fitb",
-                "openresponse"
-              ],
-              "count": 1
-            }
-          ]
-        }
-      },
       "trueExam": {
         "title": "Pharmaceutics II Final Exam - True Exam",
         "questionLimit": 65,
@@ -180,55 +138,6 @@
               "sourceSection": "pharmacokineticsCalculations",
               "questionKind": "calculation",
               "count": 16
-            }
-          ]
-        }
-      },
-      "adaptive": {
-        "title": "Pharmaceutics II Final Exam - Adaptive",
-        "questionLimit": 65,
-        "timerSeconds": 6600,
-        "hintsEnabled": true,
-        "notice": "Adaptive mode uses difficulty tags to bias toward harder questions while keeping the quick quiz mix.",
-        "selection": {
-          "allowPartial": false,
-          "useDifficulty": true,
-          "difficultyWeights": {
-            "easy": 1,
-            "medium": 2,
-            "hard": 3
-          },
-          "rules": [
-            {
-              "sourceSection": "pharmacokineticsCalculations",
-              "questionKind": "calculation",
-              "countWeight": 3
-            },
-            {
-              "sourceSection": "pharmacokineticsConcepts",
-              "questionKinds": [
-                "choice",
-                "fitb"
-              ],
-              "countWeight": 4
-            },
-            {
-              "sourceSection": "exam1Review",
-              "questionKinds": [
-                "choice",
-                "fitb",
-                "openresponse"
-              ],
-              "countWeight": 2
-            },
-            {
-              "sourceSection": "exam2Review",
-              "questionKinds": [
-                "choice",
-                "fitb",
-                "openresponse"
-              ],
-              "countWeight": 1
             }
           ]
         }

@@ -178,32 +178,34 @@ function validateCeuticsFinalBlueprint(quiz, errors) {
     }
   }
 
-  if (!adaptiveMode || typeof adaptiveMode !== "object") {
-    errors.push(`ceutics2-final: settings.modeConfigs.adaptive is required`);
-  } else {
-    if (Number(adaptiveMode.questionLimit) !== 65) errors.push(`ceutics2-final: adaptive questionLimit must default to 65`);
-    if (Number(adaptiveMode.timerSeconds) !== 6600) errors.push(`ceutics2-final: adaptive timerSeconds must default to 6600`);
-    if (adaptiveMode?.selection?.useDifficulty !== true) {
-      errors.push(`ceutics2-final: adaptive mode must set selection.useDifficulty = true`);
+  if (adaptiveMode && typeof adaptiveMode === "object") {
+    if (Number(adaptiveMode.questionLimit) !== 10) errors.push(`ceutics2-final: adaptive questionLimit must default to 10`);
+    if (Number(adaptiveMode.timerSeconds) !== 600) errors.push(`ceutics2-final: adaptive timerSeconds must default to 600`);
+    if (adaptiveMode?.selection?.adaptive !== true) errors.push(`ceutics2-final: adaptive mode must set selection.adaptive = true`);
+    if (normalizeLooseText(adaptiveMode?.selection?.startDifficulty) !== "medium") {
+      errors.push(`ceutics2-final: adaptive mode must start at medium difficulty`);
     }
-    const weights = adaptiveMode?.selection?.difficultyWeights || {};
-    if (Number(weights.easy) !== 1 || Number(weights.medium) !== 2 || Number(weights.hard) !== 3) {
-      errors.push(`ceutics2-final: adaptive mode must define difficultyWeights of 1/2/3 for easy/medium/hard`);
+    const adaptiveRules = Array.isArray(adaptiveMode?.selection?.rules) ? adaptiveMode.selection.rules : [];
+    if (adaptiveRules.some(ruleUsesDifficulty)) {
+      errors.push(`ceutics2-final: adaptive mode should use runtime difficulty adjustment, not rule difficulty filters`);
     }
 
-    const adaptiveRules = Array.isArray(adaptiveMode?.selection?.rules) ? adaptiveMode.selection.rules : [];
-    const expectedWeights = {
+    const expectedCounts = {
       pharmacokineticscalculations: 3,
       pharmacokineticsconcepts: 4,
       exam1review: 2,
       exam2review: 1
     };
+    const seenAdaptiveCounts = {};
     adaptiveRules.forEach((rule) => {
       const section = normalizeLooseText(rule?.sourceSection);
-      if (!section || !(section in expectedWeights)) return;
-      const weight = Number(rule?.countWeight || 0);
-      if (weight !== expectedWeights[section]) {
-        errors.push(`ceutics2-final: adaptive mode must keep ${section} countWeight at ${expectedWeights[section]}`);
+      if (!section || !(section in expectedCounts)) return;
+      seenAdaptiveCounts[section] = Number(rule?.count || 0);
+    });
+
+    Object.entries(expectedCounts).forEach(([section, expectedCount]) => {
+      if (Number(seenAdaptiveCounts[section] || 0) !== expectedCount) {
+        errors.push(`ceutics2-final: adaptive mode must keep ${section} count at ${expectedCount}`);
       }
     });
   }

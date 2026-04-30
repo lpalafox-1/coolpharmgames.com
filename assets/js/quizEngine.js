@@ -2483,7 +2483,7 @@ function showHint() {
         if (formula) hintLines.push(`Formula: ${formula}`);
         if (units) hintLines.push(`Units: ${units}`);
         if (!hintLines.length) {
-            alert("4a1 No hint available for this question.");
+            alert("No hint available for this question.");
             return;
         }
 
@@ -2507,7 +2507,7 @@ function showHint() {
         alert(conceptHint);
         return;
     }
-    
+
     const drug = q.drugRef;
     if (!drug) {
         alert("💡 No hint available for this question.");
@@ -6784,47 +6784,7 @@ function applyAnswerToQuestion(q, val) {
         state.pointScore += getQuestionPointValue(q);
     }
     applyStreakOutcome(!!isCorrect);
-    maybeFinishAdaptiveEarly();
     return isCorrect;
-}
-
-function getAdaptiveEarlyStopConfig() {
-    const selection = state.activeModeConfig?.selection;
-    if (!selection || !selection.stopWhenStable) return null;
-
-    const minQuestions = Math.max(0, Number(selection.minQuestionsBeforeStability) || 0);
-    const stabilityWindow = Math.max(1, Number(selection.stabilityWindow) || 0);
-
-    return {
-        minQuestions,
-        stabilityWindow
-    };
-}
-
-function shouldStopAdaptiveEarly() {
-    if (state.progressCompleted || state.reviewMode) return false;
-
-    const config = getAdaptiveEarlyStopConfig();
-    if (!config) return false;
-
-    const answered = state.questions.filter((question) => question?._answered);
-    const minimumNeeded = Math.max(config.minQuestions, config.stabilityWindow);
-    if (answered.length < minimumNeeded) return false;
-
-    const answeredWithTime = answered.filter((question) => Number.isFinite(question?._answeredAt));
-    const ordered = answeredWithTime.length
-        ? answeredWithTime.sort((a, b) => a._answeredAt - b._answeredAt)
-        : answered;
-    const recent = ordered.slice(-config.stabilityWindow);
-    if (recent.length < config.stabilityWindow) return false;
-
-    const target = recent[0]?._correct;
-    return recent.every((question) => question?._correct === target);
-}
-
-function maybeFinishAdaptiveEarly() {
-    if (!shouldStopAdaptiveEarly()) return;
-    showResults();
 }
 
 function scoreCurrent(val) {
@@ -7053,7 +7013,6 @@ async function main() {
         state.generatedQuestionLimit = 0;
         state.generatedAttemptIdentity = null;
         state.adaptiveSummary = null;
-
         let filteredPool = [];
         let fullPool = [];
         let storageKey = null;
