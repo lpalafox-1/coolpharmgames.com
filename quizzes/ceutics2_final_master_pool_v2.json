@@ -201,54 +201,30 @@
       "questionKind": "choice"
     },
     {
-      "id": "q2",
-      "prompt": "Which USP classification corresponds to powders in which all particles pass through a No. 20 sieve and not more than 40% through a No. 60 sieve?",
-      "difficulty": "medium",
-      "sourceSection": "exam1Review",
-      "tags": [
-        "exam1Review",
-        "mcq"
-      ],
-      "topicTags": [
-        "exam1Review"
-      ],
-      "objectiveTags": [],
-      "type": "mcq",
-      "choices": [
-        "Very fine",
-        "Moderately coarse",
-        "Moderately fine",
-        "Very coarse"
-      ],
-      "answer": "Moderately coarse",
-      "questionKind": "choice"
-    },
-    {
       "id": "q3",
-      "prompt": "Which microscopic diameter measurement is defined as the distance between two parallel tangents on opposite sides of the particle?",
-      "difficulty": "medium",
+      "prompt": "Poor powder flow during manufacturing is often caused by excessive interparticle ________.",
+      "difficulty": "easy",
       "sourceSection": "exam1Review",
       "tags": [
         "exam1Review",
-        "mcq"
+        "fitb"
       ],
       "topicTags": [
         "exam1Review"
       ],
       "objectiveTags": [],
-      "type": "mcq",
-      "choices": [
-        "Martin diameter",
-        "Feret diameter",
-        "Heywood diameter",
-        "Krummbein diameter"
+      "type": "short",
+      "answer": [
+        "cohesion"
       ],
-      "answer": "Feret diameter",
-      "questionKind": "choice"
+      "acceptableAnswers": [
+        "cohesion"
+      ],
+      "questionKind": "fitb"
     },
     {
       "id": "q4",
-      "prompt": "An angle of repose of 50° would be classified as:",
+      "prompt": "Poor powder flow during tablet manufacturing is most likely to cause:",
       "difficulty": "medium",
       "sourceSection": "exam1Review",
       "tags": [
@@ -261,12 +237,12 @@
       "objectiveTags": [],
       "type": "mcq",
       "choices": [
-        "Excellent flow",
-        "Good flow",
-        "Poor flow",
-        "Very poor flow"
+        "Irregular die filling",
+        "Faster drug release",
+        "Improved chemical stability",
+        "Better tablet hardness"
       ],
-      "answer": "Very poor flow",
+      "answer": "Irregular die filling",
       "questionKind": "choice"
     },
     {
@@ -360,52 +336,6 @@
       ],
       "answer": "Inferior and middle rectal veins",
       "questionKind": "choice"
-    },
-    {
-      "id": "q9",
-      "prompt": "Which polymorph of cocoa butter is metastable and has the lowest melting point?",
-      "difficulty": "medium",
-      "sourceSection": "exam1Review",
-      "tags": [
-        "exam1Review",
-        "mcq"
-      ],
-      "topicTags": [
-        "exam1Review"
-      ],
-      "objectiveTags": [],
-      "type": "mcq",
-      "choices": [
-        "Alpha",
-        "Beta",
-        "Gamma",
-        "Delta"
-      ],
-      "answer": "Gamma",
-      "questionKind": "choice"
-    },
-    {
-      "id": "q10",
-      "prompt": "The instrument commonly used to measure the true density of powders is the __________ pycnometer.",
-      "difficulty": "easy",
-      "sourceSection": "exam1Review",
-      "tags": [
-        "exam1Review",
-        "fitb"
-      ],
-      "topicTags": [
-        "exam1Review"
-      ],
-      "objectiveTags": [],
-      "type": "short",
-      "answer": [
-        "helium"
-      ],
-      "acceptableAnswers": [
-        "helium",
-        "helium gas"
-      ],
-      "questionKind": "fitb"
     },
     {
       "id": "q11",
@@ -939,7 +869,7 @@
     },
     {
       "id": "q34",
-      "prompt": "For repeated dosing, the accumulation factor (R) is:",
+      "prompt": "For a repeatedly dosed drug, the accumulation factor generally increases when the dosing interval is:",
       "difficulty": "medium",
       "sourceSection": "pharmacokineticsConcepts",
       "tags": [
@@ -952,12 +882,12 @@
       "objectiveTags": [],
       "type": "mcq",
       "choices": [
-        "1/(1 - e^{-ke τ})",
-        "e^{-ke τ}",
-        "ke × τ",
-        "1 - e^{-ke τ}"
+        "Shorter than the drug's half-life",
+        "Longer than the drug's half-life",
+        "Equal to the dose amount",
+        "Independent of clearance"
       ],
-      "answer": "1/(1 - e^{-ke τ})",
+      "answer": "Shorter than the drug's half-life",
       "questionKind": "choice"
     },
     {
@@ -1261,7 +1191,7 @@
     },
     {
       "id": "q48",
-      "prompt": "The accumulation factor (R) for repeated dosing is R = ______.",
+      "prompt": "If the dosing interval is reduced while dose and half-life remain the same, accumulation generally:",
       "difficulty": "easy",
       "sourceSection": "pharmacokineticsConcepts",
       "tags": [
@@ -1274,13 +1204,11 @@
       "objectiveTags": [],
       "type": "short",
       "answer": [
-        "1/(1 - e^{-ke τ})"
+        "increases"
       ],
       "acceptableAnswers": [
-        "1/(1 - e^{-ke τ})",
-        "1/(1-e^{-ke τ})",
-        "1 / (1 - e^{-ke τ})",
-        "1/(1 - e^(-ke τ))"
+        "increases",
+        "increase"
       ],
       "questionKind": "fitb"
     },
@@ -1338,7 +1266,7 @@
     },
     {
       "id": "q102",
-      "prompt": "Drug Y exhibits first-order elimination. After an IV bolus dose, plasma concentration decreases from 15 mg/L immediately to 10 mg/L after 4 hours. Calculate the elimination rate constant (ke).",
+      "prompt": "Drug Y exhibits first-order elimination. After an IV bolus dose, plasma concentration decreases from 15 mg/L immediately to 10 mg/L after 4 hours. Calculate the elimination rate constant (ke) to two significant figures.",
       "difficulty": "hard",
       "sourceSection": "pharmacokineticsCalculations",
       "tags": [
@@ -1351,22 +1279,23 @@
       "objectiveTags": [],
       "type": "short",
       "answer": [
-        "0.1013662770270411"
+        "0.10"
       ],
       "acceptableAnswers": [
-        "0.1013662770270411"
+        "0.10",
+        "0.1"
       ],
       "questionKind": "calculation",
       "units": "h^-1",
       "formula": "ke = ln(C1/C2) / Δt",
-      "tolerance": 0.001,
+      "tolerance": 0.01,
       "givenValues": {
         "fromPrompt": true
       }
     },
     {
       "id": "q103",
-      "prompt": "Drug Y has an elimination rate constant ke = 0.1013662770270411 h^-1. Calculate the half-life (t1/2).",
+      "prompt": "Drug Y has an elimination rate constant ke = 0.10 h^-1. Calculate the half-life (t1/2) in hours.",
       "difficulty": "hard",
       "sourceSection": "pharmacokineticsCalculations",
       "tags": [
@@ -1379,22 +1308,22 @@
       "objectiveTags": [],
       "type": "short",
       "answer": [
-        "6.836593197707468"
+        "6.9"
       ],
       "acceptableAnswers": [
-        "6.836593197707468"
+        "6.9"
       ],
       "questionKind": "calculation",
       "units": "h",
       "formula": "t1/2 = 0.693 / ke",
-      "tolerance": 0.01,
+      "tolerance": 0.1,
       "givenValues": {
         "fromPrompt": true
       }
     },
     {
       "id": "q104",
-      "prompt": "Drug Z has an initial concentration of 10 mg/L and an elimination rate constant of 0.1733 h^-1. Calculate its plasma concentration 6 hours after administration.",
+      "prompt": "Drug Z has an initial concentration of 10 mg/L and an elimination rate constant of 0.173 h^-1. Calculate its plasma concentration 6 hours after administration.",
       "difficulty": "hard",
       "sourceSection": "pharmacokineticsCalculations",
       "tags": [
@@ -1407,22 +1336,22 @@
       "objectiveTags": [],
       "type": "short",
       "answer": [
-        "3.5352537996473683"
+        "3.54"
       ],
       "acceptableAnswers": [
-        "3.5352537996473683"
+        "3.54"
       ],
       "questionKind": "calculation",
       "units": "mg/L",
       "formula": "Ct = C0 × e^(-ke × t)",
-      "tolerance": 0.01,
+      "tolerance": 0.05,
       "givenValues": {
         "fromPrompt": true
       }
     },
     {
       "id": "q105",
-      "prompt": "The plasma concentration of Drug A is 4 mg/L at 6 hours after dosing. If the elimination rate constant is 0.14 h^-1, calculate the plasma concentration at 2 hours after dosing.",
+      "prompt": "The plasma concentration of Drug A is 4 mg/L at 6 hours after dosing. If the elimination rate constant is 0.14 h^-1, calculate the plasma concentration 2 hours earlier.",
       "difficulty": "hard",
       "sourceSection": "pharmacokineticsCalculations",
       "tags": [
@@ -1435,15 +1364,16 @@
       "objectiveTags": [],
       "type": "short",
       "answer": [
-        "7.002690001184405"
+        "7.00"
       ],
       "acceptableAnswers": [
-        "7.002690001184405"
+        "7.00",
+        "7.0"
       ],
       "questionKind": "calculation",
       "units": "mg/L",
       "formula": "Cearlier = Clater × e^(ke × Δt)",
-      "tolerance": 0.01,
+      "tolerance": 0.05,
       "givenValues": {
         "fromPrompt": true
       }
@@ -1562,7 +1492,7 @@
     },
     {
       "id": "q110",
-      "prompt": "Drug E follows first-order elimination with ke = 0.1 h^-1. If a dose of 1000 mg is administered, how much drug remains in the body 10 hours later?",
+      "prompt": "Drug E follows first-order elimination with ke = 0.10 h^-1. If a dose of 1000 mg is administered, how much drug remains in the body 10 hours later?",
       "difficulty": "hard",
       "sourceSection": "pharmacokineticsCalculations",
       "tags": [
@@ -1575,10 +1505,10 @@
       "objectiveTags": [],
       "type": "short",
       "answer": [
-        "367.87944117144235"
+        "368"
       ],
       "acceptableAnswers": [
-        "367.87944117144235"
+        "368"
       ],
       "questionKind": "calculation",
       "units": "mg",
@@ -1715,10 +1645,10 @@
       "objectiveTags": [],
       "type": "short",
       "answer": [
-        "71.42857142857143"
+        "71.4"
       ],
       "acceptableAnswers": [
-        "71.42857142857143"
+        "71.4"
       ],
       "questionKind": "calculation",
       "units": "mg·h/L",
@@ -1743,15 +1673,16 @@
       "objectiveTags": [],
       "type": "short",
       "answer": [
-        "78.97062676302866"
+        "79"
       ],
       "acceptableAnswers": [
-        "78.97062676302866"
+        "79",
+        "79%"
       ],
       "questionKind": "calculation",
       "units": "%",
       "formula": "% steady state = (1 - e^(-ke × t)) × 100",
-      "tolerance": 0.1,
+      "tolerance": 1.0,
       "givenValues": {
         "fromPrompt": true
       }
@@ -1786,7 +1717,7 @@
     },
     {
       "id": "q118",
-      "prompt": "Drug Y exhibits first-order elimination. After an IV bolus dose, plasma concentration decreases from 20 mg/L immediately to 8 mg/L after 5 hours. Calculate the elimination rate constant (ke).",
+      "prompt": "Drug Y exhibits first-order elimination. After an IV bolus dose, plasma concentration decreases from 20 mg/L immediately to 8 mg/L after 5 hours. Calculate the elimination rate constant (ke) to two significant figures.",
       "difficulty": "hard",
       "sourceSection": "pharmacokineticsCalculations",
       "tags": [
@@ -1799,22 +1730,22 @@
       "objectiveTags": [],
       "type": "short",
       "answer": [
-        "0.183258146374831"
+        "0.18"
       ],
       "acceptableAnswers": [
-        "0.183258146374831"
+        "0.18"
       ],
       "questionKind": "calculation",
       "units": "h^-1",
       "formula": "ke = ln(C1/C2) / Δt",
-      "tolerance": 0.001,
+      "tolerance": 0.01,
       "givenValues": {
         "fromPrompt": true
       }
     },
     {
       "id": "q119",
-      "prompt": "Drug Z has an initial concentration of 12 mg/L and an elimination rate constant of 0.2 h^-1. Calculate its plasma concentration 8 hours after administration.",
+      "prompt": "Drug Z has an initial concentration of 12 mg/L and an elimination rate constant of 0.20 h^-1. Calculate its plasma concentration 8 hours after administration.",
       "difficulty": "hard",
       "sourceSection": "pharmacokineticsCalculations",
       "tags": [
@@ -1827,22 +1758,22 @@
       "objectiveTags": [],
       "type": "short",
       "answer": [
-        "2.4227582159358647"
+        "2.42"
       ],
       "acceptableAnswers": [
-        "2.4227582159358647"
+        "2.42"
       ],
       "questionKind": "calculation",
       "units": "mg/L",
       "formula": "Ct = C0 × e^(-ke × t)",
-      "tolerance": 0.01,
+      "tolerance": 0.05,
       "givenValues": {
         "fromPrompt": true
       }
     },
     {
       "id": "q120",
-      "prompt": "The plasma concentration of Drug A is 3 mg/L at 6 hours after dosing. If the elimination rate constant is 0.18 h^-1, calculate the plasma concentration at 2 hours after dosing.",
+      "prompt": "The plasma concentration of Drug A is 3 mg/L at 6 hours after dosing. If the elimination rate constant is 0.18 h^-1, calculate the plasma concentration 2 hours earlier.",
       "difficulty": "hard",
       "sourceSection": "pharmacokineticsCalculations",
       "tags": [
@@ -1855,15 +1786,15 @@
       "objectiveTags": [],
       "type": "short",
       "answer": [
-        "6.163299631931663"
+        "6.16"
       ],
       "acceptableAnswers": [
-        "6.163299631931663"
+        "6.16"
       ],
       "questionKind": "calculation",
       "units": "mg/L",
       "formula": "Cearlier = Clater × e^(ke × Δt)",
-      "tolerance": 0.01,
+      "tolerance": 0.05,
       "givenValues": {
         "fromPrompt": true
       }
@@ -1939,15 +1870,15 @@
       "objectiveTags": [],
       "type": "short",
       "answer": [
-        "0.3333333333333333"
+        "0.33"
       ],
       "acceptableAnswers": [
-        "0.3333333333333333"
+        "0.33"
       ],
       "questionKind": "calculation",
       "units": "unitless",
       "formula": "Extraction ratio = CL / Q",
-      "tolerance": 0.001,
+      "tolerance": 0.01,
       "givenValues": {
         "fromPrompt": true
       }
@@ -1995,10 +1926,10 @@
       "objectiveTags": [],
       "type": "short",
       "answer": [
-        "263.64621202152426"
+        "264"
       ],
       "acceptableAnswers": [
-        "263.64621202152426"
+        "264"
       ],
       "questionKind": "calculation",
       "units": "mg",
@@ -2163,15 +2094,16 @@
       "objectiveTags": [],
       "type": "short",
       "answer": [
-        "93.74631940268291"
+        "94"
       ],
       "acceptableAnswers": [
-        "93.74631940268291"
+        "94",
+        "94%"
       ],
       "questionKind": "calculation",
       "units": "%",
       "formula": "% steady state = (1 - e^(-ke × t)) × 100",
-      "tolerance": 0.1,
+      "tolerance": 1.0,
       "givenValues": {
         "fromPrompt": true
       }

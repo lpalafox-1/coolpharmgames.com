@@ -3969,9 +3969,11 @@ function getConceptAxisLabel(item) {
 }
 
 function getQuestionContextLabel(question) {
-    return (question?._mode === "concept" || question?.conceptRef)
-        ? (state.quizConfig?.questionContextLabel || "Endocrine Concept Practice")
-        : "Drug Practice";
+    if (question?._mode === "concept" || question?.conceptRef) {
+        return state.quizConfig?.questionContextLabel || "Endocrine Concept Practice";
+    }
+
+    return state.title || quizCatalog?.getEntry?.(quizId)?.title || "Drug Practice";
 }
 
 function getQuestionIdentity(item) {
