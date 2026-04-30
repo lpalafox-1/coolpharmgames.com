@@ -144,19 +144,24 @@
       },
       "adaptive": {
         "title": "Pharmaceutics II Final Exam - Adaptive",
-        "questionLimit": 10,
-        "timerSeconds": 600,
+        "questionLimit": 65,
+        "timerSeconds": 6600,
         "hintsEnabled": true,
-        "notice": "Adaptive mode starts at medium difficulty and shifts easier/harder after each answer while keeping a PK-heavy mix.",
+        "notice": "Adaptive mode starts at medium difficulty and shifts easier/harder after each answer while matching the official 65-question final blueprint.",
         "selection": {
           "adaptive": true,
           "allowPartial": false,
           "startDifficulty": "medium",
           "rules": [
-            { "sourceSection": "pharmacokineticsCalculations", "questionKind": "calculation", "count": 3 },
-            { "sourceSection": "pharmacokineticsConcepts", "questionKinds": ["choice", "fitb"], "count": 4 },
-            { "sourceSection": "exam1Review", "questionKinds": ["choice", "fitb", "openresponse"], "count": 2 },
-            { "sourceSection": "exam2Review", "questionKinds": ["choice", "fitb", "openresponse"], "count": 1 }
+            { "sourceSection": "exam1Review", "questionKind": "choice", "count": 9 },
+            { "sourceSection": "exam1Review", "questionKind": "fitb", "count": 2 },
+            { "sourceSection": "exam1Review", "questionKind": "openresponse", "count": 1 },
+            { "sourceSection": "exam2Review", "questionKind": "choice", "count": 8 },
+            { "sourceSection": "exam2Review", "questionKind": "fitb", "count": 2 },
+            { "sourceSection": "exam2Review", "questionKind": "openresponse", "count": 1 },
+            { "sourceSection": "pharmacokineticsConcepts", "questionKind": "choice", "count": 22 },
+            { "sourceSection": "pharmacokineticsConcepts", "questionKind": "fitb", "count": 4 },
+            { "sourceSection": "pharmacokineticsCalculations", "questionKind": "calculation", "count": 16 }
           ]
         }
       },

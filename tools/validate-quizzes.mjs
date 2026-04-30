@@ -179,8 +179,8 @@ function validateCeuticsFinalBlueprint(quiz, errors) {
   }
 
   if (adaptiveMode && typeof adaptiveMode === "object") {
-    if (Number(adaptiveMode.questionLimit) !== 10) errors.push(`ceutics2-final: adaptive questionLimit must default to 10`);
-    if (Number(adaptiveMode.timerSeconds) !== 600) errors.push(`ceutics2-final: adaptive timerSeconds must default to 600`);
+    if (Number(adaptiveMode.questionLimit) !== 65) errors.push(`ceutics2-final: adaptive questionLimit must default to 65`);
+    if (Number(adaptiveMode.timerSeconds) !== 6600) errors.push(`ceutics2-final: adaptive timerSeconds must default to 6600`);
     if (adaptiveMode?.selection?.adaptive !== true) errors.push(`ceutics2-final: adaptive mode must set selection.adaptive = true`);
     if (normalizeLooseText(adaptiveMode?.selection?.startDifficulty) !== "medium") {
       errors.push(`ceutics2-final: adaptive mode must start at medium difficulty`);
@@ -190,24 +190,17 @@ function validateCeuticsFinalBlueprint(quiz, errors) {
       errors.push(`ceutics2-final: adaptive mode should use runtime difficulty adjustment, not rule difficulty filters`);
     }
 
-    const expectedCounts = {
-      pharmacokineticscalculations: 3,
-      pharmacokineticsconcepts: 4,
-      exam1review: 2,
-      exam2review: 1
-    };
-    const seenAdaptiveCounts = {};
-    adaptiveRules.forEach((rule) => {
-      const section = normalizeLooseText(rule?.sourceSection);
-      if (!section || !(section in expectedCounts)) return;
-      seenAdaptiveCounts[section] = Number(rule?.count || 0);
-    });
+    const totals = { choice: 0, fitb: 0, openresponse: 0, calculation: 0 };
+    for (const rule of adaptiveRules) {
+      const key = normalizeLooseText(rule?.questionKind);
+      const count = Number(rule?.count || 0);
+      if (totals[key] !== undefined) totals[key] += count;
+    }
 
-    Object.entries(expectedCounts).forEach(([section, expectedCount]) => {
-      if (Number(seenAdaptiveCounts[section] || 0) !== expectedCount) {
-        errors.push(`ceutics2-final: adaptive mode must keep ${section} count at ${expectedCount}`);
-      }
-    });
+    if (totals.choice !== 39) errors.push(`ceutics2-final: adaptive mode must target 39 choice questions`);
+    if (totals.fitb !== 8) errors.push(`ceutics2-final: adaptive mode must target 8 fitb questions`);
+    if (totals.openresponse !== 2) errors.push(`ceutics2-final: adaptive mode must target 2 open response questions`);
+    if (totals.calculation !== 16) errors.push(`ceutics2-final: adaptive mode must target 16 calculation questions`);
   }
 
   if (masterPoolMode && typeof masterPoolMode === "object" && Number(masterPoolMode.questionLimit) !== 100) {
