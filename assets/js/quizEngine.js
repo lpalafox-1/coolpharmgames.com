@@ -2859,6 +2859,13 @@ function loadSavedQuizProgress() {
         return null;
     }
 
+    // Guard against older buggy snapshots that saved the wrong question list length.
+    // If the stored list doesn't match what this mode expects, start fresh.
+    if (currentQuestionLimit > 0 && saved.questions.length !== currentQuestionLimit) {
+        clearQuizProgress();
+        return null;
+    }
+
     return saved;
 }
 
@@ -3650,14 +3657,19 @@ function buildConfiguredModeQuestions(data, modeConfig) {
 
     if (adaptiveEnabled) {
         const { session, pickNext } = buildAdaptiveConfiguredSession();
-        const firstQuestion = pickNext(undefined);
-        if (!firstQuestion) {
+        const built = [];
+        for (let i = 0; i < session.slots.length; i += 1) {
+            const next = pickNext(undefined);
+            if (!next) break;
+            built.push(next);
+        }
+        if (!built.length) {
             throw new Error(`Quiz "${data?.id || quizId || "unknown"}" does not have enough items to build adaptive mode yet.`);
         }
         return {
-            questions: [firstQuestion],
+            questions: built,
             shortfalls,
-            adaptiveSession: { ...session, _pickNext: pickNext }
+            adaptiveSession: { difficulty: session.difficulty }
         };
     }
 
@@ -6951,12 +6963,38 @@ function scoreCurrent(val) {
     if (!q) return;
 
     applyAnswerToQuestion(q, val);
-    if (state.adaptiveSession && state.index == state.questions.length - 1 && q._answered) {
-        const next = state.adaptiveSession._pickNext ? state.adaptiveSession._pickNext(!!q._correct) : null;
-        if (next) {
-            state.questions.push({ ...next, _id: state.questions.length });
-            syncPointTotalsFromQuestions();
-            if (getEl("qtotal")) getEl("qtotal").textContent = state.questions.length;
+    if (state.adaptiveSession && q._answered && state.index < state.questions.length - 1) {
+        const order = ["easy", "medium", "hard"];
+        const normalize = (v) => {
+            const key = normalizeQuizValue(v);
+            return order.includes(key) ? key : "medium";
+        };
+        const step = (current, correct) => {
+            const idx = Math.max(0, order.indexOf(normalize(current)));
+            const nextIdx = correct ? Math.min(order.length - 1, idx + 1) : Math.max(0, idx - 1);
+            return order[nextIdx];
+        };
+        const currentDifficulty = normalize(state.adaptiveSession.difficulty || "medium");
+        const desired = step(currentDifficulty, !!q._correct);
+        state.adaptiveSession.difficulty = desired;
+
+        // Simple adaptation: swap the next unanswered question with one later in the queue
+        // that best matches the desired difficulty.
+        const nextIndex = state.index + 1;
+        let swapIndex = -1;
+        for (let i = nextIndex; i < state.questions.length; i += 1) {
+            const candidate = state.questions[i];
+            if (!candidate || candidate._answered) continue;
+            const diff = normalize(getConfiguredQuestionDifficulty(candidate));
+            if (diff === desired) {
+                swapIndex = i;
+                break;
+            }
+        }
+        if (swapIndex > nextIndex) {
+            const tmp = state.questions[nextIndex];
+            state.questions[nextIndex] = state.questions[swapIndex];
+            state.questions[swapIndex] = tmp;
         }
     }
     render();
