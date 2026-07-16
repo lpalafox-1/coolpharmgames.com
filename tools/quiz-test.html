@@ -25,7 +25,7 @@
                 output.innerHTML += `<p class="info">Testing URL: ${url}</p>`;
 
                 // Check if the quiz file exists
-                const response = await fetch('quizzes/chapter1-review.json');
+                const response = await fetch('../quizzes/chapter1-review.json');
                 if (response.ok) {
                     const data = await response.json();
                     output.innerHTML += '<p class="success">✅ Quiz file loads successfully</p>';
@@ -34,7 +34,7 @@
                     output.innerHTML += `<p><strong>Hard questions:</strong> ${(data.pools?.hard || []).length}</p>`;
 
                     // Test supplemental exam too
-                    const suppResponse = await fetch('quizzes/supplemental-exam1-2024.json');
+                    const suppResponse = await fetch('../quizzes/supplemental-exam1-2024.json');
                     if (suppResponse.ok) {
                         const suppData = await suppResponse.json();
                         output.innerHTML += '<p class="success">✅ Supplemental exam loads successfully</p>';
