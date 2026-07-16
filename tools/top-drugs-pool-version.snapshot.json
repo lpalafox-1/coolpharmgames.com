@@ -1,0 +1,7 @@
+{
+  "note": "Snapshot of TopDrugsData.computePoolVersion over assets/data/master_pool.json. The version renders as the user-visible Top Drugs data badge. Regenerate deliberately (same commit as any approved master-pool change) — tools/top-drugs-data-regression.test.mjs fails on drift.",
+  "poolPath": "assets/data/master_pool.json",
+  "count": 169,
+  "hash": "3d5bfddd",
+  "version": "v169-3d5bfddd"
+}
