@@ -78,13 +78,17 @@ Track your quiz performance over time with:
 - All preferences saved to localStorage for seamless experience
 
 Repository layout:
-- `quizzes/` - JSON quiz files organized in folders (Chapter Reviews, Exam Practice, Supplemental, Fun Modes)
-- `assets/` - front-end JS/CSS and icons
+- `quizzes/` - static quiz JSON files (flat directory), validated against `schema.json`
+- `assets/data/` - master pool JSON used to generate quizzes (Top Drugs, Basis II units)
+- `assets/js/`, `assets/css/` - front-end JS/CSS; `assets/icon.svg` site icon
 - `tools/` - local test harness and validation scripts
+- `scripts/validate-quizzes.mjs` - CI shim that delegates to `tools/validate-quizzes.mjs`
 
 Run local validator:
 
 ```bash
+npm run validate
+# or directly:
 node tools/validate-quizzes.mjs
 ```
 
