@@ -3,6 +3,7 @@
 import { existsSync, readFileSync, readdirSync, statSync } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import vm from "vm";
 import Ajv from "ajv";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -11,6 +12,7 @@ const repoRoot = path.resolve(__dirname, "..");
 
 const quizzesDir = path.join(repoRoot, "quizzes");
 const indexPath = path.join(repoRoot, "index.html");
+const catalogPath = path.join(repoRoot, "assets", "js", "quiz-catalog.js");
 const schemaPath = path.join(repoRoot, "schema.json");
 const masterPoolPath = path.join(repoRoot, "assets", "data", "master_pool.json");
 const conceptPoolPath = path.join(repoRoot, "assets", "data", "bdt_unit10_quiz8_master_pool.json");
@@ -49,6 +51,37 @@ function flattenPoolData(data) {
   return [];
 }
 
+function loadCatalogIds() {
+  const sandbox = { window: {}, URLSearchParams };
+  vm.runInNewContext(readFileSync(catalogPath, "utf8"), sandbox, {
+    filename: catalogPath,
+    timeout: 1_000
+  });
+
+  const entries = sandbox.window.PharmletQuizCatalog?.entries;
+  if (!Array.isArray(entries)) {
+    throw new Error("quiz catalog must expose an entries array");
+  }
+
+  return new Set(entries.map((entry) => entry.id).filter(Boolean));
+}
+
+function extractLinkedQuizIds(html) {
+  const ids = [];
+  const hrefPattern = /\bhref\s*=\s*(?:"([^"]*)"|'([^']*)')/gi;
+
+  for (const match of html.matchAll(hrefPattern)) {
+    const href = match[1] ?? match[2];
+    const url = new URL(href, "https://pharmlet.local/");
+    if (!url.pathname.endsWith("/quiz.html")) continue;
+
+    const id = url.searchParams.get("id");
+    if (id) ids.push(id);
+  }
+
+  return [...new Set(ids)];
+}
+
 function walkFiles(dir, files = []) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     if (entry.name === ".git" || entry.name === "node_modules") continue;
@@ -60,10 +93,6 @@ function walkFiles(dir, files = []) {
     }
   }
   return files;
-}
-
-function extractLinkedQuizIds(html) {
-  return [...new Set([...html.matchAll(/quiz\.html\?id=([^&"']+)/g)].map((match) => match[1]))];
 }
 
 function getFooterQuestionCount(html) {
@@ -150,7 +179,7 @@ if (footerCount === null) {
 }
 
 console.log("\n🔗 Link Check");
-const quizIds = new Set(quizSummaries.map((item) => item.quiz?.id).filter(Boolean));
+const quizIds = loadCatalogIds();
 for (const virtualId of VIRTUAL_QUIZ_IDS) quizIds.add(virtualId);
 const linkedIds = extractLinkedQuizIds(homepage);
 const brokenLinks = linkedIds.filter((id) => !quizIds.has(id));

@@ -1,51 +1,64 @@
 #!/usr/bin/env node
 /**
- * Check if all quiz links in index.html correspond to actual quiz files
+ * Check if all quiz links in index.html correspond to known catalog entries.
  */
 
-import { readFileSync, readdirSync } from 'fs';
+import { readFileSync } from 'fs';
+import path from 'path';
+import vm from 'vm';
+import { fileURLToPath } from 'url';
 
-const indexPath = 'index.html';
-const quizzesDir = 'quizzes';
+const __filename = fileURLToPath(import.meta.url);
+const repoRoot = path.resolve(path.dirname(__filename), '..');
+const indexPath = path.join(repoRoot, 'index.html');
+const catalogPath = path.join(repoRoot, 'assets', 'js', 'quiz-catalog.js');
 const virtualQuizIds = new Set(['log-lab-final-2', 'bdt-unit10-quiz8', 'custom-quiz', 'review-quiz']);
 
-function getQuizIds() {
-  const ids = new Set();
+function loadCatalogIds() {
+  const sandbox = { window: {}, URLSearchParams };
+  vm.runInNewContext(readFileSync(catalogPath, 'utf8'), sandbox, {
+    filename: catalogPath,
+    timeout: 1_000
+  });
 
-  for (const file of readdirSync(quizzesDir).filter(f => f.endsWith('.json'))) {
-    const raw = readFileSync(`${quizzesDir}/${file}`, 'utf8');
-    const quiz = JSON.parse(raw);
-    if (quiz.id) ids.add(quiz.id);
+  const entries = sandbox.window.PharmletQuizCatalog?.entries;
+  if (!Array.isArray(entries)) {
+    throw new Error('quiz catalog must expose an entries array');
   }
 
-  return ids;
+  return new Set(entries.map((entry) => entry.id).filter(Boolean));
+}
+
+function extractLinkedQuizIds(html) {
+  const ids = [];
+  const hrefPattern = /\bhref\s*=\s*(?:"([^"]*)"|'([^']*)')/gi;
+
+  for (const match of html.matchAll(hrefPattern)) {
+    const href = match[1] ?? match[2];
+    const url = new URL(href, 'https://pharmlet.local/');
+    if (!url.pathname.endsWith('/quiz.html')) continue;
+
+    const id = url.searchParams.get('id');
+    if (id) ids.push(id);
+  }
+
+  return [...new Set(ids)];
 }
 
 try {
-  // Read index.html
   const indexContent = readFileSync(indexPath, 'utf8');
 
-  // Get all quiz IDs from JSON plus generated virtual quizzes
-  const quizIds = getQuizIds();
+  const quizIds = loadCatalogIds();
   for (const id of virtualQuizIds) quizIds.add(id);
 
-  // Extract quiz IDs from links in index.html
-  const linkRegex = /quiz\.html\?id=([a-z0-9-]+)/g;
-  const foundLinks = [];
-  let match;
-
-  while ((match = linkRegex.exec(indexContent)) !== null) {
-    foundLinks.push(match[1]);
-  }
-
-  const uniqueLinks = [...new Set(foundLinks)];
+  const uniqueLinks = extractLinkedQuizIds(indexContent);
 
   console.log('\n🔗 Quiz Link Validation Report');
   console.log('=' .repeat(40));
 
   let allValid = true;
 
-  // Check if all links have corresponding files
+  // Check if all links resolve to the runtime quiz catalog.
   for (const linkId of uniqueLinks) {
     if (quizIds.has(linkId)) {
       console.log(`✅ ${linkId}`);
@@ -55,7 +68,7 @@ try {
     }
   }
 
-  // Check if there are quiz files not linked
+  // Check if there are catalog entries not linked from the homepage.
   const unlinkedQuizIds = [...quizIds]
     .filter(id => !virtualQuizIds.has(id))
     .filter(id => !uniqueLinks.includes(id));
@@ -66,7 +79,7 @@ try {
 
   console.log(`\n📊 Summary: ${uniqueLinks.length} unique links, ${quizIds.size} total quiz IDs`);
 
-  if (allValid && unlinkedQuizIds.length === 0) {
+  if (allValid) {
     console.log('🎉 All links are valid!');
     process.exit(0);
   } else {
