@@ -2,26 +2,16 @@
 
 import { existsSync, readFileSync, readdirSync, statSync } from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
 import vm from "vm";
-import Ajv from "ajv";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const repoRoot = path.resolve(__dirname, "..");
+import { repoRoot, validateQuizSchema } from "./validator-core.mjs";
 
 const quizzesDir = path.join(repoRoot, "quizzes");
 const indexPath = path.join(repoRoot, "index.html");
 const catalogPath = path.join(repoRoot, "assets", "js", "quiz-catalog.js");
-const schemaPath = path.join(repoRoot, "schema.json");
 const masterPoolPath = path.join(repoRoot, "assets", "data", "master_pool.json");
 const conceptPoolPath = path.join(repoRoot, "assets", "data", "bdt_unit10_quiz8_master_pool.json");
 const VIRTUAL_QUIZ_IDS = new Set(["log-lab-final-2", "bdt-unit10-quiz8", "custom-quiz", "review-quiz"]);
 const countsOnly = process.argv.includes("--count-only");
-
-const schema = JSON.parse(readFileSync(schemaPath, "utf8"));
-const ajv = new Ajv({ allErrors: true, allowUnionTypes: true });
-const validate = ajv.compile(schema);
 
 const report = {
   errors: [],
@@ -138,11 +128,11 @@ for (const item of quizSummaries) {
     continue;
   }
 
-  const valid = validate(item.quiz);
+  const { valid, errors } = validateQuizSchema(item.quiz);
   if (!valid) {
     report.errors.push(`${item.file}: schema validation failed`);
     console.log(`❌ ${item.file}`);
-    for (const err of validate.errors || []) {
+    for (const err of errors) {
       console.log(`   - ${err.instancePath || "(root)"} ${err.message}`);
     }
   } else {

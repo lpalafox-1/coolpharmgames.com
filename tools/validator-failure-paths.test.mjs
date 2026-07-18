@@ -17,6 +17,7 @@ function runValidatorAgainst(fixtureQuizzes) {
   mkdirSync(path.join(fixtureRoot, "tools"));
   mkdirSync(path.join(fixtureRoot, "quizzes"));
   cpSync(path.join(repoRoot, "tools/validate-quizzes.mjs"), path.join(fixtureRoot, "tools/validate-quizzes.mjs"));
+  cpSync(path.join(repoRoot, "tools/validator-core.mjs"), path.join(fixtureRoot, "tools/validator-core.mjs"));
   cpSync(path.join(repoRoot, "schema.json"), path.join(fixtureRoot, "schema.json"));
   symlinkSync(path.join(repoRoot, "node_modules"), path.join(fixtureRoot, "node_modules"), "dir");
 
