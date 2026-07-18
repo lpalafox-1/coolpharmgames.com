@@ -69,7 +69,9 @@ fixed: review-queue `wrongCounts` re-fold inflation (see P2B-10).
 
 ### P2B-03 — Browser harness consolidation
 
-- **Phase:** 2B · **Status:** `READY` *(the only READY task)*
+- **Phase:** 2B · **Status:** `DONE` *(implemented by commit
+  `2f7d0cda017519bffc4a15d8c9eca16d698e73c4` on
+  `claude/p2b-03-harness-consolidation`; supervisor-approved 2026-07-18)*
 - **Objective:** Compare the two browser harnesses (`tools/test-quiz.html`,
   older iframe harness still referenced by README, vs `tools/quiz-test.html`,
   the maintained functionality-test page). Retain the maintained harness,
@@ -79,7 +81,10 @@ fixed: review-queue `wrongCounts` re-fold inflation (see P2B-10).
 - **Dependencies:** none.
 - **Risk:** Low.
 - **Allowed files:** `tools/test-quiz.html` (delete), `tools/quiz-test.html`
-  (charset meta tag only), `README.md` (harness pointer only).
+  (charset meta tag only), `README.md` (harness pointer only),
+  `tools/validate.html` (owner-authorized amendment 2026-07-18: retarget its
+  harness link from `test-quiz.html` to `quiz-test.html`, nothing else — added
+  after a Routine no-op correctly found the link would go stale on deletion).
 - **Forbidden files:** everything else, per standing protections.
 - **Behavioral change:** none — developer tooling and documentation only; no
   application page or runtime behavior is affected.
@@ -95,8 +100,8 @@ fixed: review-queue `wrongCounts` re-fold inflation (see P2B-10).
 
 ### P2B-04 — Engine-manifest regeneration tool
 
-- **Phase:** 2B · **Status:** `BLOCKED` (by P2B-03 completion — one-at-a-time
-  execution only; no technical dependency)
+- **Phase:** 2B · **Status:** `READY` *(the only READY task — unblocked by
+  P2B-03 completion)*
 - **Objective:** Add `tools/generate-engine-manifest.mjs` so
   `tools/engine-globals.manifest.json` can be regenerated deliberately after
   an approved engine change, sharing the exact extraction logic used by

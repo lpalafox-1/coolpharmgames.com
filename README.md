@@ -96,7 +96,7 @@ Quick local test (simple server):
 
 ```bash
 python3 -m http.server 8000
-# open http://localhost:8000/tools/test-quiz.html
+# open http://localhost:8000/tools/quiz-test.html
 ```
 
 ## Deployment
