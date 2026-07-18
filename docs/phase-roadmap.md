@@ -100,8 +100,9 @@ fixed: review-queue `wrongCounts` re-fold inflation (see P2B-10).
 
 ### P2B-04 — Engine-manifest regeneration tool
 
-- **Phase:** 2B · **Status:** `IN PROGRESS` *(implemented on
-  `codex/p2b-04-engine-manifest-regenerator`; awaiting owner/supervisor review)*
+- **Phase:** 2B · **Status:** `DONE` *(implemented by `c2c1421` plus CLI
+  portability fix `fb49566` on `codex/p2b-04-engine-manifest-regenerator`;
+  merged to main via `0bc774c`, 2026-07-18)*
 - **Objective:** Add `tools/generate-engine-manifest.mjs` so
   `tools/engine-globals.manifest.json` can be regenerated deliberately after
   an approved engine change, sharing the exact extraction logic used by
@@ -124,7 +125,8 @@ fixed: review-queue `wrongCounts` re-fold inflation (see P2B-10).
 
 ### P2B-05 — Cataloged assets/data validation warnings
 
-- **Phase:** 2B · **Status:** `BLOCKED` (by P2B-04)
+- **Phase:** 2B · **Status:** `READY` *(the only READY task — unblocked by
+  P2B-04 completion)*
 - **Objective:** Give warning-level validator visibility to live quiz sources
   the catalog points at outside `quizzes/` (today: `basis2-quiz9` →
   `assets/data/bdt2_quiz9_masterpool.json`). Warnings only — exit codes for
