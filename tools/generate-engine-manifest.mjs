@@ -1,6 +1,6 @@
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, realpathSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
 const repoRoot = path.resolve(path.dirname(__filename), "..");
@@ -50,5 +50,16 @@ function main() {
   process.stdout.write(output);
 }
 
-const isDirectRun = process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
-if (isDirectRun) main();
+// URL-string comparison breaks under symlinks: Node's ESM loader resolves
+// import.meta.url to the real path while process.argv[1] keeps the invoked
+// (possibly aliased) path. Compare realpath-resolved filesystem paths instead.
+function isDirectCliExecution(argvPath, moduleUrl) {
+  if (!argvPath) return false;
+  try {
+    return realpathSync(path.resolve(argvPath)) === realpathSync(fileURLToPath(moduleUrl));
+  } catch {
+    return false;
+  }
+}
+
+if (isDirectCliExecution(process.argv[1], import.meta.url)) main();

@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, symlinkSync } from "node:fs";
+import os from "node:os";
 import path from "node:path";
+import { spawnSync } from "node:child_process";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import {
@@ -42,6 +44,30 @@ test("engine manifest generator reproduces the committed manifest byte-for-byte"
   const generated = formatEngineManifest(generateEngineManifest(readFileSync(enginePath, "utf8")));
 
   assert.equal(generated, committed);
+});
+
+test("manifest generator CLI runs when invoked through a symlinked path", () => {
+  // Reproduces the Copilot finding: argv[1] is the alias while Node resolves
+  // import.meta.url to the real path, so URL-string entrypoint detection
+  // silently skips main(). The CLI must still execute and produce output.
+  const committed = readFileSync(manifestPath, "utf8");
+  const tmpDir = mkdtempSync(path.join(os.tmpdir(), "pharmlet-manifest-cli-"));
+  try {
+    const linkPath = path.join(tmpDir, "manifest-cli-link.mjs");
+    symlinkSync(path.join(repoRoot, "tools/generate-engine-manifest.mjs"), linkPath);
+
+    const stdoutRun = spawnSync(process.execPath, [linkPath], { encoding: "utf8" });
+    assert.equal(stdoutRun.status, 0, stdoutRun.stderr);
+    assert.equal(stdoutRun.stdout, committed, "default stdout mode must emit the manifest via the symlinked CLI");
+
+    const outputPath = path.join(tmpDir, "manifest-out.json");
+    const outputRun = spawnSync(process.execPath, [linkPath, "--output", outputPath], { encoding: "utf8" });
+    assert.equal(outputRun.status, 0, outputRun.stderr);
+    assert.equal(outputRun.stdout, "", "--output mode must not write to stdout");
+    assert.equal(readFileSync(outputPath, "utf8"), committed, "--output mode must write the manifest file");
+  } finally {
+    rmSync(tmpDir, { recursive: true, force: true });
+  }
 });
 
 test("historically fragile helpers are present in the engine", () => {
