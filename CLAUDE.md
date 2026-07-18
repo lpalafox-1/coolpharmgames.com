@@ -36,8 +36,12 @@ A static, client-side site (no build step, no backend) deployed via GitHub Pages
 ## Known repo state (context, not instructions)
 
 - GitHub Pages deploys from `main`; the old `gh-pages` branch was removed. `deploy-pages.yml.disabled` is intentionally inactive — don't re-enable it without asking.
-- `tools/check-links.mjs` has three known pre-existing false positives (`basis2-quiz9`, `bdt-unit10-exam4`, `top-drugs-final-mock`) because it only scans `quizzes/` instead of using `quiz-catalog.js` as the source of truth. Treat these as known-stale, not regressions, unless asked to fix the checker itself.
-- A cleanup roadmap exists in prior sessions (Phase 1 complete; Phase 2 covers validator/CI consolidation and the check-links fix; Phase 3 covers decomposing `quizEngine.js` and fixing a biased `shuffled()` implementation). Ask before assuming this roadmap should be resumed — it changes over time.
+- `tools/check-links.mjs` and `tools/repo-health.mjs` are catalog-aware since `9f3cb3d`. Treat any `npm run check:links` failure as a real regression, not a known false positive.
+- The local workflow commit `96fc305` adds `check:links` and `test:tools` to CI, but it has not yet been pushed and verified on GitHub.
+- `npm run health:repo` exits 1 by design over two deferred findings: the empty `practice-e2b` placeholder and the `index.html` footer count mismatch.
+- A 30-test regression suite exists under `npm run test:tools`; run it before and after changes.
+- `tools/engine-globals.manifest.json` pins the engine global surface and must be updated deliberately in the same approved commit as any intentional engine-surface change.
+- Cleanup roadmap status: Phase 1 complete; Phase 2A complete; Phase 2B in progress (see `docs/` for the audit, architecture map, and health report). Ask before assuming the remaining roadmap should be resumed — it changes over time.
 
 ## Working conventions
 
