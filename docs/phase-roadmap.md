@@ -100,8 +100,8 @@ fixed: review-queue `wrongCounts` re-fold inflation (see P2B-10).
 
 ### P2B-04 — Engine-manifest regeneration tool
 
-- **Phase:** 2B · **Status:** `READY` *(the only READY task — unblocked by
-  P2B-03 completion)*
+- **Phase:** 2B · **Status:** `IN PROGRESS` *(implemented on
+  `codex/p2b-04-engine-manifest-regenerator`; awaiting owner/supervisor review)*
 - **Objective:** Add `tools/generate-engine-manifest.mjs` so
   `tools/engine-globals.manifest.json` can be regenerated deliberately after
   an approved engine change, sharing the exact extraction logic used by

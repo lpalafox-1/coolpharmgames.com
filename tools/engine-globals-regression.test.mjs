@@ -3,20 +3,16 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import {
+  extractGlobalSurface,
+  formatEngineManifest,
+  generateEngineManifest
+} from "./generate-engine-manifest.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const repoRoot = path.resolve(path.dirname(__filename), "..");
 const enginePath = path.join(repoRoot, "assets/js/quizEngine.js");
 const manifestPath = path.join(repoRoot, "tools/engine-globals.manifest.json");
-
-function extractGlobalSurface(source) {
-  const functions = [...source.matchAll(/^(?:async )?function ([A-Za-z0-9_$]+)\s*\(/gm)].map((m) => m[1]);
-  const windowExports = [...source.matchAll(/^\s*window\.([A-Za-z0-9_$]+)\s*=/gm)].map((m) => m[1]);
-  return {
-    functions: [...new Set(functions)].sort(),
-    windowExports: [...new Set(windowExports)].sort()
-  };
-}
 
 test("quizEngine.js global surface matches the committed manifest", () => {
   const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
@@ -39,6 +35,13 @@ test("quizEngine.js global surface matches the committed manifest", () => {
       `${surface} added to quizEngine.js without updating tools/engine-globals.manifest.json (update it in the same approved engine commit): ${added.join(", ")}`
     );
   }
+});
+
+test("engine manifest generator reproduces the committed manifest byte-for-byte", () => {
+  const committed = readFileSync(manifestPath, "utf8");
+  const generated = formatEngineManifest(generateEngineManifest(readFileSync(enginePath, "utf8")));
+
+  assert.equal(generated, committed);
 });
 
 test("historically fragile helpers are present in the engine", () => {
