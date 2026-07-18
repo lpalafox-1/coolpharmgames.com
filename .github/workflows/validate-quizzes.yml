@@ -12,3 +12,5 @@ jobs:
         with: { node-version: 20, cache: npm }
       - run: npm ci
       - run: node scripts/validate-quizzes.mjs
+      - run: npm run check:links
+      - run: npm run test:tools
