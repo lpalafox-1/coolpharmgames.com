@@ -3,15 +3,17 @@
 // quiz semantic validation, consumed by tools/validate-quizzes.mjs (the
 // canonical CLI, also run by CI via the scripts/ shim) and tools/repo-health.mjs.
 // Not a public API — keep minimal.
-import { readFileSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import vm from "vm";
 import Ajv from "ajv";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 export const repoRoot = path.resolve(__dirname, "..");
 const schemaPath = path.join(repoRoot, "schema.json");
+const catalogPath = path.join(repoRoot, "assets", "js", "quiz-catalog.js");
 
 const ajv = new Ajv({ allErrors: true, allowUnionTypes: true });
 const schema = JSON.parse(readFileSync(schemaPath, "utf8"));
@@ -261,4 +263,30 @@ export function validateQuizSemantics(quiz, fileName) {
 
   validateCeuticsFinalBlueprint(quiz, errors);
   return errors;
+}
+
+// Cataloged quiz sources whose files live outside quizzes/ (e.g. basis2-quiz9 →
+// assets/data/bdt2_quiz9_masterpool.json) are served to students but are not in
+// the validator's normal scan. This loads them from the runtime catalog for
+// warning-level visibility. Returns [] silently when the catalog file is absent
+// (so fixture repositories without assets/js/quiz-catalog.js are unaffected) or
+// on any load error — this is advisory only and must never break validation.
+export function loadCatalogExternalQuizSources() {
+  try {
+    if (!existsSync(catalogPath)) return [];
+    const sandbox = { window: {}, URLSearchParams };
+    vm.runInNewContext(readFileSync(catalogPath, "utf8"), sandbox, { filename: catalogPath, timeout: 1000 });
+    const entries = sandbox.window.PharmletQuizCatalog?.entries;
+    if (!Array.isArray(entries)) return [];
+    return entries
+      .filter((entry) => entry
+        && entry.sourceType === "quiz-json"
+        && typeof entry.sourcePath === "string"
+        && entry.sourcePath
+        && !entry.sourcePath.startsWith("quizzes/"))
+      .map((entry) => ({ id: String(entry.id || ""), sourcePath: entry.sourcePath }))
+      .sort((a, b) => a.sourcePath.localeCompare(b.sourcePath));
+  } catch {
+    return [];
+  }
 }
