@@ -3,15 +3,32 @@
 // quiz semantic validation, consumed by tools/validate-quizzes.mjs (the
 // canonical CLI, also run by CI via the scripts/ shim) and tools/repo-health.mjs.
 // Not a public API — keep minimal.
-import { readFileSync } from "fs";
+import { existsSync, readFileSync, realpathSync } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import vm from "vm";
 import Ajv from "ajv";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 export const repoRoot = path.resolve(__dirname, "..");
 const schemaPath = path.join(repoRoot, "schema.json");
+const catalogPath = path.join(repoRoot, "assets", "js", "quiz-catalog.js");
+const quizzesDir = path.join(repoRoot, "quizzes");
+let repoRootReal;
+try {
+  repoRootReal = realpathSync(repoRoot);
+} catch {
+  repoRootReal = repoRoot;
+}
+
+// True when `target` is strictly inside `root` by normalized path ancestry —
+// not a string prefix. Rejects `root` itself, `../` escapes, and absolute
+// paths that resolve elsewhere.
+function isInside(root, target) {
+  const rel = path.relative(root, target);
+  return rel !== "" && !rel.startsWith("..") && !path.isAbsolute(rel);
+}
 
 const ajv = new Ajv({ allErrors: true, allowUnionTypes: true });
 const schema = JSON.parse(readFileSync(schemaPath, "utf8"));
@@ -261,4 +278,56 @@ export function validateQuizSemantics(quiz, fileName) {
 
   validateCeuticsFinalBlueprint(quiz, errors);
   return errors;
+}
+
+// Cataloged quiz sources whose files live outside quizzes/ (e.g. basis2-quiz9 →
+// assets/data/bdt2_quiz9_masterpool.json) are served to students but are not in
+// the validator's normal scan. This loads them from the runtime catalog for
+// warning-level visibility. Returns [] silently when the catalog file is absent
+// (so fixture repositories without assets/js/quiz-catalog.js are unaffected) or
+// on any load error — this is advisory only and must never break validation.
+//
+// Every candidate path is normalized and confined to repoRoot: lexical escapes
+// (../) are rejected, existing files whose real path escapes repoRoot via a
+// symlink are rejected, and anything resolving under quizzes/ is treated as a
+// normal static quiz (not external), by path ancestry rather than string prefix.
+// Each returned source carries a normalized repo-relative `sourcePath` (for
+// deterministic display and sorting) and an absolute `resolvedPath`.
+export function loadCatalogExternalQuizSources() {
+  try {
+    if (!existsSync(catalogPath)) return [];
+    const sandbox = { window: {}, URLSearchParams };
+    vm.runInNewContext(readFileSync(catalogPath, "utf8"), sandbox, { filename: catalogPath, timeout: 1000 });
+    const entries = sandbox.window.PharmletQuizCatalog?.entries;
+    if (!Array.isArray(entries)) return [];
+
+    const sources = [];
+    for (const entry of entries) {
+      if (!entry || entry.sourceType !== "quiz-json" || typeof entry.sourcePath !== "string" || !entry.sourcePath) continue;
+
+      const resolved = path.resolve(repoRoot, entry.sourcePath);
+      if (!isInside(repoRoot, resolved)) continue;          // lexical escape (../ etc.)
+      if (isInside(quizzesDir, resolved)) continue;         // normal static quiz, not external
+
+      if (existsSync(resolved)) {
+        let realResolved;
+        try {
+          realResolved = realpathSync(resolved);
+        } catch {
+          continue;
+        }
+        if (!isInside(repoRootReal, realResolved)) continue; // symlink escapes repoRoot
+      }
+
+      sources.push({
+        id: String(entry.id || ""),
+        sourcePath: path.relative(repoRoot, resolved),
+        resolvedPath: resolved
+      });
+    }
+
+    return sources.sort((a, b) => a.sourcePath.localeCompare(b.sourcePath));
+  } catch {
+    return [];
+  }
 }
