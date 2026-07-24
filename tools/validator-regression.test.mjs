@@ -17,7 +17,10 @@ test("canonical validator accepts every tracked static quiz", () => {
   const quizCount = readdirSync(quizzesDir).filter((file) => file.endsWith(".json")).length;
 
   assert.equal(result.status, 0, result.stderr || result.stdout);
-  assert.equal((result.stdout.match(/✅/g) || []).length, quizCount);
+  // Count ✅ only in the static quizzes/ section, before the advisory
+  // external-source warnings block (which may print its own ✅ "no warnings" line).
+  const staticStdout = result.stdout.split("\n⚠️  Cataloged data sources outside quizzes/")[0];
+  assert.equal((staticStdout.match(/✅/g) || []).length, quizCount);
 });
 
 test("the E2B placeholder remains schema-valid while its question count is zero", () => {

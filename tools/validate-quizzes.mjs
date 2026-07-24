@@ -44,12 +44,11 @@ for (const file of files) {
 const MAX_WARNING_DETAIL = 5;
 
 function collectExternalSourceWarnings(source) {
-  const fullPath = path.join(repoRoot, source.sourcePath);
-  if (!existsSync(fullPath)) return ["file not found"];
+  if (!existsSync(source.resolvedPath)) return ["file not found"];
 
   let data;
   try {
-    data = JSON.parse(readFileSync(fullPath, "utf8"));
+    data = JSON.parse(readFileSync(source.resolvedPath, "utf8"));
   } catch (error) {
     return [`invalid JSON: ${error.message}`];
   }
