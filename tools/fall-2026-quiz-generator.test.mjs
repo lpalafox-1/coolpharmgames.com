@@ -326,6 +326,67 @@ test("every MCQ distractor traces to the matching official source field through 
   }
 });
 
+test("Week 1-3 class MCQs present complete source listings without hardcodes or canonical edits", () => {
+  const canonicalDataBefore = JSON.stringify(drugData);
+  const productionSource = readFileSync(
+    path.join(repoRoot, "assets", "js", "fall-2026-quiz-generator.js"),
+    "utf8"
+  );
+  const legacyEngineSource = readFileSync(
+    path.join(repoRoot, "assets", "js", "quizEngine.js"),
+    "utf8"
+  );
+  const promptPrefix = "Which complete drug-class listing is recorded for";
+
+  assert.ok(!productionSource.includes("Benazepril"));
+  assert.ok(!legacyEngineSource.includes(promptPrefix));
+
+  const benazepril = drugData.drugs.find((drug) => drug.genericName === "Benazepril");
+  assert.ok(benazepril, "official source must retain Benazepril");
+  assert.equal(benazepril.drugClass, "ACEI, Antihypertensive");
+
+  let auditedClassQuestionCount = 0;
+  for (let quizWeek = 1; quizWeek <= 3; quizWeek += 1) {
+    const materialTypes = quizWeek === 1 ? ["new"] : ["new", "review"];
+    const eligibleDrugs = drugData.drugs.filter(
+      (drug) => drug.semester === policy.semester && drug.quizWeek <= quizWeek
+    );
+    const eligibleClassValues = new Set(
+      eligibleDrugs.map((drug) => normalizeChoice(drug.drugClass))
+    );
+    const classCandidates = materialTypes.flatMap((materialType) => (
+      buildQuestionCandidates({ drugData, policy, quizWeek, materialType })
+        .filter((candidate) => candidate.domainId === "drugClass")
+    ));
+
+    for (const candidate of classCandidates) {
+      const sourceDrug = drugData.drugs.find((drug) => drug.id === candidate.sourceDrugId);
+      const result = materialize(candidate, `class-presentation-${candidate.id}`);
+
+      assert.equal(result.status, "materialized");
+      assert.equal(
+        result.question.prompt,
+        `${promptPrefix} <b>${sourceDrug.genericName}</b>?`
+      );
+      assert.equal(result.question.answer, sourceDrug.drugClass);
+      assert.equal(
+        result.question.metadata.choiceSources.find((entry) => entry.role === "correct")?.value,
+        sourceDrug.drugClass
+      );
+      for (const choice of result.question.choices) {
+        assert.ok(
+          eligibleClassValues.has(normalizeChoice(choice)),
+          `${candidate.id} has a class option that is not source-backed through Week ${quizWeek}`
+        );
+      }
+      auditedClassQuestionCount += 1;
+    }
+  }
+
+  assert.ok(auditedClassQuestionCount > 0);
+  assert.equal(JSON.stringify(drugData), canonicalDataBefore);
+});
+
 test("Access Pharmacy sorting-category fields are rejected and never generated", () => {
   const withForbiddenCategory = clone(drugData);
   withForbiddenCategory.drugs[0].category = "Cardiovascular Agent";

@@ -18,7 +18,7 @@ export const WEEK_1_PRACTICE_NOTE = "Practice configuration: Week 1 has no prior
 const DOMAIN_SPECS = Object.freeze({
   drugClass: Object.freeze({
     field: "drugClass",
-    prompt: (drug) => `What is the drug class of <b>${drug.genericName}</b>?`
+    prompt: (drug) => `Which complete drug-class listing is recorded for <b>${drug.genericName}</b>?`
   }),
   fdaIndication: Object.freeze({
     field: "fdaIndications",
