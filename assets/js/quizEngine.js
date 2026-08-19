@@ -4013,7 +4013,7 @@ function getTemptingWrongAnswerInsight(question) {
     return { commonWrong, commonWrongCount };
 }
 
-function hasMalformedShortAnswerMatchingMarker(question) {
+const hasMalformedShortAnswerMatchingMarker = (question) => {
     if (question?.type !== "short"
         || !question?.metadata
         || !Object.prototype.hasOwnProperty.call(question.metadata, "answerMatching")) {
@@ -4023,7 +4023,7 @@ function hasMalformedShortAnswerMatchingMarker(question) {
     const answerMatching = question.metadata.answerMatching;
     return answerMatching?.spellingSensitive !== true
         || answerMatching?.capitalizationSensitive !== false;
-}
+};
 
 function saveMissedQuestionsToReviewQueue(questions) {
     const reviewQueueStore = window.PharmletReviewQueueStore;
