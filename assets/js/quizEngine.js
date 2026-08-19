@@ -6807,12 +6807,17 @@ function extractLooseNumericTokens(value) {
 function evaluateAnswerForQuestion(q, val) {
     if (!q || val === "Revealed" || isBlankAnswerValue(val)) return false;
 
-    const answerMatching = q?.metadata?.answerMatching;
-    const usesStrictCaseInsensitiveMatching = q.type === "short"
-        && answerMatching?.spellingSensitive === true
-        && answerMatching?.capitalizationSensitive === false;
+    const hasAnswerMatchingMarker = q.type === "short"
+        && q?.metadata
+        && Object.prototype.hasOwnProperty.call(q.metadata, "answerMatching");
 
-    if (usesStrictCaseInsensitiveMatching) {
+    if (hasAnswerMatchingMarker) {
+        const answerMatching = q.metadata.answerMatching;
+        if (answerMatching?.spellingSensitive !== true
+            || answerMatching?.capitalizationSensitive !== false) {
+            return false;
+        }
+
         if (typeof val !== "string" || typeof q.answer !== "string" || !q.answer.trim()) {
             return false;
         }
