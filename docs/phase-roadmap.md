@@ -257,22 +257,56 @@ fixed: review-queue `wrongCounts` re-fold inflation (see P2B-10).
 
 ### F26-02 — Deterministic quiz selector/generator module
 
+- **Status:** `DONE`
+- **PR:** #43
+- **Merge:** `3889247cc5ca22c607fe877515ed7ee814b935b7`
+- **Deliverables:**
+  - deterministic Fall 2026 generator
+  - Weeks 2–10 6-new + 4-review composition
+  - seeded/injectable deterministic RNG
+  - source-backed MCQ distractors
+  - Brand/Generic FITB generation
+  - future-week leakage protection
+  - duplicate-generic ambiguity protection
+  - Week 1 remains unresolved
+  - no runtime activation
+  - `quizEngine.js` unchanged
+
+### F26-03 — Runtime integration contract + strict FITB scoring design
+
 - **Status:** `READY` *(the only READY task in this ledger)*
-- **Objective:** Create a deterministic, unit-tested generator that consumes
-  the Fall 2026 drug dataset and Lab III policy and emits normalized
-  existing-engine-compatible FITB and MCQ question objects.
-- **Dependencies:** F26-01 (satisfied).
-- **Constraints:**
-  - legacy quizzes remain untouched
-  - no runtime activation yet
-  - `quizEngine.js` remains read-only unless separate owner approval is given
-  - Week 1 unresolved total-question behavior must remain unresolved
-  - generator must support Week 2–10 6-new + 4-review selection
-  - Brand/Generic produces FITB
-  - Class, indication, MOA, ADR, BBW produce MCQ
-  - deterministic injectable RNG/seed for tests
-  - source-backed distractors only
-  - no page routing or UI changes in this task
+- **Objective:** Design and test the smallest safe contract needed to connect
+  the merged Fall 2026 generator to the existing quiz runtime while preserving
+  the official Brand/Generic scoring requirement:
+  - spelling-sensitive
+  - capitalization-insensitive
+- **Dependencies:** F26-02 (satisfied).
+- **Current known mismatch:** The existing `quizEngine.js` short-answer
+  evaluator accepts loose punctuation/separator-normalized answer forms. The
+  Fall 2026 policy requires stricter Brand/Generic scoring.
+- **Task mode:** DESIGN / CHARACTERIZATION first.
+- **Allowed scope:**
+  - inspect and characterize existing `quizEngine.js` scoring behavior
+  - add isolated regression/characterization tests if possible without runtime
+    changes
+  - document the exact compatibility gap
+  - propose the smallest safe integration boundary
+  - determine whether a tiny engine change, adapter, or question-level scoring
+    mode is required
+- **Do not:**
+  - activate the Fall generator on any page
+  - change routes or HTML
+  - modify Fall source JSON
+  - change `quizEngine.js` unless a later separate owner-approved implementation
+    task explicitly permits it
+  - weaken the official spelling-sensitive policy
+  - break or alter legacy quiz scoring
+- **Required design decisions:**
+  - exact spelling-sensitive/capitalization-insensitive matching
+  - multiple accepted official brand names
+  - preservation of legacy loose-answer behavior for existing quizzes
+  - how Fall-specific strict scoring can coexist without global regressions
+  - whether normalized generator metadata can safely select the scoring mode
 
 ---
 
