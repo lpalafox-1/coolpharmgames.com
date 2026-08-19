@@ -1,0 +1,2272 @@
+{
+  "schemaVersion": 1,
+  "id": "fall-2026-p2-top-drugs",
+  "academicYear": "2026-27",
+  "semester": "P2 Fall",
+  "source": {
+    "document": "2026-27_P2_Top Drug List - P2 Top Drug List.pdf",
+    "sha256": "917420820f18d3adf77cad796b72ce4c0777bb97b3578668597707e75d94b3c1",
+    "pagesUsed": [
+      1,
+      2,
+      3
+    ],
+    "extractionRule": "Source wording is preserved; visual line items are arrays and wrapped prose is whitespace-normalized."
+  },
+  "excludedFromTestableData": [
+    {
+      "sourceColumn": "Category (for sorting the Access Pharmacy Drug Card) - Do NOT memorize",
+      "reason": "The authoritative source explicitly marks this sorting category as non-memorized."
+    }
+  ],
+  "sourceReviewFlags": [
+    {
+      "recordId": "p2-fall-quiz-04-drug-04",
+      "field": "adverseReactions",
+      "sourceText": "Rhabomylosis",
+      "reason": "Possible source typo; preserved verbatim for owner review."
+    },
+    {
+      "recordId": "p2-fall-quiz-06-drug-03",
+      "field": "adverseReactions",
+      "sourceText": "Nocturnal ensuresis",
+      "reason": "Possible source typo; preserved verbatim for owner review."
+    },
+    {
+      "field": "boxWarning",
+      "sourceText": "none / None",
+      "reason": "The source uses inconsistent capitalization; each record preserves its source form."
+    },
+    {
+      "recordIds": [
+        "p2-fall-quiz-08-drug-03",
+        "p2-fall-quiz-08-drug-04"
+      ],
+      "field": "genericName",
+      "sourceText": "Fluticasone",
+      "reason": "The source contains two distinct Fluticasone rows with different brand, indication, class, MOA, and ADR data; both are preserved."
+    }
+  ],
+  "drugs": [
+    {
+      "id": "p2-fall-quiz-01-drug-01",
+      "semester": "P2 Fall",
+      "quizWeek": 1,
+      "genericName": "Enalapril",
+      "brandListing": "Vasotec",
+      "brandNames": [
+        "Vasotec"
+      ],
+      "fdaIndications": [
+        "Hypertension",
+        "Heart failure"
+      ],
+      "drugClass": "ACEI, Antihypertensive",
+      "mechanismOfAction": "Inhibits the conversion of angiotensin I to angiotensin II, causing vasodilation and reduction in the release of aldosterone.",
+      "boxWarning": "Pregnancy",
+      "adverseReactions": [
+        "Increased SCr"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-01-drug-02",
+      "semester": "P2 Fall",
+      "quizWeek": 1,
+      "genericName": "Lisinopril",
+      "brandListing": "Prinivil, Zestril",
+      "brandNames": [
+        "Prinivil",
+        "Zestril"
+      ],
+      "fdaIndications": [
+        "Hypertension",
+        "Heart failure"
+      ],
+      "drugClass": "ACEI, Antihypertensive",
+      "mechanismOfAction": "Inhibits the conversion of angiotensin I to angiotensin II, causing vasodilation and reduction in the release of aldosterone.",
+      "boxWarning": "Pregnancy",
+      "adverseReactions": [
+        "Dizziness",
+        "Hypotension",
+        "Angioedema"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-01-drug-03",
+      "semester": "P2 Fall",
+      "quizWeek": 1,
+      "genericName": "Ramipril",
+      "brandListing": "Altace",
+      "brandNames": [
+        "Altace"
+      ],
+      "fdaIndications": [
+        "Hypertension",
+        "Heart failure"
+      ],
+      "drugClass": "ACEI, Antihypertensive",
+      "mechanismOfAction": "Inhibits the conversion of angiotensin I to angiotensin II, causing vasodilation and reduction in the release of aldosterone.",
+      "boxWarning": "Pregnancy",
+      "adverseReactions": [
+        "Dizziness",
+        "Hypotension",
+        "Angioedema"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-01-drug-04",
+      "semester": "P2 Fall",
+      "quizWeek": 1,
+      "genericName": "Fosinopril",
+      "brandListing": "Monopril",
+      "brandNames": [
+        "Monopril"
+      ],
+      "fdaIndications": [
+        "Hypertension",
+        "Heart failure"
+      ],
+      "drugClass": "ACEI, Antihypertensive",
+      "mechanismOfAction": "Inhibits the conversion of angiotensin I to angiotensin II, causing vasodilation and reduction in the release of aldosterone.",
+      "boxWarning": "Pregnancy",
+      "adverseReactions": [
+        "Dizziness",
+        "Hypotension",
+        "Angioedema"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-01-drug-05",
+      "semester": "P2 Fall",
+      "quizWeek": 1,
+      "genericName": "Quinapril",
+      "brandListing": "Accupril",
+      "brandNames": [
+        "Accupril"
+      ],
+      "fdaIndications": [
+        "Hypertension",
+        "Heart failure"
+      ],
+      "drugClass": "ACEI, Antihypertensive",
+      "mechanismOfAction": "Inhibits the conversion of angiotensin I to angiotensin II, causing vasodilation and reduction in the release of aldosterone.",
+      "boxWarning": "Pregnancy",
+      "adverseReactions": [
+        "Dizziness",
+        "Hypotension",
+        "Angioedema"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-01-drug-06",
+      "semester": "P2 Fall",
+      "quizWeek": 1,
+      "genericName": "Benazepril",
+      "brandListing": "Lotensin",
+      "brandNames": [
+        "Lotensin"
+      ],
+      "fdaIndications": [
+        "Hypertension"
+      ],
+      "drugClass": "ACEI, Antihypertensive",
+      "mechanismOfAction": "Inhibits the conversion of angiotensin I to angiotensin II, causing vasodilation and reduction in the release of aldosterone.",
+      "boxWarning": "Pregnancy",
+      "adverseReactions": [
+        "Dizziness",
+        "Hypotension",
+        "Angioedema"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-01-drug-07",
+      "semester": "P2 Fall",
+      "quizWeek": 1,
+      "genericName": "Amlodipine",
+      "brandListing": "Norvasc",
+      "brandNames": [
+        "Norvasc"
+      ],
+      "fdaIndications": [
+        "Hypertension",
+        "Chronic stable angina"
+      ],
+      "drugClass": "Calcium Channel Blocker",
+      "mechanismOfAction": "Inhibits the influx of calcium ions into vascular smooth muscle and cardiac muscle, resulting in decreased peripheral vascular resistance and reduced blood pressure.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Peripheral edema"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-01-drug-08",
+      "semester": "P2 Fall",
+      "quizWeek": 1,
+      "genericName": "Verapamil",
+      "brandListing": "Calan, Verelan",
+      "brandNames": [
+        "Calan",
+        "Verelan"
+      ],
+      "fdaIndications": [
+        "Hypertension",
+        "Angina"
+      ],
+      "drugClass": "Non-Dihydropyridine Calcium Channel Blocker",
+      "mechanismOfAction": "Inhibits the influx of calcium ions into vascular smooth muscle, leading to vasodilation and reduced heart rate.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Gingival hyperplasia"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-01-drug-09",
+      "semester": "P2 Fall",
+      "quizWeek": 1,
+      "genericName": "Bisoprolol",
+      "brandListing": "Cardicor, Zebeta",
+      "brandNames": [
+        "Cardicor",
+        "Zebeta"
+      ],
+      "fdaIndications": [
+        "Hypertension"
+      ],
+      "drugClass": "Cardioselective β-Adrenergic Blocker",
+      "mechanismOfAction": "Selectively blocks beta1-adrenergic receptors in the heart, decreasing heart rate and contractility.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Dizziness",
+        "Hypotension",
+        "Depression"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-01-drug-10",
+      "semester": "P2 Fall",
+      "quizWeek": 1,
+      "genericName": "Diltiazem",
+      "brandListing": "Cardizem, Cartia XT, Dilacor XR, Dilt-XR, Taztia XT, Tiazac",
+      "brandNames": [
+        "Cardizem",
+        "Cartia XT",
+        "Dilacor XR",
+        "Dilt-XR",
+        "Taztia XT",
+        "Tiazac"
+      ],
+      "fdaIndications": [
+        "Hypertension",
+        "Angina"
+      ],
+      "drugClass": "Non-Dihydropyridine Calcium Channel Blocker",
+      "mechanismOfAction": "Inhibits the influx of calcium ions into vascular smooth muscle, leading to vasodilation and reduced heart rate.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Edema"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-02-drug-01",
+      "semester": "P2 Fall",
+      "quizWeek": 2,
+      "genericName": "Irbesartan",
+      "brandListing": "Avapro",
+      "brandNames": [
+        "Avapro"
+      ],
+      "fdaIndications": [
+        "Hypertension",
+        "Diabetic nephropathy"
+      ],
+      "drugClass": "Angiotensin II Receptor Antagonist",
+      "mechanismOfAction": "Selectively blocks the binding of angiotensin II to the AT1 receptor, preventing vasoconstriction and reducing the secretion of aldosterone.",
+      "boxWarning": "Pregnancy",
+      "adverseReactions": [
+        "Hyperkalemia",
+        "Dizziness"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-02-drug-02",
+      "semester": "P2 Fall",
+      "quizWeek": 2,
+      "genericName": "Losartan",
+      "brandListing": "Cozaar",
+      "brandNames": [
+        "Cozaar"
+      ],
+      "fdaIndications": [
+        "Hypertension",
+        "Diabetic nephropathy"
+      ],
+      "drugClass": "Angiotensin II Receptor Antagonist",
+      "mechanismOfAction": "Selectively blocks the binding of angiotensin II to the AT1 receptor, preventing vasoconstriction and reducing the secretion of aldosterone.",
+      "boxWarning": "Pregnancy",
+      "adverseReactions": [
+        "Hyperkalemia",
+        "Headache"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-02-drug-03",
+      "semester": "P2 Fall",
+      "quizWeek": 2,
+      "genericName": "Valsartan",
+      "brandListing": "Diovan",
+      "brandNames": [
+        "Diovan"
+      ],
+      "fdaIndications": [
+        "Hypertension",
+        "Heart failure"
+      ],
+      "drugClass": "Angiotensin II Receptor Antagonist",
+      "mechanismOfAction": "Selectively blocks the binding of angiotensin II to the AT1 receptor, preventing vasoconstriction and reducing the secretion of aldosterone.",
+      "boxWarning": "Pregnancy",
+      "adverseReactions": [
+        "Increased BUN",
+        "Dizziness"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-02-drug-04",
+      "semester": "P2 Fall",
+      "quizWeek": 2,
+      "genericName": "Candesartan",
+      "brandListing": "Atacand",
+      "brandNames": [
+        "Atacand"
+      ],
+      "fdaIndications": [
+        "Hypertension",
+        "Heart failure"
+      ],
+      "drugClass": "Angiotensin II Receptor Antagonist",
+      "mechanismOfAction": "Selectively blocks the binding of angiotensin II to the AT1 receptor, preventing vasoconstriction and reducing the secretion of aldosterone.",
+      "boxWarning": "Pregnancy",
+      "adverseReactions": [
+        "Hypotension",
+        "Nephrotoxicity"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-02-drug-05",
+      "semester": "P2 Fall",
+      "quizWeek": 2,
+      "genericName": "Telmisartan",
+      "brandListing": "Micardis",
+      "brandNames": [
+        "Micardis"
+      ],
+      "fdaIndications": [
+        "Hypertension",
+        "Cardiovascular Risk Reduction"
+      ],
+      "drugClass": "Angiotensin II Receptor Antagonist",
+      "mechanismOfAction": "Selectively blocks the binding of angiotensin II to the AT1 receptor, preventing vasoconstriction and reducing the secretion of aldosterone.",
+      "boxWarning": "Pregnancy",
+      "adverseReactions": [
+        "Hyperkalemia",
+        "Dizziness"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-02-drug-06",
+      "semester": "P2 Fall",
+      "quizWeek": 2,
+      "genericName": "Olmesartan",
+      "brandListing": "Benicar",
+      "brandNames": [
+        "Benicar"
+      ],
+      "fdaIndications": [
+        "Hypertension"
+      ],
+      "drugClass": "Angiotensin II Receptor Antagonist",
+      "mechanismOfAction": "Selectively blocks the binding of angiotensin II to the AT1 receptor, preventing vasoconstriction and reducing the secretion of aldosterone.",
+      "boxWarning": "Pregnancy",
+      "adverseReactions": [
+        "Hyperkalemia",
+        "Dizziness"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-02-drug-07",
+      "semester": "P2 Fall",
+      "quizWeek": 2,
+      "genericName": "Sacubitril/Valsartan",
+      "brandListing": "Entresto",
+      "brandNames": [
+        "Entresto"
+      ],
+      "fdaIndications": [
+        "Heart failure, reduced or preserved ejection fraction"
+      ],
+      "drugClass": "Angiotensin II Receptor Blocker (ARB) and Neprilysin Inhibitor",
+      "mechanismOfAction": "Selectively blocks the binding of angiotensin II to the AT1 receptor, preventing vasoconstriction and reducing the secretion of aldosterone; inhibits neprilysin to induce vasodilation and natriuresis",
+      "boxWarning": "Fetal toxicity",
+      "adverseReactions": [
+        "Hypotension",
+        "Hyperkalemia",
+        "Increased serum creatinine"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-02-drug-08",
+      "semester": "P2 Fall",
+      "quizWeek": 2,
+      "genericName": "Triamterene + Hydrochlorothiazide",
+      "brandListing": "Dyazide, Maxzide",
+      "brandNames": [
+        "Dyazide",
+        "Maxzide"
+      ],
+      "fdaIndications": [
+        "Edema",
+        "Hypertension"
+      ],
+      "drugClass": "Potassium Sparing/Thiazide Diuretic Combination",
+      "mechanismOfAction": "Triamterene: directly from the distal tubular lumen on active sodium exchange for potassium and hydrogen, producing a mild diuresis that is independent of aldosterone concentration HCTZ: increases sodium and chloride excretion by interfering with their reabsorption in the cortical diluting segment of the nephron; a mild diuresis of slightly concentrated urine results",
+      "boxWarning": "Hyperkalemia",
+      "adverseReactions": [
+        "Hypotension",
+        "Dizziness",
+        "Headache"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-02-drug-09",
+      "semester": "P2 Fall",
+      "quizWeek": 2,
+      "genericName": "Hydrochlorothiazide",
+      "brandListing": "Microzide",
+      "brandNames": [
+        "Microzide"
+      ],
+      "fdaIndications": [
+        "Hypertension",
+        "Edema"
+      ],
+      "drugClass": "Thiazide Diuretic, Antihypertensive",
+      "mechanismOfAction": "Inhibits sodium reabsorption in the distal tubules causing increased excretion of sodium and water, as well as potassium and hydrogen ions.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Hypotension",
+        "Dizziness",
+        "Headache"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-02-drug-10",
+      "semester": "P2 Fall",
+      "quizWeek": 2,
+      "genericName": "Chlorthalidone",
+      "brandListing": "Thalitone",
+      "brandNames": [
+        "Thalitone"
+      ],
+      "fdaIndications": [
+        "Hypertension",
+        "Edema"
+      ],
+      "drugClass": "Thiazide Diuretic",
+      "mechanismOfAction": "Inhibits sodium reabsorption in the distal tubules causing increased excretion of sodium and water, as well as potassium and hydrogen ions.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Dizziness",
+        "Hypotension",
+        "Hyperuricemia"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-03-drug-01",
+      "semester": "P2 Fall",
+      "quizWeek": 3,
+      "genericName": "Spironolactone",
+      "brandListing": "Aldactone",
+      "brandNames": [
+        "Aldactone"
+      ],
+      "fdaIndications": [
+        "Hypertension",
+        "Heart failure, NYHA class III-IV"
+      ],
+      "drugClass": "Potassium-Sparing Diuretic; Selective Aldosterone Blocker",
+      "mechanismOfAction": "Competes with aldosterone in the distal renal tubules, increasing sodium and water excretion while conserving potassium and hydrogen ions; may block the effect of aldosterone on arteriolar smooth muscle as well",
+      "boxWarning": "Tumorigenic in animal models",
+      "adverseReactions": [
+        "Gynecomastia"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-03-drug-02",
+      "semester": "P2 Fall",
+      "quizWeek": 3,
+      "genericName": "Atenolol",
+      "brandListing": "Tenormin",
+      "brandNames": [
+        "Tenormin"
+      ],
+      "fdaIndications": [
+        "Angina pectoris, chronic",
+        "Hypertension"
+      ],
+      "drugClass": "β-Adrenergic Blocker, Cardioselective",
+      "mechanismOfAction": "Selectively blocks beta1-adrenergic receptors in the heart decreasing heart rate and contractility.",
+      "boxWarning": "Avoid abrupt withdrawal",
+      "adverseReactions": [
+        "Dizziness",
+        "Hypotension",
+        "Depression"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-03-drug-03",
+      "semester": "P2 Fall",
+      "quizWeek": 3,
+      "genericName": "Metoprolol",
+      "brandListing": "Lopressor (tartrate), Toprol XL (succinate)",
+      "brandNames": [
+        "Lopressor (tartrate)",
+        "Toprol XL (succinate)"
+      ],
+      "fdaIndications": [
+        "Hypertension",
+        "Heart failure with reduced ejection fraction"
+      ],
+      "drugClass": "β-Adrenergic Blocker, Cardioselective",
+      "mechanismOfAction": "Selectively blocks beta1-adrenergic receptors in the heart and smooth muscle, decreasing heart rate and contractility.",
+      "boxWarning": "Ischemic heart disease with abrupt withdrawal",
+      "adverseReactions": [
+        "Dizziness",
+        "Fatigue",
+        "Hypotension"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-03-drug-04",
+      "semester": "P2 Fall",
+      "quizWeek": 3,
+      "genericName": "Nebivolol",
+      "brandListing": "Bystolic",
+      "brandNames": [
+        "Bystolic"
+      ],
+      "fdaIndications": [
+        "Hypertension"
+      ],
+      "drugClass": "β-Adrenergic Blocker, Cardioselective, B1 Selective",
+      "mechanismOfAction": "Not fully understood, but proposed: decreased HR, decreased myocardial contractility and vasodilation, and decreased peripheral vascular resistance",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Heart block",
+        "Withdrawal symptoms"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-03-drug-05",
+      "semester": "P2 Fall",
+      "quizWeek": 3,
+      "genericName": "Propranolol",
+      "brandListing": "Inderal, Inderal LA, Inderal XL",
+      "brandNames": [
+        "Inderal",
+        "Inderal LA",
+        "Inderal XL"
+      ],
+      "fdaIndications": [
+        "Hypertension",
+        "Angina, chronic"
+      ],
+      "drugClass": "β-Adrenergic Blocker, Nonselective",
+      "mechanismOfAction": "Nonselectively blocks beta-adrenergic receptors, reducing heart rate and contractility.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Hypotension"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-03-drug-06",
+      "semester": "P2 Fall",
+      "quizWeek": 3,
+      "genericName": "Carvedilol",
+      "brandListing": "Coreg, Coreg CR",
+      "brandNames": [
+        "Coreg",
+        "Coreg CR"
+      ],
+      "fdaIndications": [
+        "Heart failure with reduced ejection fraction",
+        "Hypertension"
+      ],
+      "drugClass": "α/β-Adrenergic Blocker",
+      "mechanismOfAction": "Nonselectively blocks beta-adrenergic receptors and alpha-1 adrenergic receptors, leading to decreased heart rate, contractility, and increased vasodilation.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Dizziness",
+        "Fatigue",
+        "Hypotension"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-03-drug-07",
+      "semester": "P2 Fall",
+      "quizWeek": 3,
+      "genericName": "Labetalol",
+      "brandListing": "Normodyne",
+      "brandNames": [
+        "Normodyne"
+      ],
+      "fdaIndications": [
+        "HTN"
+      ],
+      "drugClass": "α/β-Adrenergic Blocker",
+      "mechanismOfAction": "Adrenergic receptor blocking drug that has selective α1- and nonselective β-adrenergic receptor blocking actions",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Dizziness",
+        "Nausea",
+        "Orthostatic hypotension"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-03-drug-08",
+      "semester": "P2 Fall",
+      "quizWeek": 3,
+      "genericName": "Furosemide",
+      "brandListing": "Lasix",
+      "brandNames": [
+        "Lasix"
+      ],
+      "fdaIndications": [
+        "Edema"
+      ],
+      "drugClass": "Loop Diuretic",
+      "mechanismOfAction": "Inhibits the reabsorption of sodium and chloride in the ascending loop of Henle and distal renal tubule leading to increased water, sodium, and potassium excretion.",
+      "boxWarning": "Fluid and electrolyte loss",
+      "adverseReactions": [
+        "Hyperuricemia",
+        "Orthostatic hypotension"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-03-drug-09",
+      "semester": "P2 Fall",
+      "quizWeek": 3,
+      "genericName": "Hydralazine",
+      "brandListing": "Apresoline",
+      "brandNames": [
+        "Apresoline"
+      ],
+      "fdaIndications": [
+        "Hypertension"
+      ],
+      "drugClass": "Peripheral Vasodilator",
+      "mechanismOfAction": "Directly relaxes arteriolar smooth muscle, reducing peripheral vascular resistance.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Headache",
+        "Dizziness"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-03-drug-10",
+      "semester": "P2 Fall",
+      "quizWeek": 3,
+      "genericName": "Nifedipine",
+      "brandListing": "Procardia XL",
+      "brandNames": [
+        "Procardia XL"
+      ],
+      "fdaIndications": [
+        "Hypertension",
+        "Stable chronic angina"
+      ],
+      "drugClass": "Dihydropyridine Calcium Channel Blocker",
+      "mechanismOfAction": "Inhibits the influx of calcium ions into vascular smooth muscle and cardiac muscle, resulting in decreased peripheral vascular resistance and reduced blood pressure.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Headache",
+        "Dizziness",
+        "Edema"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-04-drug-01",
+      "semester": "P2 Fall",
+      "quizWeek": 4,
+      "genericName": "Fenofibrate",
+      "brandListing": "Tricor",
+      "brandNames": [
+        "Tricor"
+      ],
+      "fdaIndications": [
+        "Hypertriglyceridemia"
+      ],
+      "drugClass": "Antihyperlipidemic",
+      "mechanismOfAction": "Activates peroxisome proliferator-activated receptor- alpha (PPAR-α), leading to increased lipolysis and elimination of triglyceride-rich particles.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Hyperhomocysteinemia"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-04-drug-02",
+      "semester": "P2 Fall",
+      "quizWeek": 4,
+      "genericName": "Ezetimibe",
+      "brandListing": "Zetia",
+      "brandNames": [
+        "Zetia"
+      ],
+      "fdaIndications": [
+        "Hypercholesterolemia"
+      ],
+      "drugClass": "Antihyperlipidemic, Cholesterol Absorption Inhibitor",
+      "mechanismOfAction": "Inhibits the absorption of cholesterol at the brush border of the small intestine.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Myopathy",
+        "Increased liver enzymes"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-04-drug-03",
+      "semester": "P2 Fall",
+      "quizWeek": 4,
+      "genericName": "Atorvastatin",
+      "brandListing": "Lipitor",
+      "brandNames": [
+        "Lipitor"
+      ],
+      "fdaIndications": [
+        "Primary and secondary prevention of ASCVD",
+        "Secondary prevention of CV events in patients with/at high risk for CAD"
+      ],
+      "drugClass": "HMG-CoA Reductase Inhibitor",
+      "mechanismOfAction": "Inhibits HMG-CoA reductase, reducing cholesterol synthesis and increasing LDL uptake from the blood.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Myopathy",
+        "Diarrhea",
+        "Nasopharyngitis"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-04-drug-04",
+      "semester": "P2 Fall",
+      "quizWeek": 4,
+      "genericName": "Lovastatin",
+      "brandListing": "Altoprev",
+      "brandNames": [
+        "Altoprev"
+      ],
+      "fdaIndications": [
+        "Coronary arteriosclerosis",
+        "Hypercholesterolemia"
+      ],
+      "drugClass": "HMG-CoA Reductase Inhibitor",
+      "mechanismOfAction": "Competitively inhibit conversion of HMG-CoA to mevalonate, an early rate-limiting step in cholesterol synthesis",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Increased creatinine phosphokinase",
+        "Rhabomylosis"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-04-drug-05",
+      "semester": "P2 Fall",
+      "quizWeek": 4,
+      "genericName": "Pravastatin",
+      "brandListing": "Pravachol",
+      "brandNames": [
+        "Pravachol"
+      ],
+      "fdaIndications": [
+        "Hyperlipidemia",
+        "Primary and secondary preventions of atherosclerotic cardiovascular disease"
+      ],
+      "drugClass": "HMG-CoA Reductase Inhibitor",
+      "mechanismOfAction": "Inhibits HMG-CoA reductase, reducing cholesterol synthesis and increasing LDL uptake from the blood.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Musculoskeletal pain",
+        "Upper respiratory tract infection"
+      ],
+      "sourcePage": 1
+    },
+    {
+      "id": "p2-fall-quiz-04-drug-06",
+      "semester": "P2 Fall",
+      "quizWeek": 4,
+      "genericName": "Rosuvastatin",
+      "brandListing": "Crestor",
+      "brandNames": [
+        "Crestor"
+      ],
+      "fdaIndications": [
+        "Hyperlipidemia",
+        "Primary and secondary preventions of atherosclerotic cardiovascular disease"
+      ],
+      "drugClass": "HMG-CoA Reductase Inhibitor",
+      "mechanismOfAction": "Inhibits HMG-CoA reductase, reducing cholesterol synthesis and increasing LDL uptake from the blood.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Arthralgia"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-04-drug-07",
+      "semester": "P2 Fall",
+      "quizWeek": 4,
+      "genericName": "Simvastatin",
+      "brandListing": "Zocor",
+      "brandNames": [
+        "Zocor"
+      ],
+      "fdaIndications": [
+        "Hyperlipidemia",
+        "Primary and secondary preventions of atherosclerotic cardiovascular disease"
+      ],
+      "drugClass": "HMG-CoA Reductase Inhibitor",
+      "mechanismOfAction": "Inhibits HMG-CoA reductase, reducing cholesterol synthesis and increasing LDL uptake from the blood.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Myopathy"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-04-drug-08",
+      "semester": "P2 Fall",
+      "quizWeek": 4,
+      "genericName": "Gemfibrozil",
+      "brandListing": "Lopid",
+      "brandNames": [
+        "Lopid"
+      ],
+      "fdaIndications": [
+        "Hyperlipidemia",
+        "Coronary arteriosclerosis"
+      ],
+      "drugClass": "Antihyperlipidemic, Fibric Acid",
+      "mechanismOfAction": "Activate PPAR-α, which increases lipolysis and elimination of triglyceride-rich particles from plasma by activating lipoprotein lipase and reducing production of apoprotein C-III (an inhibitor of lipoprotein lipase activity). Activation of PPAR-α also induces an increase in the synthesis of apoproteins A- I and A-II and HDL-cholesterol",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Indigestion"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-04-drug-09",
+      "semester": "P2 Fall",
+      "quizWeek": 4,
+      "genericName": "Ranolazine",
+      "brandListing": "Ranexa",
+      "brandNames": [
+        "Ranexa"
+      ],
+      "fdaIndications": [
+        "Chronic angina"
+      ],
+      "drugClass": "Antianginal Agent",
+      "mechanismOfAction": "Inhibits the late phase of the inward sodium channel during cardiac repolarization reducing intracellular sodium concentrations, thereby reducing calcium influx via Na+-Ca2+ exchange that in turn reduces ventricular tension and myocardial oxygen consumption",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Angioedema"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-04-drug-10",
+      "semester": "P2 Fall",
+      "quizWeek": 4,
+      "genericName": "Amiodarone",
+      "brandListing": "Pacerone",
+      "brandNames": [
+        "Pacerone"
+      ],
+      "fdaIndications": [
+        "Secondary prophylaxis of ventricular arrhythmias"
+      ],
+      "drugClass": "Class III Antiarrhythmic",
+      "mechanismOfAction": "Inhibits potassium channels responsible for repolarizatin of the cardiac cell membrane; Prolongs the action potential and refractory period of cardiac cells.",
+      "boxWarning": "Hepatotoxicity, proarrhythmic effects, pulmonary toxicity",
+      "adverseReactions": [
+        "Nausea",
+        "Hypotension",
+        "Phospholipidemia"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-05-drug-01",
+      "semester": "P2 Fall",
+      "quizWeek": 5,
+      "genericName": "Isosorbide Mononitrate",
+      "brandListing": "Imdur",
+      "brandNames": [
+        "Imdur"
+      ],
+      "fdaIndications": [
+        "Angina, prophylaxis"
+      ],
+      "drugClass": "Long-Acting Nitrate, Antianginal",
+      "mechanismOfAction": "Relaxes vascular smooth muscle by increasing nitric oxide, leading to vasodilation.",
+      "boxWarning": "None",
+      "adverseReactions": [
+        "Dizziness",
+        "Headache"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-05-drug-02",
+      "semester": "P2 Fall",
+      "quizWeek": 5,
+      "genericName": "Nitroglycerin",
+      "brandListing": "Minitran, Nitro-Dur, Nitrostat",
+      "brandNames": [
+        "Minitran",
+        "Nitro-Dur",
+        "Nitrostat"
+      ],
+      "fdaIndications": [
+        "Angina"
+      ],
+      "drugClass": "Nitrate, Antianginal",
+      "mechanismOfAction": "Converted to nitric oxide (NO) by vascular endothelium. NO activates guanylate cyclase, increasing cyclic GMP that in turn decreases intracellular calcium, resulting in direct relaxation of vascular smooth muscle. In myocardial ischemia, nitrates dilate large epicardial vessels, enhance collateral size and flow, and reduce coronary vasoconstriction",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Headache"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-05-drug-03",
+      "semester": "P2 Fall",
+      "quizWeek": 5,
+      "genericName": "Clonidine",
+      "brandListing": "Catapres",
+      "brandNames": [
+        "Catapres"
+      ],
+      "fdaIndications": [
+        "ADHD",
+        "Hypertension, treatment refractory"
+      ],
+      "drugClass": "α2-Adrenergic Agonist",
+      "mechanismOfAction": "Stimulates alpha-2 adrenergic receptors in the brainstem, reducing sympathetic outflow and decreasing blood pressure.",
+      "boxWarning": "Epidural use for perioperative pain management, in obstetrics, or in postpartum patients",
+      "adverseReactions": [
+        "Erythema (patchy)",
+        "Somnolence",
+        "Xerostomia"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-05-drug-04",
+      "semester": "P2 Fall",
+      "quizWeek": 5,
+      "genericName": "Metformin",
+      "brandListing": "Glucophage",
+      "brandNames": [
+        "Glucophage"
+      ],
+      "fdaIndications": [
+        "Diabetes mellitus, Type 2"
+      ],
+      "drugClass": "Biguanide, Hypoglycemic",
+      "mechanismOfAction": "Decreases hepatic glucose production, decreases intestinal absorption of glucose, and improves insulin sensitivity by increasing peripheral glucose uptake.",
+      "boxWarning": "Lactic acidosis",
+      "adverseReactions": [
+        "Diarrhea",
+        "Nausea, vomiting"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-05-drug-05",
+      "semester": "P2 Fall",
+      "quizWeek": 5,
+      "genericName": "Linagliptin",
+      "brandListing": "Tradjenta",
+      "brandNames": [
+        "Tradjenta"
+      ],
+      "fdaIndications": [
+        "Diabetes mellitus, Type 2"
+      ],
+      "drugClass": "Dipeptidyl Peptidase IV Inhibitor, Antidiabetic",
+      "mechanismOfAction": "Inhibits dipeptidyl peptidase-4 (DPP-4), increasing incretin levels and enhancing glucose-dependent insulin secretion.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Hypoglycemia with sulfonylureas or insulin"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-05-drug-06",
+      "semester": "P2 Fall",
+      "quizWeek": 5,
+      "genericName": "Sitagliptin",
+      "brandListing": "Januvia, Zituvio",
+      "brandNames": [
+        "Januvia",
+        "Zituvio"
+      ],
+      "fdaIndications": [
+        "Diabetes mellitus, Type 2"
+      ],
+      "drugClass": "Dipeptidyl Peptidase IV Inhibitor, Antidiabetic",
+      "mechanismOfAction": "Inhibits dipeptidyl peptidase-4 (DPP-4), increasing incretin levels and enhancing glucose-dependent insulin secretion.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Hypoglycemia"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-05-drug-07",
+      "semester": "P2 Fall",
+      "quizWeek": 5,
+      "genericName": "Saxagliptin",
+      "brandListing": "Onglyza",
+      "brandNames": [
+        "Onglyza"
+      ],
+      "fdaIndications": [
+        "Diabetes mellitus, Type 2"
+      ],
+      "drugClass": "Dipeptidyl Peptidase IV Inhibitor, Antidiabetic",
+      "mechanismOfAction": "Inhibits dipeptidyl peptidase-4 (DPP-4), increasing incretin levels and enhancing glucose-dependent insulin secretion.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Hypoglycemia"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-05-drug-08",
+      "semester": "P2 Fall",
+      "quizWeek": 5,
+      "genericName": "Dulaglutide",
+      "brandListing": "Trulicity",
+      "brandNames": [
+        "Trulicity"
+      ],
+      "fdaIndications": [
+        "Diabetes mellitus, Type 2"
+      ],
+      "drugClass": "GLP-1 Receptor Agonist",
+      "mechanismOfAction": "Activates glucagon-like peptide-1 (GLP-1) receptor to enhance glucose-dependent insulin secretion, decrease inappropriate glucagon secretion, slow gastric emptying, and decrease food intake.",
+      "boxWarning": "Risk of thyroid cancers",
+      "adverseReactions": [
+        "Hypoglycemia",
+        "Nausea",
+        "Vomiting"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-05-drug-09",
+      "semester": "P2 Fall",
+      "quizWeek": 5,
+      "genericName": "Semaglutide",
+      "brandListing": "Ozempic, Rybelsus Wegovy",
+      "brandNames": [
+        "Ozempic",
+        "Rybelsus",
+        "Wegovy"
+      ],
+      "fdaIndications": [
+        "Diabetes mellitus, Type 2 (Brands: Ozempic, Rybelsus)",
+        "Weight management (Brand: Wegovy)"
+      ],
+      "drugClass": "GLP-1 Receptor Agonist",
+      "mechanismOfAction": "Activates glucagon-like peptide-1 (GLP-1) receptor to enhance glucose-dependent insulin secretion, decrease inappropriate glucagon secretion, slow gastric emptying, and decrease food intake.",
+      "boxWarning": "Thyroid cancer",
+      "adverseReactions": [
+        "Constipation",
+        "Diarrhea",
+        "Nausea"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-05-drug-10",
+      "semester": "P2 Fall",
+      "quizWeek": 5,
+      "genericName": "Liraglutide",
+      "brandListing": "Victoza Saxenda",
+      "brandNames": [
+        "Victoza",
+        "Saxenda"
+      ],
+      "fdaIndications": [
+        "Diabetes mellitus, Type 2 (Brand: Victoza)",
+        "Chronic weight management (Brand: Saxenda)"
+      ],
+      "drugClass": "Glucagon-Like Peptide-1-Receptor Agonist",
+      "mechanismOfAction": "Activates glucagon-like peptide-1 (GLP-1) receptor to enhance glucose-dependent insulin secretion, decrease inappropriate glucagon secretion, slow gastric emptying, and decrease food intake.",
+      "boxWarning": "Increased risk of thyroid cancer",
+      "adverseReactions": [
+        "Nausea",
+        "Hypoglycemia",
+        "Increased HR"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-06-drug-01",
+      "semester": "P2 Fall",
+      "quizWeek": 6,
+      "genericName": "Glimepiride",
+      "brandListing": "Amaryl",
+      "brandNames": [
+        "Amaryl"
+      ],
+      "fdaIndications": [
+        "Diabetes mellitus, Type 2"
+      ],
+      "drugClass": "Second-Generation Sulfonylurea, Antidiabetic",
+      "mechanismOfAction": "Stimulates insulin release from pancreatic beta cells by blocking ATP-sensitive potassium channels.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Hypoglycemia"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-06-drug-02",
+      "semester": "P2 Fall",
+      "quizWeek": 6,
+      "genericName": "Glipizide",
+      "brandListing": "Glucotrol XL",
+      "brandNames": [
+        "Glucotrol XL"
+      ],
+      "fdaIndications": [
+        "Diabetes mellitus, Type 2"
+      ],
+      "drugClass": "Second-Generation Sulfonylurea, Antidiabetic",
+      "mechanismOfAction": "Stimulates insulin release from pancreatic beta cells by blocking ATP-sensitive potassium channels.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Asthenia",
+        "Hypoglycemia"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-06-drug-03",
+      "semester": "P2 Fall",
+      "quizWeek": 6,
+      "genericName": "Glyburide",
+      "brandListing": "Glynase",
+      "brandNames": [
+        "Glynase"
+      ],
+      "fdaIndications": [
+        "Diabetes mellitus, Type 2"
+      ],
+      "drugClass": "Second-Generation Sulfonylurea, Antidiabetic",
+      "mechanismOfAction": "Stimulates insulin release from pancreatic beta cells by blocking ATP-sensitive potassium channels.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Nocturnal ensuresis",
+        "Hypoglycemia"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-06-drug-04",
+      "semester": "P2 Fall",
+      "quizWeek": 6,
+      "genericName": "Pioglitazone",
+      "brandListing": "Actos",
+      "brandNames": [
+        "Actos"
+      ],
+      "fdaIndications": [
+        "Diabetes mellitus, Type 2"
+      ],
+      "drugClass": "Thiazolidinedione Antidiabetic",
+      "mechanismOfAction": "Increases insulin sensitivity by binding to peroxisome proliferator-activated receptor-gamma (PPAR-γ).",
+      "boxWarning": "Heart failure risk",
+      "adverseReactions": [
+        "Edema",
+        "Weight gain"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-06-drug-05",
+      "semester": "P2 Fall",
+      "quizWeek": 6,
+      "genericName": "Canagliflozin",
+      "brandListing": "Invokana",
+      "brandNames": [
+        "Invokana"
+      ],
+      "fdaIndications": [
+        "Diabetes mellitus, Type 2"
+      ],
+      "drugClass": "SGLT2 Inhibitor",
+      "mechanismOfAction": "Inhibits sodium-glucose cotransporter 2 (SGLT2) in the proximal renal tubules, reducing glucose reabsorption.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "GU fungal infection"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-06-drug-06",
+      "semester": "P2 Fall",
+      "quizWeek": 6,
+      "genericName": "Dapagliflozin",
+      "brandListing": "Farxiga",
+      "brandNames": [
+        "Farxiga"
+      ],
+      "fdaIndications": [
+        "Diabetes mellitus, Type 2",
+        "Heart failure with reduced ejection fraction"
+      ],
+      "drugClass": "SGLT2 Inhibitor",
+      "mechanismOfAction": "Inhibits sodium-glucose cotransporter 2 (SGLT2) in the proximal renal tubules, reducing glucose reabsorption.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Acute renal failure",
+        "Bone fracture"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-06-drug-07",
+      "semester": "P2 Fall",
+      "quizWeek": 6,
+      "genericName": "Empagliflozin",
+      "brandListing": "Jardiance",
+      "brandNames": [
+        "Jardiance"
+      ],
+      "fdaIndications": [
+        "Diabetes mellitus, Type 2",
+        "Chronic kidney disease"
+      ],
+      "drugClass": "SGLT2 Inhibitor",
+      "mechanismOfAction": "Inhibits sodium-glucose cotransporter 2 (SGLT2) in the proximal renal tubules, reducing glucose reabsorption.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Acute renal failure",
+        "Increased risk of lower limb amputation"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-06-drug-08",
+      "semester": "P2 Fall",
+      "quizWeek": 6,
+      "genericName": "Insulin",
+      "brandListing": "Aspart: Novolog, Fiasp, Merilog Glargine: Lantus, Basaglar, Toujeo, Semglee, Rezvoglar Lispro: Humalog, Admelog, Lyumjev NPH: Humulin N, Novolin N Regular: Humulin R, Novolin R",
+      "brandNames": [
+        "Novolog",
+        "Fiasp",
+        "Merilog",
+        "Lantus",
+        "Basaglar",
+        "Toujeo",
+        "Semglee",
+        "Rezvoglar",
+        "Humalog",
+        "Admelog",
+        "Lyumjev",
+        "Humulin N",
+        "Novolin N",
+        "Humulin R",
+        "Novolin R"
+      ],
+      "fdaIndications": [
+        "Diabetes mellitus, Types 1 and 2"
+      ],
+      "drugClass": "Insulin",
+      "mechanismOfAction": "Functions as bolus glycemic control by regulating glucose metabolism; stimulates glucose uptake in skeletal muscle and fat and inhibits hepatic glucose production.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Antibody development",
+        "Headache",
+        "Nasopharyngitis"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-06-drug-09",
+      "semester": "P2 Fall",
+      "quizWeek": 6,
+      "genericName": "Levothyroxine",
+      "brandListing": "Synthroid, Levoxyl",
+      "brandNames": [
+        "Synthroid",
+        "Levoxyl"
+      ],
+      "fdaIndications": [
+        "Hypothyroidism"
+      ],
+      "drugClass": "Thyroid Supplement, synthetic thyroxine (T4)",
+      "mechanismOfAction": "Synthetic form of thyroxine (T4) that is converted to active metabolite T3 which binds to thyroid receptor to increase its effects.",
+      "boxWarning": "Not for use for weight reduction",
+      "adverseReactions": [
+        "Hyperthyroidism"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-06-drug-10",
+      "semester": "P2 Fall",
+      "quizWeek": 6,
+      "genericName": "Finasteride",
+      "brandListing": "Proscar Propecia",
+      "brandNames": [
+        "Proscar",
+        "Propecia"
+      ],
+      "fdaIndications": [
+        "Benign prostatic hyperplasia (BPH, Brand: Proscar)",
+        "Male pattern alopecia (Brand: Propecia)"
+      ],
+      "drugClass": "5α-Reductase Inhibitor",
+      "mechanismOfAction": "inhibits type II 5-alpha reductase to stop the conversion of testosterone to its active form",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Impotence",
+        "Reduced libido"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-07-drug-01",
+      "semester": "P2 Fall",
+      "quizWeek": 7,
+      "genericName": "Famotidine",
+      "brandListing": "Pepcid",
+      "brandNames": [
+        "Pepcid"
+      ],
+      "fdaIndications": [
+        "GERD",
+        "Indigestion"
+      ],
+      "drugClass": "Histamine H2 Antagonist",
+      "mechanismOfAction": "Inhibits histamine at H2 receptors of the gastric parietal cells, reducing gastric acid secretion.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Agitation (infants)"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-07-drug-02",
+      "semester": "P2 Fall",
+      "quizWeek": 7,
+      "genericName": "Esomeprazole",
+      "brandListing": "Nexium",
+      "brandNames": [
+        "Nexium"
+      ],
+      "fdaIndications": [
+        "GERD",
+        "Erosive esophagitis"
+      ],
+      "drugClass": "Proton Pump Inhibitor",
+      "mechanismOfAction": "Inhibits the H+/K+ ATPase enzyme system in the gastric parietal cells, reducing the production of gastric acid.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Headache"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-07-drug-03",
+      "semester": "P2 Fall",
+      "quizWeek": 7,
+      "genericName": "Lansoprazole",
+      "brandListing": "Prevacid",
+      "brandNames": [
+        "Prevacid"
+      ],
+      "fdaIndications": [
+        "GERD",
+        "Ulcer treatment (Duodenal or gastric)"
+      ],
+      "drugClass": "Proton Pump Inhibitor",
+      "mechanismOfAction": "Inhibits the H+/K+ ATPase enzyme system in the gastric parietal cells, reducing the production of gastric acid.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Bone fractures"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-07-drug-04",
+      "semester": "P2 Fall",
+      "quizWeek": 7,
+      "genericName": "Dexlansoprazole",
+      "brandListing": "Dexilant",
+      "brandNames": [
+        "Dexilant"
+      ],
+      "fdaIndications": [
+        "GERD",
+        "Erosive esophagitis"
+      ],
+      "drugClass": "Proton Pump Inhibitor",
+      "mechanismOfAction": "Inhibits the H+/K+ ATPase enzyme system in the gastric parietal cells, reducing the production of gastric acid.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Abdominal pain",
+        "Diarrhea"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-07-drug-05",
+      "semester": "P2 Fall",
+      "quizWeek": 7,
+      "genericName": "Rabeprazole",
+      "brandListing": "AcipHex",
+      "brandNames": [
+        "AcipHex"
+      ],
+      "fdaIndications": [
+        "GERD",
+        "PUD"
+      ],
+      "drugClass": "Proton Pump Inhibitor",
+      "mechanismOfAction": "Inhibits the H+/K+ ATPase enzyme system in the gastric parietal cells, reducing the production of gastric acid.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Abdominal pain",
+        "Diarrhea"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-07-drug-06",
+      "semester": "P2 Fall",
+      "quizWeek": 7,
+      "genericName": "Omeprazole",
+      "brandListing": "Prilosec",
+      "brandNames": [
+        "Prilosec"
+      ],
+      "fdaIndications": [
+        "GERD",
+        "PUD"
+      ],
+      "drugClass": "Proton Pump Inhibitor",
+      "mechanismOfAction": "Inhibits the H+/K+ ATPase enzyme system in the gastric parietal cells, reducing the production of gastric acid.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Headache"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-07-drug-07",
+      "semester": "P2 Fall",
+      "quizWeek": 7,
+      "genericName": "Pantoprazole",
+      "brandListing": "Protonix",
+      "brandNames": [
+        "Protonix"
+      ],
+      "fdaIndications": [
+        "GERD",
+        "Zollinger-Ellison syndrome"
+      ],
+      "drugClass": "Proton Pump Inhibitor",
+      "mechanismOfAction": "Inhibits the H+/K+ ATPase enzyme system in the gastric parietal cells, reducing the production of gastric acid.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Headache"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-07-drug-08",
+      "semester": "P2 Fall",
+      "quizWeek": 7,
+      "genericName": "Montelukast",
+      "brandListing": "Singulair",
+      "brandNames": [
+        "Singulair"
+      ],
+      "fdaIndications": [
+        "Asthma, maintenance therapy"
+      ],
+      "drugClass": "Leukotriene Receptor Antagonist",
+      "mechanismOfAction": "Blocks the action of leukotrienes, reducing inflammation, bronchoconstriction, and mucus production.",
+      "boxWarning": "Behavior and mood-related effects",
+      "adverseReactions": [
+        "Neuropsychiatric reactions"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-07-drug-09",
+      "semester": "P2 Fall",
+      "quizWeek": 7,
+      "genericName": "Fexofenadine",
+      "brandListing": "Allegra",
+      "brandNames": [
+        "Allegra"
+      ],
+      "fdaIndications": [
+        "Seasonal allergic rhinitis (OTC)",
+        "Idiopathic urticaria"
+      ],
+      "drugClass": "Histamine H1 Antagonist, 2nd Generation; Piperidine Derivative",
+      "mechanismOfAction": "Selectively inhibits peripheral Histamine-1 (H1) receptors.",
+      "boxWarning": "None",
+      "adverseReactions": [
+        "Vomiting"
+      ],
+      "sourcePage": 2
+    },
+    {
+      "id": "p2-fall-quiz-07-drug-10",
+      "semester": "P2 Fall",
+      "quizWeek": 7,
+      "genericName": "Cetirizine",
+      "brandListing": "Zyrtec",
+      "brandNames": [
+        "Zyrtec"
+      ],
+      "fdaIndications": [
+        "Perennial or seasonal allergic rhinitis",
+        "Urticaria, chronic"
+      ],
+      "drugClass": "Antihistamine",
+      "mechanismOfAction": "Selectively inhibits peripheral Histamine-1 (H1) receptors.",
+      "boxWarning": "None",
+      "adverseReactions": [
+        "Drowsiness",
+        "Headache"
+      ],
+      "sourcePage": 3
+    },
+    {
+      "id": "p2-fall-quiz-08-drug-01",
+      "semester": "P2 Fall",
+      "quizWeek": 8,
+      "genericName": "Tiotropium",
+      "brandListing": "Spiriva",
+      "brandNames": [
+        "Spiriva"
+      ],
+      "fdaIndications": [
+        "COPD",
+        "Asthma"
+      ],
+      "drugClass": "Anticholinergic Bronchodilator",
+      "mechanismOfAction": "Inhibits the action of acetylcholine at M3 receptors in the bronchial smooth muscle, leading to bronchodilation and decreased mucus secretion.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Xerostomia",
+        "Upper respiratory infection",
+        "Pharyngitis"
+      ],
+      "sourcePage": 3
+    },
+    {
+      "id": "p2-fall-quiz-08-drug-02",
+      "semester": "P2 Fall",
+      "quizWeek": 8,
+      "genericName": "Ipratropium+Albuterol",
+      "brandListing": "Combivent",
+      "brandNames": [
+        "Combivent"
+      ],
+      "fdaIndications": [
+        "COPD"
+      ],
+      "drugClass": "Anticholinergic/Selective β2-Agonist Combination",
+      "mechanismOfAction": "Inhibits the action of acetylcholine at M3 receptors in the bronchial smooth muscle, leading to bronchodilation and decreased mucus secretion.; Stimulates beta2-adrenergic receptors, resulting in bronchial smooth muscle relaxation.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Bronchitis",
+        "Upper respiratory tract infections"
+      ],
+      "sourcePage": 3
+    },
+    {
+      "id": "p2-fall-quiz-08-drug-03",
+      "semester": "P2 Fall",
+      "quizWeek": 8,
+      "genericName": "Fluticasone",
+      "brandListing": "Flovent, Arnuity",
+      "brandNames": [
+        "Flovent",
+        "Arnuity"
+      ],
+      "fdaIndications": [
+        "Asthma"
+      ],
+      "drugClass": "Intranasal Adrenal Glucocorticosteroid",
+      "mechanismOfAction": "Acts as an anti-inflammatory agent by inhibiting inflammatory mediators.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Pharyngeal candidiasis",
+        "Arthralgia",
+        "Throat irritation"
+      ],
+      "sourcePage": 3
+    },
+    {
+      "id": "p2-fall-quiz-08-drug-04",
+      "semester": "P2 Fall",
+      "quizWeek": 8,
+      "genericName": "Fluticasone",
+      "brandListing": "Flonase, Xhance",
+      "brandNames": [
+        "Flonase",
+        "Xhance"
+      ],
+      "fdaIndications": [
+        "Allergic/non-allergic rhinitis"
+      ],
+      "drugClass": "Intranasal Adrenal Glucocorticosteroid",
+      "mechanismOfAction": "Induction of phospholipase A2-inhibitory proteins, lipocortins; lipocortins control the biosynthesis of potent mediators of inflammation such as prostaglandins and leukotrienes by inhibiting the release of their common precursor, arachidonic acid",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Epistaxis",
+        "Headache",
+        "Nasal irritation"
+      ],
+      "sourcePage": 3
+    },
+    {
+      "id": "p2-fall-quiz-08-drug-05",
+      "semester": "P2 Fall",
+      "quizWeek": 8,
+      "genericName": "Fluticasone+Salmeterol",
+      "brandListing": "Advair, Wixela",
+      "brandNames": [
+        "Advair",
+        "Wixela"
+      ],
+      "fdaIndications": [
+        "Asthma",
+        "COPD"
+      ],
+      "drugClass": "Inhaled Corticosteroid and Long-Acting β2- Adrenergic Agonist Combination",
+      "mechanismOfAction": "Inhibits inflammatory mediators and stimulates beta2-adrenergic receptors, resulting in decreased inflammation and bronchial smooth muscle relaxation.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Headache",
+        "Pharyngitis",
+        "Upper respiratory infection"
+      ],
+      "sourcePage": 3
+    },
+    {
+      "id": "p2-fall-quiz-08-drug-06",
+      "semester": "P2 Fall",
+      "quizWeek": 8,
+      "genericName": "Budesonide+Formoterol",
+      "brandListing": "Symbicort, Breyna",
+      "brandNames": [
+        "Symbicort",
+        "Breyna"
+      ],
+      "fdaIndications": [
+        "Asthma, maintenance",
+        "COPD"
+      ],
+      "drugClass": "Inhaled Corticosteroid/Bronchodilator Combination",
+      "mechanismOfAction": "Inhibits inflammatory mediators and stimulates beta2-adrenergic receptors, resulting in decreased inflammation and bronchial smooth muscle relaxation.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Upper respiratory tract infections",
+        "Headache",
+        "Nasopharyngitis"
+      ],
+      "sourcePage": 3
+    },
+    {
+      "id": "p2-fall-quiz-08-drug-07",
+      "semester": "P2 Fall",
+      "quizWeek": 8,
+      "genericName": "Albuterol",
+      "brandListing": "ProAir, Ventolin, Proventil",
+      "brandNames": [
+        "ProAir",
+        "Ventolin",
+        "Proventil"
+      ],
+      "fdaIndications": [
+        "Asthma"
+      ],
+      "drugClass": "Selective β2-Adrenergic Agonist",
+      "mechanismOfAction": "Stimulates beta2-adrenergic receptors, resulting in bronchial smooth muscle relaxation.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Upper respiratory tract infections",
+        "Tremor",
+        "Nervousness"
+      ],
+      "sourcePage": 3
+    },
+    {
+      "id": "p2-fall-quiz-08-drug-08",
+      "semester": "P2 Fall",
+      "quizWeek": 8,
+      "genericName": "Warfarin",
+      "brandListing": "Coumadin, Jantoven",
+      "brandNames": [
+        "Coumadin",
+        "Jantoven"
+      ],
+      "fdaIndications": [
+        "Anticoagulation"
+      ],
+      "drugClass": "Anticoagulant, Vitamin K Antagonist",
+      "mechanismOfAction": "Inhibits the synthesis of vitamin K-dependent clotting factors II, VII, IX, and X.",
+      "boxWarning": "Bleeding",
+      "adverseReactions": [
+        "Bleeding"
+      ],
+      "sourcePage": 3
+    },
+    {
+      "id": "p2-fall-quiz-08-drug-09",
+      "semester": "P2 Fall",
+      "quizWeek": 8,
+      "genericName": "Doxazosin",
+      "brandListing": "Cardura, Cardura XL",
+      "brandNames": [
+        "Cardura",
+        "Cardura XL"
+      ],
+      "fdaIndications": [
+        "Hypertension",
+        "Benign prostatic hyperplasia (BPH)"
+      ],
+      "drugClass": "α1-Adrenergic Blocker",
+      "mechanismOfAction": "Selectively blocks postsynaptic α1-adrenergic receptors, reducing peripheral resistance through arterial and venous dilations",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Dizziness",
+        "Fatigue",
+        "Malaise"
+      ],
+      "sourcePage": 3
+    },
+    {
+      "id": "p2-fall-quiz-08-drug-10",
+      "semester": "P2 Fall",
+      "quizWeek": 8,
+      "genericName": "Tamsulosin",
+      "brandListing": "Flomax",
+      "brandNames": [
+        "Flomax"
+      ],
+      "fdaIndications": [
+        "Benign prostatic hyperplasia"
+      ],
+      "drugClass": "α1-Adrenergic Blocker",
+      "mechanismOfAction": "Inhibits alpha-1 receptors in the prostate to cause smooth muscle relaxation in the bladder neck and prostate",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Headache",
+        "Rhinitis",
+        "Positional hypotension"
+      ],
+      "sourcePage": 3
+    },
+    {
+      "id": "p2-fall-quiz-09-drug-01",
+      "semester": "P2 Fall",
+      "quizWeek": 9,
+      "genericName": "Sildenafil",
+      "brandListing": "Viagra Revatio",
+      "brandNames": [
+        "Viagra",
+        "Revatio"
+      ],
+      "fdaIndications": [
+        "Erectile dysfunction (Brand: Viagra)",
+        "Pulmonary HTN, WHO Group I (Brand: Revatio)"
+      ],
+      "drugClass": "Erectile Dysfunction Agent, Pulmonary HTN Agent",
+      "mechanismOfAction": "Inhibits the enzyme phosphodiesterase-5 to prevent the degredation of cGMP leading to smooth muscle relaxation and increased blood flow to the corpus cavernosum.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Flushing",
+        "Nausea",
+        "Headache"
+      ],
+      "sourcePage": 3
+    },
+    {
+      "id": "p2-fall-quiz-09-drug-02",
+      "semester": "P2 Fall",
+      "quizWeek": 9,
+      "genericName": "Tadalafil",
+      "brandListing": "Cialis Adcirca, Alyq, Tadliq",
+      "brandNames": [
+        "Cialis",
+        "Adcirca",
+        "Alyq",
+        "Tadliq"
+      ],
+      "fdaIndications": [
+        "Erectile dysfunction (Brand: Cialis)",
+        "Pulmonary HTN (Brands: Adcirca, Alyq, Tadliq)"
+      ],
+      "drugClass": "Erectile Dysfunction Agent; Pulmonary HTN Agent",
+      "mechanismOfAction": "Inhibition of phosphodiesterase type 5 (PDE5) enhances erectile function by increasing the amount of cyclic GMP enhancing erectile function and pulmonary vasculature relaxation.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Flushing",
+        "Nausea",
+        "Headache"
+      ],
+      "sourcePage": 3
+    },
+    {
+      "id": "p2-fall-quiz-09-drug-03",
+      "semester": "P2 Fall",
+      "quizWeek": 9,
+      "genericName": "Oxybutynin",
+      "brandListing": "Ditropan",
+      "brandNames": [
+        "Ditropan"
+      ],
+      "fdaIndications": [
+        "Overactive or neurogenic bladder"
+      ],
+      "drugClass": "Urinary Antispasmodic",
+      "mechanismOfAction": "Competitive muscarinic receptor antagonist. Muscarinic receptors play an important role in several major cholinergically mediated functions, including contractions of the urinary bladder smooth muscle and stimulation of salivary secretion.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Constipation",
+        "Xerostomia",
+        "Blurred vision"
+      ],
+      "sourcePage": 3
+    },
+    {
+      "id": "p2-fall-quiz-09-drug-04",
+      "semester": "P2 Fall",
+      "quizWeek": 9,
+      "genericName": "Solifenacin",
+      "brandListing": "Vesicare",
+      "brandNames": [
+        "Vesicare"
+      ],
+      "fdaIndications": [
+        "Overactive bladder",
+        "Neurogenic detrusor overactivity"
+      ],
+      "drugClass": "Urinary Antispasmodic; Anticholinergic Agent",
+      "mechanismOfAction": "Competitive muscarinic receptor antagonist. Muscarinic receptors play an important role in several major cholinergically mediated functions, including contractions of the urinary bladder smooth muscle and stimulation of salivary secretion.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Constipation",
+        "Xerostomia",
+        "Blurred vision"
+      ],
+      "sourcePage": 3
+    },
+    {
+      "id": "p2-fall-quiz-09-drug-05",
+      "semester": "P2 Fall",
+      "quizWeek": 9,
+      "genericName": "Colchicine",
+      "brandListing": "Colcrys",
+      "brandNames": [
+        "Colcrys"
+      ],
+      "fdaIndications": [
+        "Gout, acute"
+      ],
+      "drugClass": "Antigout",
+      "mechanismOfAction": "Inhibits beta-tubulin polymerizing into microtubules, reducing the inflammatory effects of gout.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Diarrhea",
+        "Nausea"
+      ],
+      "sourcePage": 3
+    },
+    {
+      "id": "p2-fall-quiz-09-drug-06",
+      "semester": "P2 Fall",
+      "quizWeek": 9,
+      "genericName": "Topiramate",
+      "brandListing": "Topamax, Trokendi XR",
+      "brandNames": [
+        "Topamax",
+        "Trokendi XR"
+      ],
+      "fdaIndications": [
+        "Seizure",
+        "Migraine prevention"
+      ],
+      "drugClass": "Anticonvulsant",
+      "mechanismOfAction": "Blocks neuronal voltage-dependent sodium channels, enhances GABA(A) activity, antagonizes AMPA/kainate glutamate receptors, and weakly inhibits carbonic anhydrase.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Loss of appetite",
+        "Impaired psychomotor performance",
+        "Somnolence"
+      ],
+      "sourcePage": 3
+    },
+    {
+      "id": "p2-fall-quiz-09-drug-07",
+      "semester": "P2 Fall",
+      "quizWeek": 9,
+      "genericName": "Clonazepam",
+      "brandListing": "Klonopin",
+      "brandNames": [
+        "Klonopin"
+      ],
+      "fdaIndications": [
+        "Seizure"
+      ],
+      "drugClass": "Benzodiazepine",
+      "mechanismOfAction": "Enhances the effect of GABA by binding to its receptor in the CNS.",
+      "boxWarning": "Concurrent use with opioids, abuse, misuse, and addiction, dependence and withdrawal reactions",
+      "adverseReactions": [
+        "Ataxia",
+        "Agitation",
+        "Somnolence"
+      ],
+      "sourcePage": 3
+    },
+    {
+      "id": "p2-fall-quiz-09-drug-08",
+      "semester": "P2 Fall",
+      "quizWeek": 9,
+      "genericName": "Oxcarbazepine",
+      "brandListing": "Trileptal, Oxtellar XR",
+      "brandNames": [
+        "Trileptal",
+        "Oxtellar XR"
+      ],
+      "fdaIndications": [
+        "Focal onset (partial seizure)"
+      ],
+      "drugClass": "Dibenzazepine Carboxamide, Anticonvulsant",
+      "mechanismOfAction": "Likely involves blockade of voltage-dependent sodium channels and inhibition of repetitive neuronal firing",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Somnolence",
+        "Headache",
+        "Dizziness"
+      ],
+      "sourcePage": 3
+    },
+    {
+      "id": "p2-fall-quiz-09-drug-09",
+      "semester": "P2 Fall",
+      "quizWeek": 9,
+      "genericName": "Folic Acid",
+      "brandListing": "FA-8, True Folic Acid",
+      "brandNames": [
+        "FA-8",
+        "True Folic Acid"
+      ],
+      "fdaIndications": [
+        "Megaloblastic and macrocytic anemia"
+      ],
+      "drugClass": "Essential B Vitamin",
+      "mechanismOfAction": "Required for the conversion of deoxyuridylate to thymidylate, which is a rate-limiting step in DNA synthesis",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Loss of appetite"
+      ],
+      "sourcePage": 3
+    },
+    {
+      "id": "p2-fall-quiz-09-drug-10",
+      "semester": "P2 Fall",
+      "quizWeek": 9,
+      "genericName": "Cyanocobalamin",
+      "brandListing": "Cobolin-M",
+      "brandNames": [
+        "Cobolin-M"
+      ],
+      "fdaIndications": [
+        "Cobalamin (Vitamin B12) deficiency"
+      ],
+      "drugClass": "Essential B Vitamin (B12)",
+      "mechanismOfAction": "Synthesis of the amino acid methionine from homocysteine",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Injection site pain",
+        "Arthralgia",
+        "Fatigue"
+      ],
+      "sourcePage": 3
+    },
+    {
+      "id": "p2-fall-quiz-10-drug-01",
+      "semester": "P2 Fall",
+      "quizWeek": 10,
+      "genericName": "Allopurinol",
+      "brandListing": "Zyloprim",
+      "brandNames": [
+        "Zyloprim"
+      ],
+      "fdaIndications": [
+        "Gout"
+      ],
+      "drugClass": "Xanthine Oxidase Inhibitor; Antigout",
+      "mechanismOfAction": "Inhibits xanthine oxidase, reducing the production of uric acid.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Acute gout attack",
+        "Hypersensitivity reactions"
+      ],
+      "sourcePage": 3
+    },
+    {
+      "id": "p2-fall-quiz-10-drug-02",
+      "semester": "P2 Fall",
+      "quizWeek": 10,
+      "genericName": "Gabapentin",
+      "brandListing": "Neurontin",
+      "brandNames": [
+        "Neurontin"
+      ],
+      "fdaIndications": [
+        "Seizure",
+        "Postherpetic neuralgia"
+      ],
+      "drugClass": "Gamma Aminobutyric Acid Analog, Anticonvulsant",
+      "mechanismOfAction": "Modulates the activity of voltage-gated calcium channels in the CNS by binding to the alpha-2-delta subunit and indirectly influences GABAergic (inhibitory neurotransmitter) activity.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Ataxia",
+        "Dizziness",
+        "Somnolence"
+      ],
+      "sourcePage": 3
+    },
+    {
+      "id": "p2-fall-quiz-10-drug-03",
+      "semester": "P2 Fall",
+      "quizWeek": 10,
+      "genericName": "Phenytoin",
+      "brandListing": "Dilantin",
+      "brandNames": [
+        "Dilantin"
+      ],
+      "fdaIndications": [
+        "Seizure"
+      ],
+      "drugClass": "Hydantoin Anticonvulsant",
+      "mechanismOfAction": "Stabilizes neuronal membranes and decreases seizure activity by increasing efflux or decreasing influx of sodium ions across cell membranes in the motor cortex during generation of nerve impulses",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Dizziness",
+        "Impaired psychomotor performance",
+        "Fatigue"
+      ],
+      "sourcePage": 3
+    },
+    {
+      "id": "p2-fall-quiz-10-drug-04",
+      "semester": "P2 Fall",
+      "quizWeek": 10,
+      "genericName": "Lamotrigine",
+      "brandListing": "Lamictal",
+      "brandNames": [
+        "Lamictal"
+      ],
+      "fdaIndications": [
+        "Bipolar I disorder",
+        "Seizure"
+      ],
+      "drugClass": "Phenyltriazine Anticonvulsant",
+      "mechanismOfAction": "Inhibits voltage-sensitive sodium channels, stabilizing neuronal membranes and reducing the release of excitatory neurotransmitters.",
+      "boxWarning": "Serious skin reactions",
+      "adverseReactions": [
+        "Nausea"
+      ],
+      "sourcePage": 3
+    },
+    {
+      "id": "p2-fall-quiz-10-drug-05",
+      "semester": "P2 Fall",
+      "quizWeek": 10,
+      "genericName": "Buspirone",
+      "brandListing": "BuSpar",
+      "brandNames": [
+        "BuSpar"
+      ],
+      "fdaIndications": [
+        "Anxiety"
+      ],
+      "drugClass": "Antianxiety",
+      "mechanismOfAction": "Largely unknown, but does have high affinity for serotonin 5-HT1A and 5-HT2 receptors without affecting benzodiazepine-GABA receptors.",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Dizziness"
+      ],
+      "sourcePage": 3
+    },
+    {
+      "id": "p2-fall-quiz-10-drug-06",
+      "semester": "P2 Fall",
+      "quizWeek": 10,
+      "genericName": "Levetiracetam",
+      "brandListing": "Keppra",
+      "brandNames": [
+        "Keppra"
+      ],
+      "fdaIndications": [
+        "Seizure"
+      ],
+      "drugClass": "Anticonvulsant",
+      "mechanismOfAction": "Inhibits voltage-dependent N-type calcium channnels, facilitates GABA-ergic inhibition, and binds to synaptic proteins to modulate neurtransmitter release",
+      "boxWarning": "none",
+      "adverseReactions": [
+        "Asthenia",
+        "Somnolence",
+        "Increased BP"
+      ],
+      "sourcePage": 3
+    },
+    {
+      "id": "p2-fall-quiz-10-drug-07",
+      "semester": "P2 Fall",
+      "quizWeek": 10,
+      "genericName": "Diazepam",
+      "brandListing": "Valium",
+      "brandNames": [
+        "Valium"
+      ],
+      "fdaIndications": [
+        "Anxiety",
+        "Seizure"
+      ],
+      "drugClass": "Benzodiazepine",
+      "mechanismOfAction": "Enhances the effect of GABA by binding to its receptor in the CNS.",
+      "boxWarning": "Concurrent use with opioids, addiction and dependence and withdrawal reactions",
+      "adverseReactions": [
+        "Drowsiness",
+        "Impaired motor coordination"
+      ],
+      "sourcePage": 3
+    },
+    {
+      "id": "p2-fall-quiz-10-drug-08",
+      "semester": "P2 Fall",
+      "quizWeek": 10,
+      "genericName": "Alprazolam",
+      "brandListing": "Xanax",
+      "brandNames": [
+        "Xanax"
+      ],
+      "fdaIndications": [
+        "Anxiety",
+        "Panic disorder, with or without agoraphobia"
+      ],
+      "drugClass": "Benzodiazepine, Short or Intermediate Acting",
+      "mechanismOfAction": "Enhances the effect of GABA by binding to its receptor in the CNS.",
+      "boxWarning": "Concurrent use with opioids, abuse potential, withdrawal reactions",
+      "adverseReactions": [
+        "Ataxia",
+        "Change in appetite",
+        "Cognitive dysfunction"
+      ],
+      "sourcePage": 3
+    },
+    {
+      "id": "p2-fall-quiz-10-drug-09",
+      "semester": "P2 Fall",
+      "quizWeek": 10,
+      "genericName": "Lorazepam",
+      "brandListing": "Ativan",
+      "brandNames": [
+        "Ativan"
+      ],
+      "fdaIndications": [
+        "Anxiety"
+      ],
+      "drugClass": "Benzodiazepine, Short or Intermediate Acting. C- IV",
+      "mechanismOfAction": "Enhances the effect of GABA by binding to its receptor in the CNS.",
+      "boxWarning": "Concurrent use with opioids; abuse, misuse, addiction; dependence and withdrawal reactions",
+      "adverseReactions": [
+        "Drowsiness",
+        "Impaired motor coordination",
+        "Retrograde amnesia"
+      ],
+      "sourcePage": 3
+    },
+    {
+      "id": "p2-fall-quiz-10-drug-10",
+      "semester": "P2 Fall",
+      "quizWeek": 10,
+      "genericName": "Temazepam",
+      "brandListing": "Restoril",
+      "brandNames": [
+        "Restoril"
+      ],
+      "fdaIndications": [
+        "Insomnia"
+      ],
+      "drugClass": "Benzodiazepine. C-IV",
+      "mechanismOfAction": "Enhances the postsynaptic effect of the inhibitory neurotransmitter, γ-aminobutyric acid (GABA)",
+      "boxWarning": "Concurrent use with opioids, abuse, dependence, withdrawal reactions",
+      "adverseReactions": [
+        "Drowsiness",
+        "Somnolence",
+        "Impaired motor coordination"
+      ],
+      "sourcePage": 3
+    }
+  ]
+}
