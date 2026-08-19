@@ -20,8 +20,8 @@ const policy = JSON.parse(
   readFileSync(path.join(repoRoot, "assets", "data", "fall-2026-lab3-quiz-policy.json"), "utf8")
 );
 const APPROVED_ENGINE_BASELINE = Object.freeze({
-  commit: "dbc754d960be66ec250f506aba3e6f9299a09a88",
-  sha256: "024ddd5775c1cdbce9b0b8421963b9ec0911441387195809579baf435f7ae366"
+  commit: "49269303835f3dc4b43977eb8ca70defda67fe20",
+  sha256: "83787296c28885b4655b9172ce0b0c6a0f7fdea9f97b0c5f8c653b943ef68c0e"
 });
 
 function createStorageStub(initialValues = {}) {
@@ -329,6 +329,55 @@ test("strict metadata and official alternatives survive the full persisted revie
   const updatedQueue = plain(store.applyReviewResults(persistedQueue, reviewProjection));
   assert.deepEqual(updatedQueue[0].metadata, strictMetadata());
   assert.deepEqual(updatedQueue[0]._acceptedAnswers, ["Rybelsus", "Wegovy"]);
+});
+
+test("malformed answerMatching markers remain fail closed by staying out of persisted review", () => {
+  let missedMergeCalls = 0;
+  let reviewResultCalls = 0;
+  const storage = createStorageStub({ "pharmlet.review-queue": "[]" });
+  const engine = loadEngineWithoutBootstrap({
+    localStorage: storage,
+    PharmletReviewQueueStore: {
+      mergeMissedEntries(_existing, entries) {
+        missedMergeCalls += 1;
+        return entries;
+      },
+      applyReviewResults(_existing, entries) {
+        reviewResultCalls += 1;
+        return entries;
+      }
+    }
+  });
+  const malformedQuestion = {
+    type: "short",
+    prompt: "Brand for Diltiazem?",
+    answer: "Dilt-XR",
+    metadata: {
+      answerMatching: {
+        spellingSensitive: true
+      }
+    },
+    sourceQuizId: "fall-2026-week-1",
+    sourceTitle: "Fall 2026 Week 1",
+    _answered: true,
+    _correct: false,
+    _user: "DiltXR"
+  };
+
+  assert.equal(engine.evaluateAnswerForQuestion(malformedQuestion, "DiltXR"), false);
+
+  engine.saveMissedQuestionsToReviewQueue([malformedQuestion]);
+  engine.saveReviewRoundResultsToReviewQueue([malformedQuestion]);
+  assert.equal(missedMergeCalls, 0);
+  assert.equal(reviewResultCalls, 0);
+
+  const store = loadBrowserGlobal("assets/js/review-queue-store.js").PharmletReviewQueueStore;
+  const persistedQueue = plain(store.normalizeQueue(JSON.parse(storage.getItem("pharmlet.review-queue"))));
+  assert.deepEqual(persistedQueue, []);
+
+  const reviewPage = loadReviewQueuePage(persistedQueue, store);
+  assert.throws(() => reviewPage.page.startReviewQuiz(null), /No questions available for review/);
+  assert.equal(reviewPage.storage.getItem("pharmlet.custom-quiz"), null);
 });
 
 test(`Fall remains inactive, legacy data has no strict marker, and the engine matches ${APPROVED_ENGINE_BASELINE.commit}`, () => {

@@ -18,8 +18,8 @@ const LEGACY_BASELINE = Object.freeze({
   masterPoolSha256: "1fb50e96e60252a9839406d53bc929e9569d76c0ddc2522aff43adf9bdf2a87c"
 });
 const APPROVED_ENGINE_BASELINE = Object.freeze({
-  commit: "dbc754d960be66ec250f506aba3e6f9299a09a88",
-  sha256: "024ddd5775c1cdbce9b0b8421963b9ec0911441387195809579baf435f7ae366"
+  commit: "49269303835f3dc4b43977eb8ca70defda67fe20",
+  sha256: "83787296c28885b4655b9172ce0b0c6a0f7fdea9f97b0c5f8c653b943ef68c0e"
 });
 
 function sha256(value) {
