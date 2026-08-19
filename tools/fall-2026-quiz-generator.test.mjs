@@ -79,6 +79,24 @@ function getDuplicateGenericFixture() {
   };
 }
 
+function getDiversityConstrainedData() {
+  return {
+    ...drugData,
+    drugs: drugData.drugs.slice(0, 4).map((drug, index) => ({
+      ...drug,
+      id: `diversity-constrained-${index + 1}`,
+      quizWeek: 1,
+      genericName: `Fixture Generic ${index + 1}`,
+      brandNames: [`Fixture Brand ${index + 1}`],
+      fdaIndications: [`Fixture Indication ${index + 1}`],
+      drugClass: `Fixture Class ${index + 1}`,
+      mechanismOfAction: `Fixture Mechanism ${index + 1}`,
+      boxWarning: `Fixture Warning ${index + 1}`,
+      adverseReactions: [`Fixture Reaction ${index + 1}`]
+    }))
+  };
+}
+
 function forgedCandidate(drug, domainId) {
   return {
     id: `forged-duplicate-generic-${drug.id}-${domainId}`,
@@ -156,6 +174,67 @@ function assertSourceBackedStemReference(question) {
   }
 
   assert.ok(question.prompt.includes(`<b>${sourceDrug.genericName} (${reference.brandName})</b>`));
+}
+
+function normalizePreAnswerText(value) {
+  return String(value ?? "")
+    .replace(/<[^>]*>/g, " ")
+    .normalize("NFKC")
+    .toLocaleLowerCase("en-US")
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
+}
+
+function visibleTextContainsAnswer(visibleText, answer) {
+  const normalizedAnswer = normalizePreAnswerText(answer);
+  return normalizedAnswer
+    ? ` ${visibleText} `.includes(` ${normalizedAnswer} `)
+    : false;
+}
+
+function assertNoBrandGenericLeakage(result, sourceData = drugData) {
+  const drugsById = new Map(sourceData.drugs.map((drug) => [drug.id, drug]));
+  const brandGenericQuestions = result.questions.filter(
+    (question) => question.metadata.knowledgeDomain === "brandGeneric"
+  );
+  const protectedIdentities = new Set(
+    brandGenericQuestions.map((question) => (
+      normalizeGenericIdentity(drugsById.get(question.metadata.sourceDrugId).genericName)
+    ))
+  );
+
+  for (const protectedQuestion of brandGenericQuestions) {
+    const protectedAnswers = [
+      protectedQuestion.answer,
+      ...(protectedQuestion._acceptedAnswers || [])
+    ];
+    for (const question of result.questions) {
+      if (question.id === protectedQuestion.id) continue;
+      const visibleText = normalizePreAnswerText([
+        question.prompt,
+        ...(Array.isArray(question.choices) ? question.choices : [])
+      ].join(" "));
+      for (const answer of protectedAnswers) {
+        assert.equal(
+          visibleTextContainsAnswer(visibleText, answer),
+          false,
+          `${question.id} reveals ${answer} from ${protectedQuestion.id}`
+        );
+      }
+    }
+  }
+
+  for (const question of result.questions.filter((item) => item.type === "mcq")) {
+    const sourceDrug = drugsById.get(question.metadata.sourceDrugId);
+    const genericIdentity = normalizeGenericIdentity(sourceDrug.genericName);
+    if (protectedIdentities.has(genericIdentity)) {
+      assert.notEqual(
+        question.metadata.stemReference.type,
+        "genericBrand",
+        `${question.id} must not combine both sides of a protected identity`
+      );
+    }
+  }
 }
 
 function assertGeneratedComposition(result, quizWeek) {
@@ -287,22 +366,78 @@ test("Weeks 1-3 practice generation remains deterministic with diversity enabled
   }
 });
 
-test("practice diversity degrades gracefully when ten distinct drugs are unavailable", () => {
-  const constrainedData = {
-    ...drugData,
-    drugs: drugData.drugs.slice(0, 4).map((drug, index) => ({
-      ...drug,
-      id: `diversity-constrained-${index + 1}`,
+test("Weeks 1-3 practice sets never expose another Brand / Generic FITB answer", () => {
+  const sourceBefore = JSON.stringify(drugData);
+  const policyBefore = JSON.stringify(policy);
+  const directions = new Set();
+  let combinedStemCount = 0;
+
+  for (let quizWeek = 1; quizWeek <= 3; quizWeek += 1) {
+    for (let seedIndex = 0; seedIndex < 100; seedIndex += 1) {
+      const result = generatePractice(quizWeek, `leakage-audit-${quizWeek}-${seedIndex}`);
+      assertNoBrandGenericLeakage(result);
+      for (const question of result.questions) {
+        if (question.metadata.knowledgeDomain === "brandGeneric") {
+          directions.add(question.metadata.brandGenericDirection);
+        }
+        if (question.metadata.stemReference?.type === "genericBrand") {
+          combinedStemCount += 1;
+        }
+      }
+    }
+  }
+
+  assert.deepEqual(directions, new Set(["genericToBrand", "brandToGeneric"]));
+  assert.ok(combinedStemCount > 0, "unprotected identities should retain safe combined stems");
+  assert.equal(JSON.stringify(drugData), sourceBefore);
+  assert.equal(JSON.stringify(policy), policyBefore);
+});
+
+test("quiz-level leakage protection handles repeated identities in constrained pools", () => {
+  const constrainedData = getDiversityConstrainedData();
+  const drugsById = new Map(constrainedData.drugs.map((drug) => [drug.id, drug]));
+  const protectedDirections = new Set();
+  let repeatedProtectedIdentityCount = 0;
+
+  for (let seedIndex = 0; seedIndex < 80; seedIndex += 1) {
+    const result = generateFall2026Quiz({
+      drugData: constrainedData,
+      policy,
       quizWeek: 1,
-      genericName: `Fixture Generic ${index + 1}`,
-      brandNames: [`Fixture Brand ${index + 1}`],
-      fdaIndications: [`Fixture Indication ${index + 1}`],
-      drugClass: `Fixture Class ${index + 1}`,
-      mechanismOfAction: `Fixture Mechanism ${index + 1}`,
-      boxWarning: `Fixture Warning ${index + 1}`,
-      adverseReactions: [`Fixture Reaction ${index + 1}`]
-    }))
-  };
+      mode: "practice",
+      questionCount: 10,
+      seed: `constrained-leakage-${seedIndex}`
+    });
+    assertNoBrandGenericLeakage(result, constrainedData);
+
+    for (const protectedQuestion of result.questions.filter(
+      (question) => question.metadata.knowledgeDomain === "brandGeneric"
+    )) {
+      const protectedDrug = drugsById.get(protectedQuestion.metadata.sourceDrugId);
+      const genericIdentity = normalizeGenericIdentity(protectedDrug.genericName);
+      const sameIdentityMcqs = result.questions.filter((question) => {
+        if (question.type !== "mcq") return false;
+        const sourceDrug = drugsById.get(question.metadata.sourceDrugId);
+        return normalizeGenericIdentity(sourceDrug.genericName) === genericIdentity;
+      });
+      if (!sameIdentityMcqs.length) continue;
+      repeatedProtectedIdentityCount += 1;
+      protectedDirections.add(protectedQuestion.metadata.brandGenericDirection);
+      const expectedReferenceType = protectedQuestion.metadata.brandGenericDirection === "genericToBrand"
+        ? "generic"
+        : "brand";
+      assert.ok(sameIdentityMcqs.every(
+        (question) => question.metadata.stemReference.type === expectedReferenceType
+      ));
+    }
+  }
+
+  assert.ok(repeatedProtectedIdentityCount > 0);
+  assert.deepEqual(protectedDirections, new Set(["genericToBrand", "brandToGeneric"]));
+});
+
+test("practice diversity degrades gracefully when ten distinct drugs are unavailable", () => {
+  const constrainedData = getDiversityConstrainedData();
   const result = generateFall2026Quiz({
     drugData: constrainedData,
     policy,
