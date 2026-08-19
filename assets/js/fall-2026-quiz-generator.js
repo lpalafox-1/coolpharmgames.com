@@ -11,6 +11,9 @@
  */
 const GENERATOR_ID = "fall-2026-p2-lab3-deterministic-generator";
 const MCQ_CHOICE_COUNT = 4;
+const WEEK_1_PRACTICE_QUESTION_COUNT = 10;
+
+export const WEEK_1_PRACTICE_NOTE = "Practice configuration: Week 1 has no prior review material. This 10-question study set uses Week 1 content only and is not intended to claim the exact official Week 1 quiz composition.";
 
 const DOMAIN_SPECS = Object.freeze({
   drugClass: Object.freeze({
@@ -657,11 +660,70 @@ function resolveRandomSource({ quizWeek, seed, rng }) {
   };
 }
 
-export function generateFall2026Quiz({ drugData, policy, quizWeek, seed, rng } = {}) {
+export function generateFall2026Quiz({
+  drugData,
+  policy,
+  quizWeek,
+  seed,
+  rng,
+  mode,
+  questionCount
+} = {}) {
   const context = createContext(drugData, policy);
   assertQuizWeek(context, quizWeek);
 
   if (quizWeek === context.week1.quizWeek) {
+    if (mode === "practice") {
+      if (questionCount !== WEEK_1_PRACTICE_QUESTION_COUNT) {
+        fail(
+          "INVALID_WEEK_1_PRACTICE_CONFIGURATION",
+          `Week 1 practice requires exactly ${WEEK_1_PRACTICE_QUESTION_COUNT} questions.`,
+          { questionCount }
+        );
+      }
+
+      const randomSource = resolveRandomSource({ quizWeek, seed, rng });
+      const newCandidates = buildCandidatesFromContext(context, quizWeek, "new");
+      const selectedNew = selectQuestionCandidates({
+        candidates: newCandidates,
+        count: questionCount,
+        rng: randomSource.rng
+      });
+      const materialized = selectedNew.map((candidate) => {
+        const result = materializeFromContext(context, candidate, randomSource.rng);
+        if (result.status !== "materialized") {
+          fail("CANDIDATE_MATERIALIZATION_FAILED", `Candidate ${candidate.id} could not be materialized.`, result);
+        }
+        return result.question;
+      });
+      const questions = shuffleCopy(materialized, randomSource.rng);
+
+      return {
+        status: "generated",
+        id: "fall-2026-p2-lab3-week-01-practice",
+        title: "Lab III Fall 2026 - Week 1 Practice",
+        quizWeek,
+        mode,
+        practiceConfiguration: true,
+        practiceNote: WEEK_1_PRACTICE_NOTE,
+        seed: randomSource.seed,
+        randomSource: randomSource.randomSource,
+        composition: {
+          newMaterialItemTarget: questionCount,
+          reviewMaterialItemTarget: 0,
+          totalItemTarget: questionCount
+        },
+        questions
+      };
+    }
+
+    if (mode !== undefined || questionCount !== undefined) {
+      fail(
+        "INVALID_WEEK_1_PRACTICE_CONFIGURATION",
+        "Week 1 overrides require mode \"practice\" and exactly 10 questions."
+      );
+    }
+
     return {
       status: "unresolved-policy",
       code: "WEEK_1_COMPOSITION_UNRESOLVED",
@@ -675,6 +737,13 @@ export function generateFall2026Quiz({ drugData, policy, quizWeek, seed, rng } =
       },
       message: context.week1.unresolvedDecision
     };
+  }
+
+  if (mode !== undefined || questionCount !== undefined) {
+    fail(
+      "INVALID_PRACTICE_OVERRIDE",
+      "The explicit practice override is supported only for Week 1."
+    );
   }
 
   const [minimumWeek, maximumWeek] = context.later.quizWeekRange;

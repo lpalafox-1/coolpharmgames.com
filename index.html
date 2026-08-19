@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Pharm-let — P1 Class of 2029 — Practice Hub</title>
-  <meta name="description" content="P1 Class of 2029 practice hub covering Fall 2025 & Spring 2026 — quizzes, review, and progress tracking." />
-  <meta property="og:title" content="Pharm-let — P1 Class of 2029 — Practice Hub" />
-  <meta property="og:description" content="Practice quizzes for P1 courses spanning Fall 2025 and Spring 2026. Dark mode and streak tracking included." />
+  <title>Pharm-let — Class of 2029 Study Hub</title>
+  <meta name="description" content="Class of 2029 study hub featuring Fall 2026 P2 Lab III practice plus the complete P1 and Spring 2026 study library." />
+  <meta property="og:title" content="Pharm-let — Class of 2029 Study Hub" />
+  <meta property="og:description" content="Fall 2026 P2 practice and the continuing Class of 2029 quiz, review, and progress hub." />
   <meta property="og:image" content="assets/og.png" />
   <meta name="theme-color" content="#8b1e3f" />
   <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
@@ -19,6 +19,9 @@
                connect-src 'self' https:;">
 
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { darkMode: "class" };
+  </script>
   <link rel="stylesheet" href="assets/css/styles.css" />
 
   <style>
@@ -53,7 +56,7 @@
     <div class="card max-w-xl w-full p-6">
       <h1 class="text-2xl font-bold">Welcome to Pharm-let COP</h1>
       <p class="mt-2" style="color:var(--muted)">
-        The P1 Class of 2029 study hub for concise, focused quiz practice.
+        The continuing Class of 2029 study hub for concise, focused quiz practice.
       </p>
       <div class="mt-4 flex gap-3">
         <button id="start-now" class="btn btn-blue">Start Practice</button>
@@ -65,24 +68,33 @@
   <section id="menu">
     <section class="hero">
       <div class="max-w-5xl mx-auto px-4 pt-10 pb-8">
-        <div class="grid md:grid-cols-[1.2fr_.8fr] gap-6 items-start">
+        <div class="grid md:grid-cols-[1.05fr_.95fr] gap-6 items-start">
           <div>
-            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">P1 Class of 2029 — COP Hub</h1>
-            <p class="mt-2 text-lg" style="color:var(--muted)">Spring 2026 Focus: Longitudinal Lab II and Basis for Drug Therapy II.</p>
+            <p class="text-xs font-black uppercase tracking-[0.22em] text-[var(--accent)]">Current focus · Fall 2026</p>
+            <h1 class="mt-3 text-3xl md:text-4xl font-extrabold tracking-tight">Fall 2026 — P2 Study Hub</h1>
+            <p class="mt-2 text-lg" style="color:var(--muted)">Start with live Lab III Top Drug practice while keeping every prior course resource close by.</p>
+            <div class="mt-5 flex flex-wrap gap-3">
+              <a href="lab3-fall-2026.html?week=1" class="btn btn-blue">Start Week 1 Practice</a>
+              <a href="lab3-fall-2026.html?week=2" class="btn btn-ghost">Week 2</a>
+              <a href="lab3-fall-2026.html?week=3" class="btn btn-ghost">Week 3</a>
+              <a href="lab3-fall-2026.html" class="btn btn-ghost">Lab III Hub</a>
+            </div>
             <div class="mt-4 flex flex-wrap gap-3" id="resume-wrap" style="display:none;">
               <a id="resume-link" class="btn btn-ghost border-2 border-[var(--accent)]" href="#">Resume last quiz</a>
             </div>
           </div>
 
           <div class="space-y-4">
-            <div class="card p-5 bg-[#8b1e3f]/10 border border-[#8b1e3f]/30">
+            <div class="card p-6 bg-[#8b1e3f]/10 border border-[#8b1e3f]/30">
               <div class="flex items-center gap-2 text-sm">
-                <span class="pill bg-[#8b1e3f] text-white">Featured</span>
-                <span class="font-bold text-[#8b1e3f]">Pharmaceutics II Final Exam</span>
+                <span class="pill pill-new">Practice Live</span>
+                <span class="font-bold text-[#8b1e3f] dark:text-rose-200">Lab III Top Drug Practice</span>
               </div>
-              <div class="mt-2 text-sm">Start the Pharmaceutics II final in True Exam mode.</div>
-              <div class="mt-4 grid gap-2 text-[11px] font-bold">
-                <a href="quiz.html?id=ceutics2-final" class="btn btn-blue w-full text-center">Start Pharmaceutics Final</a>
+              <h2 class="mt-3 text-2xl font-black">Weeks 1-3 are ready</h2>
+              <p class="mt-2 text-sm leading-relaxed" style="color:var(--muted)">Fresh 10-question versions, official Fall source material, strict Brand / Generic short answer, and the familiar Pharm-let quiz experience.</p>
+              <div class="mt-5 grid gap-2 text-sm font-bold">
+                <a href="lab3-fall-2026.html?week=1" class="btn btn-blue w-full text-center">Generate Week 1 Set</a>
+                <a href="lab3-fall-2026.html" class="btn btn-ghost w-full text-center">Explore Lab III Practice</a>
               </div>
             </div>
 
@@ -105,7 +117,35 @@
         <a href="top-drugs-integrity.html" class="card p-4 hover:border-[var(--accent)] transition-colors text-center">🧪 Pool Integrity</a>
       </div>
 
-      <h2 class="text-xl font-bold mt-8 mb-4" style="color: var(--accent);">Spring 2026 — Course Highlights</h2>
+      <section class="mt-10 mb-12" aria-labelledby="fall-2026-heading">
+        <div class="flex flex-wrap items-end justify-between gap-3 mb-4">
+          <div>
+            <p class="text-xs font-black uppercase tracking-[0.2em] text-[var(--accent)]">Current semester</p>
+            <h2 id="fall-2026-heading" class="mt-1 text-2xl font-black">Fall 2026 — P2</h2>
+          </div>
+          <a href="lab3-fall-2026.html" class="btn btn-ghost">Open Lab III Hub</a>
+        </div>
+        <article class="card p-6 border border-[#8b1e3f]/30 bg-[#8b1e3f]/5">
+          <div class="grid lg:grid-cols-[1fr_auto] gap-6 items-center">
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="pill pill-new">Weeks 1-3 Live</span>
+                <span class="text-xs font-bold uppercase tracking-widest opacity-60">Lab III</span>
+              </div>
+              <h3 class="mt-3 text-2xl font-black">Fall 2026 Top Drug Practice</h3>
+              <p class="mt-2 max-w-2xl text-sm leading-relaxed" style="color:var(--muted)">Generate a new study set from the current Fall Lab III drug list. Week 1 uses only Week 1 content; Weeks 2-3 use the official 6-new + 4-review composition.</p>
+            </div>
+            <div class="grid sm:grid-cols-3 lg:grid-cols-1 gap-2 min-w-[12rem]">
+              <a href="lab3-fall-2026.html?week=1" class="btn btn-blue text-center">Week 1</a>
+              <a href="lab3-fall-2026.html?week=2" class="btn btn-ghost text-center">Week 2</a>
+              <a href="lab3-fall-2026.html?week=3" class="btn btn-ghost text-center">Week 3</a>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <h2 class="text-xl font-bold mt-8 mb-2" style="color: var(--accent);">P1 &amp; Spring 2026 Study Library</h2>
+      <p class="mb-4 text-sm" style="color:var(--muted)">Prior course practice remains active and easy to reach for cumulative P2 review.</p>
       <div class="grid md:grid-cols-3 gap-4 mb-10">
         <div class="card p-5 bg-[#8b1e3f]/10 border border-[#8b1e3f]/30">
           <div class="flex items-center gap-2 text-sm">
@@ -173,43 +213,23 @@
         </div>
       </div>
 
-      <h2 class="text-xl font-bold mt-10 mb-4" style="color: var(--accent);">Coming Soon — Final Exam Generators</h2>
-      <div class="grid md:grid-cols-3 gap-4 mb-10">
-        <div class="card p-5 border border-amber-500/25 bg-amber-500/10">
-          <div class="flex items-center gap-2 text-sm">
-            <span class="pill pill-tbd">Coming Soon</span>
-            <span class="font-bold text-amber-700 dark:text-amber-300">Principles of Pharmacy Practice II</span>
+      <section class="mt-10 mb-10" aria-labelledby="future-p2-heading">
+        <div class="card p-5 border border-amber-500/20 bg-amber-500/5">
+          <div class="flex flex-wrap items-center gap-3">
+            <h2 id="future-p2-heading" class="text-lg font-black">Future P2 Practice</h2>
+            <span class="pill pill-tbd">Planned</span>
           </div>
-          <p class="mt-3 text-xs leading-snug opacity-80">A future final exam generator is in planning for private study and review.</p>
-          <span class="mt-4 inline-flex items-center justify-center rounded-lg border border-amber-500/30 px-3 py-2 text-[11px] font-bold text-amber-700 dark:text-amber-300">
-            Planned Final Generator
-          </span>
-        </div>
-
-        <div class="card p-5 border border-amber-500/25 bg-amber-500/10">
-          <div class="flex items-center gap-2 text-sm">
-            <span class="pill pill-tbd">Coming Soon</span>
-            <span class="font-bold text-amber-700 dark:text-amber-300">Drug Action I</span>
+          <p class="mt-2 text-xs leading-relaxed opacity-75">Compact placeholders for future generators; no launch buttons are active yet.</p>
+          <div class="mt-4 flex flex-wrap gap-2 text-xs font-bold">
+            <span class="rounded-full border border-amber-500/25 px-3 py-2">Principles of Pharmacy Practice II</span>
+            <span class="rounded-full border border-amber-500/25 px-3 py-2">Drug Action I</span>
+            <span class="rounded-full border border-amber-500/25 px-3 py-2">Therapeutics I</span>
           </div>
-          <p class="mt-3 text-xs leading-snug opacity-80">Future exam generation work for this course is still underway.</p>
-          <span class="mt-4 inline-flex items-center justify-center rounded-lg border border-amber-500/30 px-3 py-2 text-[11px] font-bold text-amber-700 dark:text-amber-300">
-            Planned Final Generator
-          </span>
         </div>
+      </section>
 
-        <div class="card p-5 border border-amber-500/25 bg-amber-500/10">
-          <div class="flex items-center gap-2 text-sm">
-            <span class="pill pill-tbd">Coming Soon</span>
-            <span class="font-bold text-amber-700 dark:text-amber-300">Therapeutics I</span>
-          </div>
-          <p class="mt-3 text-xs leading-snug opacity-80">This page holds a future generative final exam slot for upcoming review content.</p>
-          <span class="mt-4 inline-flex items-center justify-center rounded-lg border border-amber-500/30 px-3 py-2 text-[11px] font-bold text-amber-700 dark:text-amber-300">
-            Planned Final Generator
-          </span>
-        </div>
-      </div>
-
-      <h2 class="text-xl font-bold mt-12 mb-4 border-b pb-2 border-[var(--ring)] text-gray-500">Fall 2025 / Legacy Archive</h2>
+      <h2 class="text-xl font-bold mt-12 mb-2 border-b pb-2 border-[var(--ring)] text-gray-500">Previous Course Practice</h2>
+      <p class="mb-4 text-sm" style="color:var(--muted)">Fall 2025 practice remains available for refreshers and cumulative review.</p>
       <div class="grid md:grid-cols-3 gap-6">
         <div class="card p-4">
           <h3 class="font-bold text-sm uppercase tracking-widest text-[var(--accent)] mb-3">Pharmaceutics I</h3>
@@ -273,7 +293,7 @@
       </section>
 
       <div class="text-center text-sm py-6 mt-6" style="color:var(--muted)">
-        <p>📚 <strong>1765 practice questions and counting!</strong> available as of April 2026</p>
+        <p>📚 <strong>1765 practice questions and counting!</strong> Plus generated sets, review queues, and progress tools for the continuing Class of 2029 curriculum.</p>
       </div>
       <footer class="text-center text-sm py-4" style="color:var(--muted)">
         Pharm-let © 2026 — <strong>Study smarter, not harder!</strong>

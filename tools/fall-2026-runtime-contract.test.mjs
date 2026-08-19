@@ -380,7 +380,7 @@ test("malformed answerMatching markers remain fail closed by staying out of pers
   assert.equal(reviewPage.storage.getItem("pharmlet.custom-quiz"), null);
 });
 
-test(`Fall remains inactive, legacy data has no strict marker, and the engine matches ${APPROVED_ENGINE_BASELINE.commit}`, () => {
+test(`Fall stays isolated to its launcher, legacy data has no strict marker, and the engine matches ${APPROVED_ENGINE_BASELINE.commit}`, () => {
   const digest = createHash("sha256").update(engineSource).digest("hex");
   assert.equal(digest, APPROVED_ENGINE_BASELINE.sha256);
 
@@ -391,6 +391,7 @@ test(`Fall remains inactive, legacy data has no strict marker, and the engine ma
   );
   for (const file of htmlFiles) {
     const source = readFileSync(file, "utf8");
+    const relativePath = path.relative(repoRoot, file);
     for (const forbiddenReference of [
       "fall-2026-quiz-generator.js",
       "fall-2026-p2-top-drugs.json",
@@ -398,10 +399,24 @@ test(`Fall remains inactive, legacy data has no strict marker, and the engine ma
     ]) {
       assert.ok(
         !source.includes(forbiddenReference),
-        `${path.relative(repoRoot, file)} must not activate ${forbiddenReference}`
+        `${relativePath} must not activate ${forbiddenReference} directly`
       );
     }
+    assert.equal(
+      source.includes("fall-2026-lab3-launcher.js"),
+      relativePath === "lab3-fall-2026.html",
+      `${relativePath} has the wrong Fall launcher activation state`
+    );
   }
+
+  const launcherSource = readFileSync(
+    path.join(repoRoot, "assets", "js", "fall-2026-lab3-launcher.js"),
+    "utf8"
+  );
+  assert.ok(launcherSource.includes('from "./fall-2026-quiz-generator.js"'));
+  assert.ok(launcherSource.includes("assets/data/fall-2026-p2-top-drugs.json"));
+  assert.ok(launcherSource.includes("assets/data/fall-2026-lab3-quiz-policy.json"));
+  assert.ok(!launcherSource.includes("master_pool.json"));
 
   const legacyQuestionSources = [
     ...listFilesRecursively(path.join(repoRoot, "quizzes"), (file) => file.endsWith(".json")),
