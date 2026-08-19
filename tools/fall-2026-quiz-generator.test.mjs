@@ -44,9 +44,50 @@ function normalizeChoice(value) {
     .toLocaleLowerCase("en-US");
 }
 
+function normalizeGenericIdentity(value) {
+  return String(value ?? "")
+    .normalize("NFKC")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLocaleLowerCase("en-US");
+}
+
 function sourceValue(drug, domainId) {
   const value = drug[MCQ_DOMAIN_FIELDS[domainId]];
   return Array.isArray(value) ? value.join("; ") : value;
+}
+
+function sourceValueIdentity(drug, domainId) {
+  const value = drug[MCQ_DOMAIN_FIELDS[domainId]];
+  if (Array.isArray(value)) {
+    return value.map(normalizeChoice).filter(Boolean).sort().join("\0");
+  }
+  return normalizeChoice(value);
+}
+
+function getDuplicateGenericFixture() {
+  const rows = drugData.drugs.filter((drug) => drug.genericName === "Fluticasone");
+  assert.equal(rows.length, 2, "official fixture must retain both Fluticasone rows");
+  return {
+    rows,
+    genericIdentity: normalizeGenericIdentity(rows[0].genericName),
+    candidates: [
+      ...buildQuestionCandidates({ drugData, policy, quizWeek: 8, materialType: "new" }),
+      ...buildQuestionCandidates({ drugData, policy, quizWeek: 8, materialType: "review" })
+    ]
+  };
+}
+
+function forgedCandidate(drug, domainId) {
+  return {
+    id: `forged-duplicate-generic-${drug.id}-${domainId}`,
+    sourceDrugId: drug.id,
+    sourceDrugQuizWeek: drug.quizWeek,
+    requestedQuizWeek: 8,
+    materialType: "new",
+    domainId,
+    questionType: domainId === "brandGeneric" ? "short" : "mcq"
+  };
 }
 
 function generate(quizWeek, seed = `test-week-${quizWeek}`) {
@@ -350,6 +391,190 @@ test("repeated class, MOA, and BBW values cannot create duplicate-choice ambigui
     assert.equal(new Set(keys).size, keys.length);
     assert.equal(keys.filter((key) => key === normalizeChoice(result.question.answer)).length, 1);
   }
+});
+
+test("the two official Fluticasone rows cannot produce an ambiguous indication MCQ", () => {
+  const fixture = getDuplicateGenericFixture();
+  assert.equal(
+    fixture.candidates.filter(
+      (candidate) => candidate.sourceGenericIdentity === fixture.genericIdentity
+        && candidate.domainId === "fdaIndication"
+    ).length,
+    0
+  );
+});
+
+test("the two official Fluticasone rows cannot produce an ambiguous MOA MCQ", () => {
+  const fixture = getDuplicateGenericFixture();
+  assert.equal(
+    fixture.candidates.filter(
+      (candidate) => candidate.sourceGenericIdentity === fixture.genericIdentity
+        && candidate.domainId === "mechanismOfAction"
+    ).length,
+    0
+  );
+});
+
+test("the two official Fluticasone rows cannot produce an ambiguous ADR MCQ", () => {
+  const fixture = getDuplicateGenericFixture();
+  assert.equal(
+    fixture.candidates.filter(
+      (candidate) => candidate.sourceGenericIdentity === fixture.genericIdentity
+        && candidate.domainId === "topAdverseReactions"
+    ).length,
+    0
+  );
+});
+
+test("the public materializer refuses every ambiguous duplicate-generic value before choices exist", () => {
+  const { rows } = getDuplicateGenericFixture();
+  for (const domainId of ["fdaIndication", "mechanismOfAction", "topAdverseReactions"]) {
+    for (const row of rows) {
+      const otherRow = rows.find((candidate) => candidate.id !== row.id);
+      const otherOfficialValue = sourceValue(otherRow, domainId);
+      assert.notEqual(sourceValueIdentity(row, domainId), sourceValueIdentity(otherRow, domainId));
+      const result = materializeQuestionCandidate({
+        candidate: forgedCandidate(row, domainId),
+        drugData,
+        policy,
+        rng: createSeededRng(`forged-${domainId}-${row.id}`)
+      });
+      assert.equal(result.status, "unavailable");
+      assert.equal(result.code, "AMBIGUOUS_DUPLICATE_GENERIC");
+      assert.ok(!Object.hasOwn(result, "question"));
+      assert.ok(!Object.hasOwn(result, "choices"));
+      assert.match(otherOfficialValue, /\S/, "the other official value must exist for this regression");
+    }
+  }
+});
+
+test("duplicate-generic Brand / Generic FITB aggregates all four official Fluticasone brands", () => {
+  const fixture = getDuplicateGenericFixture();
+  const brandCandidates = fixture.candidates.filter(
+    (candidate) => candidate.sourceGenericIdentity === fixture.genericIdentity
+      && candidate.domainId === "brandGeneric"
+  );
+  assert.equal(brandCandidates.length, 1);
+
+  const result = materializeQuestionCandidate({
+    candidate: brandCandidates[0],
+    drugData,
+    policy,
+    rng: () => 0.75
+  });
+  assert.equal(result.status, "materialized");
+  assert.equal(result.question.metadata.brandGenericDirection, "genericToBrand");
+  assert.deepEqual(
+    new Set([result.question.answer, ...(result.question._acceptedAnswers || [])]),
+    new Set(["Flovent", "Arnuity", "Flonase", "Xhance"])
+  );
+  assert.deepEqual(result.question.metadata.sourceDrugIds, fixture.rows.map((row) => row.id));
+});
+
+test("duplicate generic identities cannot emit duplicate rendered prompt/answer questions", () => {
+  const fixture = getDuplicateGenericFixture();
+  const renderedKeys = new Set();
+  for (const candidate of fixture.candidates) {
+    const result = materializeQuestionCandidate({
+      candidate,
+      drugData,
+      policy,
+      rng: candidate.domainId === "brandGeneric" ? () => 0.75 : createSeededRng(candidate.id)
+    });
+    assert.equal(result.status, "materialized", candidate.id);
+    const renderedKey = `${normalizeChoice(result.question.prompt)}\0${normalizeChoice(result.question.answer)}`;
+    assert.ok(!renderedKeys.has(renderedKey), `duplicate rendered question: ${result.question.prompt}`);
+    renderedKeys.add(renderedKey);
+  }
+});
+
+test("duplicate-generic protection is generic production logic, not a Fluticasone special case", () => {
+  const productionSource = readFileSync(
+    path.join(repoRoot, "assets", "js", "fall-2026-quiz-generator.js"),
+    "utf8"
+  );
+  assert.ok(!productionSource.includes("Fluticasone"));
+
+  const renamedData = clone(drugData);
+  for (const row of renamedData.drugs.filter((drug) => drug.genericName === "Fluticasone")) {
+    row.genericName = "Synthetic Duplicate Generic";
+  }
+  const identity = normalizeGenericIdentity("Synthetic Duplicate Generic");
+  const candidates = buildQuestionCandidates({
+    drugData: renamedData,
+    policy,
+    quizWeek: 8,
+    materialType: "new"
+  }).filter((candidate) => candidate.sourceGenericIdentity === identity);
+
+  assert.equal(candidates.filter((candidate) => candidate.domainId === "brandGeneric").length, 1);
+  for (const domainId of ["fdaIndication", "mechanismOfAction", "topAdverseReactions"]) {
+    assert.equal(candidates.filter((candidate) => candidate.domainId === domainId).length, 0);
+  }
+});
+
+test("dataset-wide duplicate generic identities obey aggregation, ambiguity, and deduplication invariants", () => {
+  let duplicateGroupCount = 0;
+  for (let quizWeek = 2; quizWeek <= 10; quizWeek += 1) {
+    const eligibleDrugs = drugData.drugs.filter(
+      (drug) => drug.semester === policy.semester && drug.quizWeek <= quizWeek
+    );
+    const groups = new Map();
+    for (const drug of eligibleDrugs) {
+      const identity = normalizeGenericIdentity(drug.genericName);
+      if (!groups.has(identity)) groups.set(identity, []);
+      groups.get(identity).push(drug);
+    }
+    const candidates = [
+      ...buildQuestionCandidates({ drugData, policy, quizWeek, materialType: "new" }),
+      ...buildQuestionCandidates({ drugData, policy, quizWeek, materialType: "review" })
+    ];
+
+    for (const [identity, rows] of groups) {
+      if (rows.length < 2) continue;
+      duplicateGroupCount += 1;
+      const identityCandidates = candidates.filter(
+        (candidate) => candidate.sourceGenericIdentity === identity
+      );
+      const canonicalRow = rows.reduce((canonical, row) => (
+        row.quizWeek > canonical.quizWeek ? row : canonical
+      ));
+      const brandCandidates = identityCandidates.filter(
+        (candidate) => candidate.domainId === "brandGeneric"
+      );
+      assert.equal(brandCandidates.length, 1, `${identity} needs one aggregated Brand/Generic candidate`);
+      assert.equal(brandCandidates[0].sourceDrugId, canonicalRow.id);
+      assert.deepEqual(brandCandidates[0].sourceDrugIds, rows.map((row) => row.id));
+
+      const brandResult = materializeQuestionCandidate({
+        candidate: brandCandidates[0],
+        drugData,
+        policy,
+        rng: () => 0.75
+      });
+      const expectedBrands = new Set(rows.flatMap((row) => row.brandNames).map(normalizeChoice));
+      const acceptedBrands = new Set(
+        [brandResult.question.answer, ...(brandResult.question._acceptedAnswers || [])].map(normalizeChoice)
+      );
+      assert.deepEqual(acceptedBrands, expectedBrands);
+
+      for (const domainId of Object.keys(MCQ_DOMAIN_FIELDS)) {
+        const valueIdentities = new Set(rows.map((row) => sourceValueIdentity(row, domainId)));
+        const domainCandidates = identityCandidates.filter(
+          (candidate) => candidate.domainId === domainId
+        );
+        if (valueIdentities.size > 1) {
+          assert.equal(domainCandidates.length, 0, `${identity}/${domainId} must be suppressed as ambiguous`);
+        } else {
+          assert.ok(domainCandidates.length <= 1, `${identity}/${domainId} must not be duplicated`);
+          if (domainCandidates.length === 1) {
+            assert.equal(domainCandidates[0].sourceDrugId, canonicalRow.id);
+          }
+        }
+      }
+    }
+  }
+  assert.ok(duplicateGroupCount > 0, "the official dataset must exercise duplicate-generic invariants");
 });
 
 test("constrained source data refuses unsafe MCQs instead of fabricating distractors", () => {

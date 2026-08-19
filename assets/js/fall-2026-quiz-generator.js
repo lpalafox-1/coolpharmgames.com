@@ -1,10 +1,13 @@
 /**
  * Pure Fall 2026 selector/generator. The choices below are implementation
  * behavior, not additional Lab III policy: one candidate per eligible
- * drug/domain; four choices per MCQ; complete source arrays displayed with
- * semicolon separators; seeded uniform candidate/option shuffles; a seeded
- * Brand/Generic direction (and brand variant); no domain quotas or no-repeat
- * drug rule; and a final seeded shuffle of the ten selected questions.
+ * normalized generic identity/domain; duplicate identities aggregate official
+ * brands, suppress generic-only MCQs whose official values disagree, and use
+ * the latest eligible week then source order as the canonical tie-breaker;
+ * four choices per MCQ; complete source arrays displayed with semicolon
+ * separators; seeded uniform candidate/option shuffles; a seeded Brand/Generic
+ * direction (and brand variant); no domain quotas or no-repeat drug rule; and
+ * a final seeded shuffle of the ten selected questions.
  */
 const GENERATOR_ID = "fall-2026-p2-lab3-deterministic-generator";
 const MCQ_CHOICE_COUNT = 4;
@@ -75,6 +78,14 @@ function normalizeChoiceKey(value) {
     .replace(/\s+/g, " ")
     .trim()
     .replace(/[.;]+$/g, "")
+    .toLocaleLowerCase("en-US");
+}
+
+function normalizeGenericIdentity(value) {
+  return String(value ?? "")
+    .normalize("NFKC")
+    .replace(/\s+/g, " ")
+    .trim()
     .toLocaleLowerCase("en-US");
 }
 
@@ -317,6 +328,57 @@ function getAvailableDrugsThroughWeek(context, quizWeek) {
   );
 }
 
+function getGenericIdentityResolution(context, sourceDrug, domainId, quizWeek) {
+  const genericIdentity = normalizeGenericIdentity(sourceDrug.genericName);
+  const sourceDrugs = getAvailableDrugsThroughWeek(context, quizWeek).filter(
+    (drug) => normalizeGenericIdentity(drug.genericName) === genericIdentity
+  );
+  const canonicalDrug = sourceDrugs.reduce((canonical, drug) => (
+    drug.quizWeek > canonical.quizWeek ? drug : canonical
+  ));
+  const sourceDrugIds = sourceDrugs.map((drug) => drug.id);
+
+  if (domainId === "brandGeneric") {
+    const brandsByIdentity = new Map();
+    for (const drug of sourceDrugs) {
+      for (const brandName of drug.brandNames) {
+        const brandIdentity = normalizeChoiceKey(brandName);
+        if (brandIdentity && !brandsByIdentity.has(brandIdentity)) {
+          brandsByIdentity.set(brandIdentity, brandName);
+        }
+      }
+    }
+    return {
+      status: sourceDrug.id === canonicalDrug.id ? "eligible" : "redundant",
+      genericIdentity,
+      canonicalDrug,
+      sourceDrugs,
+      sourceDrugIds,
+      brandNames: [...brandsByIdentity.values()]
+    };
+  }
+
+  const distinctValueKeys = new Set(sourceDrugs.map((drug) => getDomainValueKey(drug, domainId)));
+  if (distinctValueKeys.size > 1) {
+    return {
+      status: "ambiguous",
+      genericIdentity,
+      canonicalDrug,
+      sourceDrugs,
+      sourceDrugIds,
+      distinctValueCount: distinctValueKeys.size
+    };
+  }
+  return {
+    status: sourceDrug.id === canonicalDrug.id ? "eligible" : "redundant",
+    genericIdentity,
+    canonicalDrug,
+    sourceDrugs,
+    sourceDrugIds,
+    distinctValueCount: distinctValueKeys.size
+  };
+}
+
 function getDistinctDistractorEntries(context, domainId, sourceDrug, quizWeek) {
   const correctKey = getDomainValueKey(sourceDrug, domainId);
   const byValue = new Map();
@@ -352,6 +414,8 @@ function buildCandidatesFromContext(context, quizWeek, materialType) {
   for (const drug of cohort) {
     for (const domainId of eligibility.eligibleDomainIds) {
       const domain = context.domainsById.get(domainId);
+      const genericResolution = getGenericIdentityResolution(context, drug, domainId, quizWeek);
+      if (genericResolution.status !== "eligible") continue;
       if (domain.questionType === "mcq") {
         const distractors = getDistinctDistractorEntries(context, domainId, drug, quizWeek);
         if (distractors.length < MCQ_CHOICE_COUNT - 1) continue;
@@ -359,7 +423,9 @@ function buildCandidatesFromContext(context, quizWeek, materialType) {
       candidates.push({
         id: `${GENERATOR_ID}-week-${String(quizWeek).padStart(2, "0")}-${materialType}-${drug.id}-${domainId}`,
         sourceDrugId: drug.id,
+        sourceDrugIds: genericResolution.sourceDrugIds,
         sourceDrugQuizWeek: drug.quizWeek,
+        sourceGenericIdentity: genericResolution.genericIdentity,
         requestedQuizWeek: quizWeek,
         materialType,
         domainId,
@@ -396,17 +462,19 @@ function baseQuestionMetadata(context, candidate, extra = {}) {
     sourceMaterial: candidate.materialType,
     knowledgeDomain: candidate.domainId,
     sourceDrugId: candidate.sourceDrugId,
+    sourceDrugIds: [...candidate.sourceDrugIds],
     sourceDrugQuizWeek: candidate.sourceDrugQuizWeek,
     ...extra
   };
 }
 
-function materializeBrandGenericQuestion(context, candidate, sourceDrug, rng) {
+function materializeBrandGenericQuestion(context, candidate, sourceDrug, genericResolution, rng) {
   const policyDomain = context.domainsById.get("brandGeneric");
   const genericToBrand = nextRandom(rng) >= 0.5;
+  const brandNames = genericResolution.brandNames;
 
   if (genericToBrand) {
-    const [answer, ...acceptedAnswers] = sourceDrug.brandNames;
+    const [answer, ...acceptedAnswers] = brandNames;
     const question = {
       id: `${candidate.id}-generic-to-brand`,
       type: "short",
@@ -421,8 +489,8 @@ function materializeBrandGenericQuestion(context, candidate, sourceDrug, rng) {
     return { status: "materialized", question };
   }
 
-  const brandIndex = Math.floor(nextRandom(rng) * sourceDrug.brandNames.length);
-  const brandName = sourceDrug.brandNames[brandIndex];
+  const brandIndex = Math.floor(nextRandom(rng) * brandNames.length);
+  const brandName = brandNames[brandIndex];
   return {
     status: "materialized",
     question: {
@@ -522,10 +590,49 @@ function materializeFromContext(context, candidate, rng) {
   if (!context.domainsById.has(candidate.domainId)) {
     fail("UNSUPPORTED_DOMAIN", `Unknown candidate domain ${candidate.domainId}.`);
   }
-  if (candidate.domainId === "brandGeneric") {
-    return materializeBrandGenericQuestion(context, candidate, sourceDrug, rng);
+  const genericResolution = getGenericIdentityResolution(
+    context,
+    sourceDrug,
+    candidate.domainId,
+    candidate.requestedQuizWeek
+  );
+  if (genericResolution.status === "ambiguous") {
+    return {
+      status: "unavailable",
+      code: "AMBIGUOUS_DUPLICATE_GENERIC",
+      candidateId: candidate.id,
+      domainId: candidate.domainId,
+      genericIdentity: genericResolution.genericIdentity,
+      sourceDrugIds: genericResolution.sourceDrugIds,
+      distinctValueCount: genericResolution.distinctValueCount
+    };
   }
-  return materializeMcqQuestion(context, candidate, sourceDrug, rng);
+  if (genericResolution.status === "redundant") {
+    return {
+      status: "unavailable",
+      code: "REDUNDANT_DUPLICATE_GENERIC",
+      candidateId: candidate.id,
+      domainId: candidate.domainId,
+      genericIdentity: genericResolution.genericIdentity,
+      sourceDrugIds: genericResolution.sourceDrugIds,
+      canonicalSourceDrugId: genericResolution.canonicalDrug.id
+    };
+  }
+  const resolvedCandidate = {
+    ...candidate,
+    sourceDrugIds: genericResolution.sourceDrugIds,
+    sourceGenericIdentity: genericResolution.genericIdentity
+  };
+  if (candidate.domainId === "brandGeneric") {
+    return materializeBrandGenericQuestion(
+      context,
+      resolvedCandidate,
+      sourceDrug,
+      genericResolution,
+      rng
+    );
+  }
+  return materializeMcqQuestion(context, resolvedCandidate, sourceDrug, rng);
 }
 
 export function materializeQuestionCandidate({ candidate, drugData, policy, rng }) {
