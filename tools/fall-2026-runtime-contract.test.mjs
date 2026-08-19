@@ -383,6 +383,7 @@ test("malformed answerMatching markers remain fail closed by staying out of pers
 test(`Fall stays isolated to its launcher, legacy data has no strict marker, and the engine matches ${APPROVED_ENGINE_BASELINE.commit}`, () => {
   const digest = createHash("sha256").update(engineSource).digest("hex");
   assert.equal(digest, APPROVED_ENGINE_BASELINE.sha256);
+  assert.ok(!engineSource.includes("stemReference"), "Fall stem provenance must not be rendered by the legacy engine");
 
   const htmlFiles = listFilesRecursively(
     repoRoot,

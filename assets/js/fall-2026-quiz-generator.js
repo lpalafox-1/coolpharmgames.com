@@ -8,7 +8,9 @@
  * separators; seeded practice-only candidate selection that prefers least-used
  * drug identities and eligible domains, then degrades when pools are
  * constrained; seeded option shuffles; a seeded Brand/Generic direction (and
- * brand variant); and a final seeded shuffle of the ten selected questions.
+ * brand variant); a quiz-level guard against pre-answer Brand/Generic leakage
+ * through other prompts or choices; and a final seeded shuffle of the ten
+ * selected questions.
  */
 const GENERATOR_ID = "fall-2026-p2-lab3-deterministic-generator";
 const MCQ_CHOICE_COUNT = 4;
@@ -332,33 +334,36 @@ function getAvailableDrugsThroughWeek(context, quizWeek) {
   );
 }
 
-function selectMcqStemReference(context, sourceDrug, quizWeek, rng) {
-  const referenceRoll = nextRandom(rng);
-  const brandIndex = Math.floor(nextRandom(rng) * sourceDrug.brandNames.length);
-  const brandName = sourceDrug.brandNames[brandIndex];
+function getBrandGenericIdentities(context, brandName, quizWeek) {
   const brandKey = normalizeChoiceKey(brandName);
-  const brandGenericIdentities = new Set(
+  return new Set(
     getAvailableDrugsThroughWeek(context, quizWeek)
       .filter((drug) => drug.brandNames.some((brand) => normalizeChoiceKey(brand) === brandKey))
       .map((drug) => normalizeGenericIdentity(drug.genericName))
   );
-  const brandOnlyIsSafe = brandGenericIdentities.size === 1;
+}
 
-  if (referenceRoll < (1 / 3)) {
+function isBrandOnlyReferenceSafe(context, brandName, genericName, quizWeek) {
+  const identities = getBrandGenericIdentities(context, brandName, quizWeek);
+  return identities.size === 1 && identities.has(normalizeGenericIdentity(genericName));
+}
+
+function createMcqStemReference(sourceDrug, type, brandName) {
+  if (type === "generic") {
     return {
       html: `<b>${sourceDrug.genericName}</b>`,
       metadata: {
-        type: "generic",
+        type,
         genericName: sourceDrug.genericName
       }
     };
   }
 
-  if (referenceRoll < (2 / 3) && brandOnlyIsSafe) {
+  if (type === "brand") {
     return {
       html: `<b>${brandName}</b>`,
       metadata: {
-        type: "brand",
+        type,
         genericName: sourceDrug.genericName,
         brandName
       }
@@ -373,6 +378,28 @@ function selectMcqStemReference(context, sourceDrug, quizWeek, rng) {
       brandName
     }
   };
+}
+
+function selectMcqStemReference(context, sourceDrug, quizWeek, rng) {
+  const referenceRoll = nextRandom(rng);
+  const brandIndex = Math.floor(nextRandom(rng) * sourceDrug.brandNames.length);
+  const brandName = sourceDrug.brandNames[brandIndex];
+  const brandOnlyIsSafe = isBrandOnlyReferenceSafe(
+    context,
+    brandName,
+    sourceDrug.genericName,
+    quizWeek
+  );
+
+  if (referenceRoll < (1 / 3)) {
+    return createMcqStemReference(sourceDrug, "generic");
+  }
+
+  if (referenceRoll < (2 / 3) && brandOnlyIsSafe) {
+    return createMcqStemReference(sourceDrug, "brand", brandName);
+  }
+
+  return createMcqStemReference(sourceDrug, "genericBrand", brandName);
 }
 
 function getGenericIdentityResolution(context, sourceDrug, domainId, quizWeek) {
@@ -737,6 +764,267 @@ function materializeFromContext(context, candidate, rng) {
   return materializeMcqQuestion(context, resolvedCandidate, sourceDrug, rng);
 }
 
+function applyMcqStemReference(question, sourceDrug, stemReference) {
+  return {
+    ...question,
+    prompt: DOMAIN_SPECS[question.metadata.knowledgeDomain].prompt(stemReference.html),
+    metadata: {
+      ...question.metadata,
+      stemReference: stemReference.metadata
+    }
+  };
+}
+
+function normalizePreAnswerVisibleText(value) {
+  return String(value ?? "")
+    .replace(/<[^>]*>/g, " ")
+    .normalize("NFKC")
+    .toLocaleLowerCase("en-US")
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
+}
+
+function questionPreAnswerVisibleText(question) {
+  return normalizePreAnswerVisibleText([
+    question.prompt,
+    ...(Array.isArray(question.choices) ? question.choices : [])
+  ].join(" "));
+}
+
+function visibleTextContainsAnswer(visibleText, answer) {
+  const normalizedAnswer = normalizePreAnswerVisibleText(answer);
+  if (!normalizedAnswer) return false;
+  return ` ${visibleText} `.includes(` ${normalizedAnswer} `);
+}
+
+function materializeBrandGenericDirection(context, question, direction) {
+  const sourceDrug = context.drugsById.get(question.metadata.sourceDrugId);
+  const genericResolution = getGenericIdentityResolution(
+    context,
+    sourceDrug,
+    "brandGeneric",
+    question.metadata.requestedQuizWeek
+  );
+  const baseId = question.id.replace(/-(?:generic-to-brand|brand-to-generic-\d+)$/, "");
+  const baseQuestion = { ...question };
+  delete baseQuestion._acceptedAnswers;
+  const metadata = { ...question.metadata, brandGenericDirection: direction };
+  delete metadata.sourceBrandName;
+
+  if (direction === "genericToBrand") {
+    const [answer, ...acceptedAnswers] = genericResolution.brandNames;
+    const nextQuestion = {
+      ...baseQuestion,
+      id: `${baseId}-generic-to-brand`,
+      prompt: `Brand name for <b>${sourceDrug.genericName}</b>?`,
+      answer,
+      metadata
+    };
+    if (acceptedAnswers.length) nextQuestion._acceptedAnswers = acceptedAnswers;
+    return nextQuestion;
+  }
+
+  const preferredBrand = question.metadata.sourceBrandName;
+  const brandNames = [preferredBrand, ...genericResolution.brandNames]
+    .filter(Boolean)
+    .filter((brandName, index, values) => (
+      values.findIndex((value) => normalizeChoiceKey(value) === normalizeChoiceKey(brandName)) === index
+    ));
+  const brandName = brandNames.find((candidate) => isBrandOnlyReferenceSafe(
+    context,
+    candidate,
+    sourceDrug.genericName,
+    question.metadata.requestedQuizWeek
+  ));
+  if (!brandName) return null;
+  const brandIndex = genericResolution.brandNames.findIndex(
+    (candidate) => normalizeChoiceKey(candidate) === normalizeChoiceKey(brandName)
+  );
+  return {
+    ...baseQuestion,
+    id: `${baseId}-brand-to-generic-${brandIndex + 1}`,
+    prompt: `Generic name for <b>${brandName}</b>?`,
+    answer: sourceDrug.genericName,
+    metadata: {
+      ...metadata,
+      sourceBrandName: brandName
+    }
+  };
+}
+
+function buildBrandGenericProtections(context, questions) {
+  const protectedByIdentity = new Map();
+
+  for (const question of questions) {
+    if (question.metadata?.knowledgeDomain !== "brandGeneric") continue;
+    const sourceDrug = context.drugsById.get(question.metadata.sourceDrugId);
+    const genericIdentity = normalizeGenericIdentity(sourceDrug.genericName);
+    if (protectedByIdentity.has(genericIdentity)) {
+      fail(
+        "DUPLICATE_BRAND_GENERIC_IDENTITY",
+        `${sourceDrug.genericName} cannot have multiple Brand / Generic questions in one practice set.`,
+        { genericIdentity }
+      );
+    }
+
+    const direction = question.metadata.brandGenericDirection;
+    if (!new Set(["genericToBrand", "brandToGeneric"]).has(direction)) {
+      fail("INVALID_BRAND_GENERIC_DIRECTION", `${question.id} has an invalid Brand / Generic direction.`);
+    }
+    protectedByIdentity.set(genericIdentity, {
+      questionId: question.id,
+      direction,
+      protectedAnswers: [question.answer, ...(question._acceptedAnswers || [])],
+      brandName: question.metadata.sourceBrandName
+    });
+  }
+
+  return protectedByIdentity;
+}
+
+function questionImmutablePreAnswerVisibleText(question) {
+  return normalizePreAnswerVisibleText([
+    ...(question.type === "mcq" ? [] : [question.prompt]),
+    ...(Array.isArray(question.choices) ? question.choices : [])
+  ].join(" "));
+}
+
+function selectSafeBrandGenericDirections(context, questions) {
+  const brandGenericIndexes = questions
+    .map((question, index) => ({ question, index }))
+    .filter(({ question }) => question.metadata?.knowledgeDomain === "brandGeneric");
+  if (!brandGenericIndexes.length) return questions;
+
+  let combinations = [[]];
+  for (const { question, index } of brandGenericIndexes) {
+    const originalDirection = question.metadata.brandGenericDirection;
+    const alternateDirection = originalDirection === "genericToBrand"
+      ? "brandToGeneric"
+      : "genericToBrand";
+    const variants = [originalDirection, alternateDirection]
+      .map((direction) => materializeBrandGenericDirection(context, question, direction))
+      .filter(Boolean)
+      .map((variant) => ({ index, variant }));
+    combinations = combinations.flatMap((combination) => (
+      variants.map((variant) => [...combination, variant])
+    ));
+  }
+
+  for (const combination of combinations) {
+    const candidateQuestions = [...questions];
+    for (const { index, variant } of combination) candidateQuestions[index] = variant;
+    const protections = buildBrandGenericProtections(context, candidateQuestions);
+    let safe = true;
+    for (const protection of protections.values()) {
+      for (const question of candidateQuestions) {
+        if (question.id === protection.questionId) continue;
+        const immutableVisibleText = questionImmutablePreAnswerVisibleText(question);
+        if (protection.protectedAnswers.some(
+          (answer) => visibleTextContainsAnswer(immutableVisibleText, answer)
+        )) {
+          safe = false;
+          break;
+        }
+      }
+      if (!safe) break;
+    }
+    if (safe) return candidateQuestions;
+  }
+
+  fail(
+    "CROSS_QUESTION_BRAND_GENERIC_LEAKAGE",
+    "No safe Brand / Generic direction exists for the selected practice questions."
+  );
+}
+
+function stemReferenceCandidates(context, question, sourceDrug, protection) {
+  if (protection?.direction === "genericToBrand") {
+    return [createMcqStemReference(sourceDrug, "generic")];
+  }
+  if (protection?.direction === "brandToGeneric") {
+    return [createMcqStemReference(sourceDrug, "brand", protection.brandName)];
+  }
+
+  const current = question.metadata.stemReference;
+  const candidates = [
+    createMcqStemReference(sourceDrug, current.type, current.brandName),
+    createMcqStemReference(sourceDrug, "generic")
+  ];
+  for (const brandName of sourceDrug.brandNames) {
+    if (isBrandOnlyReferenceSafe(
+      context,
+      brandName,
+      sourceDrug.genericName,
+      question.metadata.requestedQuizWeek
+    )) {
+      candidates.push(createMcqStemReference(sourceDrug, "brand", brandName));
+    }
+    candidates.push(createMcqStemReference(sourceDrug, "genericBrand", brandName));
+  }
+  const seen = new Set();
+  return candidates.filter((candidate) => {
+    const key = `${candidate.metadata.type}\0${normalizeChoiceKey(candidate.metadata.brandName)}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function applyQuizLevelBrandGenericLeakageGuard(context, questions) {
+  const directionSafeQuestions = selectSafeBrandGenericDirections(context, questions);
+  const protectedByIdentity = buildBrandGenericProtections(context, directionSafeQuestions);
+  const allProtections = [...protectedByIdentity.values()];
+
+  const guardedQuestions = directionSafeQuestions.map((question) => {
+    if (question.type !== "mcq") return question;
+    const sourceDrug = context.drugsById.get(question.metadata.sourceDrugId);
+    const protection = protectedByIdentity.get(normalizeGenericIdentity(sourceDrug.genericName));
+    const safeReference = stemReferenceCandidates(context, question, sourceDrug, protection)
+      .find((candidate) => {
+        const candidateQuestion = applyMcqStemReference(question, sourceDrug, candidate);
+        const promptText = normalizePreAnswerVisibleText(candidateQuestion.prompt);
+        return allProtections.every((item) => item.protectedAnswers.every(
+          (answer) => !visibleTextContainsAnswer(promptText, answer)
+        ));
+      });
+    if (!safeReference) {
+      fail(
+        "CROSS_QUESTION_BRAND_GENERIC_LEAKAGE",
+        `${question.id} has no safe source-backed stem reference.`,
+        { leakingQuestionId: question.id }
+      );
+    }
+    return applyMcqStemReference(
+      question,
+      sourceDrug,
+      safeReference
+    );
+  });
+
+  for (const protection of protectedByIdentity.values()) {
+    for (const question of guardedQuestions) {
+      if (question.id === protection.questionId) continue;
+      const visibleText = questionPreAnswerVisibleText(question);
+      const leakedAnswer = protection.protectedAnswers.find(
+        (answer) => visibleTextContainsAnswer(visibleText, answer)
+      );
+      if (leakedAnswer) {
+        fail(
+          "CROSS_QUESTION_BRAND_GENERIC_LEAKAGE",
+          `${question.id} reveals a Brand / Generic answer protected by ${protection.questionId}.`,
+          {
+            leakingQuestionId: question.id,
+            protectedQuestionId: protection.questionId,
+            leakedAnswer
+          }
+        );
+      }
+    }
+  }
+
+  return guardedQuestions;
+}
+
 export function materializeQuestionCandidate({ candidate, drugData, policy, rng }) {
   const context = createContext(drugData, policy);
   return materializeFromContext(context, candidate, rng);
@@ -795,7 +1083,8 @@ export function generateFall2026Quiz({
         }
         return result.question;
       });
-      const questions = shuffleCopy(materialized, randomSource.rng);
+      const guardedQuestions = applyQuizLevelBrandGenericLeakageGuard(context, materialized);
+      const questions = shuffleCopy(guardedQuestions, randomSource.rng);
 
       return {
         status: "generated",
@@ -873,7 +1162,8 @@ export function generateFall2026Quiz({
     }
     return result.question;
   });
-  const questions = shuffleCopy(materialized, randomSource.rng);
+  const guardedQuestions = applyQuizLevelBrandGenericLeakageGuard(context, materialized);
+  const questions = shuffleCopy(guardedQuestions, randomSource.rng);
 
   if (questions.length !== context.later.totalItemTarget) {
     fail("COMPOSITION_MISMATCH", "Generated quiz does not match the policy total.");
