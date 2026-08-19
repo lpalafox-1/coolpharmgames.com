@@ -188,7 +188,7 @@ test("Fall 2026 policy separates eligibility, question types, and Week 1 uncerta
   assertNoForbiddenQuestionBankKeys(policy);
 });
 
-test("Fall 2026 source data is selected only by the intended student launcher", () => {
+test("Fall 2026 source data is selected only by the launcher and approved reference adapter", () => {
   const htmlFiles = listFilesRecursively(
     repoRoot,
     (file) => file.endsWith(".html"),
@@ -198,18 +198,23 @@ test("Fall 2026 source data is selected only by the intended student launcher", 
     ...htmlFiles,
     ...listFilesRecursively(path.join(repoRoot, "assets", "js"), (file) => file.endsWith(".js"))
   ];
-  const forbiddenReferences = [
-    "fall-2026-p2-top-drugs.json",
-    "fall-2026-lab3-quiz-policy.json"
-  ];
+  const allowedSelectors = {
+    "fall-2026-p2-top-drugs.json": new Set([
+      "assets/js/fall-2026-lab3-launcher.js",
+      "assets/js/top-drugs-reference-data.js"
+    ]),
+    "fall-2026-lab3-quiz-policy.json": new Set([
+      "assets/js/fall-2026-lab3-launcher.js"
+    ])
+  };
 
   for (const file of runtimeFiles) {
     const source = readFileSync(file, "utf8");
     const relativePath = path.relative(repoRoot, file);
-    for (const reference of forbiddenReferences) {
+    for (const [reference, allowedFiles] of Object.entries(allowedSelectors)) {
       assert.equal(
         source.includes(reference),
-        relativePath === "assets/js/fall-2026-lab3-launcher.js",
+        allowedFiles.has(relativePath),
         `${relativePath} has the wrong selection state for ${reference}`
       );
     }
