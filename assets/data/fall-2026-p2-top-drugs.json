@@ -44,7 +44,7 @@
       ],
       "field": "genericName",
       "sourceText": "Fluticasone",
-      "reason": "The source contains two distinct Fluticasone rows with different brand, indication, class, MOA, and ADR data; both are preserved."
+      "reason": "The source contains two distinct Fluticasone rows with different brand, indication, MOA, and ADR data; both are preserved."
     }
   ],
   "drugs": [
