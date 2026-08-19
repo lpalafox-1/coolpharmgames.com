@@ -274,39 +274,52 @@ fixed: review-queue `wrongCounts` re-fold inflation (see P2B-10).
 
 ### F26-03 — Runtime integration contract + strict FITB scoring design
 
+- **Status:** `DONE`
+- **PR:** #45
+- **Merge:** `c1c745b599850d4137c71806742e4e7c6ed1b5bc`
+- **Deliverables:**
+  - real evaluator characterization
+  - strict capitalization-insensitive/spelling-sensitive contract
+  - multiple-official-answer handling
+  - opt-in question-level scoring recommendation
+  - persisted review-queue lifecycle gap
+  - no runtime activation
+  - `quizEngine.js` unchanged
+
+### F26-04 — Opt-in strict FITB scorer + review-queue contract preservation
+
 - **Status:** `READY` *(the only READY task in this ledger)*
-- **Objective:** Design and test the smallest safe contract needed to connect
-  the merged Fall 2026 generator to the existing quiz runtime while preserving
-  the official Brand/Generic scoring requirement:
-  - spelling-sensitive
-  - capitalization-insensitive
-- **Dependencies:** F26-02 (satisfied).
-- **Current known mismatch:** The existing `quizEngine.js` short-answer
-  evaluator accepts loose punctuation/separator-normalized answer forms. The
-  Fall 2026 policy requires stricter Brand/Generic scoring.
-- **Task mode:** DESIGN / CHARACTERIZATION first.
-- **Allowed scope:**
-  - inspect and characterize existing `quizEngine.js` scoring behavior
-  - add isolated regression/characterization tests if possible without runtime
-    changes
-  - document the exact compatibility gap
-  - propose the smallest safe integration boundary
-  - determine whether a tiny engine change, adapter, or question-level scoring
-    mode is required
-- **Do not:**
-  - activate the Fall generator on any page
-  - change routes or HTML
-  - modify Fall source JSON
-  - change `quizEngine.js` unless a later separate owner-approved implementation
-    task explicitly permits it
-  - weaken the official spelling-sensitive policy
-  - break or alter legacy quiz scoring
-- **Required design decisions:**
-  - exact spelling-sensitive/capitalization-insensitive matching
-  - multiple accepted official brand names
-  - preservation of legacy loose-answer behavior for existing quizzes
-  - how Fall-specific strict scoring can coexist without global regressions
-  - whether normalized generator metadata can safely select the scoring mode
+- **Owner approval:** **REQUIRED before implementation.** READY records product
+  priority only; it does not authorize changes to protected runtime files.
+- **Objective:** Implement the smallest opt-in strict FITB scoring branch
+  defined by F26-03 and preserve its question-level contract through the
+  persisted review queue without changing legacy scoring.
+- **Dependencies:** F26-03 (satisfied).
+- **Required behavior:**
+  - select strict matching only for explicitly marked FITB questions
+  - remain spelling-sensitive and capitalization-insensitive
+  - compare the complete user response against `answer` and every official
+    `_acceptedAnswers` entry without loose punctuation deletion, separator
+    splitting, alias expansion, or brand inference
+  - preserve the strict marker and `_acceptedAnswers` through question loading,
+    progress/resume, in-session review, persisted review-queue normalization,
+    and review-quiz reconstruction
+  - fail closed for malformed marked questions instead of falling through to
+    legacy loose matching
+  - keep every unmarked legacy question on the existing evaluator path
+- **Potential protected implementation scope after separate owner approval:**
+  `assets/js/quizEngine.js`, `assets/js/review-queue-store.js`,
+  `assets/js/review-queue.js`, focused `tools/*.test.mjs`, and only the cache
+  token updates required by repository protection rules.
+- **Explicitly out of scope:**
+  - route or UI activation
+  - Fall generator hookup on any page
+  - changes to Fall source data or policy JSON
+  - resolution of the Week 1 composition decision
+  - global tightening, refactoring, or removal of legacy loose-answer behavior
+- **Validation:** the four baseline commands; direct Fall runtime-contract and
+  legacy evaluator regression tests; engine-global regression; and the required
+  browser smoke checklist for any approved runtime touch.
 
 ---
 
