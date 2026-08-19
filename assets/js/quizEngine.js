@@ -4017,17 +4017,33 @@ function saveMissedQuestionsToReviewQueue(questions) {
     const reviewQueueStore = window.PharmletReviewQueueStore;
     const missedEntries = (questions || [])
         .filter(question => question?._answered && !question?._correct)
-        .map(question => ({
-            quizId: question?.sourceQuizId || getHistoryQuizId(),
-            title: question?.sourceTitle || state.title || "",
-            type: question?.type || "mcq",
-            prompt: question?.prompt || "",
-            choices: Array.isArray(question?.choices) ? question.choices : undefined,
-            answer: getCorrectAnswerValue(question),
-            answerText: question?.answerText,
-            userAnswer: Array.isArray(question?._user) ? question._user : (question?._user ?? ""),
-            timestamp: new Date().toISOString()
-        }))
+        .map(question => {
+            const entry = {
+                quizId: question?.sourceQuizId || getHistoryQuizId(),
+                title: question?.sourceTitle || state.title || "",
+                type: question?.type || "mcq",
+                prompt: question?.prompt || "",
+                choices: Array.isArray(question?.choices) ? question.choices : undefined,
+                answer: getCorrectAnswerValue(question),
+                answerText: question?.answerText,
+                userAnswer: Array.isArray(question?._user) ? question._user : (question?._user ?? ""),
+                timestamp: new Date().toISOString()
+            };
+            const answerMatching = question?.metadata?.answerMatching;
+            if (answerMatching?.spellingSensitive === true
+                && answerMatching?.capitalizationSensitive === false) {
+                entry.metadata = {
+                    answerMatching: {
+                        spellingSensitive: true,
+                        capitalizationSensitive: false
+                    }
+                };
+                if (Array.isArray(question?._acceptedAnswers)) {
+                    entry._acceptedAnswers = [...question._acceptedAnswers];
+                }
+            }
+            return entry;
+        })
         .filter(entry => entry.prompt && (entry.answer || Array.isArray(entry.answer)));
 
     if (!missedEntries.length || !reviewQueueStore) return;
@@ -4047,18 +4063,34 @@ function saveReviewRoundResultsToReviewQueue(questions) {
 
     const reviewResults = (questions || [])
         .filter(question => question?._answered)
-        .map(question => ({
-            quizId: question?.sourceQuizId || getHistoryQuizId(),
-            title: question?.sourceTitle || state.title || "",
-            type: question?.type || "mcq",
-            prompt: question?.prompt || "",
-            choices: Array.isArray(question?.choices) ? question.choices : undefined,
-            answer: getCorrectAnswerValue(question),
-            answerText: question?.answerText,
-            userAnswer: Array.isArray(question?._user) ? question._user : (question?._user ?? ""),
-            correct: !!question?._correct,
-            timestamp: new Date().toISOString()
-        }))
+        .map(question => {
+            const entry = {
+                quizId: question?.sourceQuizId || getHistoryQuizId(),
+                title: question?.sourceTitle || state.title || "",
+                type: question?.type || "mcq",
+                prompt: question?.prompt || "",
+                choices: Array.isArray(question?.choices) ? question.choices : undefined,
+                answer: getCorrectAnswerValue(question),
+                answerText: question?.answerText,
+                userAnswer: Array.isArray(question?._user) ? question._user : (question?._user ?? ""),
+                correct: !!question?._correct,
+                timestamp: new Date().toISOString()
+            };
+            const answerMatching = question?.metadata?.answerMatching;
+            if (answerMatching?.spellingSensitive === true
+                && answerMatching?.capitalizationSensitive === false) {
+                entry.metadata = {
+                    answerMatching: {
+                        spellingSensitive: true,
+                        capitalizationSensitive: false
+                    }
+                };
+                if (Array.isArray(question?._acceptedAnswers)) {
+                    entry._acceptedAnswers = [...question._acceptedAnswers];
+                }
+            }
+            return entry;
+        })
         .filter(entry => entry.prompt && (entry.answer || Array.isArray(entry.answer)));
 
     if (!reviewResults.length) return;
