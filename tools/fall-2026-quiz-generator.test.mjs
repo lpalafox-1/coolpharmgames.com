@@ -5,6 +5,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 import {
   Fall2026GeneratorError,
+  WEEK_1_PRACTICE_NOTE,
   buildQuestionCandidates,
   createSeededRng,
   generateFall2026Quiz,
@@ -356,6 +357,71 @@ test("complete Week 1 generation returns the explicit unresolved-policy result",
   assert.ok(!Object.hasOwn(result, "questions"));
 });
 
+test("explicit Week 1 practice mode generates ten Week 1-only questions without changing policy", () => {
+  const policyBefore = JSON.stringify(policy);
+  const result = generateFall2026Quiz({
+    drugData,
+    policy,
+    quizWeek: 1,
+    mode: "practice",
+    questionCount: 10,
+    seed: "week-one-student-practice"
+  });
+
+  assert.equal(result.status, "generated");
+  assert.equal(result.id, "fall-2026-p2-lab3-week-01-practice");
+  assert.equal(result.title, "Lab III Fall 2026 - Week 1 Practice");
+  assert.equal(result.mode, "practice");
+  assert.equal(result.practiceConfiguration, true);
+  assert.equal(result.practiceNote, WEEK_1_PRACTICE_NOTE);
+  assert.deepEqual(result.composition, {
+    newMaterialItemTarget: 10,
+    reviewMaterialItemTarget: 0,
+    totalItemTarget: 10
+  });
+  assert.equal(result.questions.length, 10);
+  assert.equal(JSON.stringify(policy), policyBefore);
+
+  for (const question of result.questions) {
+    assert.equal(question.metadata.sourceMaterial, "new");
+    assert.equal(question.metadata.sourceDrugQuizWeek, 1);
+    assert.equal(question.metadata.requestedQuizWeek, 1);
+    assert.ok(question.metadata.knowledgeDomain in {
+      brandGeneric: true,
+      drugClass: true,
+      fdaIndication: true,
+      mechanismOfAction: true,
+      topAdverseReactions: true,
+      boxWarning: true
+    });
+    if (question.metadata.knowledgeDomain === "brandGeneric") {
+      assert.deepEqual(question.metadata.answerMatching, {
+        spellingSensitive: true,
+        capitalizationSensitive: false
+      });
+    }
+  }
+
+  const serialized = JSON.stringify(result);
+  assert.ok(!serialized.includes("accessPharmacySortingCategory"));
+  assert.ok(!serialized.includes('"sourceMaterial":"review"'));
+});
+
+test("Week 1 practice override must be explicit and exactly match the authorized configuration", () => {
+  for (const options of [
+    { quizWeek: 1, mode: "practice" },
+    { quizWeek: 1, mode: "practice", questionCount: 6 },
+    { quizWeek: 1, questionCount: 10 },
+    { quizWeek: 2, mode: "practice", questionCount: 10 }
+  ]) {
+    assert.throws(
+      () => generateFall2026Quiz({ drugData, policy, seed: "invalid-practice", ...options }),
+      (error) => error instanceof Fall2026GeneratorError
+        && ["INVALID_WEEK_1_PRACTICE_CONFIGURATION", "INVALID_PRACTICE_OVERRIDE"].includes(error.code)
+    );
+  }
+});
+
 test("invalid quiz weeks fail cleanly", () => {
   for (const quizWeek of [0, 11, 2.5, "2", null]) {
     assert.throws(
@@ -629,7 +695,7 @@ test("injected RNG is honored and invalid RNG output is rejected", () => {
   );
 });
 
-test("no existing application page references or loads the generator module", () => {
+test("the Fall generator stack is activated only through the intended Fall Lab III page", () => {
   const htmlFiles = findFilesRecursively(
     repoRoot,
     (file) => file.endsWith(".html"),
@@ -637,9 +703,17 @@ test("no existing application page references or loads the generator module", ()
   );
   for (const file of htmlFiles) {
     const source = readFileSync(file, "utf8");
-    assert.ok(
-      !source.includes("fall-2026-quiz-generator.js"),
-      `${path.relative(repoRoot, file)} must not activate the Fall 2026 generator`
-    );
+    const relativePath = path.relative(repoRoot, file);
+    if (relativePath === "lab3-fall-2026.html") {
+      assert.ok(source.includes("assets/js/fall-2026-lab3-launcher.js"));
+    } else {
+      assert.ok(
+        !source.includes("fall-2026-lab3-launcher.js"),
+        `${relativePath} must not activate the Fall 2026 launcher`
+      );
+    }
+    assert.ok(!source.includes("fall-2026-quiz-generator.js"));
+    assert.ok(!source.includes("fall-2026-p2-top-drugs.json"));
+    assert.ok(!source.includes("fall-2026-lab3-quiz-policy.json"));
   }
 });

@@ -188,7 +188,7 @@ test("Fall 2026 policy separates eligibility, question types, and Week 1 uncerta
   assertNoForbiddenQuestionBankKeys(policy);
 });
 
-test("Fall 2026 foundation is not referenced by an application page or runtime script", () => {
+test("Fall 2026 source data is selected only by the intended student launcher", () => {
   const htmlFiles = listFilesRecursively(
     repoRoot,
     (file) => file.endsWith(".html"),
@@ -205,8 +205,16 @@ test("Fall 2026 foundation is not referenced by an application page or runtime s
 
   for (const file of runtimeFiles) {
     const source = readFileSync(file, "utf8");
+    const relativePath = path.relative(repoRoot, file);
     for (const reference of forbiddenReferences) {
-      assert.ok(!source.includes(reference), `${path.relative(repoRoot, file)} unexpectedly selects ${reference}`);
+      assert.equal(
+        source.includes(reference),
+        relativePath === "assets/js/fall-2026-lab3-launcher.js",
+        `${relativePath} has the wrong selection state for ${reference}`
+      );
     }
   }
+
+  const fallPage = readFileSync(path.join(repoRoot, "lab3-fall-2026.html"), "utf8");
+  assert.ok(fallPage.includes("assets/js/fall-2026-lab3-launcher.js"));
 });
