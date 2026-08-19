@@ -125,8 +125,8 @@ fixed: review-queue `wrongCounts` re-fold inflation (see P2B-10).
 
 ### P2B-05 — Cataloged assets/data validation warnings
 
-- **Phase:** 2B · **Status:** `READY` *(the only READY task — unblocked by
-  P2B-04 completion)*
+- **Phase:** 2B · **Status:** `DONE` *(merged through PR #40 at
+  `d55a57b638b9424299ab2fabb842a73e8792edab`)*
 - **Objective:** Give warning-level validator visibility to live quiz sources
   the catalog points at outside `quizzes/` (today: `basis2-quiz9` →
   `assets/data/bdt2_quiz9_masterpool.json`). Warnings only — exit codes for
@@ -149,7 +149,10 @@ fixed: review-queue `wrongCounts` re-fold inflation (see P2B-10).
 
 ### P2B-06 — Cache-token consistency tests
 
-- **Phase:** 2B · **Status:** `BLOCKED` (by P2B-05)
+- **Phase:** 2B · **Status:** `DEFERRED` *(product-owner decision,
+  2026-08-19: the remaining Phase 2B infrastructure work was deliberately
+  deferred so current Fall 2026 Lab III student-facing work could take
+  priority)*
 - **Objective:** A test that scans all application HTML for shared-script
   `?v=` cache tokens (`quiz-catalog.js`, `review-queue-store.js`,
   `top-drugs-data.js`, `quizEngine.js`) and fails when the same script is
@@ -234,6 +237,42 @@ fixed: review-queue `wrongCounts` re-fold inflation (see P2B-10).
   `tools/review-queue-store-regression.test.mjs`, HTML cache tokens for the
   store. **Commit:** `fix: stop wrongCounts inflation on review-queue normalize`
 - **Rollback:** revert.
+
+---
+
+## Current product work — Fall 2026 P2 Lab III Generative Quiz
+
+### F26-01 — Official Fall 2026 data + policy foundation
+
+- **Status:** `DONE`
+- **PR:** #41
+- **Merge:** `3f49c2f65d2d77635ffee0090f5ec8fbf5715e4c`
+- **Deliverables:**
+  - canonical 100-drug Fall dataset
+  - Lab III quiz policy
+  - architecture documentation
+  - regression protection
+  - legacy quizzes unchanged
+  - `quizEngine.js` unchanged
+
+### F26-02 — Deterministic quiz selector/generator module
+
+- **Status:** `READY` *(the only READY task in this ledger)*
+- **Objective:** Create a deterministic, unit-tested generator that consumes
+  the Fall 2026 drug dataset and Lab III policy and emits normalized
+  existing-engine-compatible FITB and MCQ question objects.
+- **Dependencies:** F26-01 (satisfied).
+- **Constraints:**
+  - legacy quizzes remain untouched
+  - no runtime activation yet
+  - `quizEngine.js` remains read-only unless separate owner approval is given
+  - Week 1 unresolved total-question behavior must remain unresolved
+  - generator must support Week 2–10 6-new + 4-review selection
+  - Brand/Generic produces FITB
+  - Class, indication, MOA, ADR, BBW produce MCQ
+  - deterministic injectable RNG/seed for tests
+  - source-backed distractors only
+  - no page routing or UI changes in this task
 
 ---
 
