@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "id": "fall-2026-p2-lab3-quiz-policy",
+  "academicYear": "2026-27",
+  "semester": "P2 Fall",
+  "course": "Lab III",
+  "source": {
+    "document": "Lab III Top Drug Quiz Guidance.pdf",
+    "sha256": "d327ce9dccdc49e897b109b81b1dc78b38e6c81f05ca20cedca216d0194fe3b1",
+    "pagesUsed": [
+      1
+    ]
+  },
+  "drugDataPath": "assets/data/fall-2026-p2-top-drugs.json",
+  "knowledgeDomains": [
+    {
+      "id": "brandGeneric",
+      "label": "Brand / Generic",
+      "curriculumOrigin": "P1 pull-through",
+      "sourceFields": [
+        "genericName",
+        "brandNames"
+      ],
+      "questionType": "fitb",
+      "answerMatching": {
+        "spellingSensitive": true,
+        "capitalizationSensitive": false
+      }
+    },
+    {
+      "id": "drugClass",
+      "label": "Drug Class",
+      "curriculumOrigin": "P1 pull-through",
+      "sourceFields": [
+        "drugClass"
+      ],
+      "questionType": "mcq"
+    },
+    {
+      "id": "fdaIndication",
+      "label": "FDA Indication",
+      "curriculumOrigin": "P1 pull-through",
+      "sourceFields": [
+        "fdaIndications"
+      ],
+      "questionType": "mcq"
+    },
+    {
+      "id": "mechanismOfAction",
+      "label": "MOA",
+      "curriculumOrigin": "P2 new",
+      "sourceFields": [
+        "mechanismOfAction"
+      ],
+      "questionType": "mcq"
+    },
+    {
+      "id": "topAdverseReactions",
+      "label": "Top ADRs",
+      "curriculumOrigin": "P2 new",
+      "sourceFields": [
+        "adverseReactions"
+      ],
+      "questionType": "mcq"
+    },
+    {
+      "id": "boxWarning",
+      "label": "BBW / Box Warning",
+      "curriculumOrigin": "P2 new",
+      "sourceFields": [
+        "boxWarning"
+      ],
+      "questionType": "mcq"
+    }
+  ],
+  "eligibility": {
+    "newMaterial": {
+      "drugRule": "sameSemesterAndAssignedWeekEqualsQuizWeek",
+      "eligibleDomainIds": [
+        "brandGeneric",
+        "drugClass",
+        "fdaIndication",
+        "mechanismOfAction",
+        "topAdverseReactions",
+        "boxWarning"
+      ]
+    },
+    "accumulatedReview": {
+      "startsAtQuizWeek": 2,
+      "drugRule": "sameSemesterAndAssignedWeekLessThanQuizWeek",
+      "eligibleDomainIds": [
+        "brandGeneric",
+        "drugClass",
+        "fdaIndication",
+        "mechanismOfAction",
+        "topAdverseReactions",
+        "boxWarning"
+      ]
+    }
+  },
+  "composition": {
+    "week2AndLater": {
+      "quizWeekRange": [
+        2,
+        10
+      ],
+      "newMaterialItemTarget": 6,
+      "reviewMaterialItemTarget": 4,
+      "totalItemTarget": 10,
+      "timeLimitMinutes": 10
+    },
+    "week1": {
+      "quizWeek": 1,
+      "newMaterialItemTarget": 6,
+      "reviewMaterialEligible": false,
+      "reviewMaterialItemTarget": 0,
+      "totalItemTarget": null,
+      "timeLimitMinutes": 10,
+      "policyStatus": "owner-decision-required",
+      "unresolvedDecision": "The guidance says Week 1 has no review questions but does not specify whether the four review slots are omitted or replaced. No replacement rule is encoded."
+    }
+  },
+  "delivery": {
+    "sameQuizWithinLabSection": true,
+    "parallelDifferentQuizForOtherSection": true
+  },
+  "excludedFromGeneration": [
+    {
+      "field": "accessPharmacySortingCategory",
+      "reason": "The official drug list says Do NOT memorize."
+    }
+  ],
+  "runtimeIntegration": {
+    "status": "foundation-only",
+    "selectedByDefault": false,
+    "legacyRoutesChanged": false
+  }
+}
