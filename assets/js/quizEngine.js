@@ -4013,10 +4013,24 @@ function getTemptingWrongAnswerInsight(question) {
     return { commonWrong, commonWrongCount };
 }
 
+function hasMalformedShortAnswerMatchingMarker(question) {
+    if (question?.type !== "short"
+        || !question?.metadata
+        || !Object.prototype.hasOwnProperty.call(question.metadata, "answerMatching")) {
+        return false;
+    }
+
+    const answerMatching = question.metadata.answerMatching;
+    return answerMatching?.spellingSensitive !== true
+        || answerMatching?.capitalizationSensitive !== false;
+}
+
 function saveMissedQuestionsToReviewQueue(questions) {
     const reviewQueueStore = window.PharmletReviewQueueStore;
     const missedEntries = (questions || [])
-        .filter(question => question?._answered && !question?._correct)
+        .filter(question => question?._answered
+            && !question?._correct
+            && !hasMalformedShortAnswerMatchingMarker(question))
         .map(question => {
             const entry = {
                 quizId: question?.sourceQuizId || getHistoryQuizId(),
@@ -4062,7 +4076,8 @@ function saveReviewRoundResultsToReviewQueue(questions) {
     if (!reviewQueueStore) return;
 
     const reviewResults = (questions || [])
-        .filter(question => question?._answered)
+        .filter(question => question?._answered
+            && !hasMalformedShortAnswerMatchingMarker(question))
         .map(question => {
             const entry = {
                 quizId: question?.sourceQuizId || getHistoryQuizId(),
