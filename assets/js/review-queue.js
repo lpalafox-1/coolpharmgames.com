@@ -184,19 +184,35 @@ function startReviewQuiz(limit) {
       ? `Review Quiz — ${getQuizDisplayTitle(questions[0])}`
       : "Review Quiz — Missed Questions",
     pools: {
-      easy: questions.map(q => ({
-        type: q.type,
-        prompt: q.prompt,
-        choices: q.choices,
-        answer: q.answer,
-        answerText: q.answerText ?? q.answer,
-        sourceQuizId: q.quizId || q.sourceQuizId || "",
-        sourceTitle: getQuizDisplayTitle(q),
-        hint: reviewQueueStore
-          ? `Mastery progress: ${reviewQueueStore.getMasterySummary(q).label}.`
-          : "Review your previous answer carefully.",
-        solution: buildReviewSolutionText(q)
-      }))
+      easy: questions.map(q => {
+        const question = {
+          type: q.type,
+          prompt: q.prompt,
+          choices: q.choices,
+          answer: q.answer,
+          answerText: q.answerText ?? q.answer,
+          sourceQuizId: q.quizId || q.sourceQuizId || "",
+          sourceTitle: getQuizDisplayTitle(q),
+          hint: reviewQueueStore
+            ? `Mastery progress: ${reviewQueueStore.getMasterySummary(q).label}.`
+            : "Review your previous answer carefully.",
+          solution: buildReviewSolutionText(q)
+        };
+        const answerMatching = q?.metadata?.answerMatching;
+        if (answerMatching?.spellingSensitive === true
+            && answerMatching?.capitalizationSensitive === false) {
+          question.metadata = {
+            answerMatching: {
+              spellingSensitive: true,
+              capitalizationSensitive: false
+            }
+          };
+          if (Array.isArray(q?._acceptedAnswers)) {
+            question._acceptedAnswers = [...q._acceptedAnswers];
+          }
+        }
+        return question;
+      })
     }
   };
 

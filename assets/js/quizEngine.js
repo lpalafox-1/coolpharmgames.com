@@ -4013,21 +4013,51 @@ function getTemptingWrongAnswerInsight(question) {
     return { commonWrong, commonWrongCount };
 }
 
+const hasMalformedShortAnswerMatchingMarker = (question) => {
+    if (question?.type !== "short"
+        || !question?.metadata
+        || !Object.prototype.hasOwnProperty.call(question.metadata, "answerMatching")) {
+        return false;
+    }
+
+    const answerMatching = question.metadata.answerMatching;
+    return answerMatching?.spellingSensitive !== true
+        || answerMatching?.capitalizationSensitive !== false;
+};
+
 function saveMissedQuestionsToReviewQueue(questions) {
     const reviewQueueStore = window.PharmletReviewQueueStore;
     const missedEntries = (questions || [])
-        .filter(question => question?._answered && !question?._correct)
-        .map(question => ({
-            quizId: question?.sourceQuizId || getHistoryQuizId(),
-            title: question?.sourceTitle || state.title || "",
-            type: question?.type || "mcq",
-            prompt: question?.prompt || "",
-            choices: Array.isArray(question?.choices) ? question.choices : undefined,
-            answer: getCorrectAnswerValue(question),
-            answerText: question?.answerText,
-            userAnswer: Array.isArray(question?._user) ? question._user : (question?._user ?? ""),
-            timestamp: new Date().toISOString()
-        }))
+        .filter(question => question?._answered
+            && !question?._correct
+            && !hasMalformedShortAnswerMatchingMarker(question))
+        .map(question => {
+            const entry = {
+                quizId: question?.sourceQuizId || getHistoryQuizId(),
+                title: question?.sourceTitle || state.title || "",
+                type: question?.type || "mcq",
+                prompt: question?.prompt || "",
+                choices: Array.isArray(question?.choices) ? question.choices : undefined,
+                answer: getCorrectAnswerValue(question),
+                answerText: question?.answerText,
+                userAnswer: Array.isArray(question?._user) ? question._user : (question?._user ?? ""),
+                timestamp: new Date().toISOString()
+            };
+            const answerMatching = question?.metadata?.answerMatching;
+            if (answerMatching?.spellingSensitive === true
+                && answerMatching?.capitalizationSensitive === false) {
+                entry.metadata = {
+                    answerMatching: {
+                        spellingSensitive: true,
+                        capitalizationSensitive: false
+                    }
+                };
+                if (Array.isArray(question?._acceptedAnswers)) {
+                    entry._acceptedAnswers = [...question._acceptedAnswers];
+                }
+            }
+            return entry;
+        })
         .filter(entry => entry.prompt && (entry.answer || Array.isArray(entry.answer)));
 
     if (!missedEntries.length || !reviewQueueStore) return;
@@ -4046,19 +4076,36 @@ function saveReviewRoundResultsToReviewQueue(questions) {
     if (!reviewQueueStore) return;
 
     const reviewResults = (questions || [])
-        .filter(question => question?._answered)
-        .map(question => ({
-            quizId: question?.sourceQuizId || getHistoryQuizId(),
-            title: question?.sourceTitle || state.title || "",
-            type: question?.type || "mcq",
-            prompt: question?.prompt || "",
-            choices: Array.isArray(question?.choices) ? question.choices : undefined,
-            answer: getCorrectAnswerValue(question),
-            answerText: question?.answerText,
-            userAnswer: Array.isArray(question?._user) ? question._user : (question?._user ?? ""),
-            correct: !!question?._correct,
-            timestamp: new Date().toISOString()
-        }))
+        .filter(question => question?._answered
+            && !hasMalformedShortAnswerMatchingMarker(question))
+        .map(question => {
+            const entry = {
+                quizId: question?.sourceQuizId || getHistoryQuizId(),
+                title: question?.sourceTitle || state.title || "",
+                type: question?.type || "mcq",
+                prompt: question?.prompt || "",
+                choices: Array.isArray(question?.choices) ? question.choices : undefined,
+                answer: getCorrectAnswerValue(question),
+                answerText: question?.answerText,
+                userAnswer: Array.isArray(question?._user) ? question._user : (question?._user ?? ""),
+                correct: !!question?._correct,
+                timestamp: new Date().toISOString()
+            };
+            const answerMatching = question?.metadata?.answerMatching;
+            if (answerMatching?.spellingSensitive === true
+                && answerMatching?.capitalizationSensitive === false) {
+                entry.metadata = {
+                    answerMatching: {
+                        spellingSensitive: true,
+                        capitalizationSensitive: false
+                    }
+                };
+                if (Array.isArray(question?._acceptedAnswers)) {
+                    entry._acceptedAnswers = [...question._acceptedAnswers];
+                }
+            }
+            return entry;
+        })
         .filter(entry => entry.prompt && (entry.answer || Array.isArray(entry.answer)));
 
     if (!reviewResults.length) return;
@@ -6774,6 +6821,35 @@ function extractLooseNumericTokens(value) {
 
 function evaluateAnswerForQuestion(q, val) {
     if (!q || val === "Revealed" || isBlankAnswerValue(val)) return false;
+
+    const hasAnswerMatchingMarker = q.type === "short"
+        && q?.metadata
+        && Object.prototype.hasOwnProperty.call(q.metadata, "answerMatching");
+
+    if (hasAnswerMatchingMarker) {
+        const answerMatching = q.metadata.answerMatching;
+        if (answerMatching?.spellingSensitive !== true
+            || answerMatching?.capitalizationSensitive !== false) {
+            return false;
+        }
+
+        if (typeof val !== "string" || typeof q.answer !== "string" || !q.answer.trim()) {
+            return false;
+        }
+
+        const normalizeStrictAnswer = (value) => value
+            .normalize("NFC")
+            .trim()
+            .toLocaleLowerCase("en-US");
+        const expectedAnswers = [
+            q.answer,
+            ...(Array.isArray(q._acceptedAnswers) ? q._acceptedAnswers : []),
+        ].filter((answer) => typeof answer === "string" && answer.trim());
+        const normalizedUserAnswer = normalizeStrictAnswer(val);
+
+        return normalizedUserAnswer !== ""
+            && expectedAnswers.some((answer) => normalizeStrictAnswer(answer) === normalizedUserAnswer);
+    }
 
     const raw = getCorrectAnswerValue(q);
     const correctAnswer = Array.isArray(raw) ? raw[0] : raw;
