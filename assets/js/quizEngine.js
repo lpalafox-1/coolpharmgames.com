@@ -6775,6 +6775,30 @@ function extractLooseNumericTokens(value) {
 function evaluateAnswerForQuestion(q, val) {
     if (!q || val === "Revealed" || isBlankAnswerValue(val)) return false;
 
+    const answerMatching = q?.metadata?.answerMatching;
+    const usesStrictCaseInsensitiveMatching = q.type === "short"
+        && answerMatching?.spellingSensitive === true
+        && answerMatching?.capitalizationSensitive === false;
+
+    if (usesStrictCaseInsensitiveMatching) {
+        if (typeof val !== "string" || typeof q.answer !== "string" || !q.answer.trim()) {
+            return false;
+        }
+
+        const normalizeStrictAnswer = (value) => value
+            .normalize("NFC")
+            .trim()
+            .toLocaleLowerCase("en-US");
+        const expectedAnswers = [
+            q.answer,
+            ...(Array.isArray(q._acceptedAnswers) ? q._acceptedAnswers : []),
+        ].filter((answer) => typeof answer === "string" && answer.trim());
+        const normalizedUserAnswer = normalizeStrictAnswer(val);
+
+        return normalizedUserAnswer !== ""
+            && expectedAnswers.some((answer) => normalizeStrictAnswer(answer) === normalizedUserAnswer);
+    }
+
     const raw = getCorrectAnswerValue(q);
     const correctAnswer = Array.isArray(raw) ? raw[0] : raw;
     const normalizeWhitespace = s => String(s).replace(/\s+/g, ' ').trim().toLowerCase();
