@@ -5,9 +5,10 @@
  * brands, suppress generic-only MCQs whose official values disagree, and use
  * the latest eligible week then source order as the canonical tie-breaker;
  * four choices per MCQ; complete source arrays displayed with semicolon
- * separators; seeded uniform candidate/option shuffles; a seeded Brand/Generic
- * direction (and brand variant); no domain quotas or no-repeat drug rule; and
- * a final seeded shuffle of the ten selected questions.
+ * separators; seeded practice-only candidate selection that prefers least-used
+ * drug identities and eligible domains, then degrades when pools are
+ * constrained; seeded option shuffles; a seeded Brand/Generic direction (and
+ * brand variant); and a final seeded shuffle of the ten selected questions.
  */
 const GENERATOR_ID = "fall-2026-p2-lab3-deterministic-generator";
 const MCQ_CHOICE_COUNT = 4;
@@ -18,23 +19,23 @@ export const WEEK_1_PRACTICE_NOTE = "Practice configuration: Week 1 has no prior
 const DOMAIN_SPECS = Object.freeze({
   drugClass: Object.freeze({
     field: "drugClass",
-    prompt: (drug) => `What is the drug class of <b>${drug.genericName}</b>?`
+    prompt: (reference) => `Which complete drug-class listing is recorded for ${reference}?`
   }),
   fdaIndication: Object.freeze({
     field: "fdaIndications",
-    prompt: (drug) => `Which complete FDA indication list is recorded for <b>${drug.genericName}</b>?`
+    prompt: (reference) => `Which complete FDA indication list is recorded for ${reference}?`
   }),
   mechanismOfAction: Object.freeze({
     field: "mechanismOfAction",
-    prompt: (drug) => `Which mechanism of action belongs to <b>${drug.genericName}</b>?`
+    prompt: (reference) => `Which mechanism of action belongs to ${reference}?`
   }),
   topAdverseReactions: Object.freeze({
     field: "adverseReactions",
-    prompt: (drug) => `Which complete top adverse-reaction list is recorded for <b>${drug.genericName}</b>?`
+    prompt: (reference) => `Which complete top adverse-reaction list is recorded for ${reference}?`
   }),
   boxWarning: Object.freeze({
     field: "boxWarning",
-    prompt: (drug) => `Which boxed-warning value belongs to <b>${drug.genericName}</b>?`
+    prompt: (reference) => `Which boxed-warning value belongs to ${reference}?`
   })
 });
 
@@ -331,6 +332,49 @@ function getAvailableDrugsThroughWeek(context, quizWeek) {
   );
 }
 
+function selectMcqStemReference(context, sourceDrug, quizWeek, rng) {
+  const referenceRoll = nextRandom(rng);
+  const brandIndex = Math.floor(nextRandom(rng) * sourceDrug.brandNames.length);
+  const brandName = sourceDrug.brandNames[brandIndex];
+  const brandKey = normalizeChoiceKey(brandName);
+  const brandGenericIdentities = new Set(
+    getAvailableDrugsThroughWeek(context, quizWeek)
+      .filter((drug) => drug.brandNames.some((brand) => normalizeChoiceKey(brand) === brandKey))
+      .map((drug) => normalizeGenericIdentity(drug.genericName))
+  );
+  const brandOnlyIsSafe = brandGenericIdentities.size === 1;
+
+  if (referenceRoll < (1 / 3)) {
+    return {
+      html: `<b>${sourceDrug.genericName}</b>`,
+      metadata: {
+        type: "generic",
+        genericName: sourceDrug.genericName
+      }
+    };
+  }
+
+  if (referenceRoll < (2 / 3) && brandOnlyIsSafe) {
+    return {
+      html: `<b>${brandName}</b>`,
+      metadata: {
+        type: "brand",
+        genericName: sourceDrug.genericName,
+        brandName
+      }
+    };
+  }
+
+  return {
+    html: `<b>${sourceDrug.genericName} (${brandName})</b>`,
+    metadata: {
+      type: "genericBrand",
+      genericName: sourceDrug.genericName,
+      brandName
+    }
+  };
+}
+
 function getGenericIdentityResolution(context, sourceDrug, domainId, quizWeek) {
   const genericIdentity = normalizeGenericIdentity(sourceDrug.genericName);
   const sourceDrugs = getAvailableDrugsThroughWeek(context, quizWeek).filter(
@@ -457,6 +501,54 @@ export function selectQuestionCandidates({ candidates, count, rng }) {
   return shuffleCopy(candidates, rng).slice(0, count);
 }
 
+function getCandidateDrugIdentity(candidate) {
+  return candidate.sourceGenericIdentity || normalizeGenericIdentity(candidate.sourceDrugId);
+}
+
+function selectPracticeQuestionCandidates({ candidates, count, rng }) {
+  if (!Array.isArray(candidates)) fail("INVALID_INPUT", "candidates must be an array.");
+  if (!Number.isInteger(count) || count < 0) fail("INVALID_INPUT", "count must be a non-negative integer.");
+  if (typeof rng !== "function") fail("INVALID_RNG", "An RNG function is required for selection.");
+  if (candidates.length < count) {
+    fail("INSUFFICIENT_CANDIDATES", `Needed ${count} candidates but found ${candidates.length}.`, {
+      requestedCount: count,
+      availableCount: candidates.length
+    });
+  }
+
+  const remaining = shuffleCopy(candidates, rng);
+  const selected = [];
+  const drugUseCounts = new Map();
+  const domainUseCounts = new Map();
+
+  while (selected.length < count) {
+    let bestIndex = 0;
+    for (let index = 1; index < remaining.length; index += 1) {
+      const candidate = remaining[index];
+      const best = remaining[bestIndex];
+      const candidateDrugUses = drugUseCounts.get(getCandidateDrugIdentity(candidate)) || 0;
+      const bestDrugUses = drugUseCounts.get(getCandidateDrugIdentity(best)) || 0;
+      const candidateDomainUses = domainUseCounts.get(candidate.domainId) || 0;
+      const bestDomainUses = domainUseCounts.get(best.domainId) || 0;
+
+      if (
+        candidateDrugUses < bestDrugUses
+        || (candidateDrugUses === bestDrugUses && candidateDomainUses < bestDomainUses)
+      ) {
+        bestIndex = index;
+      }
+    }
+
+    const [chosen] = remaining.splice(bestIndex, 1);
+    const drugIdentity = getCandidateDrugIdentity(chosen);
+    selected.push(chosen);
+    drugUseCounts.set(drugIdentity, (drugUseCounts.get(drugIdentity) || 0) + 1);
+    domainUseCounts.set(chosen.domainId, (domainUseCounts.get(chosen.domainId) || 0) + 1);
+  }
+
+  return selected;
+}
+
 function baseQuestionMetadata(context, candidate, extra = {}) {
   return {
     generatorId: GENERATOR_ID,
@@ -548,17 +640,24 @@ function materializeMcqQuestion(context, candidate, sourceDrug, rng) {
       domainId: candidate.domainId
     };
   }
+  const stemReference = selectMcqStemReference(
+    context,
+    sourceDrug,
+    candidate.requestedQuizWeek,
+    rng
+  );
 
   return {
     status: "materialized",
     question: {
       id: candidate.id,
       type: "mcq",
-      prompt: DOMAIN_SPECS[candidate.domainId].prompt(sourceDrug),
+      prompt: DOMAIN_SPECS[candidate.domainId].prompt(stemReference.html),
       choices: choiceEntries.map((entry) => entry.value),
       answer: correctValue,
       metadata: baseQuestionMetadata(context, candidate, {
-        choiceSources: choiceEntries.map((entry) => ({ ...entry }))
+        choiceSources: choiceEntries.map((entry) => ({ ...entry })),
+        stemReference: stemReference.metadata
       })
     }
   };
@@ -684,7 +783,7 @@ export function generateFall2026Quiz({
 
       const randomSource = resolveRandomSource({ quizWeek, seed, rng });
       const newCandidates = buildCandidatesFromContext(context, quizWeek, "new");
-      const selectedNew = selectQuestionCandidates({
+      const selectedNew = selectPracticeQuestionCandidates({
         candidates: newCandidates,
         count: questionCount,
         rng: randomSource.rng
@@ -756,12 +855,12 @@ export function generateFall2026Quiz({
   const randomSource = resolveRandomSource({ quizWeek, seed, rng });
   const newCandidates = buildCandidatesFromContext(context, quizWeek, "new");
   const reviewCandidates = buildCandidatesFromContext(context, quizWeek, "review");
-  const selectedNew = selectQuestionCandidates({
+  const selectedNew = selectPracticeQuestionCandidates({
     candidates: newCandidates,
     count: context.later.newMaterialItemTarget,
     rng: randomSource.rng
   });
-  const selectedReview = selectQuestionCandidates({
+  const selectedReview = selectPracticeQuestionCandidates({
     candidates: reviewCandidates,
     count: context.later.reviewMaterialItemTarget,
     rng: randomSource.rng

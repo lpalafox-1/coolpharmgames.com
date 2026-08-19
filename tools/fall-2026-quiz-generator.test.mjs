@@ -95,6 +95,69 @@ function generate(quizWeek, seed = `test-week-${quizWeek}`) {
   return generateFall2026Quiz({ drugData, policy, quizWeek, seed });
 }
 
+function generatePractice(quizWeek, seed = `practice-week-${quizWeek}`) {
+  return generateFall2026Quiz({
+    drugData,
+    policy,
+    quizWeek,
+    seed,
+    ...(quizWeek === 1 ? { mode: "practice", questionCount: 10 } : {})
+  });
+}
+
+function countBy(items, getKey) {
+  const counts = new Map();
+  for (const item of items) {
+    const key = getKey(item);
+    counts.set(key, (counts.get(key) || 0) + 1);
+  }
+  return counts;
+}
+
+function assertBalancedEligibleDomains(questions, eligibleDomainIds, label) {
+  const domainCounts = countBy(questions, (question) => question.metadata.knowledgeDomain);
+  const counts = eligibleDomainIds.map((domainId) => domainCounts.get(domainId) || 0);
+  assert.equal(
+    domainCounts.size,
+    Math.min(questions.length, eligibleDomainIds.length),
+    `${label} should use as many eligible domains as its size permits`
+  );
+  assert.ok(
+    Math.max(...counts) - Math.min(...counts) <= 1,
+    `${label} domain counts should differ by at most one: ${JSON.stringify(Object.fromEntries(domainCounts))}`
+  );
+}
+
+function assertSourceBackedStemReference(question) {
+  if (question.type !== "mcq") return;
+  const reference = question.metadata.stemReference;
+  const sourceDrug = drugData.drugs.find((drug) => drug.id === question.metadata.sourceDrugId);
+  assert.ok(reference, `${question.id} needs stem-reference provenance`);
+  assert.equal(reference.genericName, sourceDrug.genericName);
+
+  if (reference.type === "generic") {
+    assert.equal(reference.brandName, undefined);
+    assert.ok(question.prompt.includes(`<b>${sourceDrug.genericName}</b>`));
+    return;
+  }
+
+  assert.ok(["brand", "genericBrand"].includes(reference.type));
+  assert.ok(sourceDrug.brandNames.includes(reference.brandName));
+  if (reference.type === "brand") {
+    const matchingGenericIdentities = new Set(
+      drugData.drugs
+        .filter((drug) => drug.quizWeek <= question.metadata.requestedQuizWeek)
+        .filter((drug) => drug.brandNames.some((brand) => normalizeChoice(brand) === normalizeChoice(reference.brandName)))
+        .map((drug) => normalizeGenericIdentity(drug.genericName))
+    );
+    assert.equal(matchingGenericIdentities.size, 1, `${reference.brandName} is not safe as a brand-only reference`);
+    assert.ok(question.prompt.includes(`<b>${reference.brandName}</b>`));
+    return;
+  }
+
+  assert.ok(question.prompt.includes(`<b>${sourceDrug.genericName} (${reference.brandName})</b>`));
+}
+
 function assertGeneratedComposition(result, quizWeek) {
   assert.equal(result.status, "generated");
   assert.equal(result.quizWeek, quizWeek);
@@ -158,6 +221,104 @@ test("different seeds can produce different valid quizzes", () => {
   assert.notDeepEqual(first.questions, second.questions);
   assertGeneratedComposition(first, 10);
   assertGeneratedComposition(second, 10);
+});
+
+test("Weeks 1-3 practice selection prefers distinct drugs within each material bucket", () => {
+  for (let quizWeek = 1; quizWeek <= 3; quizWeek += 1) {
+    for (let seedIndex = 0; seedIndex < 12; seedIndex += 1) {
+      const result = generatePractice(quizWeek, `distinct-${quizWeek}-${seedIndex}`);
+      const newQuestions = result.questions.filter(
+        (question) => question.metadata.sourceMaterial === "new"
+      );
+      const reviewQuestions = result.questions.filter(
+        (question) => question.metadata.sourceMaterial === "review"
+      );
+
+      assert.equal(
+        new Set(newQuestions.map((question) => question.metadata.sourceDrugId)).size,
+        newQuestions.length,
+        `Week ${quizWeek} new material repeated a drug for seed ${seedIndex}`
+      );
+      assert.equal(
+        new Set(reviewQuestions.map((question) => question.metadata.sourceDrugId)).size,
+        reviewQuestions.length,
+        `Week ${quizWeek} review material repeated a drug for seed ${seedIndex}`
+      );
+      if (quizWeek === 1) {
+        assert.equal(newQuestions.length, 10);
+        assert.equal(reviewQuestions.length, 0);
+      } else {
+        assert.equal(newQuestions.length, 6);
+        assert.equal(reviewQuestions.length, 4);
+      }
+    }
+  }
+});
+
+test("Weeks 1-3 practice selection balances all safely eligible domains", () => {
+  for (let quizWeek = 1; quizWeek <= 3; quizWeek += 1) {
+    const materialTypes = quizWeek === 1 ? ["new"] : ["new", "review"];
+    for (let seedIndex = 0; seedIndex < 12; seedIndex += 1) {
+      const result = generatePractice(quizWeek, `domains-${quizWeek}-${seedIndex}`);
+      for (const materialType of materialTypes) {
+        const eligibleDomainIds = [...new Set(
+          buildQuestionCandidates({ drugData, policy, quizWeek, materialType })
+            .map((candidate) => candidate.domainId)
+        )];
+        const questions = result.questions.filter(
+          (question) => question.metadata.sourceMaterial === materialType
+        );
+        assertBalancedEligibleDomains(
+          questions,
+          eligibleDomainIds,
+          `Week ${quizWeek} ${materialType} seed ${seedIndex}`
+        );
+      }
+    }
+  }
+});
+
+test("Weeks 1-3 practice generation remains deterministic with diversity enabled", () => {
+  for (let quizWeek = 1; quizWeek <= 3; quizWeek += 1) {
+    const first = generatePractice(quizWeek, `diversity-deterministic-${quizWeek}`);
+    const second = generatePractice(quizWeek, `diversity-deterministic-${quizWeek}`);
+    assert.deepEqual(first, second);
+    assert.equal(JSON.stringify(first), JSON.stringify(second));
+  }
+});
+
+test("practice diversity degrades gracefully when ten distinct drugs are unavailable", () => {
+  const constrainedData = {
+    ...drugData,
+    drugs: drugData.drugs.slice(0, 4).map((drug, index) => ({
+      ...drug,
+      id: `diversity-constrained-${index + 1}`,
+      quizWeek: 1,
+      genericName: `Fixture Generic ${index + 1}`,
+      brandNames: [`Fixture Brand ${index + 1}`],
+      fdaIndications: [`Fixture Indication ${index + 1}`],
+      drugClass: `Fixture Class ${index + 1}`,
+      mechanismOfAction: `Fixture Mechanism ${index + 1}`,
+      boxWarning: `Fixture Warning ${index + 1}`,
+      adverseReactions: [`Fixture Reaction ${index + 1}`]
+    }))
+  };
+  const result = generateFall2026Quiz({
+    drugData: constrainedData,
+    policy,
+    quizWeek: 1,
+    mode: "practice",
+    questionCount: 10,
+    seed: "constrained-diversity"
+  });
+  const drugCounts = [...countBy(
+    result.questions,
+    (question) => question.metadata.sourceDrugId
+  ).values()];
+
+  assert.equal(result.questions.length, 10);
+  assert.equal(drugCounts.length, 4);
+  assert.ok(Math.max(...drugCounts) - Math.min(...drugCounts) <= 1);
 });
 
 test("Week 2 produces exactly six new and four accumulated-review questions", () => {
@@ -324,6 +485,150 @@ test("every MCQ distractor traces to the matching official source field through 
       }
     }
   }
+});
+
+test("Week 1-3 class MCQs present complete source listings without hardcodes or canonical edits", () => {
+  const canonicalDataBefore = JSON.stringify(drugData);
+  const productionSource = readFileSync(
+    path.join(repoRoot, "assets", "js", "fall-2026-quiz-generator.js"),
+    "utf8"
+  );
+  const legacyEngineSource = readFileSync(
+    path.join(repoRoot, "assets", "js", "quizEngine.js"),
+    "utf8"
+  );
+  const promptPrefix = "Which complete drug-class listing is recorded for";
+
+  assert.ok(!productionSource.includes("Benazepril"));
+  assert.ok(!legacyEngineSource.includes(promptPrefix));
+
+  const benazepril = drugData.drugs.find((drug) => drug.genericName === "Benazepril");
+  assert.ok(benazepril, "official source must retain Benazepril");
+  assert.equal(benazepril.drugClass, "ACEI, Antihypertensive");
+
+  let auditedClassQuestionCount = 0;
+  for (let quizWeek = 1; quizWeek <= 3; quizWeek += 1) {
+    const materialTypes = quizWeek === 1 ? ["new"] : ["new", "review"];
+    const eligibleDrugs = drugData.drugs.filter(
+      (drug) => drug.semester === policy.semester && drug.quizWeek <= quizWeek
+    );
+    const eligibleClassValues = new Set(
+      eligibleDrugs.map((drug) => normalizeChoice(drug.drugClass))
+    );
+    const classCandidates = materialTypes.flatMap((materialType) => (
+      buildQuestionCandidates({ drugData, policy, quizWeek, materialType })
+        .filter((candidate) => candidate.domainId === "drugClass")
+    ));
+
+    for (const candidate of classCandidates) {
+      const sourceDrug = drugData.drugs.find((drug) => drug.id === candidate.sourceDrugId);
+      const result = materialize(candidate, `class-presentation-${candidate.id}`);
+
+      assert.equal(result.status, "materialized");
+      assert.ok(result.question.prompt.startsWith(`${promptPrefix} `));
+      assertSourceBackedStemReference(result.question);
+      assert.equal(result.question.answer, sourceDrug.drugClass);
+      assert.equal(
+        result.question.metadata.choiceSources.find((entry) => entry.role === "correct")?.value,
+        sourceDrug.drugClass
+      );
+      for (const choice of result.question.choices) {
+        assert.ok(
+          eligibleClassValues.has(normalizeChoice(choice)),
+          `${candidate.id} has a class option that is not source-backed through Week ${quizWeek}`
+        );
+      }
+      auditedClassQuestionCount += 1;
+    }
+  }
+
+  assert.ok(auditedClassQuestionCount > 0);
+  assert.equal(JSON.stringify(drugData), canonicalDataBefore);
+});
+
+test("Week 1-3 MCQ stems vary across generic, official brand, and combined references", () => {
+  const referenceTypeCounts = new Map();
+  let strictFitbCount = 0;
+
+  for (let quizWeek = 1; quizWeek <= 3; quizWeek += 1) {
+    for (let seedIndex = 0; seedIndex < 16; seedIndex += 1) {
+      const result = generatePractice(quizWeek, `stem-variety-${quizWeek}-${seedIndex}`);
+      for (const question of result.questions) {
+        if (question.type === "mcq") {
+          assertSourceBackedStemReference(question);
+          const referenceType = question.metadata.stemReference.type;
+          referenceTypeCounts.set(referenceType, (referenceTypeCounts.get(referenceType) || 0) + 1);
+        } else {
+          assert.equal(question.metadata.knowledgeDomain, "brandGeneric");
+          assert.deepEqual(question.metadata.answerMatching, {
+            spellingSensitive: true,
+            capitalizationSensitive: false
+          });
+          assert.equal(question.metadata.stemReference, undefined);
+          strictFitbCount += 1;
+        }
+      }
+    }
+  }
+
+  assert.ok((referenceTypeCounts.get("generic") || 0) > 0);
+  assert.ok((referenceTypeCounts.get("brand") || 0) > 0);
+  assert.ok((referenceTypeCounts.get("genericBrand") || 0) > 0);
+  assert.ok(strictFitbCount > 0);
+});
+
+test("multiple-brand drugs use only their official brands in seeded MCQ references", () => {
+  const semaglutide = drugData.drugs.find((drug) => drug.genericName === "Semaglutide");
+  assert.ok(semaglutide.brandNames.length > 1);
+  const candidate = buildQuestionCandidates({
+    drugData,
+    policy,
+    quizWeek: semaglutide.quizWeek,
+    materialType: "new"
+  }).find((item) => item.sourceDrugId === semaglutide.id && item.domainId === "drugClass");
+  const observedBrands = new Set();
+
+  for (let seedIndex = 0; seedIndex < 48; seedIndex += 1) {
+    const result = materialize(candidate, `multiple-brand-stem-${seedIndex}`);
+    assert.equal(result.status, "materialized");
+    assertSourceBackedStemReference(result.question);
+    const brandName = result.question.metadata.stemReference.brandName;
+    if (brandName) observedBrands.add(brandName);
+  }
+
+  assert.ok(observedBrands.size > 1, "seeded MCQ references should exercise multiple official brands");
+  for (const brandName of observedBrands) {
+    assert.ok(semaglutide.brandNames.includes(brandName));
+  }
+});
+
+test("an ambiguous official brand is never used as a brand-only MCQ reference", () => {
+  const ambiguousBrandData = clone(drugData);
+  const sourceDrug = ambiguousBrandData.drugs.find((drug) => drug.genericName === "Benazepril");
+  const otherDrug = ambiguousBrandData.drugs.find((drug) => drug.genericName === "Amlodipine");
+  otherDrug.brandNames = [...otherDrug.brandNames, sourceDrug.brandNames[0]];
+  const candidate = buildQuestionCandidates({
+    drugData: ambiguousBrandData,
+    policy,
+    quizWeek: 1,
+    materialType: "new"
+  }).find((item) => item.sourceDrugId === sourceDrug.id && item.domainId === "drugClass");
+  const result = materializeQuestionCandidate({
+    candidate,
+    drugData: ambiguousBrandData,
+    policy,
+    rng: () => 0.5
+  });
+
+  assert.equal(result.status, "materialized");
+  assert.deepEqual(result.question.metadata.stemReference, {
+    type: "genericBrand",
+    genericName: sourceDrug.genericName,
+    brandName: sourceDrug.brandNames[0]
+  });
+  assert.ok(
+    result.question.prompt.includes(`<b>${sourceDrug.genericName} (${sourceDrug.brandNames[0]})</b>`)
+  );
 });
 
 test("Access Pharmacy sorting-category fields are rejected and never generated", () => {
@@ -535,6 +840,32 @@ test("duplicate-generic Brand / Generic FITB aggregates all four official Flutic
     new Set(["Flovent", "Arnuity", "Flonase", "Xhance"])
   );
   assert.deepEqual(result.question.metadata.sourceDrugIds, fixture.rows.map((row) => row.id));
+});
+
+test("duplicate-generic MCQ stem references remain source-backed and unambiguous", () => {
+  const fixture = getDuplicateGenericFixture();
+  const mcqCandidates = fixture.candidates.filter(
+    (candidate) => candidate.sourceGenericIdentity === fixture.genericIdentity
+      && candidate.domainId !== "brandGeneric"
+  );
+  const officialBrands = new Set(fixture.rows.flatMap((row) => row.brandNames));
+  assert.ok(mcqCandidates.length > 0);
+
+  for (const candidate of mcqCandidates) {
+    for (let seedIndex = 0; seedIndex < 12; seedIndex += 1) {
+      const result = materializeQuestionCandidate({
+        candidate,
+        drugData,
+        policy,
+        rng: createSeededRng(`duplicate-stem-${candidate.id}-${seedIndex}`)
+      });
+      assert.equal(result.status, "materialized");
+      assertSourceBackedStemReference(result.question);
+      const reference = result.question.metadata.stemReference;
+      assert.equal(reference.genericName, "Fluticasone");
+      if (reference.brandName) assert.ok(officialBrands.has(reference.brandName));
+    }
+  }
 });
 
 test("duplicate generic identities cannot emit duplicate rendered prompt/answer questions", () => {

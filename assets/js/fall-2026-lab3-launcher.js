@@ -1,7 +1,7 @@
 import {
   WEEK_1_PRACTICE_NOTE,
   generateFall2026Quiz
-} from "./fall-2026-quiz-generator.js";
+} from "./fall-2026-quiz-generator.js?v=20260819a";
 
 const CUSTOM_QUIZ_KEY = "pharmlet.custom-quiz";
 const SUPPORTED_WEEKS = new Set([1, 2, 3]);
