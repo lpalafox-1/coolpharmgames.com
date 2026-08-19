@@ -38,6 +38,41 @@
     return normalizeText(value);
   }
 
+  function getStrictAnswerContract(source) {
+    const answerMatching = source?.metadata?.answerMatching;
+    if (answerMatching?.spellingSensitive !== true
+        || answerMatching?.capitalizationSensitive !== false) {
+      return null;
+    }
+
+    return {
+      acceptedAnswers: Array.isArray(source?._acceptedAnswers)
+        ? source._acceptedAnswers.filter((answer) => typeof answer === "string" && answer.trim())
+        : []
+    };
+  }
+
+  function applyStrictAnswerContract(target, ...sources) {
+    const contracts = sources.map(getStrictAnswerContract).filter(Boolean);
+    if (!contracts.length) return;
+
+    target.metadata = {
+      answerMatching: {
+        spellingSensitive: true,
+        capitalizationSensitive: false
+      }
+    };
+
+    const acceptedAnswers = [];
+    contracts.forEach((contract) => {
+      contract.acceptedAnswers.forEach((answer) => {
+        if (!acceptedAnswers.includes(answer)) acceptedAnswers.push(answer);
+      });
+    });
+
+    if (acceptedAnswers.length) target._acceptedAnswers = acceptedAnswers;
+  }
+
   function normalizeIso(value, fallbackIso) {
     const timestamp = new Date(value || fallbackIso || Date.now()).getTime();
     if (Number.isNaN(timestamp)) {
@@ -151,6 +186,8 @@
       archived: Boolean(rawEntry.archived)
     };
 
+    applyStrictAnswerContract(normalized, rawEntry);
+
     if (normalized.clearStreak >= MASTERED_STREAK_TARGET) {
       normalized.archived = true;
       normalized.masteredAt = normalized.masteredAt || normalized.lastReviewedAt || normalized.lastMissedAt;
@@ -195,6 +232,8 @@
         : null,
       archived: Boolean(newerReviewState.archived || newerEntry.archived)
     };
+
+    applyStrictAnswerContract(combined, existing, incoming);
 
     if (combined.clearStreak >= MASTERED_STREAK_TARGET) {
       combined.archived = true;
@@ -273,6 +312,7 @@
     if (Array.isArray(record.choices)) entry.choices = record.choices;
     if (record.answer !== undefined) entry.answer = record.answer;
     if (record.answerText !== undefined) entry.answerText = record.answerText;
+    applyStrictAnswerContract(entry, entry, record);
   }
 
   function buildEmptyEntry(record, timestampIso) {

@@ -19,18 +19,24 @@ const drugData = JSON.parse(
 const policy = JSON.parse(
   readFileSync(path.join(repoRoot, "assets", "data", "fall-2026-lab3-quiz-policy.json"), "utf8")
 );
-const EXPECTED_ENGINE_SHA256 = "b9862408f282f5e57f2ff6f7813b027ef94117f683e2c73a166bae1792dbe3be";
+const APPROVED_ENGINE_BASELINE = Object.freeze({
+  commit: "dbc754d960be66ec250f506aba3e6f9299a09a88",
+  sha256: "024ddd5775c1cdbce9b0b8421963b9ec0911441387195809579baf435f7ae366"
+});
 
-function createStorageStub() {
+function createStorageStub(initialValues = {}) {
+  const values = new Map(
+    Object.entries(initialValues).map(([key, value]) => [key, String(value)])
+  );
   return {
-    getItem() { return null; },
-    setItem() {},
-    removeItem() {}
+    getItem(key) { return values.has(key) ? values.get(key) : null; },
+    setItem(key, value) { values.set(key, String(value)); },
+    removeItem(key) { values.delete(key); }
   };
 }
 
-function loadEngineWithoutBootstrap() {
-  const storage = createStorageStub();
+function loadEngineWithoutBootstrap(extraGlobals = {}) {
+  const storage = extraGlobals.localStorage || createStorageStub();
   return loadBrowserGlobal("assets/js/quizEngine.js", {
     location: { search: "", href: "" },
     document: { addEventListener() {} },
@@ -41,7 +47,8 @@ function loadEngineWithoutBootstrap() {
     setTimeout,
     clearTimeout,
     setInterval,
-    clearInterval
+    clearInterval,
+    ...extraGlobals
   });
 }
 
@@ -63,12 +70,36 @@ function listFilesRecursively(directory, predicate, skippedNames = new Set()) {
   return files;
 }
 
-function sourceBetween(source, startMarker, endMarker) {
-  const start = source.indexOf(startMarker);
-  const end = source.indexOf(endMarker, start + startMarker.length);
-  assert.ok(start >= 0, `missing source marker: ${startMarker}`);
-  assert.ok(end > start, `missing source marker: ${endMarker}`);
-  return source.slice(start, end);
+function strictMetadata() {
+  return {
+    answerMatching: {
+      spellingSensitive: true,
+      capitalizationSensitive: false
+    }
+  };
+}
+
+function loadReviewQueuePage(queue, reviewQueueStore) {
+  const storage = createStorageStub({
+    "pharmlet.review-queue": JSON.stringify(queue)
+  });
+  const location = { search: "", href: "" };
+  const document = {
+    addEventListener() {},
+    getElementById(id) {
+      return id === "filter-quiz" ? { value: "" } : null;
+    }
+  };
+  const page = loadBrowserGlobal("assets/js/review-queue.js", {
+    document,
+    localStorage: storage,
+    location,
+    PharmletReviewQueueStore: reviewQueueStore,
+    PharmletQuizCatalog: null,
+    alert(message) { throw new Error(message); },
+    confirm() { return false; }
+  });
+  return { page, storage, location };
 }
 
 test("the actual shipped evaluator is callable without running app bootstrap", () => {
@@ -151,6 +182,53 @@ test("legacy aliases, _acceptedAnswers, brand extras, and qualifier removal part
   }, "ProAir HFA"), true);
 });
 
+test("marked Fall FITB scoring is spelling-sensitive and capitalization-insensitive", () => {
+  const evaluate = loadEngineWithoutBootstrap().evaluateAnswerForQuestion;
+  const marked = (answer, acceptedAnswers = []) => ({
+    type: "short",
+    prompt: "Fall Brand/Generic FITB",
+    answer,
+    _acceptedAnswers: acceptedAnswers,
+    metadata: strictMetadata()
+  });
+
+  assert.equal(evaluate(marked("Vasotec"), "VASOTEC"), true);
+  assert.equal(evaluate(marked("Vasotec"), "  vasotec  "), true);
+  assert.equal(evaluate(marked("Vasotec"), "Vasotecc"), false);
+
+  assert.equal(evaluate(marked("Dilt-XR"), "dilt-xr"), true);
+  assert.equal(evaluate(marked("Dilt-XR"), "DiltXR"), false);
+  assert.equal(evaluate(marked("Dilt-XR"), "Dilt.XR"), false);
+  assert.equal(evaluate(marked("Cartia XT"), "Cartia     XT"), false);
+
+  assert.equal(evaluate(marked("Sacubitril/Valsartan"), "sacubitril/valsartan"), true);
+  assert.equal(evaluate(marked("Sacubitril/Valsartan"), "Sacubitril Valsartan"), false);
+  assert.equal(evaluate(marked("Sacubitril/Valsartan"), "Valsartan-Sacubitril"), false);
+
+  const semaglutide = marked("Ozempic", ["Rybelsus", "Wegovy"]);
+  assert.equal(evaluate(semaglutide, "RYBELSUS"), true);
+  assert.equal(evaluate(semaglutide, "wegovy"), true);
+  assert.equal(evaluate(semaglutide, "Rybelsus!"), false);
+});
+
+test("malformed marked FITB questions fail closed instead of using legacy loose scoring", () => {
+  const evaluate = loadEngineWithoutBootstrap().evaluateAnswerForQuestion;
+  const base = {
+    type: "short",
+    prompt: "Brand for Diltiazem?",
+    answer: "Dilt-XR"
+  };
+
+  assert.equal(evaluate({ ...base, metadata: { answerMatching: null } }, "DiltXR"), false);
+  assert.equal(evaluate({
+    ...base,
+    metadata: { answerMatching: { spellingSensitive: true } }
+  }, "DiltXR"), false);
+  assert.equal(evaluate({ ...base, answer: ["Dilt-XR"], metadata: strictMetadata() }, "Dilt-XR"), false);
+  assert.equal(evaluate({ ...base, answer: undefined, metadata: strictMetadata() }, "Dilt-XR"), false);
+  assert.equal(evaluate({ ...base, metadata: strictMetadata() }, ["Dilt-XR"]), false);
+});
+
 test("Fall answerMatching metadata and official alternatives survive loading and in-session clones", () => {
   const engine = loadEngineWithoutBootstrap();
   const semaglutide = drugData.drugs.find((drug) => drug.genericName === "Semaglutide");
@@ -188,29 +266,74 @@ test("Fall answerMatching metadata and official alternatives survive loading and
   assert.deepEqual(plain(generatedClone._acceptedAnswers), result.question._acceptedAnswers);
 });
 
-test("the persisted review-queue path currently drops strict metadata and accepted alternatives", () => {
-  const saveProjection = sourceBetween(
-    engineSource,
-    "function saveMissedQuestionsToReviewQueue",
-    "function saveReviewRoundResultsToReviewQueue"
-  );
-  assert.doesNotMatch(saveProjection, /answerMatching/);
-  assert.doesNotMatch(saveProjection, /_acceptedAnswers/);
+test("strict metadata and official alternatives survive the full persisted review lifecycle", () => {
+  let missedProjection;
+  let reviewProjection;
+  const storage = createStorageStub({ "pharmlet.review-queue": "[]" });
+  const engine = loadEngineWithoutBootstrap({
+    localStorage: storage,
+    PharmletReviewQueueStore: {
+      mergeMissedEntries(_existing, entries) {
+        missedProjection = plain(entries);
+        return entries;
+      },
+      applyReviewResults(_existing, entries) {
+        reviewProjection = plain(entries);
+        return entries;
+      }
+    }
+  });
+  const markedQuestion = {
+    type: "short",
+    prompt: "Brand for Semaglutide?",
+    answer: "Ozempic",
+    _acceptedAnswers: ["Rybelsus", "Wegovy"],
+    metadata: strictMetadata(),
+    sourceQuizId: "fall-2026-week-8",
+    sourceTitle: "Fall 2026 Week 8",
+    _answered: true,
+    _correct: false,
+    _user: "Rybelsus!"
+  };
 
-  const storeSource = readFileSync(path.join(repoRoot, "assets", "js", "review-queue-store.js"), "utf8");
-  const storeProjection = sourceBetween(storeSource, "function normalizeEntry", "function combineEntries");
-  assert.doesNotMatch(storeProjection, /answerMatching/);
-  assert.doesNotMatch(storeProjection, /_acceptedAnswers/);
+  engine.saveMissedQuestionsToReviewQueue([markedQuestion]);
+  assert.deepEqual(missedProjection[0].metadata, strictMetadata());
+  assert.deepEqual(missedProjection[0]._acceptedAnswers, ["Rybelsus", "Wegovy"]);
 
-  const reviewPageSource = readFileSync(path.join(repoRoot, "assets", "js", "review-queue.js"), "utf8");
-  const rebuildProjection = sourceBetween(reviewPageSource, "function startReviewQuiz", "function populateQuizFilter");
-  assert.doesNotMatch(rebuildProjection, /answerMatching/);
-  assert.doesNotMatch(rebuildProjection, /_acceptedAnswers/);
+  const store = loadBrowserGlobal("assets/js/review-queue-store.js").PharmletReviewQueueStore;
+  const persistedQueue = plain(store.mergeMissedEntries([], missedProjection));
+  assert.deepEqual(persistedQueue[0].metadata, strictMetadata());
+  assert.deepEqual(persistedQueue[0]._acceptedAnswers, ["Rybelsus", "Wegovy"]);
+
+  const reviewPage = loadReviewQueuePage(persistedQueue, store);
+  reviewPage.page.startReviewQuiz(null);
+  const customQuiz = JSON.parse(reviewPage.storage.getItem("pharmlet.custom-quiz"));
+  const rebuiltQuestion = customQuiz.pools.easy[0];
+  assert.deepEqual(rebuiltQuestion.metadata, strictMetadata());
+  assert.deepEqual(rebuiltQuestion._acceptedAnswers, ["Rybelsus", "Wegovy"]);
+  assert.match(reviewPage.location.href, /^quiz\.html\?id=review-quiz/);
+
+  const normalizedReview = engine.normalizeLoadedQuizQuestion(rebuiltQuestion);
+  assert.equal(engine.evaluateAnswerForQuestion(normalizedReview, "RYBELSUS"), true);
+  assert.equal(engine.evaluateAnswerForQuestion(normalizedReview, "Rybelsus!"), false);
+
+  engine.saveReviewRoundResultsToReviewQueue([{
+    ...rebuiltQuestion,
+    _answered: true,
+    _correct: true,
+    _user: "RYBELSUS"
+  }]);
+  assert.deepEqual(reviewProjection[0].metadata, strictMetadata());
+  assert.deepEqual(reviewProjection[0]._acceptedAnswers, ["Rybelsus", "Wegovy"]);
+
+  const updatedQueue = plain(store.applyReviewResults(persistedQueue, reviewProjection));
+  assert.deepEqual(updatedQueue[0].metadata, strictMetadata());
+  assert.deepEqual(updatedQueue[0]._acceptedAnswers, ["Rybelsus", "Wegovy"]);
 });
 
-test("Fall remains inactive, legacy data has no strict marker, and quizEngine.js is byte-identical", () => {
+test(`Fall remains inactive, legacy data has no strict marker, and the engine matches ${APPROVED_ENGINE_BASELINE.commit}`, () => {
   const digest = createHash("sha256").update(engineSource).digest("hex");
-  assert.equal(digest, EXPECTED_ENGINE_SHA256);
+  assert.equal(digest, APPROVED_ENGINE_BASELINE.sha256);
 
   const htmlFiles = listFilesRecursively(
     repoRoot,

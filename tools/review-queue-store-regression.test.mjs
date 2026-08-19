@@ -58,6 +58,67 @@ test("a missed question creates a v2 entry with the documented key grammar", () 
   // (Spread copies the vm-realm object so deep-equal compares same-realm prototypes.)
   assert.deepEqual({ ...entry.wrongCounts }, { "ACE inhibitor": 2 });
   assert.equal(entry.lastMissedAt, "2026-07-01T12:00:00.000Z");
+  assert.equal(Object.hasOwn(entry, "metadata"), false, "legacy entries must not gain strict metadata");
+  assert.equal(Object.hasOwn(entry, "_acceptedAnswers"), false, "legacy entries must not gain accepted-answer fields");
+});
+
+test("strict scoring metadata and accepted answers survive queue normalization and updates", () => {
+  const store = loadStore();
+  const strictRecord = missedRecord({
+    type: "short",
+    prompt: "Brand for Semaglutide?",
+    answer: "Ozempic",
+    _acceptedAnswers: ["Rybelsus", "Wegovy"],
+    metadata: {
+      answerMatching: {
+        spellingSensitive: true,
+        capitalizationSensitive: false
+      }
+    }
+  });
+
+  let queue = store.mergeMissedEntries([], [strictRecord]);
+  assert.deepEqual({ ...queue[0].metadata.answerMatching }, {
+    spellingSensitive: true,
+    capitalizationSensitive: false
+  });
+  assert.deepEqual([...queue[0]._acceptedAnswers], ["Rybelsus", "Wegovy"]);
+
+  queue = store.applyReviewResults(queue, [{
+    ...strictRecord,
+    metadata: undefined,
+    _acceptedAnswers: undefined,
+    correct: true,
+    timestamp: "2026-07-02T12:00:00.000Z"
+  }]);
+  assert.deepEqual({ ...queue[0].metadata.answerMatching }, {
+    spellingSensitive: true,
+    capitalizationSensitive: false
+  });
+  assert.deepEqual([...queue[0]._acceptedAnswers], ["Rybelsus", "Wegovy"]);
+
+  const combined = store.normalizeQueue([
+    queue[0],
+    { ...strictRecord, _acceptedAnswers: ["Wegovy", "Rybelsus"] }
+  ]);
+  assert.deepEqual([...combined[0]._acceptedAnswers], ["Rybelsus", "Wegovy"]);
+});
+
+test("invalid scoring markers and unmarked accepted-answer fields are not persisted", () => {
+  const store = loadStore();
+  const queue = store.mergeMissedEntries([], [missedRecord({
+    type: "short",
+    _acceptedAnswers: ["Unmarked alternative"],
+    metadata: {
+      answerMatching: {
+        spellingSensitive: true,
+        capitalizationSensitive: true
+      }
+    }
+  })]);
+
+  assert.equal(Object.hasOwn(queue[0], "metadata"), false);
+  assert.equal(Object.hasOwn(queue[0], "_acceptedAnswers"), false);
 });
 
 test("HTML and plain-text prompts deduplicate to the same entry", () => {

@@ -15,8 +15,11 @@ const LEGACY_BASELINE = Object.freeze({
   commit: "d55a57b638b9424299ab2fabb842a73e8792edab",
   quizFileCount: 35,
   quizCorpusSha256: "10e5336b75c55f15ad249ce8350edf66737a560423b50e6eedc38c68e27cf2fb",
-  masterPoolSha256: "1fb50e96e60252a9839406d53bc929e9569d76c0ddc2522aff43adf9bdf2a87c",
-  quizEngineSha256: "b9862408f282f5e57f2ff6f7813b027ef94117f683e2c73a166bae1792dbe3be"
+  masterPoolSha256: "1fb50e96e60252a9839406d53bc929e9569d76c0ddc2522aff43adf9bdf2a87c"
+});
+const APPROVED_ENGINE_BASELINE = Object.freeze({
+  commit: "dbc754d960be66ec250f506aba3e6f9299a09a88",
+  sha256: "024ddd5775c1cdbce9b0b8421963b9ec0911441387195809579baf435f7ae366"
 });
 
 function sha256(value) {
@@ -67,7 +70,7 @@ function assertNoForbiddenQuestionBankKeys(value, location = "policy") {
   }
 }
 
-test(`legacy quiz inputs and engine source remain byte-identical to ${LEGACY_BASELINE.commit}`, () => {
+test(`legacy quiz inputs remain byte-identical to ${LEGACY_BASELINE.commit} and the engine matches ${APPROVED_ENGINE_BASELINE.commit}`, () => {
   const quizCorpus = hashQuizCorpus();
   assert.equal(quizCorpus.count, LEGACY_BASELINE.quizFileCount, "legacy static quiz file count changed");
   assert.equal(quizCorpus.digest, LEGACY_BASELINE.quizCorpusSha256, "legacy static quiz JSON changed");
@@ -76,7 +79,7 @@ test(`legacy quiz inputs and engine source remain byte-identical to ${LEGACY_BAS
   assert.equal(sha256(masterPool), LEGACY_BASELINE.masterPoolSha256, "legacy Top Drugs master pool changed");
 
   const quizEngine = readFileSync(path.join(repoRoot, "assets", "js", "quizEngine.js"));
-  assert.equal(sha256(quizEngine), LEGACY_BASELINE.quizEngineSha256, "legacy engine/scoring source changed");
+  assert.equal(sha256(quizEngine), APPROVED_ENGINE_BASELINE.sha256, "approved strict-scoring engine baseline changed");
 });
 
 test("Fall 2026 drug data contains ten complete weekly cohorts without a testable sorting category", () => {
