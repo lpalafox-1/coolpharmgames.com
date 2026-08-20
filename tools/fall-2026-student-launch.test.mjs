@@ -156,7 +156,7 @@ test("the launcher preserves deterministic generator output for a supplied seed"
 });
 
 test("a launched multiple-brand FITB keeps strict scoring and accepted answers through the runtime and review queue", () => {
-  const payload = build(1, "dilt-inverse-1");
+  const payload = build(1, "dilt-class-1");
   const launchedQuestion = payload.questions.find((question) => (
     question.metadata?.knowledgeDomain === "brandGeneric"
     && [question.answer, ...(question._acceptedAnswers || [])].includes("Dilt-XR")
