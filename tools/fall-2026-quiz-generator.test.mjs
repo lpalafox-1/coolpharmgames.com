@@ -32,6 +32,12 @@ const MCQ_DOMAIN_FIELDS = Object.freeze({
   boxWarning: "boxWarning"
 });
 
+const STRUCTURED_MCQ_DOMAIN_IDS = Object.freeze([
+  "drugClass",
+  "fdaIndication",
+  "topAdverseReactions"
+]);
+
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
 }
@@ -64,6 +70,50 @@ function sourceValueIdentity(drug, domainId) {
     return value.map(normalizeChoice).filter(Boolean).sort().join("\0");
   }
   return normalizeChoice(value);
+}
+
+function sourceStructuralCardinality(drug, domainId) {
+  if (domainId === "drugClass") {
+    return drug.drugClass
+      .split(/[;,]/)
+      .map((component) => component.trim())
+      .filter(Boolean)
+      .length;
+  }
+  if (domainId === "fdaIndication") return drug.fdaIndications.length;
+  if (domainId === "topAdverseReactions") return drug.adverseReactions.length;
+  return null;
+}
+
+function assertStructuredMcqCardinality(question, sourceData = drugData) {
+  if (!STRUCTURED_MCQ_DOMAIN_IDS.includes(question.metadata.knowledgeDomain)) return;
+  const domainId = question.metadata.knowledgeDomain;
+  const choiceSources = question.metadata.choiceSources;
+  assert.equal(choiceSources.length, 4, `${question.id} must retain four choice sources`);
+  assert.deepEqual(
+    question.choices,
+    choiceSources.map((entry) => entry.value),
+    `${question.id} choices must preserve their source-provenance order`
+  );
+  const cardinalities = choiceSources.map((entry) => {
+    const sourceDrug = sourceData.drugs.find((drug) => drug.id === entry.sourceDrugId);
+    assert.ok(sourceDrug, `${question.id} has an unknown choice source ${entry.sourceDrugId}`);
+    assert.ok(
+      sourceDrug.quizWeek <= question.metadata.requestedQuizWeek,
+      `${question.id} uses future-week choice source ${entry.sourceDrugId}`
+    );
+    assert.equal(
+      normalizeChoice(entry.value),
+      normalizeChoice(sourceValue(sourceDrug, domainId)),
+      `${question.id} does not preserve the complete canonical source value for ${entry.sourceDrugId}`
+    );
+    return sourceStructuralCardinality(sourceDrug, domainId);
+  });
+  assert.equal(
+    new Set(cardinalities).size,
+    1,
+    `${question.id} mixes structural cardinalities: ${cardinalities.join(", ")}`
+  );
 }
 
 function getDuplicateGenericFixture() {
@@ -132,7 +182,7 @@ function countBy(items, getKey) {
   return counts;
 }
 
-function assertBalancedEligibleDomains(questions, eligibleDomainIds, label) {
+function assertBalancedEligibleDomains(questions, eligibleDomainIds, label, maximumSpread = 1) {
   const domainCounts = countBy(questions, (question) => question.metadata.knowledgeDomain);
   const counts = eligibleDomainIds.map((domainId) => domainCounts.get(domainId) || 0);
   assert.equal(
@@ -141,8 +191,8 @@ function assertBalancedEligibleDomains(questions, eligibleDomainIds, label) {
     `${label} should use as many eligible domains as its size permits`
   );
   assert.ok(
-    Math.max(...counts) - Math.min(...counts) <= 1,
-    `${label} domain counts should differ by at most one: ${JSON.stringify(Object.fromEntries(domainCounts))}`
+    Math.max(...counts) - Math.min(...counts) <= maximumSpread,
+    `${label} domain-count spread must not exceed ${maximumSpread}: ${JSON.stringify(Object.fromEntries(domainCounts))}`
   );
 }
 
@@ -350,7 +400,8 @@ test("Weeks 1-3 practice selection balances all safely eligible domains", () => 
         assertBalancedEligibleDomains(
           questions,
           eligibleDomainIds,
-          `Week ${quizWeek} ${materialType} seed ${seedIndex}`
+          `Week ${quizWeek} ${materialType} seed ${seedIndex}`,
+          quizWeek === 1 ? 2 : 1
         );
       }
     }
@@ -625,6 +676,148 @@ test("every MCQ distractor traces to the matching official source field through 
   }
 });
 
+test("Weeks 1-3 structured MCQs use only same-cardinality canonical source choices", () => {
+  const sourceBefore = JSON.stringify(drugData);
+  const policyBefore = JSON.stringify(policy);
+  const observedStructuredDomains = new Set();
+
+  for (let quizWeek = 1; quizWeek <= 3; quizWeek += 1) {
+    const materialTypes = quizWeek === 1 ? ["new"] : ["new", "review"];
+    const safelyEligibleDomains = new Set(materialTypes.flatMap((materialType) => (
+      buildQuestionCandidates({ drugData, policy, quizWeek, materialType })
+        .map((candidate) => candidate.domainId)
+    )));
+    for (let seedIndex = 0; seedIndex < 100; seedIndex += 1) {
+      const result = generatePractice(quizWeek, `structural-audit-${quizWeek}-${seedIndex}`);
+      assert.equal(result.status, "generated");
+      assert.equal(result.questions.length, 10);
+      const generatedDomainCounts = countBy(
+        result.questions,
+        (question) => question.metadata.knowledgeDomain
+      );
+      assert.equal(
+        generatedDomainCounts.size,
+        safelyEligibleDomains.size,
+        `Week ${quizWeek} seed ${seedIndex} should exercise every safely eligible domain`
+      );
+      assert.ok(
+        Math.max(...generatedDomainCounts.values())
+          <= Math.ceil(result.questions.length / safelyEligibleDomains.size) + 1,
+        `Week ${quizWeek} seed ${seedIndex} is unreasonably concentrated: ${JSON.stringify(Object.fromEntries(generatedDomainCounts))}`
+      );
+      if (quizWeek === 1) {
+        assert.equal(new Set(result.questions.map((question) => question.metadata.sourceDrugId)).size, 10);
+      } else {
+        assertGeneratedComposition(result, quizWeek);
+        for (const materialType of ["new", "review"]) {
+          const materialQuestions = result.questions.filter(
+            (question) => question.metadata.sourceMaterial === materialType
+          );
+          assert.equal(
+            new Set(materialQuestions.map((question) => question.metadata.sourceDrugId)).size,
+            materialQuestions.length,
+            `Week ${quizWeek} ${materialType} seed ${seedIndex} repeated a drug`
+          );
+        }
+      }
+
+      for (const question of result.questions) {
+        if (!STRUCTURED_MCQ_DOMAIN_IDS.includes(question.metadata.knowledgeDomain)) continue;
+        observedStructuredDomains.add(question.metadata.knowledgeDomain);
+        assertStructuredMcqCardinality(question);
+      }
+    }
+  }
+
+  assert.deepEqual(observedStructuredDomains, new Set(STRUCTURED_MCQ_DOMAIN_IDS));
+  assert.equal(JSON.stringify(drugData), sourceBefore);
+  assert.equal(JSON.stringify(policy), policyBefore);
+});
+
+test("drug-class cardinality follows canonical comma and semicolon list separators", () => {
+  const sourceDrug = drugData.drugs.find(
+    (drug) => drug.quizWeek <= 3 && drug.drugClass.includes(";")
+  );
+  assert.ok(sourceDrug, "the Weeks 1-3 source needs a semicolon-delimited class fixture");
+  assert.ok(sourceStructuralCardinality(sourceDrug, "drugClass") > 1);
+  const materialType = sourceDrug.quizWeek === 3 ? "new" : "review";
+  const candidate = buildQuestionCandidates({
+    drugData,
+    policy,
+    quizWeek: 3,
+    materialType
+  }).find(
+    (item) => item.sourceDrugId === sourceDrug.id && item.domainId === "drugClass"
+  );
+  assert.ok(candidate, "the semicolon-delimited class fixture should have a safe matched pool");
+  const result = materialize(candidate, "semicolon-class-structure");
+  assert.equal(result.status, "materialized");
+  assertStructuredMcqCardinality(result.question);
+});
+
+test("a structured candidate fails closed when three matched distractors do not exist", () => {
+  const quizWeek = 1;
+  const sourceDrug = drugData.drugs.find(
+    (drug) => drug.quizWeek === quizWeek && sourceStructuralCardinality(drug, "drugClass") > 1
+  );
+  assert.ok(sourceDrug, "the canonical fixture needs a multi-component Week 1 class listing");
+  const sourceCardinality = sourceStructuralCardinality(sourceDrug, "drugClass");
+  const mismatchedDistinctValues = new Set(
+    drugData.drugs
+      .filter((drug) => drug.quizWeek <= quizWeek)
+      .filter((drug) => sourceStructuralCardinality(drug, "drugClass") !== sourceCardinality)
+      .map((drug) => sourceValueIdentity(drug, "drugClass"))
+  );
+  assert.ok(
+    mismatchedDistinctValues.size >= 3,
+    "the fixture must prove mismatched values were available but rejected"
+  );
+
+  const builtCandidates = buildQuestionCandidates({
+    drugData,
+    policy,
+    quizWeek,
+    materialType: "new"
+  });
+  assert.equal(
+    builtCandidates.some(
+      (candidate) => candidate.sourceDrugId === sourceDrug.id && candidate.domainId === "drugClass"
+    ),
+    false
+  );
+
+  const result = materializeQuestionCandidate({
+    candidate: {
+      id: "forged-structurally-unsafe-class-candidate",
+      sourceDrugId: sourceDrug.id,
+      sourceDrugQuizWeek: sourceDrug.quizWeek,
+      requestedQuizWeek: quizWeek,
+      materialType: "new",
+      domainId: "drugClass",
+      questionType: "mcq"
+    },
+    drugData,
+    policy,
+    rng: createSeededRng("structurally-unsafe")
+  });
+
+  assert.equal(result.status, "unavailable");
+  assert.equal(result.code, "INSUFFICIENT_STRUCTURALLY_MATCHED_DISTRACTORS");
+  assert.equal(result.structuralCardinality, sourceCardinality);
+  assert.ok(result.availableDistractors < 3);
+  assert.ok(!Object.hasOwn(result, "question"));
+});
+
+test("structured distractor matching contains no example-specific production hardcode", () => {
+  const productionSource = readFileSync(
+    path.join(repoRoot, "assets", "js", "fall-2026-quiz-generator.js"),
+    "utf8"
+  );
+  for (const exampleSpecificValue of ["Altace", "Ramipril", "ACEI"]) {
+    assert.ok(!productionSource.includes(exampleSpecificValue));
+  }
+});
+
 test("Week 1-3 class MCQs present complete source listings without hardcodes or canonical edits", () => {
   const canonicalDataBefore = JSON.stringify(drugData);
   const productionSource = readFileSync(
@@ -750,7 +943,7 @@ test("an ambiguous official brand is never used as a brand-only MCQ reference", 
     policy,
     quizWeek: 1,
     materialType: "new"
-  }).find((item) => item.sourceDrugId === sourceDrug.id && item.domainId === "drugClass");
+  }).find((item) => item.sourceDrugId === sourceDrug.id && item.domainId === "mechanismOfAction");
   const result = materializeQuestionCandidate({
     candidate,
     drugData: ambiguousBrandData,
@@ -1154,8 +1347,9 @@ test("constrained source data refuses unsafe MCQs instead of fabricating distrac
     rng: createSeededRng("constrained")
   });
   assert.equal(unavailable.status, "unavailable");
-  assert.equal(unavailable.code, "INSUFFICIENT_DISTRACTORS");
+  assert.equal(unavailable.code, "INSUFFICIENT_STRUCTURALLY_MATCHED_DISTRACTORS");
   assert.equal(unavailable.availableDistractors, 0);
+  assert.equal(unavailable.structuralCardinality, 1);
 
   assert.throws(
     () => selectQuestionCandidates({ candidates: classCandidates, count: 1, rng: createSeededRng("none") }),

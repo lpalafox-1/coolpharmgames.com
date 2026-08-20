@@ -5,12 +5,13 @@
  * brands, suppress generic-only MCQs whose official values disagree, and use
  * the latest eligible week then source order as the canonical tie-breaker;
  * four choices per MCQ; complete source arrays displayed with semicolon
- * separators; seeded practice-only candidate selection that prefers least-used
- * drug identities and eligible domains, then degrades when pools are
- * constrained; seeded option shuffles; a seeded Brand/Generic direction (and
- * brand variant); a quiz-level guard against pre-answer Brand/Generic leakage
- * through other prompts or choices; and a final seeded shuffle of the ten
- * selected questions.
+ * separators; source-structure-matched distractors for class, indication, and
+ * adverse-reaction lists; seeded practice-only candidate selection that
+ * prefers least-used drug identities and eligible domains, then degrades when
+ * pools are constrained; seeded option shuffles; a seeded Brand/Generic
+ * direction (and brand variant); a quiz-level guard against pre-answer
+ * Brand/Generic leakage through other prompts or choices; and a final seeded
+ * shuffle of the ten selected questions.
  */
 const GENERATOR_ID = "fall-2026-p2-lab3-deterministic-generator";
 const MCQ_CHOICE_COUNT = 4;
@@ -114,6 +115,19 @@ function getDomainValueKey(drug, domainId) {
     return rawValue.map(normalizeChoiceKey).filter(Boolean).sort().join("\0");
   }
   return normalizeChoiceKey(rawValue);
+}
+
+function getDomainStructuralCardinality(drug, domainId) {
+  if (domainId === "drugClass") {
+    return drug.drugClass
+      .split(/[;,]/)
+      .map((component) => component.trim())
+      .filter(Boolean)
+      .length;
+  }
+  if (domainId === "fdaIndication") return drug.fdaIndications.length;
+  if (domainId === "topAdverseReactions") return drug.adverseReactions.length;
+  return null;
 }
 
 function createContext(drugData, policy) {
@@ -444,9 +458,16 @@ function getGenericIdentityResolution(context, sourceDrug, domainId, quizWeek) {
 
 function getDistinctDistractorEntries(context, domainId, sourceDrug, quizWeek) {
   const correctKey = getDomainValueKey(sourceDrug, domainId);
+  const correctStructuralCardinality = getDomainStructuralCardinality(sourceDrug, domainId);
   const byValue = new Map();
 
   for (const drug of getAvailableDrugsThroughWeek(context, quizWeek)) {
+    if (
+      correctStructuralCardinality !== null
+      && getDomainStructuralCardinality(drug, domainId) !== correctStructuralCardinality
+    ) {
+      continue;
+    }
     const value = getDomainSourceValue(drug, domainId);
     const key = getDomainValueKey(drug, domainId);
     if (!key || key === correctKey || byValue.has(key)) continue;
@@ -620,6 +641,7 @@ function materializeBrandGenericQuestion(context, candidate, sourceDrug, generic
 
 function materializeMcqQuestion(context, candidate, sourceDrug, rng) {
   const correctValue = getDomainSourceValue(sourceDrug, candidate.domainId);
+  const structuralCardinality = getDomainStructuralCardinality(sourceDrug, candidate.domainId);
   const distractorPool = getDistinctDistractorEntries(
     context,
     candidate.domainId,
@@ -629,11 +651,14 @@ function materializeMcqQuestion(context, candidate, sourceDrug, rng) {
   if (distractorPool.length < MCQ_CHOICE_COUNT - 1) {
     return {
       status: "unavailable",
-      code: "INSUFFICIENT_DISTRACTORS",
+      code: structuralCardinality === null
+        ? "INSUFFICIENT_DISTRACTORS"
+        : "INSUFFICIENT_STRUCTURALLY_MATCHED_DISTRACTORS",
       candidateId: candidate.id,
       domainId: candidate.domainId,
       requiredDistractors: MCQ_CHOICE_COUNT - 1,
-      availableDistractors: distractorPool.length
+      availableDistractors: distractorPool.length,
+      ...(structuralCardinality === null ? {} : { structuralCardinality })
     };
   }
 
