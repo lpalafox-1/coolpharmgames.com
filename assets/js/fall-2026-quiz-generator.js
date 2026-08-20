@@ -370,14 +370,7 @@ function createMcqStemReference(sourceDrug, type, brandName) {
     };
   }
 
-  return {
-    html: `<b>${sourceDrug.genericName} (${brandName})</b>`,
-    metadata: {
-      type: "genericBrand",
-      genericName: sourceDrug.genericName,
-      brandName
-    }
-  };
+  fail("INVALID_STEM_REFERENCE", `Unsupported MCQ stem-reference type: ${type}`);
 }
 
 function selectMcqStemReference(context, sourceDrug, quizWeek, rng) {
@@ -391,15 +384,11 @@ function selectMcqStemReference(context, sourceDrug, quizWeek, rng) {
     quizWeek
   );
 
-  if (referenceRoll < (1 / 3)) {
+  if (referenceRoll < 0.5 || !brandOnlyIsSafe) {
     return createMcqStemReference(sourceDrug, "generic");
   }
 
-  if (referenceRoll < (2 / 3) && brandOnlyIsSafe) {
-    return createMcqStemReference(sourceDrug, "brand", brandName);
-  }
-
-  return createMcqStemReference(sourceDrug, "genericBrand", brandName);
+  return createMcqStemReference(sourceDrug, "brand", brandName);
 }
 
 function getGenericIdentityResolution(context, sourceDrug, domainId, quizWeek) {
@@ -959,7 +948,6 @@ function stemReferenceCandidates(context, question, sourceDrug, protection) {
     )) {
       candidates.push(createMcqStemReference(sourceDrug, "brand", brandName));
     }
-    candidates.push(createMcqStemReference(sourceDrug, "genericBrand", brandName));
   }
   const seen = new Set();
   return candidates.filter((candidate) => {
