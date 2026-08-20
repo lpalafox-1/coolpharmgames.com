@@ -159,21 +159,16 @@ function assertSourceBackedStemReference(question) {
     return;
   }
 
-  assert.ok(["brand", "genericBrand"].includes(reference.type));
+  assert.equal(reference.type, "brand");
   assert.ok(sourceDrug.brandNames.includes(reference.brandName));
-  if (reference.type === "brand") {
-    const matchingGenericIdentities = new Set(
-      drugData.drugs
-        .filter((drug) => drug.quizWeek <= question.metadata.requestedQuizWeek)
-        .filter((drug) => drug.brandNames.some((brand) => normalizeChoice(brand) === normalizeChoice(reference.brandName)))
-        .map((drug) => normalizeGenericIdentity(drug.genericName))
-    );
-    assert.equal(matchingGenericIdentities.size, 1, `${reference.brandName} is not safe as a brand-only reference`);
-    assert.ok(question.prompt.includes(`<b>${reference.brandName}</b>`));
-    return;
-  }
-
-  assert.ok(question.prompt.includes(`<b>${sourceDrug.genericName} (${reference.brandName})</b>`));
+  const matchingGenericIdentities = new Set(
+    drugData.drugs
+      .filter((drug) => drug.quizWeek <= question.metadata.requestedQuizWeek)
+      .filter((drug) => drug.brandNames.some((brand) => normalizeChoice(brand) === normalizeChoice(reference.brandName)))
+      .map((drug) => normalizeGenericIdentity(drug.genericName))
+  );
+  assert.equal(matchingGenericIdentities.size, 1, `${reference.brandName} is not safe as a brand-only reference`);
+  assert.ok(question.prompt.includes(`<b>${reference.brandName}</b>`));
 }
 
 function normalizePreAnswerText(value) {
@@ -192,15 +187,30 @@ function visibleTextContainsAnswer(visibleText, answer) {
     : false;
 }
 
+function assertMcqStemDoesNotPairGenericAndBrand(question, sourceData = drugData) {
+  if (question.type !== "mcq") return;
+  const sourceDrug = sourceData.drugs.find((drug) => drug.id === question.metadata.sourceDrugId);
+  const promptText = normalizePreAnswerText(question.prompt);
+  const showsGeneric = visibleTextContainsAnswer(promptText, sourceDrug.genericName);
+  const shownBrand = sourceDrug.brandNames.find((brandName) => (
+    visibleTextContainsAnswer(promptText, brandName)
+  ));
+
+  assert.ok(
+    ["generic", "brand"].includes(question.metadata.stemReference.type),
+    `${question.id} uses unsupported ${question.metadata.stemReference.type} stem-reference metadata`
+  );
+  assert.equal(
+    showsGeneric && Boolean(shownBrand),
+    false,
+    `${question.id} exposes both ${sourceDrug.genericName} and ${shownBrand}`
+  );
+}
+
 function assertNoBrandGenericLeakage(result, sourceData = drugData) {
   const drugsById = new Map(sourceData.drugs.map((drug) => [drug.id, drug]));
   const brandGenericQuestions = result.questions.filter(
     (question) => question.metadata.knowledgeDomain === "brandGeneric"
-  );
-  const protectedIdentities = new Set(
-    brandGenericQuestions.map((question) => (
-      normalizeGenericIdentity(drugsById.get(question.metadata.sourceDrugId).genericName)
-    ))
   );
 
   for (const protectedQuestion of brandGenericQuestions) {
@@ -224,17 +234,7 @@ function assertNoBrandGenericLeakage(result, sourceData = drugData) {
     }
   }
 
-  for (const question of result.questions.filter((item) => item.type === "mcq")) {
-    const sourceDrug = drugsById.get(question.metadata.sourceDrugId);
-    const genericIdentity = normalizeGenericIdentity(sourceDrug.genericName);
-    if (protectedIdentities.has(genericIdentity)) {
-      assert.notEqual(
-        question.metadata.stemReference.type,
-        "genericBrand",
-        `${question.id} must not combine both sides of a protected identity`
-      );
-    }
-  }
+  result.questions.forEach((question) => assertMcqStemDoesNotPairGenericAndBrand(question, sourceData));
 }
 
 function assertGeneratedComposition(result, quizWeek) {
@@ -370,7 +370,7 @@ test("Weeks 1-3 practice sets never expose another Brand / Generic FITB answer",
   const sourceBefore = JSON.stringify(drugData);
   const policyBefore = JSON.stringify(policy);
   const directions = new Set();
-  let combinedStemCount = 0;
+  const referenceTypeCounts = new Map();
 
   for (let quizWeek = 1; quizWeek <= 3; quizWeek += 1) {
     for (let seedIndex = 0; seedIndex < 100; seedIndex += 1) {
@@ -380,15 +380,18 @@ test("Weeks 1-3 practice sets never expose another Brand / Generic FITB answer",
         if (question.metadata.knowledgeDomain === "brandGeneric") {
           directions.add(question.metadata.brandGenericDirection);
         }
-        if (question.metadata.stemReference?.type === "genericBrand") {
-          combinedStemCount += 1;
+        if (question.type === "mcq") {
+          const referenceType = question.metadata.stemReference.type;
+          referenceTypeCounts.set(referenceType, (referenceTypeCounts.get(referenceType) || 0) + 1);
         }
       }
     }
   }
 
   assert.deepEqual(directions, new Set(["genericToBrand", "brandToGeneric"]));
-  assert.ok(combinedStemCount > 0, "unprotected identities should retain safe combined stems");
+  assert.ok((referenceTypeCounts.get("generic") || 0) > 0, "many-seed audit must exercise generic-only MCQ stems");
+  assert.ok((referenceTypeCounts.get("brand") || 0) > 0, "many-seed audit must exercise safe brand-only MCQ stems");
+  assert.deepEqual([...referenceTypeCounts.keys()].sort(), ["brand", "generic"]);
   assert.equal(JSON.stringify(drugData), sourceBefore);
   assert.equal(JSON.stringify(policy), policyBefore);
 });
@@ -681,7 +684,7 @@ test("Week 1-3 class MCQs present complete source listings without hardcodes or 
   assert.equal(JSON.stringify(drugData), canonicalDataBefore);
 });
 
-test("Week 1-3 MCQ stems vary across generic, official brand, and combined references", () => {
+test("Week 1-3 MCQ stems vary across generic-only and official brand-only references", () => {
   const referenceTypeCounts = new Map();
   let strictFitbCount = 0;
 
@@ -708,7 +711,7 @@ test("Week 1-3 MCQ stems vary across generic, official brand, and combined refer
 
   assert.ok((referenceTypeCounts.get("generic") || 0) > 0);
   assert.ok((referenceTypeCounts.get("brand") || 0) > 0);
-  assert.ok((referenceTypeCounts.get("genericBrand") || 0) > 0);
+  assert.deepEqual([...referenceTypeCounts.keys()].sort(), ["brand", "generic"]);
   assert.ok(strictFitbCount > 0);
 });
 
@@ -757,13 +760,22 @@ test("an ambiguous official brand is never used as a brand-only MCQ reference", 
 
   assert.equal(result.status, "materialized");
   assert.deepEqual(result.question.metadata.stemReference, {
-    type: "genericBrand",
-    genericName: sourceDrug.genericName,
-    brandName: sourceDrug.brandNames[0]
+    type: "generic",
+    genericName: sourceDrug.genericName
   });
-  assert.ok(
-    result.question.prompt.includes(`<b>${sourceDrug.genericName} (${sourceDrug.brandNames[0]})</b>`)
+  assert.ok(result.question.prompt.includes(`<b>${sourceDrug.genericName}</b>`));
+  assert.ok(!result.question.prompt.includes(sourceDrug.brandNames[0]));
+});
+
+test("production MCQ stem references have no combined Generic (Brand) form", () => {
+  const productionSource = readFileSync(
+    path.join(repoRoot, "assets", "js", "fall-2026-quiz-generator.js"),
+    "utf8"
   );
+  assert.ok(!productionSource.includes("genericBrand"));
+  for (const exampleSpecificValue of ["Amlodipine", "Lisinopril", "Norvasc", "Zestril"]) {
+    assert.ok(!productionSource.includes(exampleSpecificValue));
+  }
 });
 
 test("Access Pharmacy sorting-category fields are rejected and never generated", () => {
