@@ -32,6 +32,12 @@ const MCQ_DOMAIN_FIELDS = Object.freeze({
   boxWarning: "boxWarning"
 });
 
+const STRUCTURED_MCQ_DOMAIN_IDS = Object.freeze([
+  "drugClass",
+  "fdaIndication",
+  "topAdverseReactions"
+]);
+
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
 }
@@ -64,6 +70,129 @@ function sourceValueIdentity(drug, domainId) {
     return value.map(normalizeChoice).filter(Boolean).sort().join("\0");
   }
   return normalizeChoice(value);
+}
+
+function sourceStructuralCardinality(drug, domainId) {
+  if (domainId === "drugClass") {
+    return drug.drugClass
+      .split(/[;,]/)
+      .map((component) => component.trim())
+      .filter(Boolean)
+      .length;
+  }
+  if (domainId === "fdaIndication") return drug.fdaIndications.length;
+  if (domainId === "topAdverseReactions") return drug.adverseReactions.length;
+  return null;
+}
+
+function sameCardinalityDistractorCount(sourceDrug, domainId, quizWeek, sourceData = drugData) {
+  const correctValueIdentity = sourceValueIdentity(sourceDrug, domainId);
+  const correctCardinality = sourceStructuralCardinality(sourceDrug, domainId);
+  return new Set(
+    sourceData.drugs
+      .filter((drug) => drug.quizWeek <= quizWeek && drug.semester === sourceDrug.semester)
+      .filter((drug) => sourceStructuralCardinality(drug, domainId) === correctCardinality)
+      .map((drug) => sourceValueIdentity(drug, domainId))
+      .filter((valueIdentity) => valueIdentity !== correctValueIdentity)
+  ).size;
+}
+
+function getEligibleReferenceRecords(sourceData, value, quizWeek) {
+  const referenceKey = normalizeChoice(value);
+  return sourceData.drugs.filter((drug) => (
+    drug.quizWeek <= quizWeek
+    && (
+      normalizeChoice(drug.genericName) === referenceKey
+      || drug.brandNames.some((brandName) => normalizeChoice(brandName) === referenceKey)
+    )
+  ));
+}
+
+function assertStructuredMcqCardinality(question, sourceData = drugData) {
+  if (!STRUCTURED_MCQ_DOMAIN_IDS.includes(question.metadata.knowledgeDomain)) return;
+  assert.equal(question.metadata.questionVariant, "structuredValueChoices");
+  const domainId = question.metadata.knowledgeDomain;
+  const choiceSources = question.metadata.choiceSources;
+  assert.equal(choiceSources.length, 4, `${question.id} must retain four choice sources`);
+  assert.deepEqual(
+    question.choices,
+    choiceSources.map((entry) => entry.value),
+    `${question.id} choices must preserve their source-provenance order`
+  );
+  const cardinalities = choiceSources.map((entry) => {
+    const sourceDrug = sourceData.drugs.find((drug) => drug.id === entry.sourceDrugId);
+    assert.ok(sourceDrug, `${question.id} has an unknown choice source ${entry.sourceDrugId}`);
+    assert.ok(
+      sourceDrug.quizWeek <= question.metadata.requestedQuizWeek,
+      `${question.id} uses future-week choice source ${entry.sourceDrugId}`
+    );
+    assert.equal(
+      normalizeChoice(entry.value),
+      normalizeChoice(sourceValue(sourceDrug, domainId)),
+      `${question.id} does not preserve the complete canonical source value for ${entry.sourceDrugId}`
+    );
+    return sourceStructuralCardinality(sourceDrug, domainId);
+  });
+  assert.equal(
+    new Set(cardinalities).size,
+    1,
+    `${question.id} mixes structural cardinalities: ${cardinalities.join(", ")}`
+  );
+}
+
+function assertInverseStructuredMcq(question, sourceData = drugData) {
+  assert.equal(question.metadata.questionVariant, "identifyDrugByStructuredValue");
+  const domainId = question.metadata.knowledgeDomain;
+  assert.ok(STRUCTURED_MCQ_DOMAIN_IDS.includes(domainId));
+  assert.ok(question.prompt.includes("recorded in the Fall source"));
+  assert.ok(question.prompt.includes("complete"));
+  const displayed = question.metadata.displayedStructuredValue;
+  const displayedSource = sourceData.drugs.find((drug) => drug.id === displayed.sourceDrugId);
+  assert.ok(displayedSource, `${question.id} has an unknown displayed-value source`);
+  assert.equal(displayed.sourceDrugId, question.metadata.sourceDrugId);
+  assert.equal(displayed.sourceDrugQuizWeek, displayedSource.quizWeek);
+  assert.equal(displayed.value, sourceValue(displayedSource, domainId));
+  assert.equal(displayed.valueKey, sourceValueIdentity(displayedSource, domainId));
+  assert.ok(question.prompt.includes(`<b>${displayed.value}</b>`));
+
+  const choiceSources = question.metadata.choiceSources;
+  assert.equal(choiceSources.length, 4);
+  assert.deepEqual(question.choices, choiceSources.map((entry) => entry.value));
+  assert.equal(new Set(choiceSources.map((entry) => entry.sourceDrugId)).size, 4);
+  assert.equal(new Set(choiceSources.map((entry) => normalizeChoice(entry.value))).size, 4);
+  const correctEntries = choiceSources.filter((entry) => entry.role === "correct");
+  assert.equal(correctEntries.length, 1);
+  assert.equal(correctEntries[0].sourceDrugId, displayedSource.id);
+  assert.equal(question.answer, correctEntries[0].value);
+
+  for (const entry of choiceSources) {
+    const entryDrug = sourceData.drugs.find((drug) => drug.id === entry.sourceDrugId);
+    assert.ok(entryDrug, `${question.id} has an unknown inverse choice source`);
+    assert.ok(entryDrug.quizWeek <= question.metadata.requestedQuizWeek);
+    assert.equal(entry.sourceDrugQuizWeek, entryDrug.quizWeek);
+    assert.equal(entry.sourceDomainValue, sourceValue(entryDrug, domainId));
+    assert.equal(entry.sourceDomainValueKey, sourceValueIdentity(entryDrug, domainId));
+    assert.deepEqual(Object.keys(entry.drugReference).sort(), ["type", "value"]);
+    assert.equal(entry.drugReference.value, entry.value);
+    if (entry.drugReference.type === "generic") {
+      assert.equal(entry.value, entryDrug.genericName);
+    } else {
+      assert.equal(entry.drugReference.type, "brand");
+      assert.ok(entryDrug.brandNames.includes(entry.value));
+    }
+    const matchingRecords = getEligibleReferenceRecords(
+      sourceData,
+      entry.value,
+      question.metadata.requestedQuizWeek
+    );
+    assert.deepEqual(matchingRecords.map((drug) => drug.id), [entryDrug.id]);
+    if (entry.role === "correct") {
+      assert.equal(entry.sourceDomainValueKey, displayed.valueKey);
+    } else {
+      assert.equal(entry.role, "distractor");
+      assert.notEqual(entry.sourceDomainValueKey, displayed.valueKey);
+    }
+  }
 }
 
 function getDuplicateGenericFixture() {
@@ -132,7 +261,7 @@ function countBy(items, getKey) {
   return counts;
 }
 
-function assertBalancedEligibleDomains(questions, eligibleDomainIds, label) {
+function assertBalancedEligibleDomains(questions, eligibleDomainIds, label, maximumSpread = 1) {
   const domainCounts = countBy(questions, (question) => question.metadata.knowledgeDomain);
   const counts = eligibleDomainIds.map((domainId) => domainCounts.get(domainId) || 0);
   assert.equal(
@@ -141,13 +270,17 @@ function assertBalancedEligibleDomains(questions, eligibleDomainIds, label) {
     `${label} should use as many eligible domains as its size permits`
   );
   assert.ok(
-    Math.max(...counts) - Math.min(...counts) <= 1,
-    `${label} domain counts should differ by at most one: ${JSON.stringify(Object.fromEntries(domainCounts))}`
+    Math.max(...counts) - Math.min(...counts) <= maximumSpread,
+    `${label} domain-count spread must not exceed ${maximumSpread}: ${JSON.stringify(Object.fromEntries(domainCounts))}`
   );
 }
 
 function assertSourceBackedStemReference(question) {
   if (question.type !== "mcq") return;
+  if (question.metadata.questionVariant === "identifyDrugByStructuredValue") {
+    assertInverseStructuredMcq(question);
+    return;
+  }
   const reference = question.metadata.stemReference;
   const sourceDrug = drugData.drugs.find((drug) => drug.id === question.metadata.sourceDrugId);
   assert.ok(reference, `${question.id} needs stem-reference provenance`);
@@ -189,6 +322,14 @@ function visibleTextContainsAnswer(visibleText, answer) {
 
 function assertMcqStemDoesNotPairGenericAndBrand(question, sourceData = drugData) {
   if (question.type !== "mcq") return;
+  if (question.metadata.questionVariant === "identifyDrugByStructuredValue") {
+    assertInverseStructuredMcq(question, sourceData);
+    for (const entry of question.metadata.choiceSources) {
+      assert.ok(["generic", "brand"].includes(entry.drugReference.type));
+      assert.equal(entry.value, entry.drugReference.value);
+    }
+    return;
+  }
   const sourceDrug = sourceData.drugs.find((drug) => drug.id === question.metadata.sourceDrugId);
   const promptText = normalizePreAnswerText(question.prompt);
   const showsGeneric = visibleTextContainsAnswer(promptText, sourceDrug.genericName);
@@ -350,7 +491,8 @@ test("Weeks 1-3 practice selection balances all safely eligible domains", () => 
         assertBalancedEligibleDomains(
           questions,
           eligibleDomainIds,
-          `Week ${quizWeek} ${materialType} seed ${seedIndex}`
+          `Week ${quizWeek} ${materialType} seed ${seedIndex}`,
+          quizWeek === 1 ? 2 : 1
         );
       }
     }
@@ -371,6 +513,7 @@ test("Weeks 1-3 practice sets never expose another Brand / Generic FITB answer",
   const policyBefore = JSON.stringify(policy);
   const directions = new Set();
   const referenceTypeCounts = new Map();
+  const inverseReferenceTypes = new Set();
 
   for (let quizWeek = 1; quizWeek <= 3; quizWeek += 1) {
     for (let seedIndex = 0; seedIndex < 100; seedIndex += 1) {
@@ -381,6 +524,12 @@ test("Weeks 1-3 practice sets never expose another Brand / Generic FITB answer",
           directions.add(question.metadata.brandGenericDirection);
         }
         if (question.type === "mcq") {
+          if (question.metadata.questionVariant === "identifyDrugByStructuredValue") {
+            for (const entry of question.metadata.choiceSources) {
+              inverseReferenceTypes.add(entry.drugReference.type);
+            }
+            continue;
+          }
           const referenceType = question.metadata.stemReference.type;
           referenceTypeCounts.set(referenceType, (referenceTypeCounts.get(referenceType) || 0) + 1);
         }
@@ -392,6 +541,7 @@ test("Weeks 1-3 practice sets never expose another Brand / Generic FITB answer",
   assert.ok((referenceTypeCounts.get("generic") || 0) > 0, "many-seed audit must exercise generic-only MCQ stems");
   assert.ok((referenceTypeCounts.get("brand") || 0) > 0, "many-seed audit must exercise safe brand-only MCQ stems");
   assert.deepEqual([...referenceTypeCounts.keys()].sort(), ["brand", "generic"]);
+  assert.deepEqual([...inverseReferenceTypes].sort(), ["brand", "generic"]);
   assert.equal(JSON.stringify(drugData), sourceBefore);
   assert.equal(JSON.stringify(policy), policyBefore);
 });
@@ -610,6 +760,10 @@ test("every MCQ distractor traces to the matching official source field through 
   for (let quizWeek = 2; quizWeek <= 10; quizWeek += 1) {
     const eligibleDrugs = drugData.drugs.filter((drug) => drug.quizWeek <= quizWeek && drug.semester === "P2 Fall");
     for (const question of generate(quizWeek, `trace-${quizWeek}`).questions.filter((item) => item.type === "mcq")) {
+      if (question.metadata.questionVariant === "identifyDrugByStructuredValue") {
+        assertInverseStructuredMcq(question);
+        continue;
+      }
       const officialValues = new Set(
         eligibleDrugs.map((drug) => normalizeChoice(sourceValue(drug, question.metadata.knowledgeDomain)))
       );
@@ -622,6 +776,202 @@ test("every MCQ distractor traces to the matching official source field through 
         assert.equal(normalizeChoice(source.value), normalizeChoice(sourceValue(sourceDrug, question.metadata.knowledgeDomain)));
       }
     }
+  }
+});
+
+test("Weeks 1-3 structured MCQs use safe normal or inverse source choices across 100 seeds", () => {
+  const sourceBefore = JSON.stringify(drugData);
+  const policyBefore = JSON.stringify(policy);
+  const observedStructuredDomains = new Set();
+  const domainFrequencyByWeek = new Map();
+  const variantCounts = new Map();
+  const inverseDomains = new Set();
+
+  for (let quizWeek = 1; quizWeek <= 3; quizWeek += 1) {
+    const materialTypes = quizWeek === 1 ? ["new"] : ["new", "review"];
+    const safelyEligibleDomains = new Set(materialTypes.flatMap((materialType) => (
+      buildQuestionCandidates({ drugData, policy, quizWeek, materialType })
+        .map((candidate) => candidate.domainId)
+    )));
+    for (let seedIndex = 0; seedIndex < 100; seedIndex += 1) {
+      const result = generatePractice(quizWeek, `structural-audit-${quizWeek}-${seedIndex}`);
+      assert.equal(result.status, "generated");
+      assert.equal(result.questions.length, 10);
+      const generatedDomainCounts = countBy(
+        result.questions,
+        (question) => question.metadata.knowledgeDomain
+      );
+      const cumulativeDomainCounts = domainFrequencyByWeek.get(quizWeek) || new Map();
+      for (const [domainId, count] of generatedDomainCounts) {
+        cumulativeDomainCounts.set(domainId, (cumulativeDomainCounts.get(domainId) || 0) + count);
+      }
+      domainFrequencyByWeek.set(quizWeek, cumulativeDomainCounts);
+      assert.equal(
+        generatedDomainCounts.size,
+        safelyEligibleDomains.size,
+        `Week ${quizWeek} seed ${seedIndex} should exercise every safely eligible domain`
+      );
+      assert.ok(
+        Math.max(...generatedDomainCounts.values())
+          <= Math.ceil(result.questions.length / safelyEligibleDomains.size) + 1,
+        `Week ${quizWeek} seed ${seedIndex} is unreasonably concentrated: ${JSON.stringify(Object.fromEntries(generatedDomainCounts))}`
+      );
+      if (quizWeek === 1) {
+        assert.equal(new Set(result.questions.map((question) => question.metadata.sourceDrugId)).size, 10);
+      } else {
+        assertGeneratedComposition(result, quizWeek);
+        for (const materialType of ["new", "review"]) {
+          const materialQuestions = result.questions.filter(
+            (question) => question.metadata.sourceMaterial === materialType
+          );
+          assert.equal(
+            new Set(materialQuestions.map((question) => question.metadata.sourceDrugId)).size,
+            materialQuestions.length,
+            `Week ${quizWeek} ${materialType} seed ${seedIndex} repeated a drug`
+          );
+        }
+      }
+
+      for (const question of result.questions) {
+        if (!STRUCTURED_MCQ_DOMAIN_IDS.includes(question.metadata.knowledgeDomain)) continue;
+        observedStructuredDomains.add(question.metadata.knowledgeDomain);
+        const variant = question.metadata.questionVariant;
+        variantCounts.set(variant, (variantCounts.get(variant) || 0) + 1);
+        if (variant === "structuredValueChoices") {
+          assertStructuredMcqCardinality(question);
+        } else {
+          inverseDomains.add(question.metadata.knowledgeDomain);
+          assertInverseStructuredMcq(question);
+        }
+      }
+    }
+  }
+
+  assert.deepEqual(observedStructuredDomains, new Set(STRUCTURED_MCQ_DOMAIN_IDS));
+  assert.ok((variantCounts.get("structuredValueChoices") || 0) > 0);
+  assert.ok((variantCounts.get("identifyDrugByStructuredValue") || 0) > 0);
+  assert.deepEqual(inverseDomains, new Set(STRUCTURED_MCQ_DOMAIN_IDS));
+  const week1Counts = domainFrequencyByWeek.get(1);
+  for (const domainId of [
+    "brandGeneric",
+    "drugClass",
+    "fdaIndication",
+    "mechanismOfAction",
+    "topAdverseReactions"
+  ]) {
+    assert.equal(week1Counts.get(domainId), 200, `Week 1 should restore balanced ${domainId} coverage`);
+  }
+  assert.equal(week1Counts.get("boxWarning") || 0, 0);
+  assert.equal(JSON.stringify(drugData), sourceBefore);
+  assert.equal(JSON.stringify(policy), policyBefore);
+});
+
+test("drug-class cardinality follows canonical comma and semicolon list separators", () => {
+  const sourceDrug = drugData.drugs.find(
+    (drug) => drug.quizWeek <= 3 && drug.drugClass.includes(";")
+  );
+  assert.ok(sourceDrug, "the Weeks 1-3 source needs a semicolon-delimited class fixture");
+  assert.ok(sourceStructuralCardinality(sourceDrug, "drugClass") > 1);
+  const materialType = sourceDrug.quizWeek === 3 ? "new" : "review";
+  const candidate = buildQuestionCandidates({
+    drugData,
+    policy,
+    quizWeek: 3,
+    materialType
+  }).find(
+    (item) => item.sourceDrugId === sourceDrug.id && item.domainId === "drugClass"
+  );
+  assert.ok(candidate, "the semicolon-delimited class fixture should have a safe matched pool");
+  const result = materialize(candidate, "semicolon-class-structure");
+  assert.equal(result.status, "materialized");
+  assertStructuredMcqCardinality(result.question);
+});
+
+test("a structured candidate uses inverse identification when three matched value distractors do not exist", () => {
+  const quizWeek = 1;
+  const sourceDrug = drugData.drugs.find(
+    (drug) => drug.quizWeek === quizWeek && sourceStructuralCardinality(drug, "drugClass") > 1
+  );
+  assert.ok(sourceDrug, "the canonical fixture needs a multi-component Week 1 class listing");
+  const sourceCardinality = sourceStructuralCardinality(sourceDrug, "drugClass");
+  const mismatchedDistinctValues = new Set(
+    drugData.drugs
+      .filter((drug) => drug.quizWeek <= quizWeek)
+      .filter((drug) => sourceStructuralCardinality(drug, "drugClass") !== sourceCardinality)
+      .map((drug) => sourceValueIdentity(drug, "drugClass"))
+  );
+  assert.ok(
+    mismatchedDistinctValues.size >= 3,
+    "the fixture must prove mismatched values were available but rejected"
+  );
+
+  const builtCandidates = buildQuestionCandidates({
+    drugData,
+    policy,
+    quizWeek,
+    materialType: "new"
+  });
+  assert.equal(
+    builtCandidates.some(
+      (candidate) => candidate.sourceDrugId === sourceDrug.id && candidate.domainId === "drugClass"
+    ),
+    true
+  );
+
+  const result = materializeQuestionCandidate({
+    candidate: {
+      id: "forged-structurally-unsafe-class-candidate",
+      sourceDrugId: sourceDrug.id,
+      sourceDrugQuizWeek: sourceDrug.quizWeek,
+      requestedQuizWeek: quizWeek,
+      materialType: "new",
+      domainId: "drugClass",
+      questionType: "mcq"
+    },
+    drugData,
+    policy,
+    rng: createSeededRng("structurally-unsafe")
+  });
+
+  assert.equal(result.status, "materialized");
+  assert.equal(result.question.metadata.questionVariant, "identifyDrugByStructuredValue");
+  assert.equal(result.question.metadata.displayedStructuredValue.structuralCardinality, sourceCardinality);
+  assert.equal(result.question.metadata.displayedStructuredValue.value, sourceDrug.drugClass);
+  assertInverseStructuredMcq(result.question);
+});
+
+test("normal same-cardinality structured MCQs remain preferred whenever their pool is sufficient", () => {
+  for (let quizWeek = 1; quizWeek <= 3; quizWeek += 1) {
+    const materialTypes = quizWeek === 1 ? ["new"] : ["new", "review"];
+    const candidates = materialTypes.flatMap((materialType) => (
+      buildQuestionCandidates({ drugData, policy, quizWeek, materialType })
+    )).filter((candidate) => STRUCTURED_MCQ_DOMAIN_IDS.includes(candidate.domainId));
+
+    for (const candidate of candidates) {
+      const sourceDrug = drugData.drugs.find((drug) => drug.id === candidate.sourceDrugId);
+      const normalDistractorCount = sameCardinalityDistractorCount(
+        sourceDrug,
+        candidate.domainId,
+        quizWeek
+      );
+      const result = materialize(candidate, `variant-preference-${candidate.id}`);
+      assert.equal(result.status, "materialized");
+      if (normalDistractorCount >= 3) {
+        assertStructuredMcqCardinality(result.question);
+      } else {
+        assertInverseStructuredMcq(result.question);
+      }
+    }
+  }
+});
+
+test("structured distractor matching contains no example-specific production hardcode", () => {
+  const productionSource = readFileSync(
+    path.join(repoRoot, "assets", "js", "fall-2026-quiz-generator.js"),
+    "utf8"
+  );
+  for (const exampleSpecificValue of ["Altace", "Ramipril", "ACEI"]) {
+    assert.ok(!productionSource.includes(exampleSpecificValue));
   }
 });
 
@@ -663,16 +1013,22 @@ test("Week 1-3 class MCQs present complete source listings without hardcodes or 
       const result = materialize(candidate, `class-presentation-${candidate.id}`);
 
       assert.equal(result.status, "materialized");
-      assert.ok(result.question.prompt.startsWith(`${promptPrefix} `));
-      assertSourceBackedStemReference(result.question);
-      assert.equal(result.question.answer, sourceDrug.drugClass);
-      assert.equal(
-        result.question.metadata.choiceSources.find((entry) => entry.role === "correct")?.value,
-        sourceDrug.drugClass
-      );
-      for (const choice of result.question.choices) {
+      if (result.question.metadata.questionVariant === "structuredValueChoices") {
+        assert.ok(result.question.prompt.startsWith(`${promptPrefix} `));
+        assertSourceBackedStemReference(result.question);
+        assert.equal(result.question.answer, sourceDrug.drugClass);
+        assert.equal(
+          result.question.metadata.choiceSources.find((entry) => entry.role === "correct")?.value,
+          sourceDrug.drugClass
+        );
+      } else {
+        assertInverseStructuredMcq(result.question);
+        assert.equal(result.question.metadata.displayedStructuredValue.value, sourceDrug.drugClass);
+      }
+      for (const entry of result.question.metadata.choiceSources) {
+        const canonicalChoiceValue = entry.sourceDomainValue || entry.value;
         assert.ok(
-          eligibleClassValues.has(normalizeChoice(choice)),
+          eligibleClassValues.has(normalizeChoice(canonicalChoiceValue)),
           `${candidate.id} has a class option that is not source-backed through Week ${quizWeek}`
         );
       }
@@ -687,12 +1043,18 @@ test("Week 1-3 class MCQs present complete source listings without hardcodes or 
 test("Week 1-3 MCQ stems vary across generic-only and official brand-only references", () => {
   const referenceTypeCounts = new Map();
   let strictFitbCount = 0;
+  let inverseQuestionCount = 0;
 
   for (let quizWeek = 1; quizWeek <= 3; quizWeek += 1) {
     for (let seedIndex = 0; seedIndex < 16; seedIndex += 1) {
       const result = generatePractice(quizWeek, `stem-variety-${quizWeek}-${seedIndex}`);
       for (const question of result.questions) {
         if (question.type === "mcq") {
+          if (question.metadata.questionVariant === "identifyDrugByStructuredValue") {
+            assertInverseStructuredMcq(question);
+            inverseQuestionCount += 1;
+            continue;
+          }
           assertSourceBackedStemReference(question);
           const referenceType = question.metadata.stemReference.type;
           referenceTypeCounts.set(referenceType, (referenceTypeCounts.get(referenceType) || 0) + 1);
@@ -713,6 +1075,7 @@ test("Week 1-3 MCQ stems vary across generic-only and official brand-only refere
   assert.ok((referenceTypeCounts.get("brand") || 0) > 0);
   assert.deepEqual([...referenceTypeCounts.keys()].sort(), ["brand", "generic"]);
   assert.ok(strictFitbCount > 0);
+  assert.ok(inverseQuestionCount > 0);
 });
 
 test("multiple-brand drugs use only their official brands in seeded MCQ references", () => {
@@ -750,7 +1113,7 @@ test("an ambiguous official brand is never used as a brand-only MCQ reference", 
     policy,
     quizWeek: 1,
     materialType: "new"
-  }).find((item) => item.sourceDrugId === sourceDrug.id && item.domainId === "drugClass");
+  }).find((item) => item.sourceDrugId === sourceDrug.id && item.domainId === "mechanismOfAction");
   const result = materializeQuestionCandidate({
     candidate,
     drugData: ambiguousBrandData,
@@ -1015,6 +1378,43 @@ test("duplicate-generic MCQ stem references remain source-backed and unambiguous
   }
 });
 
+test("inverse choices preserve duplicate source records with record-unique official brands", () => {
+  const fluticasoneRows = drugData.drugs.filter((drug) => drug.genericName === "Fluticasone");
+  const correctDrug = drugData.drugs.find((drug) => drug.genericName === "Tiotropium");
+  const otherDrug = drugData.drugs.find((drug) => drug.genericName === "Ipratropium+Albuterol");
+  const duplicateChoiceData = {
+    ...drugData,
+    drugs: [correctDrug, ...fluticasoneRows, otherDrug]
+  };
+  const candidate = buildQuestionCandidates({
+    drugData: duplicateChoiceData,
+    policy,
+    quizWeek: 8,
+    materialType: "new"
+  }).find((item) => item.sourceDrugId === correctDrug.id && item.domainId === "drugClass");
+  assert.ok(candidate, "the fixture needs an inverse class candidate");
+
+  const result = materializeQuestionCandidate({
+    candidate,
+    drugData: duplicateChoiceData,
+    policy,
+    rng: createSeededRng("duplicate-record-inverse")
+  });
+  assert.equal(result.status, "materialized");
+  assertInverseStructuredMcq(result.question, duplicateChoiceData);
+  const duplicateEntries = result.question.metadata.choiceSources.filter(
+    (entry) => fluticasoneRows.some((row) => row.id === entry.sourceDrugId)
+  );
+  assert.equal(duplicateEntries.length, 2);
+  assert.ok(duplicateEntries.every((entry) => entry.drugReference.type === "brand"));
+  assert.ok(duplicateEntries.every((entry) => entry.value !== "Fluticasone"));
+  assert.equal(new Set(duplicateEntries.map((entry) => entry.sourceDrugId)).size, 2);
+  for (const entry of duplicateEntries) {
+    const sourceDrug = fluticasoneRows.find((row) => row.id === entry.sourceDrugId);
+    assert.ok(sourceDrug.brandNames.includes(entry.value));
+  }
+});
+
 test("duplicate generic identities cannot emit duplicate rendered prompt/answer questions", () => {
   const fixture = getDuplicateGenericFixture();
   const renderedKeys = new Set();
@@ -1154,8 +1554,11 @@ test("constrained source data refuses unsafe MCQs instead of fabricating distrac
     rng: createSeededRng("constrained")
   });
   assert.equal(unavailable.status, "unavailable");
-  assert.equal(unavailable.code, "INSUFFICIENT_DISTRACTORS");
+  assert.equal(unavailable.code, "INSUFFICIENT_SOURCE_SAFE_INVERSE_DISTRACTORS");
   assert.equal(unavailable.availableDistractors, 0);
+  assert.equal(unavailable.normalAvailableDistractors, 0);
+  assert.equal(unavailable.structuralCardinality, 1);
+  assert.equal(unavailable.correctReferenceAvailable, true);
 
   assert.throws(
     () => selectQuestionCandidates({ candidates: classCandidates, count: 1, rng: createSeededRng("none") }),

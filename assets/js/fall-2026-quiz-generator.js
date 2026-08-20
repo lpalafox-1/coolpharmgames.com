@@ -5,12 +5,14 @@
  * brands, suppress generic-only MCQs whose official values disagree, and use
  * the latest eligible week then source order as the canonical tie-breaker;
  * four choices per MCQ; complete source arrays displayed with semicolon
- * separators; seeded practice-only candidate selection that prefers least-used
- * drug identities and eligible domains, then degrades when pools are
- * constrained; seeded option shuffles; a seeded Brand/Generic direction (and
- * brand variant); a quiz-level guard against pre-answer Brand/Generic leakage
- * through other prompts or choices; and a final seeded shuffle of the ten
- * selected questions.
+ * separators; source-structure-matched distractors for class, indication, and
+ * adverse-reaction lists with exact-record inverse identification only when a
+ * normal structured pool is unavailable; seeded practice-only candidate
+ * selection that prefers least-used drug identities and eligible domains,
+ * then degrades when pools are constrained; seeded option shuffles; a seeded
+ * Brand/Generic direction (and brand variant); a quiz-level guard against
+ * pre-answer Brand/Generic leakage through other prompts or choices; and a
+ * final seeded shuffle of the ten selected questions.
  */
 const GENERATOR_ID = "fall-2026-p2-lab3-deterministic-generator";
 const MCQ_CHOICE_COUNT = 4;
@@ -21,11 +23,13 @@ export const WEEK_1_PRACTICE_NOTE = "Practice configuration: Week 1 has no prior
 const DOMAIN_SPECS = Object.freeze({
   drugClass: Object.freeze({
     field: "drugClass",
-    prompt: (reference) => `Which complete drug-class listing is recorded for ${reference}?`
+    prompt: (reference) => `Which complete drug-class listing is recorded for ${reference}?`,
+    inversePrompt: (value) => `Which drug is recorded in the Fall source with this complete drug-class listing?<br><b>${value}</b>`
   }),
   fdaIndication: Object.freeze({
     field: "fdaIndications",
-    prompt: (reference) => `Which complete FDA indication list is recorded for ${reference}?`
+    prompt: (reference) => `Which complete FDA indication list is recorded for ${reference}?`,
+    inversePrompt: (value) => `Which drug is recorded in the Fall source with this complete FDA indication list?<br><b>${value}</b>`
   }),
   mechanismOfAction: Object.freeze({
     field: "mechanismOfAction",
@@ -33,7 +37,8 @@ const DOMAIN_SPECS = Object.freeze({
   }),
   topAdverseReactions: Object.freeze({
     field: "adverseReactions",
-    prompt: (reference) => `Which complete top adverse-reaction list is recorded for ${reference}?`
+    prompt: (reference) => `Which complete top adverse-reaction list is recorded for ${reference}?`,
+    inversePrompt: (value) => `Which drug is recorded in the Fall source with this complete top adverse-reaction list?<br><b>${value}</b>`
   }),
   boxWarning: Object.freeze({
     field: "boxWarning",
@@ -114,6 +119,19 @@ function getDomainValueKey(drug, domainId) {
     return rawValue.map(normalizeChoiceKey).filter(Boolean).sort().join("\0");
   }
   return normalizeChoiceKey(rawValue);
+}
+
+function getDomainStructuralCardinality(drug, domainId) {
+  if (domainId === "drugClass") {
+    return drug.drugClass
+      .split(/[;,]/)
+      .map((component) => component.trim())
+      .filter(Boolean)
+      .length;
+  }
+  if (domainId === "fdaIndication") return drug.fdaIndications.length;
+  if (domainId === "topAdverseReactions") return drug.adverseReactions.length;
+  return null;
 }
 
 function createContext(drugData, policy) {
@@ -348,6 +366,36 @@ function isBrandOnlyReferenceSafe(context, brandName, genericName, quizWeek) {
   return identities.size === 1 && identities.has(normalizeGenericIdentity(genericName));
 }
 
+function getSourceRecordsForDrugReference(context, value, quizWeek) {
+  const referenceKey = normalizeChoiceKey(value);
+  return getAvailableDrugsThroughWeek(context, quizWeek).filter((drug) => (
+    normalizeChoiceKey(drug.genericName) === referenceKey
+    || drug.brandNames.some((brandName) => normalizeChoiceKey(brandName) === referenceKey)
+  ));
+}
+
+function createDrugChoiceReference(type, value) {
+  return {
+    value,
+    metadata: { type, value }
+  };
+}
+
+function getSourceRecordChoiceReferences(context, sourceDrug, quizWeek) {
+  const candidates = [
+    createDrugChoiceReference("generic", sourceDrug.genericName),
+    ...sourceDrug.brandNames.map((brandName) => createDrugChoiceReference("brand", brandName))
+  ];
+  const seen = new Set();
+  return candidates.filter((candidate) => {
+    const key = normalizeChoiceKey(candidate.value);
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    const matchingRecords = getSourceRecordsForDrugReference(context, candidate.value, quizWeek);
+    return matchingRecords.length === 1 && matchingRecords[0].id === sourceDrug.id;
+  });
+}
+
 function createMcqStemReference(sourceDrug, type, brandName) {
   if (type === "generic") {
     return {
@@ -444,9 +492,16 @@ function getGenericIdentityResolution(context, sourceDrug, domainId, quizWeek) {
 
 function getDistinctDistractorEntries(context, domainId, sourceDrug, quizWeek) {
   const correctKey = getDomainValueKey(sourceDrug, domainId);
+  const correctStructuralCardinality = getDomainStructuralCardinality(sourceDrug, domainId);
   const byValue = new Map();
 
   for (const drug of getAvailableDrugsThroughWeek(context, quizWeek)) {
+    if (
+      correctStructuralCardinality !== null
+      && getDomainStructuralCardinality(drug, domainId) !== correctStructuralCardinality
+    ) {
+      continue;
+    }
     const value = getDomainSourceValue(drug, domainId);
     const key = getDomainValueKey(drug, domainId);
     if (!key || key === correctKey || byValue.has(key)) continue;
@@ -457,6 +512,46 @@ function getDistinctDistractorEntries(context, domainId, sourceDrug, quizWeek) {
     });
   }
   return [...byValue.values()];
+}
+
+function createInverseChoiceEntry(context, domainId, sourceDrug, quizWeek, reference) {
+  const drugReference = reference
+    || getSourceRecordChoiceReferences(context, sourceDrug, quizWeek)[0];
+  if (!drugReference) return null;
+  return {
+    value: drugReference.value,
+    sourceDrugId: sourceDrug.id,
+    sourceDrugQuizWeek: sourceDrug.quizWeek,
+    drugReference: { ...drugReference.metadata },
+    sourceDomainValue: getDomainSourceValue(sourceDrug, domainId),
+    sourceDomainValueKey: getDomainValueKey(sourceDrug, domainId)
+  };
+}
+
+function getInverseStructuredChoicePool(context, domainId, sourceDrug, quizWeek) {
+  if (getDomainStructuralCardinality(sourceDrug, domainId) === null) return null;
+  const correctDomainValueKey = getDomainValueKey(sourceDrug, domainId);
+  const correctEntry = createInverseChoiceEntry(
+    context,
+    domainId,
+    sourceDrug,
+    quizWeek
+  );
+  if (!correctEntry) return { correctEntry: null, distractors: [] };
+
+  const distractors = [];
+  const usedReferenceKeys = new Set([normalizeChoiceKey(correctEntry.value)]);
+  for (const drug of getAvailableDrugsThroughWeek(context, quizWeek)) {
+    if (drug.id === sourceDrug.id || getDomainValueKey(drug, domainId) === correctDomainValueKey) {
+      continue;
+    }
+    const entry = createInverseChoiceEntry(context, domainId, drug, quizWeek);
+    const referenceKey = normalizeChoiceKey(entry?.value);
+    if (!entry || usedReferenceKeys.has(referenceKey)) continue;
+    usedReferenceKeys.add(referenceKey);
+    distractors.push(entry);
+  }
+  return { correctEntry, distractors };
 }
 
 function buildCandidatesFromContext(context, quizWeek, materialType) {
@@ -481,7 +576,20 @@ function buildCandidatesFromContext(context, quizWeek, materialType) {
       if (genericResolution.status !== "eligible") continue;
       if (domain.questionType === "mcq") {
         const distractors = getDistinctDistractorEntries(context, domainId, drug, quizWeek);
-        if (distractors.length < MCQ_CHOICE_COUNT - 1) continue;
+        if (distractors.length < MCQ_CHOICE_COUNT - 1) {
+          const inversePool = getInverseStructuredChoicePool(
+            context,
+            domainId,
+            drug,
+            quizWeek
+          );
+          if (
+            !inversePool?.correctEntry
+            || inversePool.distractors.length < MCQ_CHOICE_COUNT - 1
+          ) {
+            continue;
+          }
+        }
       }
       candidates.push({
         id: `${GENERATOR_ID}-week-${String(quizWeek).padStart(2, "0")}-${materialType}-${drug.id}-${domainId}`,
@@ -618,8 +726,132 @@ function materializeBrandGenericQuestion(context, candidate, sourceDrug, generic
   };
 }
 
+function validateInverseChoiceEntries(context, candidate, sourceDrug, choiceEntries, displayedValueKey) {
+  if (choiceEntries.length !== MCQ_CHOICE_COUNT) return false;
+  if (new Set(choiceEntries.map((entry) => entry.sourceDrugId)).size !== MCQ_CHOICE_COUNT) {
+    return false;
+  }
+  if (new Set(choiceEntries.map((entry) => normalizeChoiceKey(entry.value))).size !== MCQ_CHOICE_COUNT) {
+    return false;
+  }
+  const correctEntries = choiceEntries.filter((entry) => entry.role === "correct");
+  if (correctEntries.length !== 1 || correctEntries[0].sourceDrugId !== sourceDrug.id) {
+    return false;
+  }
+
+  for (const entry of choiceEntries) {
+    const entryDrug = context.drugsById.get(entry.sourceDrugId);
+    if (
+      !entryDrug
+      || entry.sourceDrugQuizWeek !== entryDrug.quizWeek
+      || entryDrug.quizWeek > candidate.requestedQuizWeek
+      || entry.sourceDomainValue !== getDomainSourceValue(entryDrug, candidate.domainId)
+      || entry.sourceDomainValueKey !== getDomainValueKey(entryDrug, candidate.domainId)
+      || entry.value !== entry.drugReference?.value
+    ) {
+      return false;
+    }
+    const referenceIsSourceBacked = getSourceRecordChoiceReferences(
+      context,
+      entryDrug,
+      candidate.requestedQuizWeek
+    ).some((reference) => (
+      reference.metadata.type === entry.drugReference.type
+      && normalizeChoiceKey(reference.value) === normalizeChoiceKey(entry.value)
+    ));
+    if (!referenceIsSourceBacked) return false;
+    if (entry.role === "correct") {
+      if (entry.sourceDomainValueKey !== displayedValueKey) return false;
+    } else if (entry.role === "distractor") {
+      if (entry.sourceDomainValueKey === displayedValueKey) return false;
+    } else {
+      return false;
+    }
+  }
+  return true;
+}
+
+function materializeInverseStructuredQuestion(
+  context,
+  candidate,
+  sourceDrug,
+  structuralCardinality,
+  normalDistractorCount,
+  rng
+) {
+  const inversePool = getInverseStructuredChoicePool(
+    context,
+    candidate.domainId,
+    sourceDrug,
+    candidate.requestedQuizWeek
+  );
+  if (
+    !inversePool?.correctEntry
+    || inversePool.distractors.length < MCQ_CHOICE_COUNT - 1
+  ) {
+    return {
+      status: "unavailable",
+      code: "INSUFFICIENT_SOURCE_SAFE_INVERSE_DISTRACTORS",
+      candidateId: candidate.id,
+      domainId: candidate.domainId,
+      requiredDistractors: MCQ_CHOICE_COUNT - 1,
+      availableDistractors: inversePool?.distractors.length || 0,
+      normalAvailableDistractors: normalDistractorCount,
+      structuralCardinality,
+      correctReferenceAvailable: Boolean(inversePool?.correctEntry)
+    };
+  }
+
+  const distractors = shuffleCopy(inversePool.distractors, rng)
+    .slice(0, MCQ_CHOICE_COUNT - 1);
+  const choiceEntries = shuffleCopy([
+    { ...inversePool.correctEntry, role: "correct" },
+    ...distractors.map((entry) => ({ ...entry, role: "distractor" }))
+  ], rng);
+  const displayedValue = getDomainSourceValue(sourceDrug, candidate.domainId);
+  const displayedValueKey = getDomainValueKey(sourceDrug, candidate.domainId);
+  if (!validateInverseChoiceEntries(
+    context,
+    candidate,
+    sourceDrug,
+    choiceEntries,
+    displayedValueKey
+  )) {
+    return {
+      status: "unavailable",
+      code: "INVALID_SOURCE_SAFE_INVERSE_CHOICES",
+      candidateId: candidate.id,
+      domainId: candidate.domainId
+    };
+  }
+  const correctEntry = choiceEntries.find((entry) => entry.role === "correct");
+
+  return {
+    status: "materialized",
+    question: {
+      id: candidate.id,
+      type: "mcq",
+      prompt: DOMAIN_SPECS[candidate.domainId].inversePrompt(displayedValue),
+      choices: choiceEntries.map((entry) => entry.value),
+      answer: correctEntry.value,
+      metadata: baseQuestionMetadata(context, candidate, {
+        questionVariant: "identifyDrugByStructuredValue",
+        displayedStructuredValue: {
+          value: displayedValue,
+          valueKey: displayedValueKey,
+          sourceDrugId: sourceDrug.id,
+          sourceDrugQuizWeek: sourceDrug.quizWeek,
+          structuralCardinality
+        },
+        choiceSources: choiceEntries.map((entry) => ({ ...entry }))
+      })
+    }
+  };
+}
+
 function materializeMcqQuestion(context, candidate, sourceDrug, rng) {
   const correctValue = getDomainSourceValue(sourceDrug, candidate.domainId);
+  const structuralCardinality = getDomainStructuralCardinality(sourceDrug, candidate.domainId);
   const distractorPool = getDistinctDistractorEntries(
     context,
     candidate.domainId,
@@ -627,6 +859,16 @@ function materializeMcqQuestion(context, candidate, sourceDrug, rng) {
     candidate.requestedQuizWeek
   );
   if (distractorPool.length < MCQ_CHOICE_COUNT - 1) {
+    if (structuralCardinality !== null) {
+      return materializeInverseStructuredQuestion(
+        context,
+        candidate,
+        sourceDrug,
+        structuralCardinality,
+        distractorPool.length,
+        rng
+      );
+    }
     return {
       status: "unavailable",
       code: "INSUFFICIENT_DISTRACTORS",
@@ -673,7 +915,10 @@ function materializeMcqQuestion(context, candidate, sourceDrug, rng) {
       answer: correctValue,
       metadata: baseQuestionMetadata(context, candidate, {
         choiceSources: choiceEntries.map((entry) => ({ ...entry })),
-        stemReference: stemReference.metadata
+        stemReference: stemReference.metadata,
+        ...(structuralCardinality === null
+          ? {}
+          : { questionVariant: "structuredValueChoices" })
       })
     }
   };
@@ -762,6 +1007,10 @@ function applyMcqStemReference(question, sourceDrug, stemReference) {
       stemReference: stemReference.metadata
     }
   };
+}
+
+function isInverseStructuredQuestion(question) {
+  return question.metadata?.questionVariant === "identifyDrugByStructuredValue";
 }
 
 function normalizePreAnswerVisibleText(value) {
@@ -873,9 +1122,109 @@ function buildBrandGenericProtections(context, questions) {
 
 function questionImmutablePreAnswerVisibleText(question) {
   return normalizePreAnswerVisibleText([
-    ...(question.type === "mcq" ? [] : [question.prompt]),
+    ...(question.type === "mcq" && !isInverseStructuredQuestion(question)
+      ? []
+      : [question.prompt]),
     ...(Array.isArray(question.choices) ? question.choices : [])
   ].join(" "));
+}
+
+function referenceLeaksProtectedAnswer(reference, protectedAnswers) {
+  const visibleText = normalizePreAnswerVisibleText(reference.value);
+  return protectedAnswers.some((answer) => visibleTextContainsAnswer(visibleText, answer));
+}
+
+function rebuildInverseChoicesForProtections(context, question, protections) {
+  const quizWeek = question.metadata.requestedQuizWeek;
+  const domainId = question.metadata.knowledgeDomain;
+  const sourceDrug = context.drugsById.get(question.metadata.sourceDrugId);
+  const displayedValueKey = question.metadata.displayedStructuredValue?.valueKey;
+  const protectedAnswers = [...protections.values()]
+    .flatMap((protection) => protection.protectedAnswers);
+  const originalEntries = question.metadata.choiceSources;
+  const correctIndex = originalEntries.findIndex((entry) => entry.role === "correct");
+  if (!sourceDrug || !displayedValueKey || correctIndex < 0) return null;
+
+  const rebuiltEntries = new Array(originalEntries.length);
+  const usedSourceDrugIds = new Set();
+  const usedReferenceKeys = new Set();
+  const getSafeReference = (drug) => getSourceRecordChoiceReferences(context, drug, quizWeek)
+    .find((reference) => (
+      !usedReferenceKeys.has(normalizeChoiceKey(reference.value))
+      && !referenceLeaksProtectedAnswer(reference, protectedAnswers)
+    ));
+
+  const correctReference = getSafeReference(sourceDrug);
+  if (!correctReference) return null;
+  rebuiltEntries[correctIndex] = {
+    ...createInverseChoiceEntry(context, domainId, sourceDrug, quizWeek, correctReference),
+    role: "correct"
+  };
+  usedSourceDrugIds.add(sourceDrug.id);
+  usedReferenceKeys.add(normalizeChoiceKey(correctReference.value));
+
+  const preferredDistractorIds = originalEntries
+    .filter((entry) => entry.role === "distractor")
+    .map((entry) => entry.sourceDrugId);
+  const alternateDistractorIds = getAvailableDrugsThroughWeek(context, quizWeek)
+    .filter((drug) => getDomainValueKey(drug, domainId) !== displayedValueKey)
+    .map((drug) => drug.id);
+  const allDistractorIds = [...preferredDistractorIds, ...alternateDistractorIds]
+    .filter((drugId, index, values) => values.indexOf(drugId) === index);
+
+  for (let index = 0; index < originalEntries.length; index += 1) {
+    if (index === correctIndex) continue;
+    const preferredSourceDrugId = originalEntries[index].sourceDrugId;
+    const candidateIds = [preferredSourceDrugId, ...allDistractorIds]
+      .filter((drugId, candidateIndex, values) => values.indexOf(drugId) === candidateIndex);
+    let rebuiltEntry = null;
+    for (const drugId of candidateIds) {
+      if (usedSourceDrugIds.has(drugId)) continue;
+      const drug = context.drugsById.get(drugId);
+      if (
+        !drug
+        || drug.quizWeek > quizWeek
+        || getDomainValueKey(drug, domainId) === displayedValueKey
+      ) {
+        continue;
+      }
+      const reference = getSafeReference(drug);
+      if (!reference) continue;
+      rebuiltEntry = {
+        ...createInverseChoiceEntry(context, domainId, drug, quizWeek, reference),
+        role: "distractor"
+      };
+      usedSourceDrugIds.add(drug.id);
+      usedReferenceKeys.add(normalizeChoiceKey(reference.value));
+      break;
+    }
+    if (!rebuiltEntry) return null;
+    rebuiltEntries[index] = rebuiltEntry;
+  }
+
+  const validationCandidate = {
+    requestedQuizWeek: quizWeek,
+    domainId
+  };
+  if (!validateInverseChoiceEntries(
+    context,
+    validationCandidate,
+    sourceDrug,
+    rebuiltEntries,
+    displayedValueKey
+  )) {
+    return null;
+  }
+  const correctEntry = rebuiltEntries[correctIndex];
+  return {
+    ...question,
+    choices: rebuiltEntries.map((entry) => entry.value),
+    answer: correctEntry.value,
+    metadata: {
+      ...question.metadata,
+      choiceSources: rebuiltEntries.map((entry) => ({ ...entry }))
+    }
+  };
 }
 
 function selectSafeBrandGenericDirections(context, questions) {
@@ -900,9 +1249,17 @@ function selectSafeBrandGenericDirections(context, questions) {
   }
 
   for (const combination of combinations) {
-    const candidateQuestions = [...questions];
+    let candidateQuestions = [...questions];
     for (const { index, variant } of combination) candidateQuestions[index] = variant;
     const protections = buildBrandGenericProtections(context, candidateQuestions);
+    let inverseChoicesAreSafe = true;
+    candidateQuestions = candidateQuestions.map((question) => {
+      if (!isInverseStructuredQuestion(question)) return question;
+      const rebuilt = rebuildInverseChoicesForProtections(context, question, protections);
+      if (!rebuilt) inverseChoicesAreSafe = false;
+      return rebuilt || question;
+    });
+    if (!inverseChoicesAreSafe) continue;
     let safe = true;
     for (const protection of protections.values()) {
       for (const question of candidateQuestions) {
@@ -964,7 +1321,7 @@ function applyQuizLevelBrandGenericLeakageGuard(context, questions) {
   const allProtections = [...protectedByIdentity.values()];
 
   const guardedQuestions = directionSafeQuestions.map((question) => {
-    if (question.type !== "mcq") return question;
+    if (question.type !== "mcq" || isInverseStructuredQuestion(question)) return question;
     const sourceDrug = context.drugsById.get(question.metadata.sourceDrugId);
     const protection = protectedByIdentity.get(normalizeGenericIdentity(sourceDrug.genericName));
     const safeReference = stemReferenceCandidates(context, question, sourceDrug, protection)

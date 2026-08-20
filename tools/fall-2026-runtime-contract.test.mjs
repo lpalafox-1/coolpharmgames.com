@@ -414,7 +414,14 @@ test(`Fall stays isolated to its launcher, legacy data has no strict marker, and
     path.join(repoRoot, "assets", "js", "fall-2026-lab3-launcher.js"),
     "utf8"
   );
-  assert.ok(launcherSource.includes('from "./fall-2026-quiz-generator.js?v=20260819a"'));
+  const fallPageSource = readFileSync(
+    path.join(repoRoot, "lab3-fall-2026.html"),
+    "utf8"
+  );
+  assert.ok(fallPageSource.includes(
+    'src="assets/js/fall-2026-lab3-launcher.js?v=20260819b"'
+  ));
+  assert.ok(launcherSource.includes('from "./fall-2026-quiz-generator.js?v=20260819b"'));
   assert.ok(launcherSource.includes("assets/data/fall-2026-p2-top-drugs.json"));
   assert.ok(launcherSource.includes("assets/data/fall-2026-lab3-quiz-policy.json"));
   assert.ok(!launcherSource.includes("master_pool.json"));
