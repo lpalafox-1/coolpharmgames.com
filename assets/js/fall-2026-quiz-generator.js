@@ -4,27 +4,62 @@
  * normalized generic identity/domain; duplicate identities aggregate official
  * brands, suppress generic-only MCQs whose official values disagree, and use
  * the latest eligible week then source order as the canonical tie-breaker;
- * four choices per MCQ; complete source arrays displayed with semicolon
- * separators; source-structure-matched distractors for class, indication, and
- * adverse-reaction lists with exact-record inverse identification only when a
- * normal structured pool is unavailable; seeded practice-only candidate
- * selection that prefers least-used drug identities and eligible domains,
- * then degrades when pools are constrained; seeded option shuffles; a seeded
- * Brand/Generic direction (and brand variant); a quiz-level guard against
- * pre-answer Brand/Generic leakage through other prompts or choices; and a
- * final seeded shuffle of the ten selected questions.
+ * four choices per MCQ; a source-string-only pharmacologic-class projection
+ * for Drug Class practice while canonical class wording remains untouched;
+ * complete source arrays displayed with semicolon separators; source-
+ * structure-matched distractors for class, indication, and adverse-reaction
+ * lists with exact-record inverse identification only when a normal structured
+ * pool is unavailable; seeded practice-only candidate selection that prefers
+ * least-used drug identities and eligible domains, then degrades when pools
+ * are constrained; seeded option shuffles; a seeded Brand/Generic direction
+ * (and brand variant); a quiz-level guard against pre-answer Brand/Generic
+ * leakage through other prompts or choices; and a final seeded shuffle of the
+ * ten selected questions.
  */
 const GENERATOR_ID = "fall-2026-p2-lab3-deterministic-generator";
 const MCQ_CHOICE_COUNT = 4;
 const WEEK_1_PRACTICE_QUESTION_COUNT = 10;
+
+// This reviewed projection uses only exact wording already present in the
+// canonical drugClass field. Only listed, clearly appended therapeutic-category
+// suffixes are removed. Known ambiguous/no-pharmacologic-class values map to an
+// empty concept and are excluded from Drug Class questions. Every other value,
+// including future duration, schedule, route, formulation, subclass, or leading-
+// category wording, falls back to the complete canonical string unchanged.
+const DRUG_CLASS_QUIZ_CONCEPT_OVERRIDES = Object.freeze({
+  "ACEI, Antihypertensive": "ACEI",
+  "Thiazide Diuretic, Antihypertensive": "Thiazide Diuretic",
+  "Long-Acting Nitrate, Antianginal": "Long-Acting Nitrate",
+  "Nitrate, Antianginal": "Nitrate",
+  "Biguanide, Hypoglycemic": "Biguanide",
+  "Dipeptidyl Peptidase IV Inhibitor, Antidiabetic": "Dipeptidyl Peptidase IV Inhibitor",
+  "Second-Generation Sulfonylurea, Antidiabetic": "Second-Generation Sulfonylurea",
+  "Erectile Dysfunction Agent, Pulmonary HTN Agent": "",
+  "Erectile Dysfunction Agent; Pulmonary HTN Agent": "",
+  "Dibenzazepine Carboxamide, Anticonvulsant": "Dibenzazepine Carboxamide",
+  "Xanthine Oxidase Inhibitor; Antigout": "Xanthine Oxidase Inhibitor",
+  "Gamma Aminobutyric Acid Analog, Anticonvulsant": "Gamma Aminobutyric Acid Analog",
+  "Benzodiazepine, Short or Intermediate Acting": "",
+  "Benzodiazepine, Short or Intermediate Acting. C- IV": "",
+  "Benzodiazepine. C-IV": ""
+});
+
+export function deriveDrugClassQuizConcept(sourceDrugClass) {
+  const canonicalValue = String(sourceDrugClass ?? "").trim();
+  if (!canonicalValue) return "";
+  if (Object.hasOwn(DRUG_CLASS_QUIZ_CONCEPT_OVERRIDES, canonicalValue)) {
+    return DRUG_CLASS_QUIZ_CONCEPT_OVERRIDES[canonicalValue];
+  }
+  return canonicalValue;
+}
 
 export const WEEK_1_PRACTICE_NOTE = "Practice configuration: Week 1 has no prior review material. This 10-question study set uses Week 1 content only and is not intended to claim the exact official Week 1 quiz composition.";
 
 const DOMAIN_SPECS = Object.freeze({
   drugClass: Object.freeze({
     field: "drugClass",
-    prompt: (reference) => `Which complete drug-class listing is recorded for ${reference}?`,
-    inversePrompt: (value) => `Which drug is recorded in the Fall source with this complete drug-class listing?<br><b>${value}</b>`
+    prompt: (reference) => `Which pharmacologic class is recorded in the Fall source for ${reference}?`,
+    inversePrompt: (value) => `Which drug is paired with this pharmacologic class in the Fall source?<br><b>${value}</b>`
   }),
   fdaIndication: Object.freeze({
     field: "fdaIndications",
@@ -111,7 +146,14 @@ function getDomainSourceValue(drug, domainId) {
   return String(rawValue ?? "").trim();
 }
 
-function getDomainValueKey(drug, domainId) {
+function getDomainQuizValue(drug, domainId) {
+  const sourceValue = getDomainSourceValue(drug, domainId);
+  return domainId === "drugClass"
+    ? deriveDrugClassQuizConcept(sourceValue)
+    : sourceValue;
+}
+
+function getDomainSourceValueKey(drug, domainId) {
   const spec = DOMAIN_SPECS[domainId];
   if (!spec) fail("UNSUPPORTED_DOMAIN", `Unsupported MCQ domain: ${domainId}.`);
   const rawValue = drug[spec.field];
@@ -121,9 +163,15 @@ function getDomainValueKey(drug, domainId) {
   return normalizeChoiceKey(rawValue);
 }
 
+function getDomainValueKey(drug, domainId) {
+  return domainId === "drugClass"
+    ? normalizeChoiceKey(getDomainQuizValue(drug, domainId))
+    : getDomainSourceValueKey(drug, domainId);
+}
+
 function getDomainStructuralCardinality(drug, domainId) {
   if (domainId === "drugClass") {
-    return drug.drugClass
+    return getDomainQuizValue(drug, domainId)
       .split(/[;,]/)
       .map((component) => component.trim())
       .filter(Boolean)
@@ -502,13 +550,23 @@ function getDistinctDistractorEntries(context, domainId, sourceDrug, quizWeek) {
     ) {
       continue;
     }
-    const value = getDomainSourceValue(drug, domainId);
+    const value = getDomainQuizValue(drug, domainId);
     const key = getDomainValueKey(drug, domainId);
-    if (!key || key === correctKey || byValue.has(key)) continue;
+    if (
+      (domainId === "drugClass" && !key)
+      || key === correctKey
+      || byValue.has(key)
+    ) continue;
     byValue.set(key, {
       value,
       sourceDrugId: drug.id,
-      sourceDrugQuizWeek: drug.quizWeek
+      sourceDrugQuizWeek: drug.quizWeek,
+      ...(domainId === "drugClass" ? {
+        sourceDomainValue: getDomainSourceValue(drug, domainId),
+        quizDomainValue: value,
+        sourceDomainValueKey: getDomainSourceValueKey(drug, domainId),
+        quizDomainValueKey: key
+      } : {})
     });
   }
   return [...byValue.values()];
@@ -524,7 +582,13 @@ function createInverseChoiceEntry(context, domainId, sourceDrug, quizWeek, refer
     sourceDrugQuizWeek: sourceDrug.quizWeek,
     drugReference: { ...drugReference.metadata },
     sourceDomainValue: getDomainSourceValue(sourceDrug, domainId),
-    sourceDomainValueKey: getDomainValueKey(sourceDrug, domainId)
+    ...(domainId === "drugClass"
+      ? {
+        quizDomainValue: getDomainQuizValue(sourceDrug, domainId),
+        quizDomainValueKey: getDomainValueKey(sourceDrug, domainId)
+      }
+      : {}),
+    sourceDomainValueKey: getDomainSourceValueKey(sourceDrug, domainId)
   };
 }
 
@@ -542,7 +606,12 @@ function getInverseStructuredChoicePool(context, domainId, sourceDrug, quizWeek)
   const distractors = [];
   const usedReferenceKeys = new Set([normalizeChoiceKey(correctEntry.value)]);
   for (const drug of getAvailableDrugsThroughWeek(context, quizWeek)) {
-    if (drug.id === sourceDrug.id || getDomainValueKey(drug, domainId) === correctDomainValueKey) {
+    const drugDomainValueKey = getDomainValueKey(drug, domainId);
+    if (
+      drug.id === sourceDrug.id
+      || (domainId === "drugClass" && !drugDomainValueKey)
+      || drugDomainValueKey === correctDomainValueKey
+    ) {
       continue;
     }
     const entry = createInverseChoiceEntry(context, domainId, drug, quizWeek);
@@ -575,6 +644,7 @@ function buildCandidatesFromContext(context, quizWeek, materialType) {
       const genericResolution = getGenericIdentityResolution(context, drug, domainId, quizWeek);
       if (genericResolution.status !== "eligible") continue;
       if (domain.questionType === "mcq") {
+        if (domainId === "drugClass" && !getDomainValueKey(drug, domainId)) continue;
         const distractors = getDistinctDistractorEntries(context, domainId, drug, quizWeek);
         if (distractors.length < MCQ_CHOICE_COUNT - 1) {
           const inversePool = getInverseStructuredChoicePool(
@@ -746,7 +816,14 @@ function validateInverseChoiceEntries(context, candidate, sourceDrug, choiceEntr
       || entry.sourceDrugQuizWeek !== entryDrug.quizWeek
       || entryDrug.quizWeek > candidate.requestedQuizWeek
       || entry.sourceDomainValue !== getDomainSourceValue(entryDrug, candidate.domainId)
-      || entry.sourceDomainValueKey !== getDomainValueKey(entryDrug, candidate.domainId)
+      || (
+        candidate.domainId === "drugClass"
+        && (
+          entry.quizDomainValue !== getDomainQuizValue(entryDrug, candidate.domainId)
+          || entry.quizDomainValueKey !== getDomainValueKey(entryDrug, candidate.domainId)
+        )
+      )
+      || entry.sourceDomainValueKey !== getDomainSourceValueKey(entryDrug, candidate.domainId)
       || entry.value !== entry.drugReference?.value
     ) {
       return false;
@@ -760,10 +837,13 @@ function validateInverseChoiceEntries(context, candidate, sourceDrug, choiceEntr
       && normalizeChoiceKey(reference.value) === normalizeChoiceKey(entry.value)
     ));
     if (!referenceIsSourceBacked) return false;
+    const entryQuizValueKey = candidate.domainId === "drugClass"
+      ? entry.quizDomainValueKey
+      : entry.sourceDomainValueKey;
     if (entry.role === "correct") {
-      if (entry.sourceDomainValueKey !== displayedValueKey) return false;
+      if (entryQuizValueKey !== displayedValueKey) return false;
     } else if (entry.role === "distractor") {
-      if (entry.sourceDomainValueKey === displayedValueKey) return false;
+      if (entryQuizValueKey === displayedValueKey) return false;
     } else {
       return false;
     }
@@ -808,7 +888,7 @@ function materializeInverseStructuredQuestion(
     { ...inversePool.correctEntry, role: "correct" },
     ...distractors.map((entry) => ({ ...entry, role: "distractor" }))
   ], rng);
-  const displayedValue = getDomainSourceValue(sourceDrug, candidate.domainId);
+  const displayedValue = getDomainQuizValue(sourceDrug, candidate.domainId);
   const displayedValueKey = getDomainValueKey(sourceDrug, candidate.domainId);
   if (!validateInverseChoiceEntries(
     context,
@@ -839,6 +919,10 @@ function materializeInverseStructuredQuestion(
         displayedStructuredValue: {
           value: displayedValue,
           valueKey: displayedValueKey,
+          ...(candidate.domainId === "drugClass" ? {
+            sourceValue: getDomainSourceValue(sourceDrug, candidate.domainId),
+            sourceValueKey: getDomainSourceValueKey(sourceDrug, candidate.domainId)
+          } : {}),
           sourceDrugId: sourceDrug.id,
           sourceDrugQuizWeek: sourceDrug.quizWeek,
           structuralCardinality
@@ -850,7 +934,7 @@ function materializeInverseStructuredQuestion(
 }
 
 function materializeMcqQuestion(context, candidate, sourceDrug, rng) {
-  const correctValue = getDomainSourceValue(sourceDrug, candidate.domainId);
+  const correctValue = getDomainQuizValue(sourceDrug, candidate.domainId);
   const structuralCardinality = getDomainStructuralCardinality(sourceDrug, candidate.domainId);
   const distractorPool = getDistinctDistractorEntries(
     context,
@@ -885,6 +969,12 @@ function materializeMcqQuestion(context, candidate, sourceDrug, rng) {
       value: correctValue,
       sourceDrugId: sourceDrug.id,
       sourceDrugQuizWeek: sourceDrug.quizWeek,
+      ...(candidate.domainId === "drugClass" ? {
+        sourceDomainValue: getDomainSourceValue(sourceDrug, candidate.domainId),
+        quizDomainValue: correctValue,
+        sourceDomainValueKey: getDomainSourceValueKey(sourceDrug, candidate.domainId),
+        quizDomainValueKey: getDomainValueKey(sourceDrug, candidate.domainId)
+      } : {}),
       role: "correct"
     },
     ...distractors.map((entry) => ({ ...entry, role: "distractor" }))
@@ -1167,7 +1257,10 @@ function rebuildInverseChoicesForProtections(context, question, protections) {
     .filter((entry) => entry.role === "distractor")
     .map((entry) => entry.sourceDrugId);
   const alternateDistractorIds = getAvailableDrugsThroughWeek(context, quizWeek)
-    .filter((drug) => getDomainValueKey(drug, domainId) !== displayedValueKey)
+    .filter((drug) => {
+      const valueKey = getDomainValueKey(drug, domainId);
+      return (domainId !== "drugClass" || valueKey) && valueKey !== displayedValueKey;
+    })
     .map((drug) => drug.id);
   const allDistractorIds = [...preferredDistractorIds, ...alternateDistractorIds]
     .filter((drugId, index, values) => values.indexOf(drugId) === index);
@@ -1184,6 +1277,7 @@ function rebuildInverseChoicesForProtections(context, question, protections) {
       if (
         !drug
         || drug.quizWeek > quizWeek
+        || (domainId === "drugClass" && !getDomainValueKey(drug, domainId))
         || getDomainValueKey(drug, domainId) === displayedValueKey
       ) {
         continue;
