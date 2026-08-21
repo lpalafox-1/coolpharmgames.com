@@ -19,14 +19,35 @@ approve anything mid-run**.
 A run is only permitted to proceed when all of the following hold:
 
 1. `git status`: tracked tree clean; untracked limited to `.claude/`,
-   `AGENTS.md` (until P2B-07 resolves it), `branch-manifest-2026-07-15.txt`.
+   `.codex/`, `AGENTS.md`, and `branch-manifest-2026-07-15.txt`. Preserve these
+   workspace items; never stage, delete, or rewrite them.
 2. Local default branch equals `origin/main` (no divergence either way).
 3. `npm run validate` → exit 0.
 4. `npm run check:links` → exit 0.
-5. `npm run test:tools` → all tests pass, zero failures.
+5. `npm run test:tools` → all tests pass, zero failures (139/139 at Phase 2
+   Facelift kickoff on `ca1a90e`; the count grows only through deliberate test
+   additions).
 6. `npm run health:repo` → exit 1 with **exactly** the two known deferred
-   findings (empty `practice-e2b` placeholder; `index.html` footer count).
+   findings (empty `quizzes/practice-e2b-exam2-prep-expanded.json`; homepage
+   count 1,765 vs actual static count 1,723).
    Any third finding, or the absence of one, is baseline drift.
+
+## Phase 2 Facelift boundaries
+
+- `docs/phase-roadmap.md` is authoritative. Exactly one task may be `READY`;
+  after P2F-01 that task is P2F-02. Never infer readiness merely because a
+  dependency is complete, and never select the stale F26-04 entry (it is DONE).
+- Preserve separate canonical sources: legacy P1
+  `assets/data/master_pool.json` and Fall P2
+  `assets/data/fall-2026-p2-top-drugs.json`. Do not merge or substitute them.
+- Fall Lab III Weeks 1–3 are student-facing; Week 1 is practice-configured and
+  Weeks 2–3 use 6 new + 4 review. Weeks 4–10 are separate course-timed
+  activation work and are not unlocked by facelift tasks.
+- The Fall generator is feature-frozen except for reproduced defects or
+  course-driven guidance. Preserve legacy URLs/content, and do not touch
+  `quizEngine.js` during unrelated Phase 2 tasks.
+- These boundaries narrow the existing Routine authority; they do not grant
+  new autonomous behavior or protected-file access.
 
 ## Autonomous execution loop
 
@@ -37,12 +58,13 @@ A run is only permitted to proceed when all of the following hold:
 3. Inspect open pull requests and existing `claude/` branches (local and
    remote).
 4. Run the documented baseline (above).
-5. Select **only the first task marked `READY`** in roadmap order.
+5. Confirm exactly one task is marked `READY`, then select that task. Do not
+   infer or create another READY status from dependency state.
 6. Confirm the task is eligible for autonomous execution (no behavioral
    change, no protected files beyond its allowed list, no dependency
    additions, fits one logical commit, and is not marked never-autonomous).
 7. Create one branch: `claude/<task-id>-<short-slug>` (e.g.
-   `claude/p2b-03-harness-consolidation`).
+   `claude/p2f-02-repository-health`).
 8. Implement only that task, within its allowed-files list.
 9. Run every validation command the task contract names.
 10. Create exactly one logical commit using the task's expected message.
@@ -60,7 +82,7 @@ Produce a concise no-op report and stop when any of these holds:
 
 - `docs/phase-roadmap.md` or this runbook is missing or unreadable
 - local/default-branch divergence that a fast-forward cannot reconcile
-- no task is marked `READY`
+- the count of tasks marked `READY` is not exactly one
 - an open roadmap PR or any existing `claude/` branch is present
 - baseline drift (any deviation from the Documented baseline section)
 - the task would require touching files outside its allowed list
@@ -133,10 +155,11 @@ Title or label every PR as autonomous Pharmlet roadmap work.
 ## Future MCP and Multi-Agent Orchestration
 
 - **MCP** is deferred until a controlled external-tool boundary is actually
-  needed; no MCP server is to be added during Phase 2B.
+  needed; no MCP server is to be added during the Phase 2 Facelift lane.
 - **LangGraph** (or any orchestration framework) is deferred until multiple
   agents, multiple repositories, retry semantics, and persistent approval
   checkpoints justify a separate system.
 - No orchestration application, external infrastructure, broad network
-  access, or new connectors may be introduced during Phase 2B. This section
+  access, or new connectors may be introduced during the Phase 2 Facelift
+  lane. This section
   exists so future proposals start from a recorded default of "not yet."
