@@ -19,6 +19,9 @@ const p2SourceText = readFileSync(p2Path, "utf8");
 const p1Source = JSON.parse(p1SourceText);
 const p2Source = JSON.parse(p2SourceText);
 const referenceData = loadBrowserGlobal("assets/js/top-drugs-reference-data.js").TopDrugsReferenceData;
+const quicksheetController = loadBrowserGlobal("assets/js/top-drugs-quicksheet.js", {
+  TopDrugsReferenceData: referenceData
+}).TopDrugsQuicksheet;
 const library = referenceData.buildReferenceLibrary(p1Source, p2Source);
 
 const APPROVED_BASELINES = Object.freeze({
@@ -53,6 +56,125 @@ test("the unified library loads every legacy P1 and official P2 record without m
   assert.equal(new Set(library.records.map((record) => record.id)).size, 269);
   assert.equal(library.records.filter((record) => record.sourceType === "legacy-p1").length, 169);
   assert.equal(library.records.filter((record) => record.sourceType === "official-p2-fall").length, 100);
+});
+
+test("progressive rendering starts with a bounded slice and can expose every record without duplicates", () => {
+  assert.equal(quicksheetController.INITIAL_RENDER_LIMIT, 12);
+  assert.equal(quicksheetController.RENDER_BATCH_SIZE, 24);
+  assert.ok(quicksheetController.INITIAL_RENDER_LIMIT < library.records.length);
+
+  let visibleCount = quicksheetController.INITIAL_RENDER_LIMIT;
+  let visible = quicksheetController.getVisibleRecords(library.records, visibleCount);
+  assert.equal(visible.length, 12);
+
+  while (visibleCount < library.records.length) {
+    const nextCount = quicksheetController.nextVisibleCount(visibleCount, library.records.length);
+    assert.ok(nextCount > visibleCount);
+    visibleCount = nextCount;
+    visible = quicksheetController.getVisibleRecords(library.records, visibleCount);
+    assert.equal(new Set(visible.map((record) => record.id)).size, visible.length);
+  }
+
+  assert.equal(visible.length, 269);
+  assert.deepEqual(plain(visible.map((record) => record.id)), plain(library.records.map((record) => record.id)));
+});
+
+test("current-P2, week, P1, and all-record shortcuts retain complete source-backed result sets", () => {
+  const expected = new Map([
+    ["p2-fall", 100],
+    ["p2-week-1", 10],
+    ["p2-week-2", 10],
+    ["p2-week-3", 10],
+    ["p1", 169],
+    ["all", 269]
+  ]);
+
+  for (const [shortcut, count] of expected) {
+    const filters = quicksheetController.filtersForShortcut(shortcut);
+    const matches = referenceData.filterRecords(library.records, filters);
+    assert.equal(matches.length, count, `${shortcut} must expose ${count} records`);
+
+    if (shortcut.startsWith("p2-")) {
+      assert.ok(matches.every((record) => (
+        record.professionalYear === "P2"
+        && record.semester === "Fall 2026"
+        && record.lab === "Lab III"
+      )));
+    }
+    if (shortcut.startsWith("p2-week-")) {
+      const expectedWeek = Number(shortcut.at(-1));
+      assert.ok(matches.every((record) => record.week === expectedWeek));
+    }
+  }
+});
+
+test("global search filters the full library before the progressive render slice", () => {
+  const zolpidem = recordsFor("Zolpidem", { field: "generic" });
+  assert.ok(zolpidem.length > 0);
+  assert.ok(zolpidem.every((record) => record.generic === "Zolpidem"));
+
+  const benazepril = recordsFor("Benazepril");
+  const lotensin = recordsFor("Lotensin");
+  assert.ok(benazepril.some((record) => record.sourceRecordId === "p2-fall-quiz-01-drug-06"));
+  assert.ok(lotensin.some((record) => record.sourceRecordId === "p2-fall-quiz-01-drug-06"));
+
+  const fluticasone = recordsFor("Fluticasone");
+  assert.equal(fluticasone.length, 5);
+  assert.equal(new Set(fluticasone.map((record) => record.id)).size, 5);
+  assert.equal(quicksheetController.getVisibleRecords(fluticasone).length, 5);
+});
+
+test("legacy and current URL filters round-trip while Clear Filters restores all records", () => {
+  const legacy = quicksheetController.filtersFromSearch(
+    "?q=Lotensin&field=brand&year=P2&semester=Fall%202026&lab=III&week=1"
+  );
+  assert.deepEqual(plain(legacy), {
+    query: "Lotensin",
+    field: "brand",
+    professionalYear: "P2",
+    semester: "Fall 2026",
+    lab: "3",
+    week: "1"
+  });
+  assert.equal(
+    quicksheetController.filtersToSearch(legacy),
+    "value=Lotensin&field=brand&year=P2&semester=Fall+2026&lab=3&week=1"
+  );
+
+  const cleared = quicksheetController.createAllFilters();
+  assert.deepEqual(plain(cleared), {
+    query: "",
+    field: "all",
+    professionalYear: "all",
+    semester: "all",
+    lab: "all",
+    week: "all"
+  });
+  assert.equal(quicksheetController.filtersToSearch(cleared), "");
+  assert.equal(referenceData.filterRecords(library.records, cleared).length, 269);
+});
+
+test("the Drug Sheet exposes accessible current-P2 and progressive-rendering controls", () => {
+  const page = readFileSync(pagePath, "utf8");
+  const script = readFileSync(quicksheetPath, "utf8");
+
+  assert.match(page, /id="current-p2-shortcuts"/);
+  assert.match(page, /P2 Fall 2026 · Lab III/);
+  assert.match(page, /href="lab3-fall-2026\.html"[^>]*>Open Lab III Practice</);
+  assert.match(page, /data-quicksheet-shortcut="p2-week-1"/);
+  assert.match(page, /data-quicksheet-shortcut="p2-week-2"/);
+  assert.match(page, /data-quicksheet-shortcut="p2-week-3"/);
+  assert.doesNotMatch(page, /data-quicksheet-shortcut="p2-week-(?:[4-9]|10)"/);
+  assert.equal((page.match(/data-quicksheet-shortcut="[^"]+" aria-pressed="false"/g) || []).length, 6);
+  assert.match(page, /reference filters; Lab III practice is currently student-facing for Weeks 1–3 only/);
+  assert.match(page, /id="quicksheet-load-more"[^>]*type="button"[^>]*aria-controls="quicksheet-grid"/);
+  assert.match(page, /id="quicksheet-count"[^>]*aria-live="polite"/);
+  assert.equal((page.match(/class="quiz-link inline-flex min-h-11 items-center"/g) || []).length, 4);
+  assert.match(page, /assets\/js\/top-drugs-quicksheet\.js\?v=20260821b/);
+  assert.match(script, /addEventListener\("popstate"/);
+  assert.match(script, /historyMode === "push" \? "pushState" : "replaceState"/);
+  assert.match(script, /grid\.innerHTML = visibleDrugs\.map\(renderDrugCard\)\.join\(""\)/);
+  assert.doesNotMatch(script, /grid\.innerHTML \+=/);
 });
 
 test("Benazepril uses the complete official P2 source record and every requested field is searchable", () => {
