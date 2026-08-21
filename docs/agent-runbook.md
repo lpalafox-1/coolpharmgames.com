@@ -24,7 +24,7 @@ A run is only permitted to proceed when all of the following hold:
 2. Local default branch equals `origin/main` (no divergence either way).
 3. `npm run validate` → exit 0.
 4. `npm run check:links` → exit 0.
-5. `npm run test:tools` → all tests pass, zero failures (143/143 after P2F-02;
+5. `npm run test:tools` → all tests pass, zero failures (146/146 after P2F-03;
    the count grows only through deliberate test additions).
 6. `npm run health:repo` → exit 0 with `Errors: 0`. The two small-quiz warnings
    remain informational; any health error or nonzero exit is baseline drift.
@@ -32,7 +32,7 @@ A run is only permitted to proceed when all of the following hold:
 ## Phase 2 Facelift boundaries
 
 - `docs/phase-roadmap.md` is authoritative. Exactly one task may be `READY`;
-  after P2F-02 that task is P2F-03. Never infer readiness merely because a
+  after P2F-03 that task is P2F-04. Never infer readiness merely because a
   dependency is complete, and never select the stale F26-04 entry (it is DONE).
 - Preserve separate canonical sources: legacy P1
   `assets/data/master_pool.json` and Fall P2

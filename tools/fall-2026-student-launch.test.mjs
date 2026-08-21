@@ -27,6 +27,7 @@ const LEGACY_HOME_HREFS = [
   "top-drugs-trends.html",
   "top-drugs-quicksheet.html",
   "top-drugs-integrity.html",
+  "#lab2-series",
   "quiz.html?id=ceutics2-final",
   "quiz.html?id=ceutics2-final&mode=quickHard",
   "quiz.html?id=ceutics2-final&mode=pkMath",
@@ -72,6 +73,21 @@ const LEGACY_HOME_HREFS = [
 
 function build(quizWeek, seed = `student-launch-week-${quizWeek}`) {
   return buildFall2026Lab3Payload({ drugData, policy, quizWeek, seed });
+}
+
+function sectionBetween(homepage, startId, endId) {
+  const startMarker = `id="${startId}"`;
+  const start = homepage.indexOf(startMarker);
+  assert.notEqual(start, -1, `homepage is missing #${startId}`);
+  if (!endId) return homepage.slice(start);
+
+  const end = homepage.indexOf(`id="${endId}"`, start + startMarker.length);
+  assert.notEqual(end, -1, `homepage is missing #${endId}`);
+  return homepage.slice(start, end);
+}
+
+function hrefsIn(source) {
+  return [...source.matchAll(/href="([^"]+)"/g)].map((match) => match[1]);
 }
 
 function createStorageStub(initialValues = {}) {
@@ -202,7 +218,75 @@ test("homepage exposes direct Fall launches while preserving every legacy study 
     assert.ok(homepage.includes(`href="lab3-fall-2026.html?week=${quizWeek}"`));
   }
   assert.ok(homepage.includes('href="lab3-fall-2026.html"'));
-  assert.ok(homepage.includes("P1 &amp; Spring 2026 Study Library"));
+  assert.ok(homepage.includes("P1 Spring 2026"));
+  assert.ok(homepage.includes("P1 Fall 2025"));
+});
+
+test("homepage prioritizes current P2 Lab III and Top Drugs without future-week claims", () => {
+  const homepage = readFileSync(path.join(repoRoot, "index.html"), "utf8");
+  const current = sectionBetween(homepage, "current-semester", "study-tools");
+  const fallWeeks = [...homepage.matchAll(/href="lab3-fall-2026\.html\?week=(\d+)"/g)]
+    .map((match) => Number(match[1]));
+
+  assert.match(current, /P2 Fall 2026/);
+  assert.match(current, /Lab III/);
+  assert.match(current, /Top Drugs Reference/);
+  assert.ok(current.includes('href="lab3-fall-2026.html"'));
+  assert.ok(current.includes('href="top-drugs-quicksheet.html"'));
+  assert.deepEqual([...new Set(fallWeeks)].sort((a, b) => a - b), [1, 2, 3]);
+  assert.doesNotMatch(current, /lab3-fall-2026\.html\?week=(?:4|5|6|7|8|9|10)/);
+  assert.match(current, /Week 1 is a practice configuration/);
+  assert.match(current, /not a claim about official quiz composition/);
+  assert.match(current, /Weeks 2–3 use 6 new \+ 4 cumulative review/);
+});
+
+test("homepage separates primary study tools, quiet utilities, and chronological P1 coursework", () => {
+  const homepage = readFileSync(path.join(repoRoot, "index.html"), "utf8");
+  const current = sectionBetween(homepage, "current-semester", "study-tools");
+  const primaryTools = sectionBetween(homepage, "study-tools", "utilities");
+  const utilities = sectionBetween(homepage, "utilities", "previous-coursework");
+  const previous = sectionBetween(homepage, "previous-coursework", "upcoming-planned");
+  const spring = sectionBetween(previous, "p1-spring-2026", "p1-fall-2025");
+  const fall = sectionBetween(previous, "p1-fall-2025");
+
+  for (const href of ["review-queue.html", "stats.html", "favorites.html", "study-timer.html", "custom-quiz.html"]) {
+    assert.ok(hrefsIn(primaryTools).includes(href), `primary tools are missing ${href}`);
+  }
+  assert.ok(!current.includes("top-drugs-integrity.html"));
+  assert.ok(!primaryTools.includes("top-drugs-integrity.html"));
+  assert.ok(utilities.includes('href="top-drugs-integrity.html"'));
+  assert.ok(utilities.includes('data-tool-tier="diagnostic"'));
+  assert.ok(homepage.indexOf('id="p1-spring-2026"') < homepage.indexOf('id="p1-fall-2025"'));
+  assert.ok(spring.includes('href="quiz.html?id=ceutics2-final"'));
+  assert.ok(spring.includes('href="quiz.html?week=11"'));
+  assert.ok(spring.includes('id="lab2-series"'));
+  assert.ok(fall.includes('href="quiz.html?id=ceutics-practice-1"'));
+  assert.ok(fall.includes('href="quiz.html?id=top-drugs-final-mockE"'));
+});
+
+test("homepage keeps compact navigation, planned-content, count, touch-target, and dark-mode contracts", () => {
+  const homepage = readFileSync(path.join(repoRoot, "index.html"), "utf8");
+  const planned = sectionBetween(homepage, "upcoming-planned");
+  const menuStart = homepage.indexOf('id="menu"');
+
+  for (const href of ["#current-semester", "#study-tools", "#previous-coursework"]) {
+    assert.ok(homepage.includes(`href="${href}"`), `section navigation is missing ${href}`);
+    assert.ok(
+      homepage.indexOf(`href="${href}"`) > menuStart,
+      `${href} navigation must follow the welcome gate's #menu visibility contract`
+    );
+  }
+  assert.equal(hrefsIn(planned).length, 0, "planned content must not expose launch links");
+  assert.match(planned, /No launches yet/);
+  assert.match(homepage, /1,723 practice questions/);
+  assert.match(homepage, /static quiz library/);
+  assert.match(homepage, /\.home-nav-link\{[^}]*min-height:44px/);
+  assert.match(homepage, /\.home-link\{[^}]*min-height:44px/);
+  assert.match(homepage, /tailwind\.config = \{ darkMode: "class" \}/);
+  assert.ok(homepage.includes('id="theme-toggle"'));
+  assert.ok(homepage.includes('id="theme-label"'));
+  assert.ok(homepage.includes("dark:text-rose-200"));
+  assert.ok(homepage.includes('src="assets/js/home.js?v=20260429a"'));
 });
 
 test("Fall UI contains no copied drug facts and does not route through the legacy master pool", () => {
