@@ -12,7 +12,7 @@ status only where the runbook explicitly permits it.
 (root `*.html`), application JS/CSS, `.github/workflows/**`, and
 `package-lock.json` are forbidden unless a task's *allowed files* list names
 them AND the task records explicit owner approval. No new dependencies in any
-Phase 2B task.
+Phase 2 Facelift task without explicit owner approval.
 
 **Documented baseline (must hold before and after every task):**
 
@@ -20,11 +20,15 @@ Phase 2B task.
 | --- | --- |
 | `npm run validate` | exit 0 |
 | `npm run check:links` | exit 0 |
-| `npm run test:tools` | all tests pass (33 as of `0ef4f17`; grows over time) |
+| `npm run test:tools` | 139/139 pass at Phase 2 Facelift kickoff (`ca1a90e`; grows only with deliberate test additions) |
 | `npm run health:repo` | exit 1 with exactly two findings: empty `practice-e2b` placeholder; `index.html` footer count mismatch |
 
-Known untracked items (expected, never commit): `.claude/`, `AGENTS.md`
-(pending P2B-07), `branch-manifest-2026-07-15.txt`.
+Current audited repository facts at `ca1a90e`: 1,723 static quiz questions
+across 35 JSON files; 169 legacy P1 Top Drugs records; and 100 Fall 2026 P2
+records, ten per week. P1 and P2 remain separate canonical sources.
+
+Known untracked items (expected, preserve and never commit): `.claude/`,
+`.codex/`, `AGENTS.md`, `branch-manifest-2026-07-15.txt`.
 
 ---
 
@@ -54,7 +58,7 @@ stale branches pruned (restore SHAs in the untracked branch manifest);
 Also: `CLAUDE.md` created (`1efd603`). Latent finding characterized, not
 fixed: review-queue `wrongCounts` re-fold inflation (see P2B-10).
 
-### Phase 2B — Consolidation (IN PROGRESS)
+### Phase 2B — Consolidation (DEFERRED after P2B-05)
 
 | Task | Deliverable | Status | Commit |
 | --- | --- | --- | --- |
@@ -65,7 +69,7 @@ fixed: review-queue `wrongCounts` re-fold inflation (see P2B-10).
 
 ---
 
-## Remaining Phase 2B tasks
+## Completed Phase 2B continuation
 
 ### P2B-03 — Browser harness consolidation
 
@@ -147,6 +151,8 @@ fixed: review-queue `wrongCounts` re-fold inflation (see P2B-10).
   cover the new path.
 - **Rollback:** revert the commit.
 
+## Deferred Phase 2B backlog
+
 ### P2B-06 — Cache-token consistency tests
 
 - **Phase:** 2B · **Status:** `DEFERRED` *(product-owner decision,
@@ -172,7 +178,7 @@ fixed: review-queue `wrongCounts` re-fold inflation (see P2B-10).
 
 ### P2B-07 — Agent instruction ownership
 
-- **Phase:** 2B · **Status:** `BLOCKED` (by P2B-06; also requires an owner
+- **Phase:** 2B · **Status:** `DEFERRED` (also requires an owner
   decision recorded in the PR)
 - **Objective:** Decide whether `CLAUDE.md` is the sole canonical agent
   instruction file or whether the currently-untracked `AGENTS.md` (a
@@ -195,7 +201,7 @@ fixed: review-queue `wrongCounts` re-fold inflation (see P2B-10).
 
 ### P2B-08 — Disabled workflow removal
 
-- **Phase:** 2B · **Status:** `BLOCKED` (requires explicit workflow-specific
+- **Phase:** 2B · **Status:** `DEFERRED` (requires explicit workflow-specific
   owner approval; never autonomous)
 - **Objective:** Verify `deploy-pages.yml.disabled` is inert and redundant
   (Pages deploys from `main` automatically) and delete it.
@@ -208,8 +214,8 @@ fixed: review-queue `wrongCounts` re-fold inflation (see P2B-10).
 
 ### P2B-09 — Homepage count correction
 
-- **Phase:** 2B · **Status:** `BLOCKED` (pending explicit owner approval;
-  **never eligible for autonomous execution**)
+- **Phase:** 2B · **Status:** `DEFERRED` (superseded by P2F-02;
+  **never eligible as a separate autonomous task**)
 - **Objective:** Correct the `index.html` footer question count (currently
   1,765 vs actual 1,723) — either the literal number or a maintainable
   mechanism — resolving one of the two standing `health:repo` findings.
@@ -223,8 +229,8 @@ fixed: review-queue `wrongCounts` re-fold inflation (see P2B-10).
 
 ### P2B-10 — Review-queue wrongCounts correction
 
-- **Phase:** 2B · **Status:** `BLOCKED` (pending explicit owner approval;
-  **never eligible for autonomous execution**)
+- **Phase:** 2B · **Status:** `DEFERRED` (moved to P2F-09; pending explicit
+  owner approval and **never eligible as a separate autonomous task**)
 - **Objective:** Fix the latent inflation in
   `assets/js/review-queue-store.js` (`normalizeEntry` re-folds
   `lastUserAnswer` into `wrongCounts` on every normalize pass) and update the
@@ -262,14 +268,16 @@ fixed: review-queue `wrongCounts` re-fold inflation (see P2B-10).
 - **Merge:** `3889247cc5ca22c607fe877515ed7ee814b935b7`
 - **Deliverables:**
   - deterministic Fall 2026 generator
-  - Weeks 2–10 6-new + 4-review composition
+  - generator policy for Weeks 2–10 6-new + 4-review composition; only Weeks
+    2–3 are currently student-facing
   - seeded/injectable deterministic RNG
   - source-backed MCQ distractors
   - Brand/Generic FITB generation
   - future-week leakage protection
   - duplicate-generic ambiguity protection
-  - Week 1 remains unresolved
-  - no runtime activation
+  - official Week 1 composition remains unresolved; the later live Week 1
+    practice configuration is not an official composition claim
+  - no runtime activation at this milestone
   - `quizEngine.js` unchanged
 
 ### F26-03 — Runtime integration contract + strict FITB scoring design
@@ -283,43 +291,84 @@ fixed: review-queue `wrongCounts` re-fold inflation (see P2B-10).
   - multiple-official-answer handling
   - opt-in question-level scoring recommendation
   - persisted review-queue lifecycle gap
-  - no runtime activation
+  - no runtime activation at this milestone
   - `quizEngine.js` unchanged
 
 ### F26-04 — Opt-in strict FITB scorer + review-queue contract preservation
 
-- **Status:** `READY` *(the only READY task in this ledger)*
-- **Owner approval:** **REQUIRED before implementation.** READY records product
-  priority only; it does not authorize changes to protected runtime files.
-- **Objective:** Implement the smallest opt-in strict FITB scoring branch
-  defined by F26-03 and preserve its question-level contract through the
-  persisted review queue without changing legacy scoring.
-- **Dependencies:** F26-03 (satisfied).
-- **Required behavior:**
-  - select strict matching only for explicitly marked FITB questions
-  - remain spelling-sensitive and capitalization-insensitive
-  - compare the complete user response against `answer` and every official
-    `_acceptedAnswers` entry without loose punctuation deletion, separator
-    splitting, alias expansion, or brand inference
-  - preserve the strict marker and `_acceptedAnswers` through question loading,
-    progress/resume, in-session review, persisted review-queue normalization,
-    and review-quiz reconstruction
-  - fail closed for malformed marked questions instead of falling through to
-    legacy loose matching
-  - keep every unmarked legacy question on the existing evaluator path
-- **Potential protected implementation scope after separate owner approval:**
-  `assets/js/quizEngine.js`, `assets/js/review-queue-store.js`,
-  `assets/js/review-queue.js`, focused `tools/*.test.mjs`, and only the cache
-  token updates required by repository protection rules.
-- **Explicitly out of scope:**
-  - route or UI activation
-  - Fall generator hookup on any page
-  - changes to Fall source data or policy JSON
-  - resolution of the Week 1 composition decision
-  - global tightening, refactoring, or removal of legacy loose-answer behavior
-- **Validation:** the four baseline commands; direct Fall runtime-contract and
-  legacy evaluator regression tests; engine-global regression; and the required
-  browser smoke checklist for any approved runtime touch.
+- **Status:** `DONE`
+- **PR / merge:** #47 / `d23cee7`
+- **Delivered:** opt-in strict Brand/Generic FITB matching; official
+  `_acceptedAnswers`; fail-closed malformed-marker handling; and strict contract
+  persistence through review-queue storage and reconstruction. Unmarked legacy
+  questions remain on the legacy evaluator path.
+
+### F26-05 — Student-facing Weeks 1–3 launch + homepage entry paths
+
+- **Status:** `DONE`
+- **PR / merge:** #48 / `ef96f7d`
+- **Delivered:** Fall Lab III launch page and homepage entry paths for Weeks
+  1–3. Week 1 is explicitly practice-configured and does not claim an official
+  professor-set composition. Weeks 2 and 3 use exactly 6 new + 4 accumulated
+  review questions, with future-week exclusion preserved.
+
+### Fall 2026 post-launch quality progression (DONE through PR #54)
+
+| PR | Merge | Delivered |
+| --- | --- | --- |
+| #49 | `598b995` | Practice-set drug/domain diversity and source-backed class-option quality |
+| #50 | `2dd5412` | Quiz-level Brand/Generic answer-leakage protection |
+| #51 | `9e1c9a0` | Unified Drug Sheet reference over separate canonical P1 and P2 sources |
+| #52 | `75f04e1` | Generic-only or safe brand-only non-FITB stems; no combined Generic (Brand) form |
+| #53 | `1eafa7b` | Structurally matched distractors with safe fallback and restored Week 1 coverage |
+| #54 | `ca1a90e` | Conservative, source-derived Drug Class quiz normalization |
+
+The Lab III generator is now **feature-frozen**. Changes require either a
+reproduced defect or course-driven guidance; feature ideas and facelift work
+do not reopen generator design.
+
+### Fall weekly activation lane (separate from Phase 2 Facelift)
+
+| Activation | Status | Constraint |
+| --- | --- | --- |
+| Weeks 1–3 | `DONE` | Student-facing; Week 1 practice-configured; Weeks 2–3 are 6-new / 4-review |
+| F26-W04 | `BLOCKED` | Future course-timed activation; requires current course timing/guidance |
+| F26-W05 | `BLOCKED` | Future course-timed activation; requires current course timing/guidance |
+| F26-W06 | `BLOCKED` | Future course-timed activation; requires current course timing/guidance |
+| F26-W07 | `BLOCKED` | Future course-timed activation; requires current course timing/guidance |
+| F26-W08 | `BLOCKED` | Future course-timed activation; requires current course timing/guidance |
+| F26-W09 | `BLOCKED` | Future course-timed activation; requires current course timing/guidance |
+| F26-W10 | `BLOCKED` | Future course-timed activation; requires current course timing/guidance |
+
+Do not infer activation readiness from the existence of canonical Weeks 4–10
+data. Activation remains separate from facelift work and is unlocked only by
+actual course timing or explicit guidance.
+
+---
+
+## Phase 2 Facelift lane
+
+This is the active product sequence. Exactly one task is `READY`; satisfying a
+dependency does not automatically change a later task's status. READY records
+priority, not blanket implementation authority: each task still needs its
+owner-approved scope and allowed-files contract before execution.
+
+| Task | Deliverable | Status | Depends on |
+| --- | --- | --- | --- |
+| P2F-01 | Phase 2 baseline and historical roadmap synchronization | `DONE` | — |
+| P2F-02 | Repository health cleanup to exit 0 | `READY` | P2F-01 |
+| P2F-03 | Homepage/current-semester navigation facelift | `BLOCKED` | P2F-02 |
+| P2F-04 | Favorites entry path and library organization | `BLOCKED` | P2F-03 |
+| P2F-05 | Top Drugs Reference v2 performance/current-P2 shortcuts | `BLOCKED` | P2F-04 |
+| P2F-06 | Question Reports v2 reproducibility workflow | `BLOCKED` | P2F-05 |
+| P2F-07 | Additive curriculum metadata contract | `BLOCKED` | P2F-06 |
+| P2F-08 | Stats Dashboard v2 | `BLOCKED` | P2F-07 |
+| P2F-09 | Review Queue v2 + `wrongCounts` correction | `BLOCKED` | P2F-08 |
+| P2F-10 | Mobile/accessibility consistency pass | `BLOCKED` | P2F-09 |
+
+P2F-02 is the sole `READY` task. Legacy URLs/content, separate P1/P2 canonical
+sources, and the feature-frozen Fall generator remain protected throughout
+this lane.
 
 ---
 

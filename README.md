@@ -2,13 +2,13 @@
 The UAMS College of Pharmacy Class of 2029 Personalized Hub is designed to assist students in preparing for quizzes and exams.
 
 
-# Pharm-let Quizzes
+# Pharm-let Quizzes — Legacy P1 Library
 
 • Chapter Reviews: Chapter-by-chapter practice in exam style (Easy/Hard).
 • Exam Practice: Mixed sets aligned to in-class exams.
 	- Practice E1 — Exam 1 Prep (Chapters 1–4)
 	- Practice E2A — Exam 2 Prep (Chapters 1–5)
-• Top Drugs Final Mocks: Five comprehensive 88-question practice exams (Mock A–E) covering all 87 top drugs with brand/generic/class/MOA questions aligned to course rubric.
+• Top Drugs Final Mocks: Five comprehensive practice exams (Mock A–E) with brand/generic/class/MOA questions drawn from the legacy P1 Top Drugs material.
 • Lab Quizzes: Targeted practice for unit quizzes (Antihypertensives, Antilipemics, Anticoagulants, Antiarrhythmics).
 • Cumulative Practice: Progressive cumulative quizzes building from Quiz 1–2 through Quiz 1–5.
 • Supplemental: Official-style mock material (kept verbatim naming).
@@ -16,6 +16,19 @@ The UAMS College of Pharmacy Class of 2029 Personalized Hub is designed to assis
 
 All questions include hint + solution for Show/Hide (MTC) support.
 Answer types: numeric, multi-numeric, short-answer (with acceptable variants).
+
+## Fall 2026 P2 Lab III
+
+- Weeks 1–3 are student-facing from `lab3-fall-2026.html`.
+- Week 1 is a 10-question practice configuration using Week 1 content only; it does not claim an official professor-set composition.
+- Weeks 2–3 use exactly 6 new questions and 4 accumulated-review questions.
+- Weeks 4–10 remain future, course-timed activation work and are not live.
+
+## Top Drugs Reference
+
+The unified Drug Sheet (`top-drugs-quicksheet.html`) searches the current
+169-record legacy P1 pool and the official 100-record Fall 2026 P2 source. The
+display is unified, but the canonical P1 and P2 source files remain separate.
 
 ### Keyboard Shortcuts
 Press `?` during any quiz to view available shortcuts:
@@ -79,7 +92,7 @@ Track your quiz performance over time with:
 
 Repository layout:
 - `quizzes/` - static quiz JSON files (flat directory), validated against `schema.json`
-- `assets/data/` - master pool JSON used to generate quizzes (Top Drugs, Basis II units)
+- `assets/data/` - separate canonical legacy P1 and Fall 2026 P2 Top Drugs sources, plus course policies and Basis II data
 - `assets/js/`, `assets/css/` - front-end JS/CSS; `assets/icon.svg` site icon
 - `tools/` - local test harness and validation scripts
 - `scripts/validate-quizzes.mjs` - CI shim that delegates to `tools/validate-quizzes.mjs`
@@ -105,4 +118,4 @@ python3 -m http.server 8000
 
 - GitHub Pages is used to publish the site from the repository. To add a custom domain, create a file named `CNAME` at the repository root containing your domain (for example `quiz.example.com`) and then add a DNS `CNAME` record pointing that domain to `lpalafox-1.github.io`.
 
-After updating `CNAME`, push to `main` and the Pages workflow will deploy the site. If you prefer to manage DNS yourself, add the `CNAME` and configure records with your DNS provider.
+After updating `CNAME`, push to `main`; GitHub Pages publishes the site from that branch. If you prefer to manage DNS yourself, add the `CNAME` and configure records with your DNS provider.

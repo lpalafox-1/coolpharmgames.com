@@ -7,8 +7,10 @@ Permanent engineering instructions for Claude sessions working on this repositor
 A static, client-side site (no build step, no backend) deployed via GitHub Pages from the `main` branch. Quiz content lives as JSON, rendered by a single large front-end engine.
 
 - `quizzes/` — static quiz JSON files (flat directory), validated against `schema.json`.
-- `assets/data/` — master pool JSON used to generate quizzes (Top Drugs, Basis II units).
-- `assets/js/quizEngine.js` — the quiz rendering/scoring engine (~7,680 lines, monolithic).
+- `assets/data/master_pool.json` — legacy P1 Top Drugs canonical source (169 records).
+- `assets/data/fall-2026-p2-top-drugs.json` — Fall 2026 P2 canonical source (100 records, ten per week). P1 and P2 are separate sources and must never be merged or substituted for one another.
+- `assets/data/` — additional policies and course-specific data sources, including Basis II units.
+- `assets/js/quizEngine.js` — the quiz rendering/scoring engine (~7,800 lines, monolithic).
 - `assets/js/`, `assets/css/` — remaining front-end JS/CSS.
 - `tools/` — local test harness and validation scripts (`validate-quizzes.mjs`, `check-links.mjs`, `repo-health.mjs`, etc.).
 - `scripts/validate-quizzes.mjs` — thin CI shim that delegates to `tools/validate-quizzes.mjs`.
@@ -21,27 +23,31 @@ A static, client-side site (no build step, no backend) deployed via GitHub Pages
 - **`assets/js/quizEngine.js` is under special protection** — see "quizEngine.js Protection Rules" below.
 - **Do not modify GitHub workflows** under `.github/workflows/` unless the specific workflow change has been explicitly approved (approved CI/tooling changes are allowed, e.g. the Phase 1 `npm ci` fix).
 - **Do not commit temporary artifacts.** Scratch files, one-off audit output, and manifests belong outside version control (or in `.gitignore`'d paths), not in commits.
+- **Preserve legacy URLs and content** unless the approved task explicitly replaces them and includes compatibility validation.
+- **Preserve expected untracked workspace files:** `.claude/`, `.codex/`, `AGENTS.md`, and `branch-manifest-2026-07-15.txt`. Never stage, delete, or rewrite them as drive-by cleanup.
 - **Commit only after explicit implementation approval.** Propose the change (plan or diff), get the user's approval of the implementation, then commit. A task that pre-authorizes commits ("apply and commit X") counts as approval; inferring approval from silence or from approval of an earlier, different change does not. One logical change per commit, with a clear message. Never amend, force-push, or run destructive git operations without explicit request.
 
 ## quizEngine.js Protection Rules
 
-`assets/js/quizEngine.js` (~7,680 lines) is a monolith of interdependent global functions with no test coverage. Past edits have silently deleted load-bearing helpers (`toggleMark`, `toggleTimer`, point-scoring functions — see the "restore X" commits in history). Treat every touch as high-risk:
+`assets/js/quizEngine.js` (~7,800 lines) is a monolith of interdependent global functions with limited direct behavioral coverage. Past edits have silently deleted load-bearing helpers (`toggleMark`, `toggleTimer`, point-scoring functions — see the "restore X" commits in history). Treat every touch as high-risk:
 
 1. **Never modify it unless the task explicitly names `quizEngine.js`** as the file to change. "Fix the quiz page" is not sufficient; confirm the engine is in scope first.
 2. **Isolate engine changes**: one concern per commit, no other files mixed in except the required cache-token bump.
 3. **Bump the cache-busting token** in `quiz.html` (`assets/js/quizEngine.js?v=...`) in the same commit as any engine change — stale caches have shipped broken sessions before.
 4. **Verify before declaring done**: run `npm run validate`, then load a real quiz over HTTP (`quiz.html?id=...&mode=...`) and exercise the changed behavior plus the fragile basics (answer check, mark, timer, reveal).
 5. **No drive-by edits**: no refactoring, renaming, dead-code removal, or formatting churn while in the file for another reason. Structural decomposition happens only as its own explicitly approved project (Phase 3 of the cleanup roadmap).
+6. **Unrelated Phase 2 Facelift work never authorizes an engine change.** If a P2F task does not explicitly name `quizEngine.js`, keep it untouched.
 
 ## Known repo state (context, not instructions)
 
 - GitHub Pages deploys from `main`; the old `gh-pages` branch was removed. `deploy-pages.yml.disabled` is intentionally inactive — don't re-enable it without asking.
 - `tools/check-links.mjs` and `tools/repo-health.mjs` are catalog-aware since `9f3cb3d`. Treat any `npm run check:links` failure as a real regression, not a known false positive.
-- The local workflow commit `96fc305` adds `check:links` and `test:tools` to CI, but it has not yet been pushed and verified on GitHub.
-- `npm run health:repo` exits 1 by design over two deferred findings: the empty `practice-e2b` placeholder and the `index.html` footer count mismatch.
-- A 30-test regression suite exists under `npm run test:tools`; run it before and after changes.
+- CI includes `validate`, `check:links`, and `test:tools`; the Phase 2 Facelift kickoff baseline is 139/139 tool tests passing.
+- `npm run health:repo` currently exits 1 with exactly two known findings: empty `quizzes/practice-e2b-exam2-prep-expanded.json` and homepage count 1,765 vs the actual 1,723 static questions. P2F-02 owns that cleanup; do not suppress or redefine the checks.
 - `tools/engine-globals.manifest.json` pins the engine global surface and must be updated deliberately in the same approved commit as any intentional engine-surface change.
-- Cleanup roadmap status: Phase 1 complete; Phase 2A complete; Phase 2B in progress (see `docs/` for the audit, architecture map, and health report). Ask before assuming the remaining roadmap should be resumed — it changes over time.
+- The active roadmap is the ordered Phase 2 Facelift lane in `docs/phase-roadmap.md`. After P2F-01, P2F-02 is the sole `READY` task; do not select stale F26-04 work or infer readiness from satisfied dependencies. Keep exactly one task `READY` at a time.
+- Fall 2026 Lab III Weeks 1–3 are student-facing. Week 1 is practice-configured and is not an official composition claim; Weeks 2–3 use 6 new + 4 accumulated review. Weeks 4–10 remain separate, course-timed activation work.
+- The Lab III generator is feature-frozen except for reproduced defects or course-driven guidance. Facelift work does not reopen generator design or activate future weeks.
 
 ## Working conventions
 
