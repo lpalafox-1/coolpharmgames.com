@@ -1,6 +1,6 @@
 # Repository Health Report
 
-_Refreshed 2026-08-21 after P2F-04 on a branch from `52f5217`. This report
+_Refreshed 2026-08-21 after P2F-05 on a branch from `a6e3f3c`. This report
 records the verified green repository-health baseline._
 
 ## Current Passing Checks
@@ -9,12 +9,14 @@ records the verified green repository-health baseline._
 | --- | --- | --- |
 | `npm run validate` | Passed | All 34 static quiz JSON files pass schema + semantic validation. |
 | `npm run check:links` | Passed | Catalog-aware since commit `9f3cb3d`; the three historical false positives (`basis2-quiz9`, `bdt-unit10-exam4`, `top-drugs-final-mock*`) are resolved. Unlinked-quiz findings are informational warnings, not failures. |
-| `npm run test:tools` | Passed | 154/154 tests, including validator, catalog/link, homepage hierarchy/routes, Favorites storage/controls, engine-surface, review-queue, unified Top Drugs Reference, and Fall 2026 generation/runtime contracts. |
+| `npm run test:tools` | Passed | 159/159 tests, including validator, catalog/link, homepage hierarchy/routes, Favorites storage/controls, engine-surface, review-queue, progressive unified Top Drugs Reference, and Fall 2026 generation/runtime contracts. |
 | `npm run health:repo` | Passed (exit 0) | `Errors: 0`; homepage count matches the source-derived static total. |
 | Repository counts | Informational | 1,723 static quiz questions across 34 JSON files; 169 legacy P1 Top Drugs records; 100 Fall 2026 P2 records (ten per week); 56 Endocrine concept-pool entries. |
 
 The Drug Sheet presents the P1 and P2 Top Drugs records in one reference
-interface while retaining their separate canonical source files.
+interface while retaining their separate canonical source files. It searches
+all 269 normalized records, renders 12 cards initially, reveals 24 more per
+request, and provides current P2 Fall/Lab III and Week 1–3 shortcuts.
 
 ## P2F-02 Resolved Findings
 
@@ -28,11 +30,11 @@ interface while retaining their separate canonical source files.
    and clarified that generated sets are additional. The unchanged health tool
    continues deriving the corpus total and fails on future drift.
 
-P2F-04 preserved the green health baseline while restoring catalog-backed
-Favorites controls, keeping the existing string-array storage contract, and
-making unavailable stored IDs fail gracefully. P2F-05 — Top Drugs Reference
-v2 performance/current-P2 shortcuts — is now the sole `READY` task. P2F-04
-did not begin that work.
+P2F-05 preserved the green health baseline while adding bounded progressive
+Drug Sheet rendering, complete-library search, current-P2 shortcuts, and URL
+history restoration without changing either canonical Top Drugs source.
+P2F-06 — Question Reports v2 reproducibility workflow — is now the sole
+`READY` task. P2F-05 did not begin that work.
 
 Warnings (informational): `supplemental-exam1-2024.json` has eight questions;
 `test-sample-3.json` has three (a dev-harness fixture). 22 quiz ids are not
@@ -56,6 +58,6 @@ these are reported as information, not errors.
 ```text
 npm run validate       # passed
 npm run check:links    # passed
-npm run test:tools     # passed (154/154 tests)
+npm run test:tools     # passed (159/159 tests)
 npm run health:repo    # passed: exit 0, Errors: 0
 ```
