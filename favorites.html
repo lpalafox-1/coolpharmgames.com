@@ -19,11 +19,7 @@
   <!-- Tailwind + site styles -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="assets/css/styles.css" />
-
-  <style>
-    .favorite-item { background: var(--card); border: 1px solid var(--ring); border-radius: 12px; padding: 1rem; transition: all 0.2s; }
-    .favorite-item:hover { border-color: var(--accent); box-shadow: 0 4px 12px rgba(139,30,63,0.15); }
-  </style>
+  <link rel="stylesheet" href="assets/css/favorites.css?v=20260821a" />
 </head>
 
 <body class="bg-[var(--bg)] text-[var(--text)]">
@@ -47,12 +43,14 @@
 
     <!-- Sort & Filter Options -->
     <div class="flex flex-wrap gap-3 mb-6">
+      <label class="sr-only" for="sort-by">Sort favorites</label>
       <select id="sort-by" class="rounded-xl border px-3 py-2" style="border-color:var(--ring); background:var(--card); color:var(--text)">
         <option value="recent">Sort: Recently Added</option>
         <option value="name">Sort: Name (A-Z)</option>
         <option value="category">Sort: Category</option>
       </select>
       
+      <label class="sr-only" for="filter-category">Filter favorites by category</label>
       <select id="filter-category" class="rounded-xl border px-3 py-2" style="border-color:var(--ring); background:var(--card); color:var(--text)">
         <option value="">All Categories</option>
         <option value="chapter">Chapter Reviews</option>
@@ -63,20 +61,20 @@
         <option value="fun">Fun Modes</option>
       </select>
 
-      <button id="clear-all" class="btn btn-ghost ml-auto">Clear All Favorites</button>
+      <button id="clear-all" class="btn btn-ghost ml-auto" type="button">Clear All Favorites</button>
     </div>
 
     <!-- Favorites List -->
     <div id="favorites-list" class="grid md:grid-cols-2 gap-4">
       <div class="text-center py-12" style="color:var(--muted)">
         <p class="text-lg">No favorites yet!</p>
-        <p class="mt-2">Click the star (☆) next to any quiz on the library page to add it here.</p>
-        <a href="index.html" class="btn btn-blue mt-4 inline-block">Browse Quizzes</a>
+        <p class="mt-2">Use the ☆ button beside a quiz in Quiz Library, or in a quiz header, to save it here.</p>
+        <a href="custom-quiz.html" class="btn btn-blue mt-4 inline-flex items-center justify-center">Browse Quiz Library</a>
       </div>
     </div>
   </main>
 
   <script src="assets/js/quiz-catalog.js?v=20260821a"></script>
-  <script src="assets/js/favorites.js?v=20260427c" defer></script>
+  <script src="assets/js/favorites.js?v=20260821a" defer></script>
 </body>
 </html>

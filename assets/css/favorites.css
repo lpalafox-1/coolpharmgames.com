@@ -1,0 +1,77 @@
+/* Shared Favorites controls and page/card layout. */
+.favorite-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 44px;
+  width: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 1px solid var(--ring);
+  border-radius: .75rem;
+  background: var(--card);
+  color: var(--accent);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color .15s ease, background-color .15s ease, transform .15s ease;
+}
+
+.favorite-toggle:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 9%, var(--card));
+  transform: translateY(-1px);
+}
+
+.favorite-toggle:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.favorite-toggle[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--card));
+}
+
+.dark .favorite-toggle {
+  color: #fecdd3;
+}
+
+.dark .favorite-toggle:focus-visible {
+  outline-color: #fecdd3;
+}
+
+.favorite-item {
+  background: var(--card);
+  border: 1px solid var(--ring);
+  border-radius: 12px;
+  padding: 1rem;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.favorite-item:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 12px rgba(139, 30, 63, .15);
+}
+
+.favorite-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+
+.quiz-selector-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: .75rem;
+}
+
+.quiz-selector-heading > label {
+  min-width: 0;
+  flex: 1;
+}
+
+#favorite-quiz-control[hidden] {
+  display: none;
+}

@@ -14,6 +14,7 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="assets/css/styles.css?v=20260428a" />
+  <link rel="stylesheet" href="assets/css/favorites.css?v=20260821a" />
   <script>
     tailwind.config = { darkMode: 'class', theme: { extend: { colors: { maroon: '#8b1e3f' } } } }
   </script>
@@ -66,6 +67,7 @@
       </div>
       <div id="timer-readout" class="bg-[#8b1e3f]/10 text-[#8b1e3f] px-5 py-2 rounded-full border border-[#8b1e3f]/20 font-black text-xl cursor-pointer">00:00</div>
       <div class="flex-1 flex justify-end gap-2">
+        <div id="favorite-quiz-control" hidden></div>
         <button id="theme-toggle" class="p-2 text-xl">🌓</button>
         <button id="help-shortcuts" class="p-2 text-xl">❓</button>
       </div>
@@ -175,6 +177,7 @@
   </div>
 
   <script src="assets/js/quiz-catalog.js?v=20260821a"></script>
+  <script src="assets/js/favorites.js?v=20260821a"></script>
   <script src="assets/js/top-drugs-data.js?v=20260419a"></script>
   <script src="assets/js/review-queue-store.js?v=20260819a"></script>
   <script src="assets/js/quizEngine.js?v=20260819e"></script>

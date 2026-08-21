@@ -20,10 +20,10 @@ Phase 2 Facelift task without explicit owner approval.
 | --- | --- |
 | `npm run validate` | exit 0 |
 | `npm run check:links` | exit 0 |
-| `npm run test:tools` | 146/146 pass after P2F-03 (grows only with deliberate test additions) |
+| `npm run test:tools` | 154/154 pass after P2F-04 (grows only with deliberate test additions) |
 | `npm run health:repo` | exit 0 with `Errors: 0`; informational small-quiz warnings remain visible |
 
-Current audited repository facts after P2F-03: 1,723 static quiz questions
+Current audited repository facts after P2F-04: 1,723 static quiz questions
 across 34 JSON files; 169 legacy P1 Top Drugs records; and 100 Fall 2026 P2
 records, ten per week. P1 and P2 remain separate canonical sources.
 
@@ -358,21 +358,23 @@ owner-approved scope and allowed-files contract before execution.
 | P2F-01 | Phase 2 baseline and historical roadmap synchronization | `DONE` | — |
 | P2F-02 | Repository health cleanup to exit 0 | `DONE` | P2F-01 |
 | P2F-03 | Homepage/current-semester navigation facelift | `DONE` | P2F-02 |
-| P2F-04 | Favorites entry path and library organization | `READY` | P2F-03 |
-| P2F-05 | Top Drugs Reference v2 performance/current-P2 shortcuts | `BLOCKED` | P2F-04 |
+| P2F-04 | Favorites entry path and library organization | `DONE` | P2F-03 |
+| P2F-05 | Top Drugs Reference v2 performance/current-P2 shortcuts | `READY` | P2F-04 |
 | P2F-06 | Question Reports v2 reproducibility workflow | `BLOCKED` | P2F-05 |
 | P2F-07 | Additive curriculum metadata contract | `BLOCKED` | P2F-06 |
 | P2F-08 | Stats Dashboard v2 | `BLOCKED` | P2F-07 |
 | P2F-09 | Review Queue v2 + `wrongCounts` correction | `BLOCKED` | P2F-08 |
 | P2F-10 | Mobile/accessibility consistency pass | `BLOCKED` | P2F-09 |
 
-P2F-04 is the sole `READY` task. P2F-03 consolidated duplicate Fall surfaces
-into one current-semester hierarchy with first-class Lab III and Top Drugs
-Reference actions, grouped primary study tools separately from diagnostics,
-organized P1 coursework chronologically, and condensed planned content. All
-legacy functional URLs/content, the guarded 1,723-question count, separate
-P1/P2 canonical sources, and the feature-frozen Fall generator remain
-protected throughout this lane.
+P2F-05 is the sole `READY` task. P2F-04 restored the existing quiz-ID
+Favorites contract with accessible add/remove controls in the Quiz Library
+and stable quiz headers, kept legacy P1 dynamic routes compatible, and made
+unavailable stored IDs fail gracefully without mutating them. Generated Fall
+Lab III sessions remain outside the quiz-only Favorites contract because they
+do not have stable relaunchable catalog IDs. All legacy functional
+URLs/content, the guarded 1,723-question count, separate P1/P2 canonical
+sources, and the feature-frozen Fall generator remain protected throughout
+this lane.
 
 ---
 
