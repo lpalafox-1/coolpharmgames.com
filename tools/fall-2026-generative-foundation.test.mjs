@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
@@ -12,9 +12,9 @@ const drugData = JSON.parse(readFileSync(drugDataPath, "utf8"));
 const policy = JSON.parse(readFileSync(policyPath, "utf8"));
 
 const LEGACY_BASELINE = Object.freeze({
-  commit: "d55a57b638b9424299ab2fabb842a73e8792edab",
-  quizFileCount: 35,
-  quizCorpusSha256: "10e5336b75c55f15ad249ce8350edf66737a560423b50e6eedc38c68e27cf2fb",
+  reference: "P2F-02 approved removal of the empty E2B placeholder from 636e436",
+  quizFileCount: 34,
+  quizCorpusSha256: "d33655347e1d0dbcfdc4eea95d751ca4db371122bf14256ddb6d93bc8bf0a2ac",
   masterPoolSha256: "1fb50e96e60252a9839406d53bc929e9569d76c0ddc2522aff43adf9bdf2a87c"
 });
 const APPROVED_ENGINE_BASELINE = Object.freeze({
@@ -70,10 +70,11 @@ function assertNoForbiddenQuestionBankKeys(value, location = "policy") {
   }
 }
 
-test(`legacy quiz inputs remain byte-identical to ${LEGACY_BASELINE.commit} and the engine matches ${APPROVED_ENGINE_BASELINE.commit}`, () => {
+test(`surviving legacy quiz inputs match the ${LEGACY_BASELINE.reference} baseline and the engine matches ${APPROVED_ENGINE_BASELINE.commit}`, () => {
   const quizCorpus = hashQuizCorpus();
   assert.equal(quizCorpus.count, LEGACY_BASELINE.quizFileCount, "legacy static quiz file count changed");
   assert.equal(quizCorpus.digest, LEGACY_BASELINE.quizCorpusSha256, "legacy static quiz JSON changed");
+  assert.equal(existsSync(path.join(repoRoot, "quizzes", "practice-e2b-exam2-prep-expanded.json")), false, "retired E2B placeholder returned");
 
   const masterPool = readFileSync(path.join(repoRoot, "assets", "data", "master_pool.json"));
   assert.equal(sha256(masterPool), LEGACY_BASELINE.masterPoolSha256, "legacy Top Drugs master pool changed");

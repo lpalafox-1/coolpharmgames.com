@@ -24,18 +24,15 @@ A run is only permitted to proceed when all of the following hold:
 2. Local default branch equals `origin/main` (no divergence either way).
 3. `npm run validate` → exit 0.
 4. `npm run check:links` → exit 0.
-5. `npm run test:tools` → all tests pass, zero failures (139/139 at Phase 2
-   Facelift kickoff on `ca1a90e`; the count grows only through deliberate test
-   additions).
-6. `npm run health:repo` → exit 1 with **exactly** the two known deferred
-   findings (empty `quizzes/practice-e2b-exam2-prep-expanded.json`; homepage
-   count 1,765 vs actual static count 1,723).
-   Any third finding, or the absence of one, is baseline drift.
+5. `npm run test:tools` → all tests pass, zero failures (143/143 after P2F-02;
+   the count grows only through deliberate test additions).
+6. `npm run health:repo` → exit 0 with `Errors: 0`. The two small-quiz warnings
+   remain informational; any health error or nonzero exit is baseline drift.
 
 ## Phase 2 Facelift boundaries
 
 - `docs/phase-roadmap.md` is authoritative. Exactly one task may be `READY`;
-  after P2F-01 that task is P2F-02. Never infer readiness merely because a
+  after P2F-02 that task is P2F-03. Never infer readiness merely because a
   dependency is complete, and never select the stale F26-04 entry (it is DONE).
 - Preserve separate canonical sources: legacy P1
   `assets/data/master_pool.json` and Fall P2
@@ -64,7 +61,7 @@ A run is only permitted to proceed when all of the following hold:
    change, no protected files beyond its allowed list, no dependency
    additions, fits one logical commit, and is not marked never-autonomous).
 7. Create one branch: `claude/<task-id>-<short-slug>` (e.g.
-   `claude/p2f-02-repository-health`).
+   `claude/p2f-03-homepage-facelift`).
 8. Implement only that task, within its allowed-files list.
 9. Run every validation command the task contract names.
 10. Create exactly one logical commit using the task's expected message.

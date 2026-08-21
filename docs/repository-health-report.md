@@ -1,40 +1,38 @@
 # Repository Health Report
 
-_Refreshed 2026-08-21 for the Phase 2 Facelift kickoff at `ca1a90e`. This
-report records the current repository state; no application, quiz-data, or
-workflow changes were made as part of this documentation review._
+_Refreshed 2026-08-21 after P2F-02 on a branch from `636e436`. This report
+records the verified green repository-health baseline._
 
 ## Current Passing Checks
 
 | Check | Result | Notes |
 | --- | --- | --- |
-| `npm run validate` | Passed | All 35 static quiz JSON files pass schema + semantic validation. |
+| `npm run validate` | Passed | All 34 static quiz JSON files pass schema + semantic validation. |
 | `npm run check:links` | Passed | Catalog-aware since commit `9f3cb3d`; the three historical false positives (`basis2-quiz9`, `bdt-unit10-exam4`, `top-drugs-final-mock*`) are resolved. Unlinked-quiz findings are informational warnings, not failures. |
-| `npm run test:tools` | Passed | 139/139 tests, including validator, catalog/link, engine-surface, review-queue, unified Top Drugs Reference, and Fall 2026 generation/runtime contracts. |
-| Repository counts | Informational | 1,723 static quiz questions across 35 JSON files; 169 legacy P1 Top Drugs records; 100 Fall 2026 P2 records (ten per week); 56 Endocrine concept-pool entries. |
+| `npm run test:tools` | Passed | 143/143 tests, including validator, catalog/link, engine-surface, review-queue, unified Top Drugs Reference, and Fall 2026 generation/runtime contracts. |
+| `npm run health:repo` | Passed (exit 0) | `Errors: 0`; homepage count matches the source-derived static total. |
+| Repository counts | Informational | 1,723 static quiz questions across 34 JSON files; 169 legacy P1 Top Drugs records; 100 Fall 2026 P2 records (ten per week); 56 Endocrine concept-pool entries. |
 
 The Drug Sheet presents the P1 and P2 Top Drugs records in one reference
 interface while retaining their separate canonical source files.
 
-## Current Failing Checks
+## P2F-02 Resolved Findings
 
-| Check | Result | Current findings |
-| --- | --- | --- |
-| `npm run health:repo` | Failed (exit 1) | Two known, deferred errors (below). |
+1. `practice-e2b-exam2-prep-expanded.json` had contained zero questions since
+   its September 2025 creation. It had no direct HTML link or usable quiz
+   content, but a later shared-catalog entry exposed it in Custom Quiz. P2F-02
+   removed the catalog entry and deleted the empty artifact; no question
+   content was fabricated or altered.
+2. The homepage count was a manually maintained literal with inconsistent
+   scope. P2F-02 changed it from 1,765 to the validated 1,723 static questions
+   and clarified that generated sets are additional. The unchanged health tool
+   continues deriving the corpus total and fails on future drift.
 
-1. `practice-e2b-exam2-prep-expanded.json` is an empty placeholder quiz. It is
-   schema-valid and covered by a regression test that documents the current
-   empty baseline; changing it requires approved quiz-JSON edits.
-2. The footer in `index.html` says 1,765 questions while the current static
-   total is 1,723. Fixing it is an application-page change requiring explicit
-   approval.
-
-P2F-02 — Repository health cleanup to exit 0 — is the sole `READY` task and
-the intended owner of both findings. This report does not suppress, redefine,
-or fix either health check.
+P2F-03 — Homepage/current-semester navigation facelift — is now the sole
+`READY` task. P2F-02 did not begin that work.
 
 Warnings (informational): `supplemental-exam1-2024.json` has eight questions;
-`test-sample-3.json` has three (a dev-harness fixture). 23 quiz ids are not
+`test-sample-3.json` has three (a dev-harness fixture). 22 quiz ids are not
 statically linked from `index.html`; menus are partly rendered dynamically, so
 these are reported as information, not errors.
 
@@ -55,6 +53,6 @@ these are reported as information, not errors.
 ```text
 npm run validate       # passed
 npm run check:links    # passed
-npm run test:tools     # passed (139/139 tests)
-npm run health:repo    # failed: the two known deferred errors above
+npm run test:tools     # passed (143/143 tests)
+npm run health:repo    # passed: exit 0, Errors: 0
 ```

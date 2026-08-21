@@ -23,11 +23,16 @@ test("canonical validator accepts every tracked static quiz", () => {
   assert.equal((staticStdout.match(/✅/g) || []).length, quizCount);
 });
 
-test("the E2B placeholder remains schema-valid while its question count is zero", () => {
-  const quiz = JSON.parse(readFileSync(path.join(quizzesDir, "practice-e2b-exam2-prep-expanded.json"), "utf8"));
-  const questionCount = Object.values(quiz.pools || {})
-    .reduce((total, pool) => total + (Array.isArray(pool) ? pool.length : 0), 0);
+test("the static quiz corpus contains no empty artifacts", () => {
+  const files = readdirSync(quizzesDir).filter((file) => file.endsWith(".json"));
 
-  assert.equal(questionCount, 0);
-  assert.equal(quiz.id, "practice-e2b-exam2-prep-expanded");
+  assert.ok(!files.includes("practice-e2b-exam2-prep-expanded.json"));
+  for (const file of files) {
+    const quiz = JSON.parse(readFileSync(path.join(quizzesDir, file), "utf8"));
+    const questionCount = (Array.isArray(quiz.questions) ? quiz.questions.length : 0)
+      + Object.values(quiz.pools || {})
+        .reduce((total, pool) => total + (Array.isArray(pool) ? pool.length : 0), 0);
+
+    assert.ok(questionCount > 0, `${file} must contain at least one question`);
+  }
 });
