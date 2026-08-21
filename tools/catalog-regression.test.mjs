@@ -10,17 +10,39 @@ const repoRoot = path.resolve(path.dirname(__filename), "..");
 const catalogPath = path.join(repoRoot, "assets", "js", "quiz-catalog.js");
 const indexPath = path.join(repoRoot, "index.html");
 const quizzesDir = path.join(repoRoot, "quizzes");
+const retiredE2bId = "practice-e2b-exam2-prep-expanded";
+const retiredE2bPath = "quizzes/practice-e2b-exam2-prep-expanded.json";
+const catalogConsumerPaths = [
+  "custom-quiz.html",
+  "favorites.html",
+  "quiz.html",
+  "review-queue.html",
+  "stats.html"
+];
 
-function loadCatalog() {
+function loadCatalogApi() {
   const sandbox = { window: {}, URLSearchParams };
   vm.runInNewContext(readFileSync(catalogPath, "utf8"), sandbox, {
     filename: catalogPath,
     timeout: 1_000
   });
 
-  const entries = sandbox.window.PharmletQuizCatalog?.entries;
+  const catalog = sandbox.window.PharmletQuizCatalog;
+  const entries = catalog?.entries;
   assert.ok(Array.isArray(entries), "quiz catalog must expose an entries array");
-  return entries;
+  return catalog;
+}
+
+function loadCatalog() {
+  return loadCatalogApi().entries;
+}
+
+function countQuizQuestions(quiz) {
+  const questions = Array.isArray(quiz?.questions) ? quiz.questions.length : 0;
+  const pools = quiz?.pools && typeof quiz.pools === "object"
+    ? Object.values(quiz.pools).reduce((sum, pool) => sum + (Array.isArray(pool) ? pool.length : 0), 0)
+    : 0;
+  return questions + pools;
 }
 
 function extractQuizIds(html) {
@@ -68,7 +90,47 @@ test("catalog quiz-json sources exist and preserve their catalog IDs", () => {
 
     const source = JSON.parse(readFileSync(sourcePath, "utf8"));
     assert.equal(source.id, entry.id, `${entry.id} source id must match its catalog id`);
+    if (entry.sourcePath.startsWith("quizzes/")) {
+      assert.ok(countQuizQuestions(source) > 0, `${entry.id} must expose at least one static question`);
+    }
   }
+});
+
+test("the retired empty E2B placeholder is absent from the catalog and Custom Quiz", () => {
+  const catalog = loadCatalogApi();
+
+  assert.equal(catalog.getEntry(retiredE2bId), null);
+  assert.equal(catalog.entries.some((entry) => entry.id === retiredE2bId || entry.sourcePath === retiredE2bPath), false);
+  assert.equal(catalog.listCustomBuilderEntries().some((entry) => entry.id === retiredE2bId), false);
+  assert.equal(existsSync(path.join(repoRoot, retiredE2bPath)), false);
+});
+
+test("representative existing P1 quiz IDs still resolve through legacy routes", () => {
+  const catalog = loadCatalogApi();
+  const examples = [
+    ["chapter1-review", "easy"],
+    ["practice-e2a-exam2-prep-ch1-5", "hard"],
+    ["top-drugs-final-mockA", "easy"]
+  ];
+
+  for (const [id, mode] of examples) {
+    assert.ok(catalog.getEntry(id), `${id} must remain cataloged`);
+    assert.equal(catalog.buildQuizHref(id, mode), `quiz.html?id=${id}&mode=${mode}`);
+  }
+});
+
+test("every page consuming the shared quiz catalog uses one cache token", () => {
+  const tokens = new Set();
+
+  for (const relativePath of catalogConsumerPaths) {
+    const html = readFileSync(path.join(repoRoot, relativePath), "utf8");
+    const match = html.match(/assets\/js\/quiz-catalog\.js\?v=([^"'\s>]+)/);
+    assert.ok(match, `${relativePath} must load the versioned quiz catalog`);
+    tokens.add(match[1]);
+  }
+
+  assert.equal(tokens.size, 1, "quiz catalog consumers must share one cache token");
+  assert.deepEqual([...tokens], ["20260821a"], "the P2F-02 catalog change needs a fresh cache token");
 });
 
 test("every static quiz is registered in the runtime catalog", () => {
