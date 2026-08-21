@@ -19,9 +19,10 @@
   <!-- Tailwind + site styles -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="stylesheet" href="assets/css/favorites.css?v=20260821a" />
 
   <style>
-    .quiz-selector { border: 2px solid var(--ring); border-radius: 8px; padding: 1rem; cursor: pointer; transition: all 0.2s; }
+    .quiz-selector { border: 2px solid var(--ring); border-radius: 8px; padding: 1rem; transition: all 0.2s; }
     .quiz-selector:hover { border-color: var(--accent); background: var(--accent-light, rgba(139,30,63,0.05)); }
     .quiz-selector.selected { border-color: var(--accent); background: var(--accent-light, rgba(139,30,63,0.1)); }
     .quiz-selector input[type="checkbox"] { width: 1.25rem; height: 1.25rem; cursor: pointer; }
@@ -42,9 +43,12 @@
   </header>
 
   <main class="max-w-5xl mx-auto p-6">
-    <div class="mb-6">
-      <h2 class="text-2xl font-bold mb-2">Build Your Custom Quiz</h2>
-      <p style="color:var(--muted)">Select multiple quizzes to combine into one practice session. Questions will be shuffled together.</p>
+    <div class="mb-6 sm:flex sm:items-start sm:justify-between sm:gap-4">
+      <div>
+        <h2 class="text-2xl font-bold mb-2">Quiz Library &amp; Custom Builder</h2>
+        <p style="color:var(--muted)">Select quizzes to combine into one practice session, or use ☆ to save an individual quiz to Favorites.</p>
+      </div>
+      <a href="favorites.html" class="btn btn-ghost mt-4 sm:mt-0 inline-flex items-center justify-center shrink-0">View Favorites</a>
     </div>
 
     <!-- Filter -->
@@ -100,16 +104,17 @@
 
     <!-- Actions -->
     <div class="flex gap-3">
-      <button id="start-quiz" class="btn btn-blue" disabled>
+      <button id="start-quiz" class="btn btn-blue" type="button" disabled>
         Start Custom Quiz
       </button>
-      <button id="clear-selection" class="btn btn-ghost">
+      <button id="clear-selection" class="btn btn-ghost" type="button">
         Clear Selection
       </button>
     </div>
   </main>
 
   <script src="assets/js/quiz-catalog.js?v=20260821a"></script>
-  <script src="assets/js/custom-quiz.js?v=20260427c" defer></script>
+  <script src="assets/js/favorites.js?v=20260821a" defer></script>
+  <script src="assets/js/custom-quiz.js?v=20260821a" defer></script>
 </body>
 </html>

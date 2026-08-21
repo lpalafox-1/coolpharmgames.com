@@ -52,7 +52,7 @@ Track your quiz performance over time with:
 - Recent activity history
 
 ### ⭐ Favorites System (`favorites.html`)
-- Bookmark quizzes with star icons (★/☆)
+- Bookmark cataloged quizzes with star icons (★/☆) in Quiz Library or a stable quiz header
 - Dedicated favorites page with sorting and filtering
 - Sort by: Recently Added, Name (A-Z), Category
 - Filter by category (Chapter Reviews, Exam Practice, Lab Quizzes, etc.)
@@ -82,7 +82,7 @@ Track your quiz performance over time with:
 - Keyboard shortcuts help modal (press `?` to view)
 
 ### ⭐ Quality of Life Features
-- **Bookmark favorites**: Star icon next to quizzes for quick access
+- **Bookmark favorites**: Save cataloged quizzes from Quiz Library or a stable quiz header for quick access
 - **Font size controls**: Adjust text size for better readability (persists across sessions)
 - **High contrast mode**: Enhanced visibility with bold colors and underlined links
 - **Confetti celebration**: Animated confetti for perfect quiz scores (100%)

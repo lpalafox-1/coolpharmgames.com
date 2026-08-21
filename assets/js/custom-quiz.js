@@ -60,6 +60,8 @@ async function loadAvailableQuizzes() {
       const quizInfo = {
         id: entry.id,
         title: data.title || entry.title || entry.id,
+        favoriteTitle: entry.title || data.title || entry.id,
+        favoriteCategory: entry.favoriteCategory || "other",
         pools: data.pools || {},
         questionCount: calculateQuestionCount(data),
         sourcePath: entry.sourcePath
@@ -96,17 +98,27 @@ function renderQuizCard(quiz) {
   div.dataset.quizId = quiz.id;
   
   div.innerHTML = `
-    <label class="flex items-start gap-3 cursor-pointer">
-      <input type="checkbox" class="quiz-checkbox mt-1" value="${quiz.id}" />
-      <div class="flex-1">
-        <div class="font-semibold">${sanitize(quiz.title)}</div>
-        <div class="text-sm mt-1" style="color:var(--muted)">
-          ${quiz.questionCount} question${quiz.questionCount === 1 ? '' : 's'}
-          ${Object.keys(quiz.pools).length > 0 ? ` · Modes: ${Object.keys(quiz.pools).join(', ')}` : ''}
+    <div class="quiz-selector-heading">
+      <label class="flex items-start gap-3 cursor-pointer">
+        <input type="checkbox" class="quiz-checkbox mt-1" value="${quiz.id}" />
+        <div class="flex-1 min-w-0">
+          <div class="text-xs font-bold uppercase tracking-wider mb-1" style="color:var(--muted)">${sanitize(quizCatalog?.getFavoriteCategoryLabel?.(quiz.favoriteCategory) || "Other")}</div>
+          <div class="font-semibold">${sanitize(quiz.title)}</div>
+          <div class="text-sm mt-1" style="color:var(--muted)">
+            ${quiz.questionCount} question${quiz.questionCount === 1 ? '' : 's'}
+            ${Object.keys(quiz.pools).length > 0 ? ` · Modes: ${Object.keys(quiz.pools).join(', ')}` : ''}
+          </div>
         </div>
-      </div>
-    </label>
+      </label>
+      <div class="favorite-control-slot"></div>
+    </div>
   `;
+
+  const favoriteButton = window.PharmletFavorites?.createToggleButton?.({
+    id: quiz.id,
+    title: quiz.favoriteTitle
+  });
+  if (favoriteButton) div.querySelector(".favorite-control-slot")?.appendChild(favoriteButton);
   
   const checkbox = div.querySelector(".quiz-checkbox");
   checkbox.addEventListener("change", (e) => {
