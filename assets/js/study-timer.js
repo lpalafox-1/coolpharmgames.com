@@ -1,7 +1,6 @@
 // assets/js/study-timer.js
 // Study session timer with Pomodoro mode
 
-const THEME_KEY = "pharmlet.theme";
 const SESSIONS_KEY = "pharmlet.sessions";
 const SETTINGS_KEY = "pharmlet.timer-settings";
 
@@ -19,24 +18,7 @@ const POMODORO_WORK = 25 * 60; // 25 minutes
 const POMODORO_BREAK = 5 * 60; // 5 minutes
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Theme toggle
-  const themeToggle = document.getElementById("theme-toggle");
-  const themeLabel = document.getElementById("theme-label");
-  
-  if (themeToggle && themeLabel) {
-    const saved = localStorage.getItem(THEME_KEY);
-    const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)")?.matches;
-    const start = saved || (prefersDark ? "dark" : "light");
-    document.documentElement.classList.toggle("dark", start === "dark");
-    themeLabel.textContent = start === "dark" ? "Light" : "Dark";
-    
-    themeToggle.addEventListener("click", () => {
-      const next = document.documentElement.classList.contains("dark") ? "light" : "dark";
-      document.documentElement.classList.toggle("dark", next === "dark");
-      localStorage.setItem(THEME_KEY, next);
-      themeLabel.textContent = next === "dark" ? "Light" : "Dark";
-    });
-  }
+  window.PharmletSite?.initTheme?.();
 
   // Event listeners
   document.getElementById("mode-session")?.addEventListener("click", () => switchMode("session"));
@@ -279,19 +261,4 @@ function formatMinutes(mins) {
   return `${minutes}m`;
 }
 
-function getTimeAgo(date) {
-  const seconds = Math.floor((new Date() - date) / 1000);
-  const intervals = {
-    day: 86400,
-    hour: 3600,
-    minute: 60
-  };
-  
-  for (const [unit, secondsInUnit] of Object.entries(intervals)) {
-    const interval = Math.floor(seconds / secondsInUnit);
-    if (interval >= 1) {
-      return `${interval} ${unit}${interval === 1 ? '' : 's'} ago`;
-    }
-  }
-  return 'just now';
-}
+const getTimeAgo = window.PharmletSite?.timeAgo;

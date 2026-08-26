@@ -1,32 +1,13 @@
-const THEME_KEY = "pharmlet.theme";
 const HISTORY_KEY = "pharmlet.history";
 const TOP_DRUGS_SIGNALS_KEY = "pharmlet.topDrugs.signals";
 const FINAL_EXAM_ID = "log-lab-final-2";
 const FINAL_EXAM_TOTAL = 110;
 
 document.addEventListener("DOMContentLoaded", async () => {
-  initTheme();
+  window.PharmletSite?.initTheme?.();
   await renderDataVersionBadge();
   renderFinalTrends();
 });
-
-function initTheme() {
-  const toggle = document.getElementById("theme-toggle");
-  const label = document.getElementById("theme-label");
-  const saved = localStorage.getItem(THEME_KEY);
-  const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)")?.matches;
-  const start = saved || (prefersDark ? "dark" : "light");
-
-  document.documentElement.classList.toggle("dark", start === "dark");
-  if (label) label.textContent = start === "dark" ? "Light" : "Dark";
-
-  toggle?.addEventListener("click", () => {
-    const next = document.documentElement.classList.contains("dark") ? "light" : "dark";
-    document.documentElement.classList.toggle("dark", next === "dark");
-    localStorage.setItem(THEME_KEY, next);
-    if (label) label.textContent = next === "dark" ? "Light" : "Dark";
-  });
-}
 
 async function renderDataVersionBadge() {
   try {

@@ -1,4 +1,3 @@
-const THEME_KEY = "pharmlet.theme";
 const TYPO_RISK_PATTERNS = [
   { label: "Horomone Replacement", pattern: /horomone replacement/i },
   { label: "degredation", pattern: /degredation/i },
@@ -9,27 +8,9 @@ const TYPO_RISK_PATTERNS = [
 ];
 
 document.addEventListener("DOMContentLoaded", async () => {
-  initTheme();
+  window.PharmletSite?.initTheme?.();
   await renderIntegrityPage();
 });
-
-function initTheme() {
-  const toggle = document.getElementById("theme-toggle");
-  const label = document.getElementById("theme-label");
-  const saved = localStorage.getItem(THEME_KEY);
-  const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)")?.matches;
-  const start = saved || (prefersDark ? "dark" : "light");
-
-  document.documentElement.classList.toggle("dark", start === "dark");
-  if (label) label.textContent = start === "dark" ? "Light" : "Dark";
-
-  toggle?.addEventListener("click", () => {
-    const next = document.documentElement.classList.contains("dark") ? "light" : "dark";
-    document.documentElement.classList.toggle("dark", next === "dark");
-    localStorage.setItem(THEME_KEY, next);
-    if (label) label.textContent = next === "dark" ? "Light" : "Dark";
-  });
-}
 
 async function renderIntegrityPage() {
   const [poolResult, auditResult] = await Promise.allSettled([

@@ -4,7 +4,6 @@
 (function (global) {
   "use strict";
 
-  const THEME_KEY = "pharmlet.theme";
   const FAVORITES_KEY = "pharmlet.favorites";
 
   function getCatalog() {
@@ -355,28 +354,9 @@
     if (unavailableNote) container.appendChild(unavailableNote);
   }
 
-  function initializeThemeToggle() {
-    const themeToggle = global.document?.getElementById?.("theme-toggle");
-    const themeLabel = global.document?.getElementById?.("theme-label");
-    if (!themeToggle || !themeLabel) return;
-
-    const saved = global.localStorage?.getItem(THEME_KEY);
-    const prefersDark = global.matchMedia?.("(prefers-color-scheme: dark)")?.matches;
-    const start = saved || (prefersDark ? "dark" : "light");
-    global.document.documentElement.classList.toggle("dark", start === "dark");
-    themeLabel.textContent = start === "dark" ? "Light" : "Dark";
-
-    themeToggle.addEventListener("click", () => {
-      const next = global.document.documentElement.classList.contains("dark") ? "light" : "dark";
-      global.document.documentElement.classList.toggle("dark", next === "dark");
-      try { global.localStorage?.setItem(THEME_KEY, next); } catch {}
-      themeLabel.textContent = next === "dark" ? "Light" : "Dark";
-    });
-  }
-
   function initializeFavoritesPage() {
     if (!global.document?.getElementById?.("favorites-list")) return;
-    initializeThemeToggle();
+    global.PharmletSite?.initTheme?.();
     loadFavoritesPage();
     global.document.getElementById("sort-by")?.addEventListener("change", loadFavoritesPage);
     global.document.getElementById("filter-category")?.addEventListener("change", loadFavoritesPage);

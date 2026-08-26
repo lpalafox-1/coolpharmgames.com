@@ -1,30 +1,12 @@
 // assets/js/review-queue.js
 // Smart review queue for wrong answers
 
-const THEME_KEY = "pharmlet.theme";
 const REVIEW_KEY = "pharmlet.review-queue";
 const reviewQueueStore = window.PharmletReviewQueueStore;
 const quizCatalog = window.PharmletQuizCatalog;
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Theme toggle
-  const themeToggle = document.getElementById("theme-toggle");
-  const themeLabel = document.getElementById("theme-label");
-  
-  if (themeToggle && themeLabel) {
-    const saved = localStorage.getItem(THEME_KEY);
-    const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)")?.matches;
-    const start = saved || (prefersDark ? "dark" : "light");
-    document.documentElement.classList.toggle("dark", start === "dark");
-    themeLabel.textContent = start === "dark" ? "Light" : "Dark";
-    
-    themeToggle.addEventListener("click", () => {
-      const next = document.documentElement.classList.contains("dark") ? "light" : "dark";
-      document.documentElement.classList.toggle("dark", next === "dark");
-      localStorage.setItem(THEME_KEY, next);
-      themeLabel.textContent = next === "dark" ? "Light" : "Dark";
-    });
-  }
+  window.PharmletSite?.initTheme?.();
 
   loadReviewQueue();
   
@@ -281,22 +263,14 @@ function clearQueue() {
   }
 }
 
-function getTimeAgo(date) {
+const getTimeAgo = window.PharmletSite?.timeAgo || ((date) => {
   const seconds = Math.floor((new Date() - date) / 1000);
-  const intervals = {
-    day: 86400,
-    hour: 3600,
-    minute: 60
-  };
-  
-  for (const [unit, secondsInUnit] of Object.entries(intervals)) {
-    const interval = Math.floor(seconds / secondsInUnit);
-    if (interval >= 1) {
-      return `${interval} ${unit}${interval === 1 ? '' : 's'} ago`;
-    }
+  for (const [unit, size] of [["day", 86400], ["hour", 3600], ["minute", 60]]) {
+    const count = Math.floor(seconds / size);
+    if (count >= 1) return `${count} ${unit}${count === 1 ? "" : "s"} ago`;
   }
-  return 'just now';
-}
+  return "just now";
+});
 
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -306,8 +280,8 @@ function shuffleArray(array) {
   return array;
 }
 
-function sanitize(str) {
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
-}
+const sanitize = window.PharmletSite?.escapeHtml || ((value) => {
+  const element = document.createElement("div");
+  element.textContent = value;
+  return element.innerHTML;
+});
