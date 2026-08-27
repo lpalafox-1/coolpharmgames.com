@@ -20,10 +20,10 @@ Phase 2 Facelift task without explicit owner approval.
 | --- | --- |
 | `npm run validate` | exit 0 |
 | `npm run check:links` | exit 0 |
-| `npm run test:tools` | 159/159 pass after P2F-05 (grows only with deliberate test additions) |
+| `npm run test:tools` | 163/163 pass after F26-06 (grows only with deliberate test additions) |
 | `npm run health:repo` | exit 0 with `Errors: 0`; informational small-quiz warnings remain visible |
 
-Current audited repository facts after P2F-05: 1,723 static quiz questions
+Current audited repository facts after F26-06: 1,723 static quiz questions
 across 34 JSON files; 169 legacy P1 Top Drugs records; and 100 Fall 2026 P2
 records, ten per week. P1 and P2 remain separate canonical sources.
 
@@ -323,26 +323,41 @@ fixed: review-queue `wrongCounts` re-fold inflation (see P2B-10).
 | #53 | `1eafa7b` | Structurally matched distractors with safe fallback and restored Week 1 coverage |
 | #54 | `ca1a90e` | Conservative, source-derived Drug Class quiz normalization |
 
-The Lab III generator is now **feature-frozen**. Changes require either a
-reproduced defect or course-driven guidance; feature ideas and facelift work
-do not reopen generator design.
+### F26-06 — Fall 2026 Lab III shared style calibration
+
+- **Status:** `DONE`
+- **Trigger:** course-driven guidance from the student's completed real Lab III
+  Quiz 1 experience; this is a shared Weeks 1–10 generator calibration, not a
+  Quiz 1 reconstruction.
+- **Delivered:** concise Brand/Generic FITB and recognition MCQ; atomic ADR and
+  FDA-indication recognition; source-safe NOT-indication sets; concise exact
+  class, MOA, and BBW recognition; and an explicit quiz-only CCB family map.
+  Every displayed fact and choice remains validated against complete canonical
+  records. Week 1 stays explicitly practice-configured; Weeks 2–10 retain
+  exactly 6 new + 4 accumulated review; future-week exclusion remains intact.
+- **MTC decision:** audited but not emitted. The existing `mcq-multiple`
+  pointer/touch renderer double-toggles selections, and fixing it would require
+  a separately authorized, isolated `quizEngine.js` change.
+- **Protected boundaries:** canonical data, policy, Drug Sheet, P1 quizzes,
+  `master_pool.json`, and `quizEngine.js` unchanged.
+
+The shared generator is feature-frozen again after F26-06. F26-07 may expose
+already-supported weeks but must not redesign question generation unless a
+reproduced defect is found. Later refinements require new course evidence or a
+correctness defect; facelift work does not reopen generator design.
 
 ### Fall weekly activation lane (separate from Phase 2 Facelift)
 
 | Activation | Status | Constraint |
 | --- | --- | --- |
 | Weeks 1–3 | `DONE` | Student-facing; Week 1 practice-configured; Weeks 2–3 are 6-new / 4-review |
-| F26-W04 | `BLOCKED` | Future course-timed activation; requires current course timing/guidance |
-| F26-W05 | `BLOCKED` | Future course-timed activation; requires current course timing/guidance |
-| F26-W06 | `BLOCKED` | Future course-timed activation; requires current course timing/guidance |
-| F26-W07 | `BLOCKED` | Future course-timed activation; requires current course timing/guidance |
-| F26-W08 | `BLOCKED` | Future course-timed activation; requires current course timing/guidance |
-| F26-W09 | `BLOCKED` | Future course-timed activation; requires current course timing/guidance |
-| F26-W10 | `BLOCKED` | Future course-timed activation; requires current course timing/guidance |
+| F26-07 | `BLOCKED` | Bounded Weeks 4–10 Pharm-let practice activation; begin only after F26-06 merges and the separate Task B scope is authorized |
 
-Do not infer activation readiness from the existence of canonical Weeks 4–10
-data. Activation remains separate from facelift work and is unlocked only by
-actual course timing or explicit guidance.
+F26-07 will intentionally let students launch Weeks 4–10 ahead of the real
+course calendar, label them as Pharm-let practice rather than official future
+professor quizzes, and preserve 6-new / 4-review. This explicit owner direction
+supersedes the earlier course-timing gate. Activation remains separate from
+facelift work and must preserve the Week 1–3 routes and generator contract.
 
 ---
 
@@ -366,16 +381,18 @@ owner-approved scope and allowed-files contract before execution.
 | P2F-09 | Review Queue v2 + `wrongCounts` correction | `BLOCKED` | P2F-08 |
 | P2F-10 | Mobile/accessibility consistency pass | `BLOCKED` | P2F-09 |
 
-P2F-06 is the sole `READY` task. P2F-05 kept the separate 169-record P1 and
+P2F-06 is restored as the sole `READY` task after the bounded F26-06
+course-driven calibration. P2F-05 kept the separate 169-record P1 and
 100-record P2 canonical sources behind the existing normalization adapter,
 added prominent P2 Fall/Lab III and Week 1–3 reference shortcuts, and reduced
 the initial Drug Sheet render from all 269 full cards to 12 with accessible
 24-record progressive loading. Search and filters still evaluate the complete
 library, direct query links remain compatible, and duplicate generics retain
 their source-record identities. Weeks 4–10 remain reference-filterable source
-data rather than live Lab III activation claims. All legacy functional
-URLs/content, the guarded 1,723-question count, and the feature-frozen Fall
-generator remain protected throughout this lane.
+data rather than live Lab III activation claims until F26-07. All legacy
+functional URLs/content, the guarded 1,723-question count, and the
+course-calibrated, feature-frozen Fall generator remain protected throughout
+this lane.
 
 ---
 
