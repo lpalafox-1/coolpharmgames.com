@@ -1,10 +1,10 @@
 import {
   WEEK_1_PRACTICE_NOTE,
   generateFall2026Quiz
-} from "./fall-2026-quiz-generator.js?v=20260826a";
+} from "./fall-2026-quiz-generator.js?v=20260827a";
 
 const CUSTOM_QUIZ_KEY = "pharmlet.custom-quiz";
-const SUPPORTED_WEEKS = new Set([1, 2, 3]);
+const SUPPORTED_WEEKS = new Set(Array.from({ length: 10 }, (_, index) => index + 1));
 const TIMER_SECONDS = 10 * 60;
 const DRUG_DATA_URL = "assets/data/fall-2026-p2-top-drugs.json";
 const POLICY_URL = "assets/data/fall-2026-lab3-quiz-policy.json";
@@ -13,7 +13,7 @@ let sourcePromise;
 
 function requireSupportedWeek(quizWeek) {
   if (!SUPPORTED_WEEKS.has(quizWeek)) {
-    throw new Error("Fall 2026 Lab III practice is currently available for Weeks 1-3.");
+    throw new Error("Fall 2026 Lab III practice is available for Weeks 1-10.");
   }
 }
 

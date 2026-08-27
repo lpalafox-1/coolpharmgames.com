@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Lab III Fall 2026 Practice — Pharm-let</title>
-  <meta name="description" content="Generate Fall 2026 P2 Lab III Top Drug practice for Weeks 1, 2, and 3." />
+  <meta name="description" content="Generate Fall 2026 P2 Lab III Top Drug practice for Weeks 1 through 10." />
   <meta name="theme-color" content="#8b1e3f" />
   <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
   <meta http-equiv="Content-Security-Policy"
@@ -41,6 +41,15 @@
     .week-card { min-height: 18rem; }
     .week-card button[aria-busy="true"] { cursor: progress; }
     .week-card button:disabled { opacity: .72; }
+    .study-ahead-launch {
+      min-height: 5.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: .2rem;
+      line-height: 1.2;
+    }
   </style>
 </head>
 <body class="bg-[var(--bg)] text-[var(--text)] min-h-screen">
@@ -66,7 +75,7 @@
     <section class="max-w-5xl mx-auto px-4 py-10" aria-labelledby="live-practice-heading">
       <div class="flex flex-wrap items-end justify-between gap-3 mb-6">
         <div>
-          <h2 id="live-practice-heading" class="text-2xl font-black">Weeks 1-3 Practice</h2>
+          <h2 id="live-practice-heading" class="text-2xl font-black">Weeks 1-10 Practice</h2>
           <p class="mt-1 text-sm" style="color:var(--muted)">Each launch generates a fresh seeded 10-question version.</p>
         </div>
         <a href="index.html" class="btn btn-ghost">← Study Hub</a>
@@ -110,14 +119,29 @@
       </div>
     </section>
 
-    <section class="max-w-5xl mx-auto px-4 pb-16" aria-labelledby="upcoming-heading">
-      <div class="card p-6 border border-dashed border-[var(--ring)]">
-        <h2 id="upcoming-heading" class="text-lg font-black">Weeks 4-10</h2>
-        <p class="mt-2 text-sm" style="color:var(--muted)">Upcoming on this student-facing hub. Weeks 1-3 are the current live practice focus.</p>
+    <section class="max-w-5xl mx-auto px-4 pb-16" aria-labelledby="study-ahead-heading">
+      <div class="card p-5 sm:p-6 border border-dashed border-[var(--ring)]">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <p class="text-xs font-black uppercase tracking-[0.2em] text-[var(--accent)]">Practice available</p>
+            <h2 id="study-ahead-heading" class="mt-1 text-xl font-black">Study ahead · Weeks 4-10</h2>
+          </div>
+          <span class="status-live">Pharm-let Practice</span>
+        </div>
+        <p id="study-ahead-note" class="mt-3 max-w-3xl text-sm leading-relaxed" style="color:var(--muted)">Each future-week launch uses six questions from the selected source week plus four cumulative review questions from eligible earlier weeks. These are study-ahead practice sets, not a claim about exact future professor questions or wording.</p>
+        <div class="mt-5 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+          <button type="button" data-launch-week="4" data-idle-label="Start Week 4 study-ahead practice" aria-label="Start Week 4 study-ahead practice" aria-describedby="study-ahead-note" class="btn btn-ghost study-ahead-launch"><strong>Week 4</strong><span class="text-xs">Study ahead</span></button>
+          <button type="button" data-launch-week="5" data-idle-label="Start Week 5 study-ahead practice" aria-label="Start Week 5 study-ahead practice" aria-describedby="study-ahead-note" class="btn btn-ghost study-ahead-launch"><strong>Week 5</strong><span class="text-xs">Study ahead</span></button>
+          <button type="button" data-launch-week="6" data-idle-label="Start Week 6 study-ahead practice" aria-label="Start Week 6 study-ahead practice" aria-describedby="study-ahead-note" class="btn btn-ghost study-ahead-launch"><strong>Week 6</strong><span class="text-xs">Study ahead</span></button>
+          <button type="button" data-launch-week="7" data-idle-label="Start Week 7 study-ahead practice" aria-label="Start Week 7 study-ahead practice" aria-describedby="study-ahead-note" class="btn btn-ghost study-ahead-launch"><strong>Week 7</strong><span class="text-xs">Study ahead</span></button>
+          <button type="button" data-launch-week="8" data-idle-label="Start Week 8 study-ahead practice" aria-label="Start Week 8 study-ahead practice" aria-describedby="study-ahead-note" class="btn btn-ghost study-ahead-launch"><strong>Week 8</strong><span class="text-xs">Study ahead</span></button>
+          <button type="button" data-launch-week="9" data-idle-label="Start Week 9 study-ahead practice" aria-label="Start Week 9 study-ahead practice" aria-describedby="study-ahead-note" class="btn btn-ghost study-ahead-launch"><strong>Week 9</strong><span class="text-xs">Study ahead</span></button>
+          <button type="button" data-launch-week="10" data-idle-label="Start Week 10 study-ahead practice" aria-label="Start Week 10 study-ahead practice" aria-describedby="study-ahead-note" class="btn btn-ghost study-ahead-launch"><strong>Week 10</strong><span class="text-xs">Study ahead</span></button>
+        </div>
       </div>
     </section>
   </main>
 
-  <script type="module" src="assets/js/fall-2026-lab3-launcher.js?v=20260826a"></script>
+  <script type="module" src="assets/js/fall-2026-lab3-launcher.js?v=20260827a"></script>
 </body>
 </html>

@@ -166,7 +166,7 @@ test("the Drug Sheet exposes accessible current-P2 and progressive-rendering con
   assert.match(page, /data-quicksheet-shortcut="p2-week-3"/);
   assert.doesNotMatch(page, /data-quicksheet-shortcut="p2-week-(?:[4-9]|10)"/);
   assert.equal((page.match(/data-quicksheet-shortcut="[^"]+" aria-pressed="false"/g) || []).length, 6);
-  assert.match(page, /reference filters; Lab III practice is currently student-facing for Weeks 1–3 only/);
+  assert.match(page, /reference filters; Lab III practice is available for Weeks 1–10 from the separate practice hub/);
   assert.match(page, /id="quicksheet-load-more"[^>]*type="button"[^>]*aria-controls="quicksheet-grid"/);
   assert.match(page, /id="quicksheet-count"[^>]*aria-live="polite"/);
   assert.equal((page.match(/class="quiz-link inline-flex min-h-11 items-center"/g) || []).length, 4);
