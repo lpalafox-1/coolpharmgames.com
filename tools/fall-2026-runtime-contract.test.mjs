@@ -419,9 +419,9 @@ test(`Fall stays isolated to its launcher, legacy data has no strict marker, and
     "utf8"
   );
   assert.ok(fallPageSource.includes(
-    'src="assets/js/fall-2026-lab3-launcher.js?v=20260820a"'
+    'src="assets/js/fall-2026-lab3-launcher.js?v=20260826a"'
   ));
-  assert.ok(launcherSource.includes('from "./fall-2026-quiz-generator.js?v=20260820a"'));
+  assert.ok(launcherSource.includes('from "./fall-2026-quiz-generator.js?v=20260826a"'));
   assert.ok(launcherSource.includes("assets/data/fall-2026-p2-top-drugs.json"));
   assert.ok(launcherSource.includes("assets/data/fall-2026-lab3-quiz-policy.json"));
   assert.ok(!launcherSource.includes("master_pool.json"));

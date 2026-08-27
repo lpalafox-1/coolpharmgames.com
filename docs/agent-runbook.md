@@ -24,7 +24,7 @@ A run is only permitted to proceed when all of the following hold:
 2. Local default branch equals `origin/main` (no divergence either way).
 3. `npm run validate` → exit 0.
 4. `npm run check:links` → exit 0.
-5. `npm run test:tools` → all tests pass, zero failures (159/159 after P2F-05;
+5. `npm run test:tools` → all tests pass, zero failures (163/163 after F26-06;
    the count grows only through deliberate test additions).
 6. `npm run health:repo` → exit 0 with `Errors: 0`. The two small-quiz warnings
    remain informational; any health error or nonzero exit is baseline drift.
@@ -38,11 +38,13 @@ A run is only permitted to proceed when all of the following hold:
   `assets/data/master_pool.json` and Fall P2
   `assets/data/fall-2026-p2-top-drugs.json`. Do not merge or substitute them.
 - Fall Lab III Weeks 1–3 are student-facing; Week 1 is practice-configured and
-  Weeks 2–3 use 6 new + 4 review. Weeks 4–10 are separate course-timed
-  activation work and are not unlocked by facelift tasks.
-- The Fall generator is feature-frozen except for reproduced defects or
-  course-driven guidance. Preserve legacy URLs/content, and do not touch
-  `quizEngine.js` during unrelated Phase 2 tasks.
+  Weeks 2–3 use 6 new + 4 review. The shared generator is validated through
+  Week 10, but Weeks 4–10 remain the separate F26-07 bounded activation task
+  and are not unlocked by facelift work.
+- The Fall generator is feature-frozen after F26-06. F26-07 may expose
+  already-supported weeks but does not authorize generator redesign. Preserve
+  legacy URLs/content, and do not touch `quizEngine.js` during unrelated Phase
+  2 or activation work.
 - These boundaries narrow the existing Routine authority; they do not grant
   new autonomous behavior or protected-file access.
 

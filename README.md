@@ -22,7 +22,10 @@ Answer types: numeric, multi-numeric, short-answer (with acceptable variants).
 - Weeks 1–3 are student-facing from `lab3-fall-2026.html`.
 - Week 1 is a 10-question practice configuration using Week 1 content only; it does not claim an official professor-set composition.
 - Weeks 2–3 use exactly 6 new questions and 4 accumulated-review questions.
-- Weeks 4–10 remain future, course-timed activation work and are not live.
+- Weeks 4–10 are generator-ready but not yet live; a separate bounded task will
+  expose them as clearly labeled Pharm-let practice ahead of the course calendar.
+- The shared Weeks 1–10 generator uses concise, source-backed recognition while
+  validating atomic facts and choices against the complete official records.
 
 ## Top Drugs Reference
 

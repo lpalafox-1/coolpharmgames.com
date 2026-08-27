@@ -1,6 +1,6 @@
 # Repository Health Report
 
-_Refreshed 2026-08-21 after P2F-05 on a branch from `a6e3f3c`. This report
+_Refreshed 2026-08-26 after F26-06 on a branch from `0d9f02a`. This report
 records the verified green repository-health baseline._
 
 ## Current Passing Checks
@@ -9,7 +9,7 @@ records the verified green repository-health baseline._
 | --- | --- | --- |
 | `npm run validate` | Passed | All 34 static quiz JSON files pass schema + semantic validation. |
 | `npm run check:links` | Passed | Catalog-aware since commit `9f3cb3d`; the three historical false positives (`basis2-quiz9`, `bdt-unit10-exam4`, `top-drugs-final-mock*`) are resolved. Unlinked-quiz findings are informational warnings, not failures. |
-| `npm run test:tools` | Passed | 159/159 tests, including validator, catalog/link, homepage hierarchy/routes, Favorites storage/controls, engine-surface, review-queue, progressive unified Top Drugs Reference, and Fall 2026 generation/runtime contracts. |
+| `npm run test:tools` | Passed | 163/163 tests, including validator, catalog/link, homepage hierarchy/routes, Favorites storage/controls, engine-surface, review-queue, progressive unified Top Drugs Reference, and the 100-seed-per-week Fall 2026 style/provenance/runtime audits. |
 | `npm run health:repo` | Passed (exit 0) | `Errors: 0`; homepage count matches the source-derived static total. |
 | Repository counts | Informational | 1,723 static quiz questions across 34 JSON files; 169 legacy P1 Top Drugs records; 100 Fall 2026 P2 records (ten per week); 56 Endocrine concept-pool entries. |
 
@@ -50,14 +50,16 @@ these are reported as information, not errors.
   cycle. Characterized by `tools/review-queue-store-regression.test.mjs`;
   a fix requires approved app-code changes.
 - Fall 2026 Lab III Weeks 1–3 are student-facing. Week 1 remains explicitly
-  practice-configured; Weeks 2–3 use 6 new + 4 accumulated review. Weeks 4–10
-  remain separate course-timed activation work, not repository-health work.
+  practice-configured; Weeks 2–3 use 6 new + 4 accumulated review. F26-06
+  calibrated the shared generator through Week 10 without changing canonical
+  data or repository-health semantics. Weeks 4–10 remain the separate F26-07
+  student-activation task, not repository-health work.
 
 ## Commands Run
 
 ```text
 npm run validate       # passed
 npm run check:links    # passed
-npm run test:tools     # passed (159/159 tests)
+npm run test:tools     # passed (163/163 tests)
 npm run health:repo    # passed: exit 0, Errors: 0
 ```

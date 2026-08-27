@@ -42,12 +42,12 @@ A static, client-side site (no build step, no backend) deployed via GitHub Pages
 
 - GitHub Pages deploys from `main`; the old `gh-pages` branch was removed. `deploy-pages.yml.disabled` is intentionally inactive — don't re-enable it without asking.
 - `tools/check-links.mjs` and `tools/repo-health.mjs` are catalog-aware since `9f3cb3d`. Treat any `npm run check:links` failure as a real regression, not a known false positive.
-- CI includes `validate`, `check:links`, and `test:tools`; the P2F-05 baseline is 159/159 tool tests passing.
+- CI includes `validate`, `check:links`, and `test:tools`; the F26-06 baseline is 163/163 tool tests passing.
 - `npm run health:repo` exits 0 with zero errors. The static library contains 1,723 questions across 34 quiz files; P2F-02 retired the never-populated E2B placeholder and aligned the homepage count without weakening the health checks.
 - `tools/engine-globals.manifest.json` pins the engine global surface and must be updated deliberately in the same approved commit as any intentional engine-surface change.
 - The active roadmap is the ordered Phase 2 Facelift lane in `docs/phase-roadmap.md`. After P2F-05, P2F-06 is the sole `READY` task; do not select stale F26-04 work or infer readiness from satisfied dependencies. Keep exactly one task `READY` at a time.
-- Fall 2026 Lab III Weeks 1–3 are student-facing. Week 1 is practice-configured and is not an official composition claim; Weeks 2–3 use 6 new + 4 accumulated review. Weeks 4–10 remain separate, course-timed activation work.
-- The Lab III generator is feature-frozen except for reproduced defects or course-driven guidance. Facelift work does not reopen generator design or activate future weeks.
+- Fall 2026 Lab III Weeks 1–3 are student-facing. Week 1 is practice-configured and is not an official composition claim; Weeks 2–3 use 6 new + 4 accumulated review. The shared generator is calibrated and validated through Week 10, but Weeks 4–10 remain a separate, bounded F26-07 student-activation task; do not expose them during facelift work.
+- The Lab III generator is feature-frozen after the course-driven F26-06 calibration. F26-07 may expose already-supported weeks but does not authorize generator redesign. Later changes require reproduced defects or new course guidance.
 
 ## Working conventions
 
