@@ -24,27 +24,27 @@ A run is only permitted to proceed when all of the following hold:
 2. Local default branch equals `origin/main` (no divergence either way).
 3. `npm run validate` → exit 0.
 4. `npm run check:links` → exit 0.
-5. `npm run test:tools` → all tests pass, zero failures (163/163 after F26-06;
-   the count grows only through deliberate test additions).
+5. `npm run test:tools` → the full current suite passes with zero failures;
+   the count grows only through deliberate test additions.
 6. `npm run health:repo` → exit 0 with `Errors: 0`. The two small-quiz warnings
    remain informational; any health error or nonzero exit is baseline drift.
 
 ## Phase 2 Facelift boundaries
 
 - `docs/phase-roadmap.md` is authoritative. Exactly one task may be `READY`;
-  after P2F-05 that task is P2F-06. Never infer readiness merely because a
+  after F26-07 that task is P2F-06. Never infer readiness merely because a
   dependency is complete, and never select the stale F26-04 entry (it is DONE).
 - Preserve separate canonical sources: legacy P1
   `assets/data/master_pool.json` and Fall P2
   `assets/data/fall-2026-p2-top-drugs.json`. Do not merge or substitute them.
-- Fall Lab III Weeks 1–3 are student-facing; Week 1 is practice-configured and
-  Weeks 2–3 use 6 new + 4 review. The shared generator is validated through
-  Week 10, but Weeks 4–10 remain the separate F26-07 bounded activation task
-  and are not unlocked by facelift work.
-- The Fall generator is feature-frozen after F26-06. F26-07 may expose
-  already-supported weeks but does not authorize generator redesign. Preserve
-  legacy URLs/content, and do not touch `quizEngine.js` during unrelated Phase
-  2 or activation work.
+- Fall Lab III Weeks 1–10 are student-facing; Week 1 is practice-configured,
+  Weeks 2–10 use 6 new + 4 review, and Weeks 4–10 are clearly study-ahead
+  Pharm-let practice rather than exact future professor-quiz claims.
+- The Fall generator is feature-frozen after F26-06 calibration and F26-07
+  activation. Preserve legacy URLs/content, and do not touch `quizEngine.js`
+  during unrelated Phase 2 or activation work. The existing `mcq-multiple`
+  pointer/touch double-toggle correction remains a separate `DEFERRED` task,
+  not `READY`.
 - These boundaries narrow the existing Routine authority; they do not grant
   new autonomous behavior or protected-file access.
 

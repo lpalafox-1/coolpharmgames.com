@@ -4,7 +4,10 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { loadBrowserGlobal } from "./browser-global-harness.mjs";
-import { buildFall2026Lab3Payload } from "../assets/js/fall-2026-lab3-launcher.js";
+import {
+  buildFall2026Lab3Payload,
+  launchFall2026Lab3Practice
+} from "../assets/js/fall-2026-lab3-launcher.js";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const drugData = JSON.parse(
@@ -15,6 +18,7 @@ const policy = JSON.parse(
 );
 
 const WEEK_1_NOTE = "Practice configuration: Week 1 has no prior review material. This 10-question study set uses Week 1 content only and is not intended to claim the exact official Week 1 quiz composition.";
+const FALL_LAB3_WEEKS = Array.from({ length: 10 }, (_, index) => index + 1);
 
 const LEGACY_HOME_HREFS = [
   "stats.html",
@@ -116,8 +120,8 @@ function loadEngine(extraGlobals = {}) {
   });
 }
 
-test("Weeks 1-3 launch payloads use the existing generated-quiz runtime contract", () => {
-  for (const quizWeek of [1, 2, 3]) {
+test("Weeks 1-10 launch payloads use the existing generated-quiz runtime contract", () => {
+  for (const quizWeek of FALL_LAB3_WEEKS) {
     const payload = build(quizWeek);
     assert.equal(payload.id, "custom-quiz");
     assert.equal(payload.title, `Lab III Fall 2026 - Week ${quizWeek} Practice`);
@@ -129,6 +133,45 @@ test("Weeks 1-3 launch payloads use the existing generated-quiz runtime contract
     assert.equal(payload.questions.length, 10);
     assert.ok(payload.questions.every((question) => question.sourceQuizId === `fall-2026-lab3-week-${quizWeek}-practice`));
     assert.ok(payload.questions.every((question) => question.sourceTitle === payload.title));
+    assert.ok(payload.questions.every((question) => question.answer !== undefined && question.answer !== ""));
+  }
+});
+
+test("the student launcher persists and routes every intended Week 1-10 payload", async () => {
+  const previousLocalStorage = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
+  const previousWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
+  const storage = createStorageStub();
+  let assignedUrl = "";
+
+  Object.defineProperty(globalThis, "localStorage", {
+    configurable: true,
+    value: storage
+  });
+  Object.defineProperty(globalThis, "window", {
+    configurable: true,
+    value: { location: { assign(url) { assignedUrl = url; } } }
+  });
+
+  try {
+    for (const quizWeek of FALL_LAB3_WEEKS) {
+      assignedUrl = "";
+      const payload = await launchFall2026Lab3Practice(quizWeek, {
+        drugData,
+        policy,
+        seed: `persisted-launch-week-${quizWeek}`
+      });
+      const persisted = JSON.parse(storage.getItem("pharmlet.custom-quiz"));
+
+      assert.deepEqual(persisted, payload);
+      assert.equal(persisted.metadata.quizWeek, quizWeek);
+      assert.equal(persisted.questions.length, 10);
+      assert.equal(assignedUrl, "quiz.html?id=custom-quiz");
+    }
+  } finally {
+    if (previousLocalStorage) Object.defineProperty(globalThis, "localStorage", previousLocalStorage);
+    else delete globalThis.localStorage;
+    if (previousWindow) Object.defineProperty(globalThis, "window", previousWindow);
+    else delete globalThis.window;
   }
 });
 
@@ -145,11 +188,16 @@ test("Week 1 launch is practice-only, contains no review, and carries the exact 
   assert.ok(!JSON.stringify(payload).includes("accessPharmacySortingCategory"));
 });
 
-test("Week 2 and Week 3 launch composition excludes future material", () => {
-  for (const quizWeek of [2, 3]) {
+test("Weeks 2-10 launch composition is 6-new/4-review and excludes later material", () => {
+  for (const quizWeek of FALL_LAB3_WEEKS.slice(1)) {
     const payload = build(quizWeek);
     const newQuestions = payload.questions.filter((question) => question.metadata.sourceMaterial === "new");
     const reviewQuestions = payload.questions.filter((question) => question.metadata.sourceMaterial === "review");
+    assert.deepEqual(payload.metadata.composition, {
+      newMaterialItemTarget: 6,
+      reviewMaterialItemTarget: 4,
+      totalItemTarget: 10
+    });
     assert.equal(newQuestions.length, 6);
     assert.equal(reviewQuestions.length, 4);
     assert.ok(newQuestions.every((question) => question.metadata.sourceDrugQuizWeek === quizWeek));
@@ -164,11 +212,36 @@ test("Week 2 and Week 3 launch composition excludes future material", () => {
 });
 
 test("the launcher preserves deterministic generator output for a supplied seed", () => {
-  assert.deepEqual(build(3, "reproducible-launch"), build(3, "reproducible-launch"));
-  assert.notDeepEqual(
-    build(3, "reproducible-launch").questions,
-    build(3, "another-launch").questions
-  );
+  for (const quizWeek of FALL_LAB3_WEEKS) {
+    assert.deepEqual(
+      build(quizWeek, `reproducible-launch-${quizWeek}`),
+      build(quizWeek, `reproducible-launch-${quizWeek}`)
+    );
+  }
+});
+
+test("Weeks 1-10 preserve strict Brand/Generic FITB metadata through activation", () => {
+  for (const quizWeek of FALL_LAB3_WEEKS) {
+    let launchedQuestion;
+    for (let attempt = 0; attempt < 40 && !launchedQuestion; attempt += 1) {
+      launchedQuestion = build(quizWeek, `activation-fitb-${quizWeek}-${attempt}`).questions.find((question) => (
+        question.metadata?.knowledgeDomain === "brandGeneric"
+        && question.type === "short"
+      ));
+    }
+
+    assert.ok(launchedQuestion, `Week ${quizWeek} activation samples must include a strict Brand/Generic FITB`);
+    assert.deepEqual(launchedQuestion.metadata.answerMatching, {
+      spellingSensitive: true,
+      capitalizationSensitive: false
+    });
+    assert.match(launchedQuestion.answer, /\S/);
+    if (launchedQuestion._acceptedAnswers !== undefined) {
+      assert.ok(Array.isArray(launchedQuestion._acceptedAnswers));
+      assert.ok(launchedQuestion._acceptedAnswers.length >= 1);
+      assert.ok(launchedQuestion._acceptedAnswers.every((answer) => typeof answer === "string" && answer.length > 0));
+    }
+  }
 });
 
 test("a launched multiple-brand FITB keeps strict scoring and accepted answers through the runtime and review queue", () => {
@@ -222,7 +295,31 @@ test("homepage exposes direct Fall launches while preserving every legacy study 
   assert.ok(homepage.includes("P1 Fall 2025"));
 });
 
-test("homepage prioritizes current P2 Lab III and Top Drugs without future-week claims", () => {
+test("Fall Lab III hub exposes one accessible launch control for every Week 1-10 practice", () => {
+  const page = readFileSync(path.join(repoRoot, "lab3-fall-2026.html"), "utf8");
+  const launchWeeks = [...page.matchAll(/data-launch-week="(\d+)"/g)]
+    .map((match) => Number(match[1]));
+
+  assert.deepEqual(launchWeeks, FALL_LAB3_WEEKS);
+  for (const quizWeek of FALL_LAB3_WEEKS) {
+    assert.match(page, new RegExp(`data-launch-week="${quizWeek}"[^>]*>[\\s\\S]*?Week ${quizWeek}`));
+  }
+  for (const quizWeek of [1, 2, 3]) {
+    assert.ok(page.includes(`id="week-${quizWeek}"`), `hub is missing the Week ${quizWeek} live card`);
+    assert.ok(page.includes(`Start Week ${quizWeek} Practice`), `hub is missing the Week ${quizWeek} start label`);
+  }
+  for (const quizWeek of FALL_LAB3_WEEKS.slice(3)) {
+    assert.match(
+      page,
+      new RegExp(`data-launch-week="${quizWeek}"[^>]*aria-describedby="study-ahead-note"`),
+      `Week ${quizWeek} study-ahead control must share the page-level guidance`
+    );
+  }
+  assert.match(page, /study ahead/i);
+  assert.match(page, /not a claim about exact future professor questions or wording/i);
+});
+
+test("homepage prioritizes current P2 Lab III and labels Weeks 4-10 as study-ahead practice", () => {
   const homepage = readFileSync(path.join(repoRoot, "index.html"), "utf8");
   const current = sectionBetween(homepage, "current-semester", "study-tools");
   const fallWeeks = [...homepage.matchAll(/href="lab3-fall-2026\.html\?week=(\d+)"/g)]
@@ -235,9 +332,11 @@ test("homepage prioritizes current P2 Lab III and Top Drugs without future-week 
   assert.ok(current.includes('href="top-drugs-quicksheet.html"'));
   assert.deepEqual([...new Set(fallWeeks)].sort((a, b) => a - b), [1, 2, 3]);
   assert.doesNotMatch(current, /lab3-fall-2026\.html\?week=(?:4|5|6|7|8|9|10)/);
+  assert.match(current, /Weeks 1–10/);
   assert.match(current, /Week 1 is a practice configuration/);
   assert.match(current, /not a claim about official quiz composition/);
-  assert.match(current, /Weeks 2–3 use 6 new \+ 4 cumulative review/);
+  assert.match(current, /Weeks 2–10 use 6 new \+ 4 cumulative review/);
+  assert.match(current, /Weeks 4–10.*study[- ]ahead/i);
 });
 
 test("homepage separates primary study tools, quiet utilities, and chronological P1 coursework", () => {

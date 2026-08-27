@@ -19,20 +19,21 @@ Answer types: numeric, multi-numeric, short-answer (with acceptable variants).
 
 ## Fall 2026 P2 Lab III
 
-- Weeks 1–3 are student-facing from `lab3-fall-2026.html`.
+- Weeks 1–10 are student-facing from `lab3-fall-2026.html`.
 - Week 1 is a 10-question practice configuration using Week 1 content only; it does not claim an official professor-set composition.
-- Weeks 2–3 use exactly 6 new questions and 4 accumulated-review questions.
-- Weeks 4–10 are generator-ready but not yet live; a separate bounded task will
-  expose them as clearly labeled Pharm-let practice ahead of the course calendar.
+- Weeks 2–10 use exactly 6 new questions and 4 accumulated-review questions.
+- Weeks 4–10 are clearly labeled study-ahead Pharm-let practice, not exact
+  future professor quizzes.
 - The shared Weeks 1–10 generator uses concise, source-backed recognition while
-  validating atomic facts and choices against the complete official records.
+  validating atomic facts and choices against the complete official records;
+  it remains feature-frozen outside reproduced defects or course-driven changes.
 
 ## Top Drugs Reference
 
 The unified Drug Sheet (`top-drugs-quicksheet.html`) searches the current
 169-record legacy P1 pool and the official 100-record Fall 2026 P2 source. The
 display is unified, but the canonical P1 and P2 source files remain separate.
-Current P2 Fall/Lab III and Week 1–3 shortcuts sit above the full filters;
+Current P2 Fall/Lab III shortcuts sit above the full filters;
 search always evaluates the complete library, while cards render progressively
 for a faster mobile reference experience.
 
