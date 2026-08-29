@@ -1,7 +1,6 @@
 // assets/js/custom-quiz.js
 // Custom quiz builder - combine questions from multiple quizzes
 
-const THEME_KEY = "pharmlet.theme";
 const CUSTOM_QUIZ_KEY = "pharmlet.custom-quiz";
 const quizCatalog = window.PharmletQuizCatalog;
 
@@ -10,25 +9,8 @@ const state = {
   selectedQuizzes: new Set(),
 };
 
-// Theme toggle
 document.addEventListener("DOMContentLoaded", () => {
-  const themeToggle = document.getElementById("theme-toggle");
-  const themeLabel = document.getElementById("theme-label");
-  
-  if (themeToggle && themeLabel) {
-    const saved = localStorage.getItem(THEME_KEY);
-    const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)")?.matches;
-    const start = saved || (prefersDark ? "dark" : "light");
-    document.documentElement.classList.toggle("dark", start === "dark");
-    themeLabel.textContent = start === "dark" ? "Light" : "Dark";
-    
-    themeToggle.addEventListener("click", () => {
-      const next = document.documentElement.classList.contains("dark") ? "light" : "dark";
-      document.documentElement.classList.toggle("dark", next === "dark");
-      localStorage.setItem(THEME_KEY, next);
-      themeLabel.textContent = next === "dark" ? "Light" : "Dark";
-    });
-  }
+  window.PharmletSite?.initTheme?.();
 
   loadAvailableQuizzes();
   
@@ -260,8 +242,8 @@ async function startCustomQuiz() {
   window.location.href = url.toString();
 }
 
-function sanitize(str) {
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
-}
+const sanitize = window.PharmletSite?.escapeHtml || ((value) => {
+  const element = document.createElement("div");
+  element.textContent = value;
+  return element.innerHTML;
+});
