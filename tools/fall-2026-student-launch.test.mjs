@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import test from "node:test";
@@ -19,6 +20,12 @@ const policy = JSON.parse(
 
 const WEEK_1_NOTE = "Practice configuration: Week 1 has no prior review material. This 10-question study set uses Week 1 content only and is not intended to claim the exact official Week 1 quiz composition.";
 const FALL_LAB3_WEEKS = Array.from({ length: 10 }, (_, index) => index + 1);
+const FALL_UI_BASELINES = Object.freeze({
+  drugData: "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01",
+  policy: "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171",
+  generator: "39e123b914f665282f6abce23110bf3e2bd4f0bcc1974b7038e0f9384cf9871a",
+  launcher: "255ef32be7b47e3f12f3b02da5db5a91e9040a5ee9fe406f68029e783a98157c"
+});
 
 const LEGACY_HOME_HREFS = [
   "stats.html",
@@ -92,6 +99,32 @@ function sectionBetween(homepage, startId, endId) {
 
 function hrefsIn(source) {
   return [...source.matchAll(/href="([^"]+)"/g)].map((match) => match[1]);
+}
+
+function htmlText(source) {
+  return source
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function cardForWeek(page, quizWeek) {
+  const openingTagPattern = new RegExp(
+    `<article\\b(?=[^>]*\\bid="week-${quizWeek}")(?=[^>]*\\bdata-week-card="${quizWeek}")[^>]*>`,
+    "i"
+  );
+  const openingTag = openingTagPattern.exec(page);
+  assert.ok(openingTag, `hub is missing the unified Week ${quizWeek} card`);
+  const end = page.indexOf("</article>", openingTag.index + openingTag[0].length);
+  assert.notEqual(end, -1, `Week ${quizWeek} card is not closed`);
+  return page.slice(openingTag.index, end + "</article>".length);
+}
+
+function sha256File(relativePath) {
+  return createHash("sha256")
+    .update(readFileSync(path.join(repoRoot, relativePath)))
+    .digest("hex");
 }
 
 function createStorageStub(initialValues = {}) {
@@ -295,28 +328,104 @@ test("homepage exposes direct Fall launches while preserving every legacy study 
   assert.ok(homepage.includes("P1 Fall 2025"));
 });
 
-test("Fall Lab III hub exposes one accessible launch control for every Week 1-10 practice", () => {
+test("Fall Lab III hub exposes ten unified visible week cards with ten native launch buttons", () => {
   const page = readFileSync(path.join(repoRoot, "lab3-fall-2026.html"), "utf8");
-  const launchWeeks = [...page.matchAll(/data-launch-week="(\d+)"/g)]
+  const cardTags = [...page.matchAll(/<article\b[^>]*\bdata-week-card="(\d+)"[^>]*>/g)];
+  const launchButtons = [...page.matchAll(/<button\b[^>]*\bdata-launch-week="(\d+)"[^>]*>/g)];
+  const cardWeeks = cardTags.map((match) => Number(match[1]));
+  const launchWeeks = launchButtons
     .map((match) => Number(match[1]));
 
+  assert.deepEqual(cardWeeks, FALL_LAB3_WEEKS);
   assert.deepEqual(launchWeeks, FALL_LAB3_WEEKS);
   for (const quizWeek of FALL_LAB3_WEEKS) {
-    assert.match(page, new RegExp(`data-launch-week="${quizWeek}"[^>]*>[\\s\\S]*?Week ${quizWeek}`));
+    const card = cardForWeek(page, quizWeek);
+    const openingTag = card.slice(0, card.indexOf(">") + 1);
+    const matchingButtons = [...card.matchAll(new RegExp(
+      `<button\\b[^>]*\\bdata-launch-week="${quizWeek}"[^>]*>`,
+      "g"
+    ))];
+
+    assert.equal(matchingButtons.length, 1, `Week ${quizWeek} needs one native launch button`);
+    assert.match(htmlText(card), new RegExp(`\\bWeek ${quizWeek}\\b`));
+    assert.match(htmlText(card), new RegExp(`Start Week ${quizWeek}`));
+    assert.doesNotMatch(openingTag, /\bhidden\b|aria-hidden="true"/i);
+    assert.doesNotMatch(matchingButtons[0][0], /\sdisabled(?:\s|=|>)/i);
+    assert.doesNotMatch(matchingButtons[0][0], /aria-disabled="true"/i);
   }
-  for (const quizWeek of [1, 2, 3]) {
-    assert.ok(page.includes(`id="week-${quizWeek}"`), `hub is missing the Week ${quizWeek} live card`);
-    assert.ok(page.includes(`Start Week ${quizWeek} Practice`), `hub is missing the Week ${quizWeek} start label`);
+});
+
+test("the unified cards communicate Week 1 and Weeks 2-10 practice structure without second-class future-week noise", () => {
+  const page = readFileSync(path.join(repoRoot, "lab3-fall-2026.html"), "utf8");
+  const week1 = htmlText(cardForWeek(page, 1));
+
+  assert.match(week1, /10 Questions/);
+  assert.match(week1, /Week 1 Content/);
+  assert.match(week1, /Practice (?:Configuration|setup)/i);
+  assert.match(week1, /no prior(?:-| )week review/i);
+  assert.match(week1, /not[^.]{0,100}official[^.]{0,100}composition/i);
+  assert.doesNotMatch(week1, /6 New|4 Review/);
+  assert.ok(!page.includes(WEEK_1_NOTE), "hub should use concise Week 1 wording instead of the full payload note");
+
+  for (const quizWeek of FALL_LAB3_WEEKS.slice(1)) {
+    const card = cardForWeek(page, quizWeek);
+    const text = htmlText(card);
+    assert.match(text, /10 Questions/, `Week ${quizWeek} must show its question count`);
+    assert.match(text, /6 New • 4 Review/, `Week ${quizWeek} must show the shared composition`);
   }
+
   for (const quizWeek of FALL_LAB3_WEEKS.slice(3)) {
-    assert.match(
-      page,
-      new RegExp(`data-launch-week="${quizWeek}"[^>]*aria-describedby="study-ahead-note"`),
-      `Week ${quizWeek} study-ahead control must share the page-level guidance`
+    const card = cardForWeek(page, quizWeek);
+    assert.doesNotMatch(
+      htmlText(card),
+      /study[- ]ahead|future quiz|coming soon|not available|unavailable/i,
+      `Week ${quizWeek} must not carry repetitive future-week labeling`
     );
   }
-  assert.match(page, /study ahead/i);
-  assert.match(page, /not a claim about exact future professor questions or wording/i);
+  assert.doesNotMatch(page, /study-ahead-launch|id="study-ahead-heading"|id="study-ahead-note"/i);
+});
+
+test("the hub uses one concise future-practice note and keeps Top Drugs Reference secondary but reachable", () => {
+  const page = readFileSync(path.join(repoRoot, "lab3-fall-2026.html"), "utf8");
+  const noteMatches = [...page.matchAll(/<([a-z][\w-]*)\b[^>]*\bid="semester-practice-note"[^>]*>([\s\S]*?)<\/\1>/gi)];
+
+  assert.equal(noteMatches.length, 1, "hub needs one shared semester practice note");
+  const note = htmlText(noteMatches[0][2]);
+  assert.match(note, /All Fall weeks are available for Pharm-let practice/i);
+  assert.match(
+    note,
+    /Future-week sets (?:use|follow) the official course (?:drug list|source) and current practice rules/i
+  );
+  assert.match(
+    note,
+    /(?:not intended to reproduce|not predictions? of) exact (?:future )?professor wording/i
+  );
+  assert.ok(note.length <= 300, "future-practice guidance should stay concise");
+  assert.ok(page.includes('href="top-drugs-quicksheet.html"'));
+  assert.match(page, /Top Drugs Reference/);
+  assert.doesNotMatch(
+    page,
+    /(?:will|does|is intended to)\s+(?:match|reproduce)\s+exact future professor|guarantees?\s+exact future professor/i
+  );
+});
+
+test("the F26-08 presentation-only change preserves launch wiring, cache tokens, generator, and canonical sources", () => {
+  const page = readFileSync(path.join(repoRoot, "lab3-fall-2026.html"), "utf8");
+  const launcher = readFileSync(
+    path.join(repoRoot, "assets", "js", "fall-2026-lab3-launcher.js"),
+    "utf8"
+  );
+
+  assert.ok(page.includes('src="assets/js/fall-2026-lab3-launcher.js?v=20260827a"'));
+  assert.ok(launcher.includes('from "./fall-2026-quiz-generator.js?v=20260827a"'));
+  assert.ok(launcher.includes('window.location.assign("quiz.html?id=custom-quiz")'));
+  assert.ok(launcher.includes('document.querySelectorAll("[data-launch-week]")'));
+  assert.deepEqual({
+    drugData: sha256File("assets/data/fall-2026-p2-top-drugs.json"),
+    policy: sha256File("assets/data/fall-2026-lab3-quiz-policy.json"),
+    generator: sha256File("assets/js/fall-2026-quiz-generator.js"),
+    launcher: sha256File("assets/js/fall-2026-lab3-launcher.js")
+  }, FALL_UI_BASELINES);
 });
 
 test("homepage prioritizes current P2 Lab III and labels Weeks 4-10 as study-ahead practice", () => {
@@ -394,7 +503,6 @@ test("Fall UI contains no copied drug facts and does not route through the legac
   const uiSource = `${page}\n${launcher}`;
 
   assert.ok(!launcher.includes("master_pool.json"));
-  assert.ok(page.includes(WEEK_1_NOTE));
   for (const drug of drugData.drugs) {
     assert.ok(!uiSource.includes(drug.genericName), `UI hardcodes generic ${drug.genericName}`);
     for (const brandName of drug.brandNames) {

@@ -1,6 +1,6 @@
 # Repository Health Report
 
-_Refreshed 2026-08-27 for F26-07. This report
+_Refreshed 2026-08-27 for F26-08. This report
 records the verified green repository-health baseline._
 
 ## Current Passing Checks
@@ -9,7 +9,7 @@ records the verified green repository-health baseline._
 | --- | --- | --- |
 | `npm run validate` | Passed | All 34 static quiz JSON files pass schema + semantic validation. |
 | `npm run check:links` | Passed | Catalog-aware since commit `9f3cb3d`; the three historical false positives (`basis2-quiz9`, `bdt-unit10-exam4`, `top-drugs-final-mock*`) are resolved. Unlinked-quiz findings are informational warnings, not failures. |
-| `npm run test:tools` | Passed | Full current suite, including validator, catalog/link, homepage hierarchy/routes, Favorites storage/controls, engine-surface, review-queue, progressive unified Top Drugs Reference, and Fall 2026 style/provenance/runtime audits. |
+| `npm run test:tools` | Passed | Full current suite, including validator, catalog/link, homepage hierarchy/routes, Favorites storage/controls, engine-surface, review-queue, progressive unified Top Drugs Reference, and Fall 2026 style, provenance, runtime, and hub audits. |
 | `npm run health:repo` | Passed (exit 0) | `Errors: 0`; homepage count matches the source-derived static total. |
 | Repository counts | Informational | 1,723 static quiz questions across 34 JSON files; 169 legacy P1 Top Drugs records; 100 Fall 2026 P2 records (ten per week); 56 Endocrine concept-pool entries. |
 
@@ -34,9 +34,13 @@ P2F-05 preserved the green health baseline while adding bounded progressive
 Drug Sheet rendering, complete-library search, current-P2 shortcuts, and URL
 history restoration without changing either canonical Top Drugs source.
 F26-07 preserved the green health baseline while exposing the already-supported
-Weeks 4–10 through the existing Lab III launcher. P2F-06 — Question Reports v2
-reproducibility workflow — is again the sole `READY` task; F26-07 did not begin
-that work.
+Weeks 4–10 through the existing Lab III launcher. F26-08 preserved that baseline
+while replacing the split Week 1–3 / Week 4–10 presentation with one responsive,
+unified ten-card semester dashboard. It retained the established launch wiring,
+Week 1 practice distinction, Weeks 2–10 6-new / 4-review representation, and a
+visible Top Drugs Reference path while consolidating future-practice guidance
+into one shared note. P2F-06 — Question Reports v2 reproducibility workflow —
+is again the sole `READY` task; F26-08 did not begin that work.
 
 Warnings (informational): `supplemental-exam1-2024.json` has eight questions;
 `test-sample-3.json` has three (a dev-harness fixture). 22 quiz ids are not
@@ -51,11 +55,12 @@ these are reported as information, not errors.
   "common wrong answer" display counts inflate slightly on each save/load
   cycle. Characterized by `tools/review-queue-store-regression.test.mjs`;
   a fix requires approved app-code changes.
-- Fall 2026 Lab III Weeks 1–10 are student-facing. Week 1 remains explicitly
-  practice-configured; Weeks 2–10 use 6 new + 4 accumulated review. Weeks 4–10
-  are study-ahead Pharm-let practice rather than exact future professor-quiz
-  claims. F26-07 changed activation surfaces without changing canonical data,
-  the calibrated generator, or repository-health semantics.
+- Fall 2026 Lab III Weeks 1–10 are student-facing in one unified semester grid.
+  Week 1 remains explicitly practice-configured; Weeks 2–10 use 6 new + 4
+  accumulated review. Weeks 4–10 are study-ahead Pharm-let practice rather than
+  exact future professor-quiz claims. F26-08 changed presentation only, without
+  changing launch wiring, canonical data, the calibrated feature-frozen
+  generator, or repository-health semantics.
 - **Deferred MTC engine defect:** the existing `mcq-multiple` pointer/touch
   path double-toggles selections. Its correction remains a separate bounded
   `quizEngine.js` task and is not `READY`.
