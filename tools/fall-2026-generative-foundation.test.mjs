@@ -18,8 +18,8 @@ const LEGACY_BASELINE = Object.freeze({
   masterPoolSha256: "1fb50e96e60252a9839406d53bc929e9569d76c0ddc2522aff43adf9bdf2a87c"
 });
 const APPROVED_ENGINE_BASELINE = Object.freeze({
-  commit: "25c9211e96cdcc8fa431fa852deb86065148282f",
-  sha256: "5852b3ce1ae6d22dba6eadb9b7dfa1461676af74913e39b639a27d07a44f34a5"
+  reference: "P2F-06 reporting-only metadata hook",
+  sha256: "db7c0c7850135eed1b985b025a0518db4a43913bba17f9b281d8cdb533f2ffaa"
 });
 
 function sha256(value) {
@@ -70,7 +70,7 @@ function assertNoForbiddenQuestionBankKeys(value, location = "policy") {
   }
 }
 
-test(`surviving legacy quiz inputs match the ${LEGACY_BASELINE.reference} baseline and the engine matches ${APPROVED_ENGINE_BASELINE.commit}`, () => {
+test(`surviving legacy quiz inputs match the ${LEGACY_BASELINE.reference} baseline and the engine matches the ${APPROVED_ENGINE_BASELINE.reference}`, () => {
   const quizCorpus = hashQuizCorpus();
   assert.equal(quizCorpus.count, LEGACY_BASELINE.quizFileCount, "legacy static quiz file count changed");
   assert.equal(quizCorpus.digest, LEGACY_BASELINE.quizCorpusSha256, "legacy static quiz JSON changed");

@@ -399,14 +399,23 @@ owner-approved scope and allowed-files contract before execution.
 | P2F-03 | Homepage/current-semester navigation facelift | `DONE` | P2F-02 |
 | P2F-04 | Favorites entry path and library organization | `DONE` | P2F-03 |
 | P2F-05 | Top Drugs Reference v2 performance/current-P2 shortcuts | `DONE` | P2F-04 |
-| P2F-06 | Question Reports v2 reproducibility workflow | `READY` | P2F-05 |
-| P2F-07 | Additive curriculum metadata contract | `BLOCKED` | P2F-06 |
+| P2F-06 | Question Reports v2 reproducibility workflow | `DONE` | P2F-05 |
+| P2F-07 | Additive curriculum metadata contract | `READY` | P2F-06 |
 | P2F-08 | Stats Dashboard v2 | `BLOCKED` | P2F-07 |
 | P2F-09 | Review Queue v2 + `wrongCounts` correction | `BLOCKED` | P2F-08 |
 | P2F-10 | Mobile/accessibility consistency pass | `BLOCKED` | P2F-09 |
 
-P2F-06 is restored as the sole `READY` task after the bounded F26-08 Lab III
-hub QOL facelift. P2F-05 kept the separate 169-record P1 and
+P2F-07 is the sole `READY` task after P2F-06 added a backward-compatible,
+local-only Question Reports v2 schema and capture workflow. Existing reports
+remain readable without migration. New reports record a reason and optional
+note; generated Fall reports retain the existing seed, requested week,
+new/review status, domain, source-drug identity, stable question ID, and
+available variant/strict-answer metadata. Stats now offers concise Copy Report
+and individual Delete actions. The approved `quizEngine.js` change is limited
+to retaining existing quiz metadata for reporting and delegating capture; it
+does not alter scoring, question selection, or generation.
+
+P2F-05 kept the separate 169-record P1 and
 100-record P2 canonical sources behind the existing normalization adapter,
 added prominent P2 Fall/Lab III and Week 1–3 reference shortcuts, and reduced
 the initial Drug Sheet render from all 269 full cards to 12 with accessible

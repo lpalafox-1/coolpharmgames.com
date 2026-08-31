@@ -20,8 +20,8 @@ const policy = JSON.parse(
   readFileSync(path.join(repoRoot, "assets", "data", "fall-2026-lab3-quiz-policy.json"), "utf8")
 );
 const APPROVED_ENGINE_BASELINE = Object.freeze({
-  commit: "25c9211e96cdcc8fa431fa852deb86065148282f",
-  sha256: "5852b3ce1ae6d22dba6eadb9b7dfa1461676af74913e39b639a27d07a44f34a5"
+  reference: "P2F-06 reporting-only metadata hook",
+  sha256: "db7c0c7850135eed1b985b025a0518db4a43913bba17f9b281d8cdb533f2ffaa"
 });
 
 function createStorageStub(initialValues = {}) {
@@ -380,7 +380,7 @@ test("malformed answerMatching markers remain fail closed by staying out of pers
   assert.equal(reviewPage.storage.getItem("pharmlet.custom-quiz"), null);
 });
 
-test(`Fall stays isolated to its launcher, legacy data has no strict marker, and the engine matches ${APPROVED_ENGINE_BASELINE.commit}`, () => {
+test(`Fall stays isolated to its launcher, legacy data has no strict marker, and the engine matches the ${APPROVED_ENGINE_BASELINE.reference}`, () => {
   const digest = createHash("sha256").update(engineSource).digest("hex");
   assert.equal(digest, APPROVED_ENGINE_BASELINE.sha256);
   assert.ok(!engineSource.includes("stemReference"), "Fall stem provenance must not be rendered by the legacy engine");
