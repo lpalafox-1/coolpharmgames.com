@@ -377,6 +377,84 @@ contract.
   `quizEngine.js` are unchanged. The Fall generator remains feature-frozen and
   F26-MTC-01 remains deferred.
 
+### F26-09 — Fall Lab III Completion & Continuation Experience
+
+- **Status:** `DONE`
+- **Delivered (completion UX):** finishing a normal quiz, Boss Round, or review
+  round is now a real completed state. `showResults()` retires the live
+  answering surface (question jump map, footer actions, mastery and mobile
+  controls), freezes the timer, ignores answering/navigation/timer/restart
+  keyboard shortcuts, and reports the attempt as saved. Completion was already a
+  save boundary in code — history, high score, review queue, and progress
+  cleanup all run in `showResults()` — so the false
+  "Your progress will be lost" restart warning was removed for completed
+  attempts and kept, unchanged, for unfinished ones. No Back-button ritual is
+  required for an attempt to persist.
+- **Delivered (continuation):** contextual, non-collapsed actions —
+  Review Missed, Boss Round, Boss Remix +1, Retry This Set / Retry Same Boss /
+  Restart Full Set, New Week X Practice Set, and Return to Lab III Hub. Legacy
+  non-Fall quizzes keep exactly their previous action set plus the completed
+  state.
+- **Delivered (Boss Remix addendum):** Fall 2026 Lab III only. Retry Same Boss
+  still replays the identical stored challenge — the resolved payload is kept in
+  full, so exactness never depends on replaying a seed through the generator.
+  Boss Remix +1 is a different product: a newly assembled, bounded challenge
+  aimed at the drugs and knowledge domains this attempt actually missed.
+  - **Attempt-local evidence only.** Answered-incorrectly is the weakness
+    signal; answered-correctly is positive evidence; blank items left by
+    "check all" or an expired timer, seen-but-unanswered items, and never-seen
+    items are neutral. Lifetime weakness counters, review-queue history, and
+    adaptive memory are never read.
+  - **Fresh at question identity, not drug.** A weak drug may return through a
+    different safe question form. "Fresh" means an identity the Boss/Remix chain
+    has not used, tracked in an additive `metadata.fallLab3.chainQuestionIds`
+    record that a Fall Boss Round now also carries. Exact repetition stays with
+    Retry Same Boss; carried items are only a bounded fallback when the week's
+    fresh material runs out, and the remix fails closed (no remix, standard
+    practice set plus an explicit note) rather than duplicating or leaking
+    future-week material.
+  - **Deterministic, capped size.** Boss 5 → Remix 6 → Remix 7, then the chain
+    is capped: no further "+1" action is advertised, so every displayed
+    "Boss Remix +1 (N)" is literally truthful.
+  - **Scope inheritance.** The requested week, chain root, and used-question
+    history come from the parent attempt, never from the current date or any
+    global week value.
+  - **No longitudinal writes.** A completed remix saves its own history entry
+    and high score, but never feeds the review queue, `wrongCounts`, or adaptive
+    memory; P2F-09 and F26-10 still own those semantics. Normal quiz and Boss
+    Round behavior outside the remix is unchanged.
+- **Delivered (history provenance):** a remix records the distinct history mode
+  `bossRemix` through the existing generated-attempt identity machinery, plus one
+  additive `attemptLineage` field carrying attempt kind, attempt/parent/root
+  attempt ids, remix generation, requested week, resolved question count, and the
+  shared P2F-07 curriculum scope (`curriculumId`, professional year, semester,
+  lab, seed). No history migration and no competing metadata system; Stats
+  display polish for the new mode stays with P2F-08.
+- **Architecture note:** the fresh remix material is borrowed from a normal
+  Week X practice set built by the existing Fall launcher. The engine stores a
+  short-lived remix request, returns through `lab3-fall-2026.html?week=N`, and
+  converts the launcher-built payload into the remix attempt. This keeps Fall
+  source data, policy, and generator selection exclusively in
+  `assets/js/fall-2026-lab3-launcher.js`, which the repository's Fall isolation
+  tests require; a direct generator import from `quizEngine.js` was rejected for
+  that reason. A consequence worth stating: freshness is bounded by what one
+  launcher-built set offers, which is why the fallback and fail-closed rules
+  above exist.
+- **Protected boundaries:** canonical Fall data, `master_pool.json`, Fall policy,
+  the Fall generator, the Fall launcher, normal weekly generation semantics
+  (Week 1 practice configuration, Weeks 2–10 6-new / 4-review), calibrated
+  question styles, scoring rules, strict FITB matching, lifetime adaptive
+  memory, and unrelated legacy quiz behavior are unchanged. The remix never
+  emits `mcq-multiple`, stays inside the requested Week X ceiling, and remains
+  source-backed. The Fall generator stays feature-frozen and F26-MTC-01 remains
+  deferred.
+- **Engine-change protocol:** `assets/js/quizEngine.js` was the named file in
+  scope; `quiz.html` carries the required cache-token bump
+  (`?v=20260831c`), `tools/engine-globals.manifest.json` was regenerated, and the
+  four committed engine sha256 baselines were re-pinned to the approved F26-09
+  engine in the same commit. Coverage lives in
+  `tools/fall-2026-lab3-completion-continuation.test.mjs`.
+
 ### Deferred Fall engine issue
 
 | Task | Status | Boundary |

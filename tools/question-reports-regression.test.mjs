@@ -10,7 +10,8 @@ import { loadBrowserGlobal } from "./browser-global-harness.mjs";
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const REPORTS_KEY = "pharmlet.question-reports";
 const REPORTS_TOKEN = "20260831b";
-const ENGINE_TOKEN = "20260831a";
+const ENGINE_TOKEN = "20260831c";
+const STATS_TOKEN = "20260831a";
 const PROTECTED_BASELINES = Object.freeze({
   fallSource: "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01",
   fallPolicy: "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171",
@@ -289,7 +290,7 @@ test("reporting assets expose the reason workflow without any network submission
   );
   assert.ok(
     stats.indexOf(`assets/js/question-reports.js?v=${REPORTS_TOKEN}`)
-      < stats.indexOf(`assets/js/stats.js?v=${ENGINE_TOKEN}`),
+      < stats.indexOf(`assets/js/stats.js?v=${STATS_TOKEN}`),
     "the shared report store must load before Stats"
   );
   assert.match(statsScript, /Copy Report/);

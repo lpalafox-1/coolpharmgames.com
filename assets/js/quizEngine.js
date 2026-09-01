@@ -42,6 +42,8 @@ const state = {
     reviewMode: false,
     bossMode: false,
     timedOut: false,
+    attemptCompleted: false,
+    attemptMetadata: null,
 
     resultsRecorded: false,
     signalsRecorded: false,
@@ -149,6 +151,7 @@ function syncCurrentDraftFromDom() {
 }
 
 function jumpToQuestion(index) {
+    if (state.attemptCompleted) return;
     if (!state.questions[index]) return;
     syncCurrentDraftFromDom();
     state.index = index;
@@ -163,6 +166,16 @@ function renderQuizStatus() {
     const seen = getSeenCount();
     const unanswered = getUnansweredCount();
     const marked = state.marked.size;
+
+    if (state.attemptCompleted) {
+        const answered = total - unanswered;
+        const completedParts = [`Completed ${answered}/${total}`, `${state.score} correct`];
+        if (marked) completedParts.push(`${marked} marked`);
+        if (state.saveStatusMessage) completedParts.push(state.saveStatusMessage);
+        status.textContent = completedParts.join(" • ");
+        return;
+    }
+
     const notes = [];
 
     if (state.saveStatusMessage) {
@@ -428,6 +441,24 @@ const TOP_DRUGS_SIGNALS_KEY = "pharmlet.topDrugs.signals";
 const FINAL_RECENT_RUN_LOOKBACK_MS = 14 * 24 * 60 * 60 * 1000;
 const FINAL_LEGACY_RUN_MATCH_WINDOW_MS = 6 * 60 * 60 * 1000;
 const GENERATED_QUIZ_IDS = new Set(["custom-quiz", "review-quiz"]);
+
+// Fall 2026 Lab III completion & continuation (F26-09). These constants only
+// describe the Fall attempt surface the engine already receives through the
+// stored generated-quiz payload; the Fall generator, launcher, policy, and
+// canonical drug data stay unchanged and are never activated by legacy routes.
+const FALL_LAB3_GENERATOR_ID = "fall-2026-p2-lab3-deterministic-generator";
+const FALL_LAB3_HUB_PAGE = "lab3-fall-2026.html";
+const FALL_LAB3_PRACTICE_KIND = "fall-2026-lab3-practice";
+const FALL_LAB3_BOSS_REMIX_KIND = "fall-2026-lab3-boss-remix";
+const FALL_LAB3_MIN_WEEK = 1;
+const FALL_LAB3_MAX_WEEK = 10;
+const FALL_LAB3_BOSS_BASE_SIZE = 5;
+const FALL_LAB3_REMIX_MAX_SIZE = 7;
+const FALL_LAB3_REMIX_MAX_GENERATION = 2;
+const FALL_LAB3_REMIX_MIN_ANSWERED = 3;
+const FALL_LAB3_CURRICULUM_ID = "p2-fall-2026-lab3";
+const FALL_LAB3_REMIX_REQUEST_KEY = "pharmlet.fall-2026-lab3.boss-remix-request";
+const FALL_LAB3_REMIX_REQUEST_MAX_AGE_MS = 10 * 60 * 1000;
 const FINAL_FOCUS_AREAS = ["brand", "class", "category", "moa"];
 const FINAL_FOCUS_AREA_LABELS = {
     brand: "Brand",
@@ -1328,6 +1359,7 @@ function launchBossRound() {
         return;
     }
 
+    const createdAt = Date.now();
     const payload = {
         id: "custom-quiz",
         title: getBossRoundTitle(state.questions),
@@ -1335,12 +1367,26 @@ function launchBossRound() {
             generatedFrom: quizId || getHistoryQuizId(),
             sourceTitle: state.title || "Quiz",
             kind: "boss-round",
-            createdAt: Date.now(),
+            createdAt,
             timerSeconds: getBossRoundTimerSeconds(bossQuestions.length),
             bossRoundSize: bossQuestions.length
         },
         questions: bossQuestions
     };
+
+    // Fall Lab III attempts additionally carry chain provenance so a later Boss
+    // Remix inherits the parent scope, lineage, and already-used questions.
+    const fallContext = getFallLab3AttemptContext();
+    if (fallContext.active) {
+        payload.metadata.quizWeek = fallContext.quizWeek;
+        payload.metadata.fallLab3 = buildFallLab3ChainRecord({
+            kind: "boss-round",
+            quizWeek: fallContext.quizWeek,
+            createdAt,
+            questions: bossQuestions,
+            parentContext: fallContext
+        });
+    }
 
     localStorage.setItem(CUSTOM_QUIZ_KEY, JSON.stringify(payload));
     location.href = "quiz.html?id=custom-quiz";
@@ -1374,6 +1420,596 @@ function launchWeakAreaRetake() {
 
     localStorage.setItem(CUSTOM_QUIZ_KEY, JSON.stringify(payload));
     location.href = "quiz.html?id=custom-quiz";
+}
+
+// --- FALL 2026 LAB III: ATTEMPT CONTEXT & PERFORMANCE-GUIDED BOSS REMIX ---
+// Remix guidance is attempt-local by contract: only the attempt that just
+// finished is read, and only explicit answer evidence counts. Lifetime weakness
+// counters, review-queue history, and adaptive memory are never consulted here,
+// and a completed remix never writes them back (P2F-09 and F26-10 own those).
+
+function getFallLab3QuestionMetadata(question) {
+    const metadata = question?.metadata;
+    return metadata && typeof metadata === "object" && !Array.isArray(metadata) ? metadata : null;
+}
+
+function isFallLab3Question(question) {
+    return getFallLab3QuestionMetadata(question)?.generatorId === FALL_LAB3_GENERATOR_ID;
+}
+
+function getFallLab3QuestionWeek(question) {
+    const week = Number(getFallLab3QuestionMetadata(question)?.requestedQuizWeek);
+    return Number.isInteger(week) && week >= FALL_LAB3_MIN_WEEK && week <= FALL_LAB3_MAX_WEEK ? week : 0;
+}
+
+function isFallLab3QuestionWithinWeekCeiling(question, quizWeek) {
+    const requestedWeek = getFallLab3QuestionWeek(question);
+    if (!requestedWeek || requestedWeek > quizWeek) return false;
+
+    const metadata = getFallLab3QuestionMetadata(question);
+    const sourceWeeks = [
+        Number(metadata?.sourceDrugQuizWeek),
+        Number(metadata?.testedFact?.sourceDrugQuizWeek),
+        ...(Array.isArray(metadata?.choiceSources)
+            ? metadata.choiceSources.map((choice) => Number(choice?.sourceDrugQuizWeek))
+            : [])
+    ].filter((week) => Number.isFinite(week) && week > 0);
+
+    return sourceWeeks.every((week) => week <= quizWeek);
+}
+
+function getFallLab3QuestionIdentity(question) {
+    const id = String(question?.id || "").trim();
+    if (id) return `id:${id}`;
+
+    const prompt = normalizeQuizValue(stripHtmlTags(question?.prompt || ""));
+    if (!prompt) return "";
+    return `prompt:${prompt}||${normalizeQuizValue(JSON.stringify(getCorrectAnswerValue(question)))}`;
+}
+
+function getFallLab3QuestionDomain(question) {
+    return normalizeQuizValue(getFallLab3QuestionMetadata(question)?.knowledgeDomain || "");
+}
+
+function getFallLab3QuestionSourceDrugIds(question) {
+    const metadata = getFallLab3QuestionMetadata(question);
+    const listed = Array.isArray(metadata?.sourceDrugIds) ? metadata.sourceDrugIds : [];
+    const single = metadata?.sourceDrugId ? [metadata.sourceDrugId] : [];
+    return [...new Set([...listed, ...single].map((value) => String(value ?? "").trim()).filter(Boolean))];
+}
+
+function getFallLab3QuestionChoiceDrugIds(question) {
+    const choiceSources = getFallLab3QuestionMetadata(question)?.choiceSources;
+    if (!Array.isArray(choiceSources)) return [];
+    return [...new Set(choiceSources.map((choice) => String(choice?.sourceDrugId ?? "").trim()).filter(Boolean))];
+}
+
+// Explicit evidence only: a blank item left behind by "check all" or an expired
+// timer is neutral, never a weakness signal.
+function isFallLab3ExplicitAnswer(question) {
+    return Boolean(question?._answered) && !isBlankAnswerValue(question?._user);
+}
+
+function isFallLab3ExplicitMiss(question) {
+    return isFallLab3ExplicitAnswer(question) && !question._correct;
+}
+
+function getFallLab3TextHash(value) {
+    let hash = 0;
+    for (const char of String(value ?? "")) {
+        hash = ((hash << 5) - hash + char.charCodeAt(0)) | 0;
+    }
+    return (hash >>> 0).toString(16);
+}
+
+function buildFallLab3AttemptId({ kind = "", quizWeek = 0, seed = "", createdAt = 0, questions = [] } = {}) {
+    const scope = `week-${Number(quizWeek) || 0}`;
+    const kindKey = normalizeQuizValue(kind) || FALL_LAB3_PRACTICE_KIND;
+    const seedKey = String(seed || "").trim();
+    if (seedKey) return `fall-2026-lab3:${scope}:${kindKey}:seed-${seedKey}`;
+
+    const createdKey = Number(createdAt) || 0;
+    if (createdKey) return `fall-2026-lab3:${scope}:${kindKey}:created-${createdKey}`;
+
+    const identitySignature = questions.map(getFallLab3QuestionIdentity).filter(Boolean).join("|");
+    return `fall-2026-lab3:${scope}:${kindKey}:set-${questions.length}-${getFallLab3TextHash(identitySignature)}`;
+}
+
+function getFallLab3ChainRecord(metadata) {
+    const record = metadata?.fallLab3;
+    return record && typeof record === "object" && !Array.isArray(record) ? record : null;
+}
+
+function buildFallLab3ChainRecord({ kind, quizWeek, createdAt = 0, seed = "", questions = [], parentContext = null, remixGeneration = null } = {}) {
+    const attemptId = buildFallLab3AttemptId({ kind, quizWeek, seed, createdAt, questions });
+    const inheritedIds = Array.isArray(parentContext?.chainQuestionIds) ? parentContext.chainQuestionIds : [];
+    const chainQuestionIds = [...new Set([
+        ...inheritedIds,
+        ...questions.map(getFallLab3QuestionIdentity).filter(Boolean)
+    ])];
+
+    return {
+        attemptId,
+        parentAttemptId: String(parentContext?.attemptId || ""),
+        rootAttemptId: String(parentContext?.rootAttemptId || parentContext?.attemptId || attemptId),
+        parentKind: String(parentContext?.kind || ""),
+        quizWeek: Number(quizWeek) || 0,
+        remixGeneration: Math.max(0, Number(remixGeneration ?? parentContext?.remixGeneration) || 0),
+        chainQuestionIds
+    };
+}
+
+function getFallLab3AttemptContext(questions = state.questions, metadata = state.attemptMetadata) {
+    const fallQuestions = (questions || []).filter(isFallLab3Question);
+    const quizWeek = fallQuestions.reduce((week, question) => Math.max(week, getFallLab3QuestionWeek(question)), 0);
+
+    if (!fallQuestions.length || !quizWeek) {
+        return {
+            active: false,
+            quizWeek: 0,
+            kind: "",
+            sourceQuizId: "",
+            sourceTitle: "",
+            attemptId: "",
+            parentAttemptId: "",
+            rootAttemptId: "",
+            remixGeneration: 0,
+            chainQuestionIds: [],
+            questionCount: 0
+        };
+    }
+
+    const attemptMetadata = metadata && typeof metadata === "object" && !Array.isArray(metadata) ? metadata : {};
+    const chain = getFallLab3ChainRecord(attemptMetadata);
+    const kind = String(attemptMetadata.kind || FALL_LAB3_PRACTICE_KIND);
+    const sourceQuizId = String(
+        fallQuestions.find((question) => question?.sourceQuizId)?.sourceQuizId
+        || `fall-2026-lab3-week-${quizWeek}-practice`
+    );
+    const sourceTitle = String(
+        fallQuestions.find((question) => question?.sourceTitle)?.sourceTitle
+        || `Lab III Fall 2026 - Week ${quizWeek} Practice`
+    );
+    const attemptId = String(chain?.attemptId || buildFallLab3AttemptId({
+        kind,
+        quizWeek,
+        seed: attemptMetadata.seed,
+        createdAt: attemptMetadata.createdAt,
+        questions: fallQuestions
+    }));
+    const chainQuestionIds = [...new Set([
+        ...(Array.isArray(chain?.chainQuestionIds) ? chain.chainQuestionIds : []),
+        ...fallQuestions.map(getFallLab3QuestionIdentity).filter(Boolean)
+    ])];
+
+    return {
+        active: true,
+        quizWeek,
+        kind,
+        sourceQuizId,
+        sourceTitle,
+        attemptId,
+        parentAttemptId: String(chain?.parentAttemptId || ""),
+        rootAttemptId: String(chain?.rootAttemptId || (kind === FALL_LAB3_PRACTICE_KIND ? attemptId : "")),
+        remixGeneration: Math.max(0, Number(chain?.remixGeneration ?? attemptMetadata.remixGeneration) || 0),
+        chainQuestionIds,
+        questionCount: fallQuestions.length
+    };
+}
+
+function buildFallLab3AttemptFocus(questions) {
+    const domains = new Set();
+    const drugIds = new Set();
+    let answeredCount = 0;
+    let missedCount = 0;
+
+    for (const question of questions || []) {
+        if (!isFallLab3Question(question) || !isFallLab3ExplicitAnswer(question)) continue;
+        answeredCount += 1;
+        if (question._correct) continue;
+
+        missedCount += 1;
+        const domain = getFallLab3QuestionDomain(question);
+        if (domain) domains.add(domain);
+        getFallLab3QuestionSourceDrugIds(question).forEach((drugId) => drugIds.add(drugId));
+    }
+
+    return { domains, drugIds, answeredCount, missedCount };
+}
+
+// Ranks a newly assembled candidate against this attempt's weak drugs/domains.
+function getFallLab3RemixCandidateScore(question, focus) {
+    let score = 0;
+    if (getFallLab3QuestionSourceDrugIds(question).some((drugId) => focus?.drugIds?.has(drugId))) score += 3;
+    if (focus?.domains?.has(getFallLab3QuestionDomain(question))) score += 2;
+    if (getFallLab3QuestionChoiceDrugIds(question).some((drugId) => focus?.drugIds?.has(drugId))) score += 1;
+    return score;
+}
+
+// Exact repetition belongs to Retry Same Boss. These items are only a bounded
+// fallback used when the fresh Week X source cannot fill the remix.
+function getFallLab3RemixFallbackScore(question, focus) {
+    if (!isFallLab3ExplicitAnswer(question)) return -Infinity;
+
+    let score = 0;
+    if (!question._correct) score += 10;
+    if (question._user === "Revealed") score += 3;
+    if (question._hintUsed) score += 2;
+
+    if (question._correct) {
+        if (focus?.domains?.has(getFallLab3QuestionDomain(question))) score += 2.5;
+        if (getFallLab3QuestionSourceDrugIds(question).some((drugId) => focus?.drugIds?.has(drugId))) score += 2;
+    }
+
+    return score;
+}
+
+function buildFallLab3RemixFallbackQuestions(questions, quizWeek, limit) {
+    const eligible = (questions || []).filter((question) => (
+        isFallLab3Question(question)
+        && isFallLab3ExplicitAnswer(question)
+        && question.type !== "mcq-multiple"
+        && isFallLab3QuestionWithinWeekCeiling(question, quizWeek)
+    ));
+    if (!eligible.length) return [];
+
+    const focus = buildFallLab3AttemptFocus(eligible);
+    const seen = new Set();
+    const picked = [];
+
+    eligible
+        .map((question, index) => ({ question, index, score: getFallLab3RemixFallbackScore(question, focus) }))
+        .sort((a, b) => (
+            b.score - a.score
+            || Number(!!a.question._correct) - Number(!!b.question._correct)
+            || a.index - b.index
+        ))
+        .forEach(({ question }) => {
+            if (picked.length >= Math.max(0, limit)) return;
+            const identity = getFallLab3QuestionIdentity(question);
+            if (!identity || seen.has(identity)) return;
+            seen.add(identity);
+            picked.push(cloneQuestionForGeneratedQuiz(question));
+        });
+
+    return picked;
+}
+
+// "Fresh" is a question identity the Boss/Remix chain has not used yet, never a
+// drug-level rule: the same weak drug may return through a different safe item.
+function selectFallLab3FreshRemixQuestions(candidateQuestions, { usedQuestionIds = [], focus = null, quizWeek = 0, limit = 0 } = {}) {
+    const used = usedQuestionIds instanceof Set
+        ? usedQuestionIds
+        : new Set(Array.isArray(usedQuestionIds) ? usedQuestionIds : []);
+    const ranked = (candidateQuestions || [])
+        .map((question, index) => ({ question, index, identity: getFallLab3QuestionIdentity(question) }))
+        .filter(({ question, identity }) => (
+            isFallLab3Question(question)
+            && question.type !== "mcq-multiple"
+            && isFallLab3QuestionWithinWeekCeiling(question, quizWeek)
+            && identity
+            && !used.has(identity)
+        ))
+        .map((candidate) => ({ ...candidate, score: getFallLab3RemixCandidateScore(candidate.question, focus) }))
+        .sort((a, b) => b.score - a.score || a.index - b.index);
+
+    const seen = new Set();
+    const picked = [];
+
+    for (const candidate of ranked) {
+        if (picked.length >= Math.max(0, limit)) break;
+        if (seen.has(candidate.identity)) continue;
+        seen.add(candidate.identity);
+        picked.push(cloneQuestionForGeneratedQuiz(candidate.question));
+    }
+
+    return picked;
+}
+
+// Deterministic, bounded progression: Boss 5 → Remix 6 → Remix 7, then the
+// chain is capped so no further "+1" action is ever advertised.
+function getFallLab3RemixTargetSize(nextGeneration) {
+    const generation = Number(nextGeneration);
+    if (!Number.isInteger(generation) || generation < 1 || generation > FALL_LAB3_REMIX_MAX_GENERATION) return 0;
+    return Math.min(FALL_LAB3_REMIX_MAX_SIZE, FALL_LAB3_BOSS_BASE_SIZE + generation);
+}
+
+function isFallLab3RemixChainCapped(context) {
+    return Boolean(context?.active) && getFallLab3RemixTargetSize(context.remixGeneration + 1) === 0;
+}
+
+function getFallLab3RemixPreviewSize(questions = state.questions, context = null) {
+    const attemptContext = context || getFallLab3AttemptContext(questions);
+    if (!attemptContext.active) return 0;
+
+    const focus = buildFallLab3AttemptFocus(questions);
+    if (focus.answeredCount < FALL_LAB3_REMIX_MIN_ANSWERED) return 0;
+
+    return getFallLab3RemixTargetSize(attemptContext.remixGeneration + 1);
+}
+
+function buildFallLab3BossRemixRequest({
+    attemptQuestions = [],
+    attemptContext = null,
+    createdAt = Date.now()
+} = {}) {
+    const context = attemptContext || getFallLab3AttemptContext(attemptQuestions);
+    if (!context.active) return null;
+
+    const focus = buildFallLab3AttemptFocus(attemptQuestions);
+    if (focus.answeredCount < FALL_LAB3_REMIX_MIN_ANSWERED) return null;
+
+    const remixGeneration = context.remixGeneration + 1;
+    const targetSize = getFallLab3RemixTargetSize(remixGeneration);
+    if (!targetSize) return null;
+
+    return {
+        version: 2,
+        quizWeek: context.quizWeek,
+        sourceQuizId: context.sourceQuizId,
+        sourceTitle: context.sourceTitle,
+        parentAttemptId: context.attemptId,
+        rootAttemptId: context.rootAttemptId || context.attemptId,
+        parentKind: context.kind,
+        remixGeneration,
+        targetSize,
+        createdAt,
+        focusDomains: [...focus.domains],
+        focusDrugIds: [...focus.drugIds],
+        missedCount: focus.missedCount,
+        chainQuestionIds: context.chainQuestionIds,
+        fallbackQuestions: buildFallLab3RemixFallbackQuestions(attemptQuestions, context.quizWeek, targetSize)
+    };
+}
+
+function isFallLab3PracticePayload(data) {
+    const week = Number(data?.metadata?.quizWeek);
+    return Boolean(
+        data?.metadata?.kind === FALL_LAB3_PRACTICE_KIND
+        && Array.isArray(data?.questions)
+        && data.questions.length
+        && Number.isInteger(week)
+        && week >= FALL_LAB3_MIN_WEEK
+        && week <= FALL_LAB3_MAX_WEEK
+    );
+}
+
+function isFallLab3BossRemixAttempt(metadata = state.attemptMetadata) {
+    return metadata?.kind === FALL_LAB3_BOSS_REMIX_KIND;
+}
+
+function clearFallLab3BossRemixRequest() {
+    try {
+        localStorage.removeItem(FALL_LAB3_REMIX_REQUEST_KEY);
+    } catch (error) {
+        console.warn("Unable to clear the Boss Remix request:", error);
+    }
+}
+
+function loadFallLab3BossRemixRequest(now = Date.now()) {
+    const saved = safeReadStorageJson(FALL_LAB3_REMIX_REQUEST_KEY, null);
+    if (!saved || typeof saved !== "object") return null;
+
+    const createdAt = Number(saved.createdAt) || 0;
+    const quizWeek = Number(saved.quizWeek);
+    const validWeek = Number.isInteger(quizWeek) && quizWeek >= FALL_LAB3_MIN_WEEK && quizWeek <= FALL_LAB3_MAX_WEEK;
+    const validSize = getFallLab3RemixTargetSize(Number(saved.remixGeneration)) === Number(saved.targetSize);
+
+    if (!createdAt || !validWeek || !validSize) {
+        clearFallLab3BossRemixRequest();
+        return null;
+    }
+
+    if (now - createdAt > FALL_LAB3_REMIX_REQUEST_MAX_AGE_MS) {
+        clearFallLab3BossRemixRequest();
+        return null;
+    }
+
+    return saved;
+}
+
+function buildFallLab3BossRemixPayload({ request = null, practicePayload = null, createdAt = Date.now() } = {}) {
+    const quizWeek = Number(request?.quizWeek);
+    const targetSize = Number(request?.targetSize);
+    const remixGeneration = Number(request?.remixGeneration);
+    if (!Number.isInteger(quizWeek) || getFallLab3RemixTargetSize(remixGeneration) !== targetSize || !targetSize) return null;
+
+    const focus = {
+        domains: new Set(Array.isArray(request?.focusDomains) ? request.focusDomains : []),
+        drugIds: new Set(Array.isArray(request?.focusDrugIds) ? request.focusDrugIds : [])
+    };
+    const usedQuestionIds = new Set(Array.isArray(request?.chainQuestionIds) ? request.chainQuestionIds : []);
+    const fresh = selectFallLab3FreshRemixQuestions(practicePayload?.questions, {
+        usedQuestionIds,
+        focus,
+        quizWeek,
+        limit: targetSize
+    });
+
+    // Fail closed: never leak future material or fabricate an unsafe duplicate
+    // just to manufacture freshness.
+    if (!fresh.length) return null;
+
+    const chosenIdentities = new Set(fresh.map(getFallLab3QuestionIdentity).filter(Boolean));
+    const carried = [];
+
+    for (const question of Array.isArray(request?.fallbackQuestions) ? request.fallbackQuestions : []) {
+        if (fresh.length + carried.length >= targetSize) break;
+        const identity = getFallLab3QuestionIdentity(question);
+        if (!identity || chosenIdentities.has(identity)) continue;
+        if (!isFallLab3QuestionWithinWeekCeiling(question, quizWeek)) continue;
+        chosenIdentities.add(identity);
+        carried.push(cloneQuestionForGeneratedQuiz(question));
+    }
+
+    const remixQuestions = [...fresh, ...carried];
+    const sourceQuizId = String(request?.sourceQuizId || `fall-2026-lab3-week-${quizWeek}-practice`);
+    const sourceTitle = String(request?.sourceTitle || `Lab III Fall 2026 - Week ${quizWeek} Practice`);
+    const title = `Lab III Fall 2026 - Week ${quizWeek} Boss Remix +1${remixGeneration > 1 ? ` (Round ${remixGeneration})` : ""}`;
+
+    return {
+        id: "custom-quiz",
+        title,
+        metadata: {
+            kind: FALL_LAB3_BOSS_REMIX_KIND,
+            bossRound: true,
+            generatedFrom: sourceQuizId,
+            sourceTitle,
+            quizWeek,
+            remixGeneration,
+            performanceGuidance: "attempt-local",
+            freshQuestionCount: fresh.length,
+            carriedQuestionCount: carried.length,
+            missedSignalCount: Math.max(0, Number(request?.missedCount) || 0),
+            freshSeed: String(practicePayload?.metadata?.seed || ""),
+            createdAt,
+            timerSeconds: getBossRoundTimerSeconds(remixQuestions.length),
+            bossRoundSize: remixQuestions.length,
+            fallLab3: buildFallLab3ChainRecord({
+                kind: FALL_LAB3_BOSS_REMIX_KIND,
+                quizWeek,
+                createdAt,
+                questions: remixQuestions,
+                remixGeneration,
+                parentContext: {
+                    attemptId: String(request?.parentAttemptId || ""),
+                    rootAttemptId: String(request?.rootAttemptId || request?.parentAttemptId || ""),
+                    kind: String(request?.parentKind || ""),
+                    chainQuestionIds: [...usedQuestionIds],
+                    remixGeneration
+                }
+            })
+        },
+        questions: remixQuestions.map((question) => ({
+            ...question,
+            sourceQuizId: question.sourceQuizId || sourceQuizId,
+            sourceTitle: question.sourceTitle || sourceTitle
+        }))
+    };
+}
+
+let fallLab3RemixNotice = "";
+
+function takeFallLab3RemixNotice() {
+    const notice = fallLab3RemixNotice;
+    fallLab3RemixNotice = "";
+    return notice;
+}
+
+// The fresh remix material comes from a normal Week X practice set built by the
+// existing Fall launcher, so the engine never selects Fall source data or the
+// Fall generator itself. The pending request is consumed on the way back in.
+function consumeFallLab3BossRemixRequest(data, now = Date.now()) {
+    if (!isFallLab3PracticePayload(data)) return null;
+
+    const request = loadFallLab3BossRemixRequest(now);
+    if (!request) return null;
+
+    clearFallLab3BossRemixRequest();
+    if (Number(request.quizWeek) !== Number(data.metadata.quizWeek)) return null;
+
+    const payload = buildFallLab3BossRemixPayload({ request, practicePayload: data, createdAt: now });
+    if (!payload) {
+        fallLab3RemixNotice = `Boss Remix had no fresh Week ${Number(request.quizWeek)} question left for this challenge chain, so this is a standard Week ${Number(request.quizWeek)} practice set instead.`;
+        return null;
+    }
+
+    try {
+        localStorage.setItem(CUSTOM_QUIZ_KEY, JSON.stringify(payload));
+    } catch (error) {
+        console.warn("Unable to store the Boss Remix attempt:", error);
+    }
+
+    return payload;
+}
+
+function buildFallLab3HistoryLineage() {
+    const context = getFallLab3AttemptContext();
+    if (!context.active) return null;
+
+    const lineage = {
+        attemptKind: context.kind,
+        attemptId: context.attemptId,
+        remixGeneration: context.remixGeneration,
+        questionCount: state.questions.length,
+        quizWeek: context.quizWeek,
+        sourceQuizId: context.sourceQuizId
+    };
+
+    if (context.parentAttemptId) lineage.parentAttemptId = context.parentAttemptId;
+    if (context.rootAttemptId) lineage.rootAttemptId = context.rootAttemptId;
+
+    // Reuse the shared P2F-07 curriculum contract for scope instead of
+    // restating curriculum facts in a competing shape.
+    const curriculum = window.PharmletCurriculumMetadata?.normalizeCurriculumMetadata?.({
+        quizId,
+        sourceQuizId: context.sourceQuizId,
+        quizMetadata: state.attemptMetadata && typeof state.attemptMetadata === "object" ? state.attemptMetadata : {},
+        questionMetadata: getFallLab3QuestionMetadata(state.questions.find(isFallLab3Question)) || {}
+    });
+    const quizCurriculum = curriculum?.quiz && typeof curriculum.quiz === "object" ? curriculum.quiz : {};
+
+    for (const field of ["curriculumId", "professionalYear", "semester", "lab", "seed"]) {
+        if (quizCurriculum[field]) lineage[field] = quizCurriculum[field];
+    }
+    if (!lineage.curriculumId) lineage.curriculumId = FALL_LAB3_CURRICULUM_ID;
+
+    return lineage;
+}
+
+function launchFallLab3BossRemix() {
+    const context = getFallLab3AttemptContext();
+    if (!context.active) {
+        alert("Boss Remix is available on Fall 2026 Lab III practice attempts.");
+        return false;
+    }
+
+    const request = buildFallLab3BossRemixRequest({
+        attemptQuestions: state.questions,
+        attemptContext: context
+    });
+
+    if (!request) {
+        alert(isFallLab3RemixChainCapped(context)
+            ? `This Boss Remix chain is complete at ${FALL_LAB3_REMIX_MAX_SIZE} questions. Retry this challenge or start a new Week ${context.quizWeek} practice set.`
+            : "Answer a few more questions first so Boss Remix has real performance evidence to work with.");
+        return false;
+    }
+
+    try {
+        localStorage.setItem(FALL_LAB3_REMIX_REQUEST_KEY, JSON.stringify(request));
+    } catch (error) {
+        console.warn("Unable to save the Boss Remix request:", error);
+        alert("This browser could not save the Boss Remix challenge.");
+        return false;
+    }
+
+    state.progressCompleted = true;
+    location.href = `${FALL_LAB3_HUB_PAGE}?week=${context.quizWeek}`;
+    return true;
+}
+
+function startFallLab3WeekPractice(quizWeek) {
+    const week = Number(quizWeek);
+    if (!Number.isInteger(week) || week < FALL_LAB3_MIN_WEEK || week > FALL_LAB3_MAX_WEEK) return false;
+
+    // A plain weekly practice launch must never inherit a stale remix request.
+    clearFallLab3BossRemixRequest();
+    state.progressCompleted = true;
+    location.href = `${FALL_LAB3_HUB_PAGE}?week=${week}`;
+    return true;
+}
+
+function openFallLab3Hub(quizWeek) {
+    clearFallLab3BossRemixRequest();
+    const week = Number(quizWeek);
+    const target = Number.isInteger(week) && week >= FALL_LAB3_MIN_WEEK && week <= FALL_LAB3_MAX_WEEK
+        ? `${FALL_LAB3_HUB_PAGE}#week-${week}`
+        : FALL_LAB3_HUB_PAGE;
+
+    state.progressCompleted = true;
+    location.href = target;
+    return true;
 }
 
 function incrementCounter(counter, key, step = 1) {
@@ -2633,7 +3269,9 @@ function buildGeneratedAttemptIdentity(data) {
     if (parts.length <= 2 && titleSegment !== "na") parts.push(titleSegment);
 
     const identity = `generated-${parts.join("-")}`;
-    const modeLabel = state.bossMode
+    const modeLabel = kindSegment === FALL_LAB3_BOSS_REMIX_KIND
+        ? "bossRemix"
+        : state.bossMode
         ? "boss"
         : kindSegment === "weak-area-playlist"
         ? "playlist"
@@ -2977,6 +3615,7 @@ function saveQuizHistory() {
         const history = raw ? JSON.parse(raw) : [];
         const letterGradeInfo = getLetterGradeInfoForQuiz(state.score, state.questions.length);
         const finalSummary = buildStoredFinalAttemptSummary(state.questions);
+        const attemptLineage = buildFallLab3HistoryLineage();
 
         history.push({
             quizId: getHistoryQuizId(),
@@ -2991,7 +3630,8 @@ function saveQuizHistory() {
             examMode: isTrueExamMode(),
             hintsUsed: state.hintsUsed,
             letterGrade: letterGradeInfo?.letter || null,
-            finalSummary
+            finalSummary,
+            ...(attemptLineage ? { attemptLineage } : {})
         });
 
         localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(-200)));
@@ -3028,13 +3668,189 @@ function getLetterGradeInfoForQuiz(score, total) {
     };
 }
 
+// --- COMPLETED-ATTEMPT LIFECYCLE (F26-09) ---
+// Finishing a run is a save boundary: history, review queue, and high scores are
+// already written by showResults(). These helpers retire the live answering
+// surface so a finished attempt can no longer be edited, re-navigated, or
+// re-timed, and so the restart warning stops lying about saved progress.
+
+const COMPLETION_CONTROL_IDS = ["nav-map", "prev", "check", "check-all", "next"];
+
+function getCompletionControlElements() {
+    const elements = COMPLETION_CONTROL_IDS.map(getEl).filter(Boolean);
+    const masteryPanel = getEl("mark")?.closest?.("aside");
+    const mobilePanel = getEl("mark-mobile")?.parentElement;
+    if (masteryPanel) elements.push(masteryPanel);
+    if (mobilePanel) elements.push(mobilePanel);
+    return elements;
+}
+
+function setCompletedAttemptControlsHidden(hidden) {
+    getCompletionControlElements().forEach((element) => {
+        if (hidden) {
+            element.dataset.completionHidden = "true";
+            element.style.display = "none";
+            return;
+        }
+
+        if (element.dataset?.completionHidden) {
+            delete element.dataset.completionHidden;
+            element.style.display = "";
+        }
+    });
+
+    const nav = getEl("nav-map");
+    if (nav && hidden) nav.innerHTML = "";
+
+    // The results card takes the full width once the sidebar retires.
+    const layout = getEl("question-card")?.parentElement;
+    if (!layout) return;
+
+    if (hidden) {
+        layout.dataset.completionLayout = "true";
+        layout.style.gridTemplateColumns = "1fr";
+    } else if (layout.dataset?.completionLayout) {
+        delete layout.dataset.completionLayout;
+        layout.style.gridTemplateColumns = "";
+    }
+}
+
+function freezeCompletedAttemptTimer() {
+    if (state.timerHandle) {
+        clearInterval(state.timerHandle);
+        state.timerHandle = null;
+    }
+    state.timerPaused = true;
+
+    const readout = getEl("timer-readout");
+    if (!readout) return;
+
+    const remaining = Math.max(0, Number(state.timerSeconds) || 0);
+    readout.textContent = `${Math.floor(remaining / 60)}:${String(remaining % 60).padStart(2, "0")}`;
+    readout.onclick = null;
+    readout.dataset.completed = "true";
+    readout.title = "Attempt complete — the timer is stopped.";
+    readout.classList.remove("animate-pulse", "cursor-pointer");
+    readout.classList.add("opacity-40", "cursor-default");
+}
+
+function restoreAttemptTimerAffordance() {
+    const readout = getEl("timer-readout");
+    if (!readout) return;
+
+    if (readout.dataset?.completed) delete readout.dataset.completed;
+    readout.title = "";
+    readout.classList.remove("opacity-40", "cursor-default");
+    readout.classList.add("cursor-pointer");
+    readout.onclick = toggleTimer;
+}
+
+function applyCompletedAttemptUi() {
+    state.attemptCompleted = true;
+    state.saveStatusMessage = state.reviewMode ? "Review round saved" : "Attempt saved to history";
+    freezeCompletedAttemptTimer();
+    setCompletedAttemptControlsHidden(true);
+    renderQuizStatus();
+}
+
+function exitCompletedAttemptUi() {
+    state.attemptCompleted = false;
+    state.saveStatusMessage = "";
+    setCompletedAttemptControlsHidden(false);
+    restoreAttemptTimerAffordance();
+}
+
+function getCompletionRetryLabel({ bossMode, reviewMode, generatedPayload }) {
+    if (bossMode) return "⚡ Retry Same Boss";
+    if (reviewMode) return "🔁 Restart Full Set";
+    return generatedPayload ? "🔁 Retry This Set" : "🔁 Restart Quiz";
+}
+
+function getCompletionContinuationActions({
+    reviewMode = false,
+    bossMode = false,
+    missedCount = 0,
+    bossQuestionCount = 0,
+    remixSize = 0,
+    generatedPayload = false,
+    fall = { active: false, quizWeek: 0 }
+} = {}) {
+    const actions = [];
+
+    if (missedCount > 0) {
+        actions.push({ id: "review-missed", tone: "review", label: `🔄 Review ${missedCount} Missed` });
+    }
+
+    if (!reviewMode && !bossMode && bossQuestionCount > 0) {
+        actions.push({ id: "boss-round", tone: "boss", label: `⚡ Boss Round (${bossQuestionCount})` });
+    }
+
+    if (fall.active && !reviewMode && remixSize > 0) {
+        actions.push({ id: "boss-remix", tone: "remix", label: `⚡ Boss Remix +1 (${remixSize})` });
+    }
+
+    actions.push({
+        id: "retry-attempt",
+        tone: "primary",
+        label: getCompletionRetryLabel({ bossMode, reviewMode, generatedPayload })
+    });
+
+    if (fall.active) {
+        actions.push({
+            id: "new-week-practice",
+            tone: "accent",
+            label: `🆕 New Week ${fall.quizWeek} Practice Set`
+        });
+        actions.push({ id: "lab3-hub", tone: "ghost", label: "← Return to Lab III Hub" });
+    }
+
+    return actions;
+}
+
+function getCompletionActionStyle(tone) {
+    if (tone === "review") return { className: "bg-red-600 text-white", style: "" };
+    if (tone === "boss") return { className: "text-white", style: "background:linear-gradient(135deg, #111827 0%, #8b1e3f 100%)" };
+    if (tone === "remix") return { className: "text-white", style: "background:linear-gradient(135deg, #8b1e3f 0%, #b45309 100%)" };
+    if (tone === "primary") return { className: "bg-maroon text-white", style: "" };
+    if (tone === "accent") return { className: "bg-blue-600 text-white", style: "" };
+    return { className: "border border-[var(--ring)] bg-[var(--card)]", style: "" };
+}
+
+function buildCompletionActionsMarkup(actions) {
+    return (actions || []).map((action) => {
+        const { className, style } = getCompletionActionStyle(action.tone);
+        return `<button type="button" data-completion-action="${escapeHtml(action.id)}" class="w-full max-w-sm px-8 py-4 rounded-2xl font-bold ${className}"${style ? ` style="${style}"` : ""}>${escapeHtml(action.label)}</button>`;
+    }).join("");
+}
+
+function runCompletionAction(actionId) {
+    if (actionId === "review-missed") return reviewMissed();
+    if (actionId === "boss-round") return launchBossRound();
+    if (actionId === "retry-attempt") return restartQuiz();
+    if (actionId === "boss-remix") return launchFallLab3BossRemix();
+    if (actionId === "new-week-practice") return startFallLab3WeekPractice(getFallLab3AttemptContext().quizWeek);
+    if (actionId === "lab3-hub") return openFallLab3Hub(getFallLab3AttemptContext().quizWeek);
+    return undefined;
+}
+
+function wireCompletionActions(card) {
+    const buttons = card?.querySelectorAll?.("[data-completion-action]");
+    if (!buttons) return;
+
+    Array.from(buttons).forEach((button) => {
+        button.addEventListener("click", () => runCompletionAction(button.dataset?.completionAction));
+    });
+}
+
 // --- RESTART WITH CONFIRMATION ---
 function restartQuiz() {
-    if (confirm("🔄 Restart this quiz? Your progress will be lost.")) {
-        state.progressCompleted = true;
-        clearQuizProgress();
-        location.reload();
-    }
+    // A completed attempt is already saved, so the "progress will be lost"
+    // warning would be false there. Unfinished runs keep the accurate warning.
+    if (!state.attemptCompleted && !confirm("🔄 Restart this quiz? Your progress will be lost.")) return;
+
+    state.progressCompleted = true;
+    clearQuizProgress();
+    location.reload();
 }
 
 function buildFreshReviewRoundQuestions(sourceQuestions = []) {
@@ -3084,6 +3900,7 @@ function replayCurrentReviewRound() {
     state.progressCompleted = false;
     state.title = `Review: ${state.originalQuestions.length} Missed`;
 
+    exitCompletedAttemptUi();
     restoreQuestionCardShell();
     if (getEl("quiz-title")) getEl("quiz-title").textContent = state.title;
     if (getEl("qtotal")) getEl("qtotal").textContent = state.questions.length;
@@ -3203,6 +4020,7 @@ function reviewMissed() {
     if (getEl("qtotal")) getEl("qtotal").textContent = state.questions.length;
     
     // Restore the quiz shell but keep the same countdown running for arcade-style retries.
+    exitCompletedAttemptUi();
     restoreQuestionCardShell();
     applyAttemptModeUI();
     render();
@@ -6727,6 +7545,10 @@ function wireEvents() {
             return;
         }
 
+        // A completed attempt keeps only the shortcuts modal live: no answering,
+        // navigation, timer, or restart shortcuts after the save boundary.
+        if (state.attemptCompleted) return;
+
         // Keep typing natural inside answer fields and other editable targets.
         const activeEl = document.activeElement;
         const isEditableTarget = activeEl
@@ -6771,6 +7593,7 @@ function wireEvents() {
 }
 
 function toggleTimer() {
+    if (state.attemptCompleted) return;
     if (!state.timerHandle && state.timerSeconds <= 0) return;
 
     state.timerPaused = !state.timerPaused;
@@ -7185,6 +8008,10 @@ function showResults() {
     state.progressCompleted = true;
 
     const shouldPersistResults = !state.reviewMode;
+    // A Boss Remix saves its own score and history, but never amplifies
+    // longitudinal weakness memory (P2F-09 and F26-10 own those semantics).
+    const remixAttempt = isFallLab3BossRemixAttempt();
+    const shouldRecordLongitudinalSignals = shouldPersistResults && !remixAttempt;
     const shouldRecordAttemptArtifacts = shouldPersistResults && !state.resultsRecorded;
     clearQuizProgress();
 
@@ -7198,10 +8025,13 @@ function showResults() {
 
     if (shouldPersistResults) {
         saveQuizHistory();
+    }
+
+    if (shouldRecordLongitudinalSignals) {
         saveMissedQuestionsToReviewQueue(state.questions);
     }
 
-    if (shouldPersistResults && !state.signalsRecorded) {
+    if (shouldRecordLongitudinalSignals && !state.signalsRecorded) {
         recordTopDrugsSignalsFromQuestions(state.questions);
         state.signalsRecorded = true;
     }
@@ -7236,14 +8066,31 @@ function showResults() {
     const card = getEl("question-card");
     const missed = state.questions.filter(q => q._answered && !q._correct);
     const hintsNote = state.hintsUsed > 0 ? `<p class="text-sm opacity-60 mt-2">💡 Hints used: ${state.hintsUsed}</p>` : '';
-    const reviewBtn = missed.length > 0 
-        ? `<button onclick="reviewMissed()" class="mt-4 px-6 py-3 bg-red-600 text-white rounded-xl font-bold">🔄 Review ${missed.length} Missed</button>` 
-        : `<p class="text-green-600 font-bold mt-4">🎉 Perfect Score!</p>`;
+    const perfectNote = missed.length === 0
+        ? `<p class="text-green-600 font-bold mt-4">🎉 Perfect Score!</p>`
+        : "";
     const bossQuestions = !state.reviewMode && !state.bossMode ? buildBossRoundQuestions(state.questions) : [];
-    const bossBtn = state.bossMode
-        ? `<button onclick="restartQuiz()" class="px-8 py-4 rounded-2xl font-bold text-white" style="background:linear-gradient(135deg, #0f172a 0%, #8b1e3f 100%)">⚡ Retry Boss Round</button>`
-        : bossQuestions.length > 0
-        ? `<button onclick="launchBossRound()" class="px-8 py-4 rounded-2xl font-bold text-white" style="background:linear-gradient(135deg, #111827 0%, #8b1e3f 100%)">⚡ Boss Round (${bossQuestions.length})</button>`
+    const fallContext = getFallLab3AttemptContext();
+    const remixSize = state.reviewMode ? 0 : getFallLab3RemixPreviewSize(state.questions, fallContext);
+    const continuationActions = getCompletionContinuationActions({
+        reviewMode: state.reviewMode,
+        bossMode: state.bossMode,
+        missedCount: missed.length,
+        bossQuestionCount: bossQuestions.length,
+        remixSize,
+        generatedPayload: GENERATED_QUIZ_IDS.has(quizId),
+        fall: fallContext
+    });
+    const continuationMarkup = buildCompletionActionsMarkup(continuationActions);
+    const savedNote = state.reviewMode
+        ? `<p class="text-sm opacity-70 mt-2">Review mastery is saved to your review queue for this round.</p>`
+        : remixAttempt
+        ? `<p class="text-sm opacity-70 mt-2">✅ Saved to this browser: this Boss Remix attempt's history and high score. Boss Remix stays a bounded challenge, so it does not feed lifetime weakness, review-queue, or adaptive memory.</p>`
+        : `<p class="text-sm opacity-70 mt-2">✅ Saved to this browser: history, high score, and review queue. Nothing else is needed to keep this attempt.</p>`;
+    const continuationNote = fallContext.active
+        ? `<p class="mt-4 text-xs opacity-70 max-w-xl mx-auto">${state.bossMode ? "Retry Same Boss" : "Retry This Set"} repeats these exact questions. ${remixSize > 0
+            ? `Boss Remix +1 assembles a new ${remixSize}-question Week ${fallContext.quizWeek} challenge aimed at the drugs and domains you missed here.`
+            : `This Boss Remix chain is complete at ${FALL_LAB3_REMIX_MAX_SIZE} questions.`} New Week ${fallContext.quizWeek} Practice Set generates a full 10-question practice set.</p>`
         : "";
     const letterGradeInfo = shouldPersistResults ? getLetterGradeInfoForQuiz(state.score, state.questions.length) : null;
     const finalBreakdown = shouldPersistResults ? buildFinalPerformanceBreakdown(state.questions) : null;
@@ -7288,9 +8135,6 @@ function showResults() {
     const examModeMarkup = isTrueExamMode()
         ? `<p class="text-sm opacity-70 mt-2">True Exam Mode was active for this attempt.</p>`
         : "";
-    const restartBtnMarkup = state.bossMode
-        ? ""
-        : `<button onclick="restartQuiz()" class="px-8 py-4 bg-maroon text-white rounded-2xl font-bold">🔁 Restart Quiz</button>`;
     const breakdownMarkup = buildFinalBreakdownMarkup(finalBreakdown);
     
     if (card) card.innerHTML = `<div class="text-center py-10">
@@ -7304,13 +8148,17 @@ function showResults() {
         ${letterGradeMarkup}
         ${examModeMarkup}
         ${hintsNote}
+        ${perfectNote}
+        ${savedNote}
         <div class="flex flex-col gap-3 items-center mt-6">
-            ${reviewBtn}
-            ${bossBtn}
-            ${restartBtnMarkup}
+            ${continuationMarkup}
         </div>
+        ${continuationNote}
         ${breakdownMarkup}
     </div>`;
+
+    wireCompletionActions(card);
+    applyCompletedAttemptUi();
 }
 
 function shuffled(a) { return [...a].sort(() => 0.5 - Math.random()); }
@@ -7325,6 +8173,7 @@ async function main() {
         state.generatedAttemptIdentity = null;
         state.adaptiveSummary = null;
         state.questionReportContext = {};
+        state.attemptMetadata = null;
         let filteredPool = [];
         let fullPool = [];
         let storageKey = null;
@@ -7519,21 +8368,28 @@ async function main() {
         }
         // ========== MODE 4: ?id=quiz-name (Legacy Static JSON) ==========
         else if (quizId) {
-            const data = GENERATED_QUIZ_IDS.has(quizId)
+            let data = GENERATED_QUIZ_IDS.has(quizId)
                 ? loadGeneratedQuizFromStorage(quizId)
                 : await loadQuizDataForId(quizId);
             if (!data) {
                 throw new Error(`Quiz "${quizId}" is not available. Try recreating it from the source page.`);
             }
 
+            // A Fall Lab III Boss Remix returns through the existing weekly
+            // launcher, so the fresh practice payload becomes the remix attempt.
+            data = consumeFallLab3BossRemixRequest(data) || data;
+
             state.questionReportContext = data?.metadata && typeof data.metadata === "object" && !Array.isArray(data.metadata)
                 ? { ...data.metadata }
                 : {};
+            state.attemptMetadata = data?.metadata && typeof data.metadata === "object" && !Array.isArray(data.metadata)
+                ? { ...data.metadata }
+                : null;
             state.bossMode = Boolean(data?.metadata?.kind === "boss-round" || data?.metadata?.bossRound);
             state.activeModeConfig = getEffectiveQuizModeConfig(data);
             state.configuredModeKey = state.activeModeConfig?._modeKey || "";
             state.placeholderQuiz = data?.meta?.placeholder === true;
-            state.modeNotice = "";
+            state.modeNotice = takeFallLab3RemixNotice();
             state.generatedTimerSeconds = Math.max(0, Number(state.activeModeConfig?.timerSeconds ?? data?.metadata?.timerSeconds) || 0);
             state.generatedQuestionLimit = Math.max(0, Number(state.activeModeConfig?.questionLimit ?? data?.metadata?.questionLimit) || 0);
             state.generatedAttemptIdentity = GENERATED_QUIZ_IDS.has(quizId)
@@ -7711,6 +8567,7 @@ function finishSetup(storageKey) {
     state.finalBreakdown = null;
     state.timerPaused = false;
     state.progressCompleted = false;
+    state.attemptCompleted = false;
     state.saveStatusMessage = "";
     state.currentScale = 1.0;
     document.body.style.zoom = state.currentScale;
