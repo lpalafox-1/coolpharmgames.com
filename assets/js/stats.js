@@ -21,6 +21,610 @@ const questionReportsStore = window.PharmletQuestionReports;
 let weakAreaPlaylistState = null;
 let morningWarmupState = null;
 
+// --- P2F-08: READ-ONLY RECORDED-ATTEMPT NORMALIZATION -----------------------
+// Stats interprets `pharmlet.history` more carefully; it never rewrites it.
+// Every helper below is pure over a raw record and returns a derived view, so
+// a Stats visit leaves the stored value byte-identical. Data the persistence
+// contract never recorded stays absent instead of being guessed or zero-filled.
+
+// The engine keeps the most recent 200 attempts (quizEngine.js history.slice(-200)).
+const HISTORY_RETENTION_LIMIT = 200;
+
+// Fall Lab III attempt kinds, read from assets/js/quizEngine.js
+// (FALL_LAB3_PRACTICE_KIND, the "boss-round" launch literal, and
+// FALL_LAB3_BOSS_REMIX_KIND) and corroborated against
+// tools/fall-2026-lab3-completion-continuation.test.mjs. Stats only reads them.
+const FALL_LAB3_PRACTICE_KIND = "fall-2026-lab3-practice";
+const FALL_LAB3_BOSS_ROUND_KIND = "boss-round";
+const FALL_LAB3_BOSS_REMIX_KIND = "fall-2026-lab3-boss-remix";
+
+const ATTEMPT_TYPES = Object.freeze([
+  Object.freeze({ id: "fall-lab3-practice", label: "Fall Lab III Practice" }),
+  Object.freeze({ id: "boss-rounds", label: "Boss Rounds" }),
+  Object.freeze({ id: "boss-remixes", label: "Boss Remixes" }),
+  Object.freeze({ id: "adaptive-playlists", label: "Adaptive Playlists" }),
+  Object.freeze({ id: "generated-sets", label: "Generated Sets / Morning Warm-Ups" }),
+  Object.freeze({ id: "standard-practice", label: "Standard Practice" }),
+  Object.freeze({ id: "unclassified", label: "Other / Unclassified" })
+]);
+
+const ATTEMPT_TYPE_LABELS = Object.freeze(
+  ATTEMPT_TYPES.reduce((labels, type) => Object.assign(labels, { [type.id]: type.label }), {})
+);
+
+// Attempt kind to display category, expressed as data. An unknown future kind
+// resolves to nothing here and falls through to mode, then to the catalog.
+const ATTEMPT_KIND_TYPE_IDS = Object.freeze({
+  [FALL_LAB3_PRACTICE_KIND]: "fall-lab3-practice",
+  [FALL_LAB3_BOSS_ROUND_KIND]: "boss-rounds",
+  [FALL_LAB3_BOSS_REMIX_KIND]: "boss-remixes"
+});
+
+// History `mode` labels the engine writes for generated attempts. Only the
+// modes that genuinely assert an attempt type are listed; "easy" and friends
+// describe difficulty, not provenance, so they never classify an attempt.
+const MODE_TYPE_IDS = Object.freeze({
+  bossRemix: "boss-remixes",
+  boss: "boss-rounds",
+  playlist: "adaptive-playlists"
+});
+
+// Catalog stats categories that already imply an attempt type.
+const CATALOG_CATEGORY_TYPE_IDS = Object.freeze({
+  "Adaptive Playlists": "adaptive-playlists",
+  "Boss Rounds": "boss-rounds",
+  "Generated Sets": "generated-sets"
+});
+
+const HISTORY_DATE_RANGES = Object.freeze([
+  Object.freeze({ id: "today", label: "Today", days: 1 }),
+  Object.freeze({ id: "7d", label: "Last 7 days", days: 7 }),
+  Object.freeze({ id: "14d", label: "Last 14 days", days: 14 }),
+  Object.freeze({ id: "30d", label: "Last 30 days", days: 30 }),
+  Object.freeze({ id: "90d", label: "Last 90 days", days: 90 }),
+  Object.freeze({ id: "all", label: "All time", days: null }),
+  Object.freeze({ id: "custom", label: "Custom range", days: null })
+]);
+
+function getCurriculumAdapter() {
+  // Read lazily so Stats still works when the adapter script is unavailable.
+  return window.PharmletCurriculumMetadata || null;
+}
+
+function isPlainRecord(value) {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+// One timestamp normalizer for every Stats sort, filter, bucket, and label.
+// Accepts epoch numbers, numeric strings, ISO strings, and Date-like objects
+// (duck-typed so a Date built in another realm still normalizes).
+function normalizeTimestamp(value) {
+  if (value === null || value === undefined) return null;
+
+  if (typeof value === "object" && typeof value.getTime === "function") {
+    const ms = value.getTime();
+    return Number.isFinite(ms) ? ms : null;
+  }
+
+  if (typeof value === "number") return Number.isFinite(value) ? value : null;
+
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+    if (/^-?\d+$/.test(trimmed)) {
+      const numeric = Number(trimmed);
+      return Number.isFinite(numeric) ? numeric : null;
+    }
+    const parsed = Date.parse(trimmed);
+    return Number.isNaN(parsed) ? null : parsed;
+  }
+
+  return null;
+}
+
+function startOfLocalDay(value) {
+  const ms = normalizeTimestamp(value);
+  if (ms === null) return null;
+
+  const date = new Date(ms);
+  if (Number.isNaN(date.getTime())) return null;
+  date.setHours(0, 0, 0, 0);
+  return date.getTime();
+}
+
+// Day arithmetic goes through setDate so a DST shift keeps local midnight
+// aligned instead of drifting an hour into the neighbouring day.
+function shiftLocalDays(value, days) {
+  const start = startOfLocalDay(value);
+  if (start === null) return null;
+
+  const date = new Date(start);
+  date.setDate(date.getDate() + Number(days || 0));
+  return date.getTime();
+}
+
+function endOfLocalDay(value) {
+  const nextDay = shiftLocalDays(value, 1);
+  return nextDay === null ? null : nextDay - 1;
+}
+
+function getLocalDayKey(value) {
+  const ms = normalizeTimestamp(value);
+  if (ms === null) return "";
+
+  const date = new Date(ms);
+  if (Number.isNaN(date.getTime())) return "";
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${date.getFullYear()}-${month}-${day}`;
+}
+
+// Local calendar day from a "YYYY-MM-DD" control value. The numeric Date
+// constructor is deliberate: `new Date("2026-09-01")` would parse as UTC and
+// shift the boundary for anyone west of Greenwich.
+function parseLocalDayInput(value) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value ?? "").trim());
+  if (!match) return null;
+
+  const date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  if (Number.isNaN(date.getTime())) return null;
+  date.setHours(0, 0, 0, 0);
+  return date.getTime();
+}
+
+function toFiniteNumber(value) {
+  if (typeof value === "boolean" || value === null || value === undefined || value === "") return null;
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? numeric : null;
+}
+
+// Every Stats score calculation goes through this guard, so one malformed
+// record can never render NaN%, Infinity, or a poisoned average.
+function getScoreRatio(score, total) {
+  const numericTotal = toFiniteNumber(total);
+  const numericScore = toFiniteNumber(score);
+  if (numericTotal === null || numericTotal <= 0) return null;
+  if (numericScore === null) return null;
+  return numericScore / numericTotal;
+}
+
+function formatRatioPercent(ratio, digits = 1) {
+  return Number.isFinite(ratio) ? `${(ratio * 100).toFixed(digits)}%` : "—";
+}
+
+function averageRatios(ratios) {
+  const usable = (ratios || []).filter((ratio) => Number.isFinite(ratio));
+  if (!usable.length) return null;
+  return usable.reduce((sum, ratio) => sum + ratio, 0) / usable.length;
+}
+
+function getHistoryLineage(raw) {
+  return isPlainRecord(raw?.attemptLineage) ? raw.attemptLineage : null;
+}
+
+function readLineageText(lineage, field) {
+  const value = lineage?.[field];
+  if (typeof value !== "string" && typeof value !== "number") return "";
+  return String(value).replace(/\s+/g, " ").trim();
+}
+
+function readLineageInteger(lineage, field, { minimum = 0 } = {}) {
+  const value = lineage?.[field];
+  if (typeof value !== "string" && typeof value !== "number") return null;
+  const numeric = Number(value);
+  return Number.isInteger(numeric) && numeric >= minimum ? numeric : null;
+}
+
+// Provenance precedence: a recognized lineage kind wins, history `mode` is the
+// fallback, and the catalog heuristic comes last. Both raw values survive.
+function resolveAttemptType(raw, lineage) {
+  const attemptKind = readLineageText(lineage, "attemptKind");
+  const rawMode = typeof raw?.mode === "string" ? raw.mode.trim() : "";
+  const lineageTypeId = ATTEMPT_KIND_TYPE_IDS[attemptKind] || "";
+  const modeTypeId = MODE_TYPE_IDS[rawMode] || "";
+
+  if (lineageTypeId) {
+    return {
+      typeId: lineageTypeId,
+      source: "lineage",
+      attemptKind,
+      rawMode,
+      // Stored history is never repaired; the disagreement is recorded instead.
+      modeConflict: Boolean(modeTypeId) && modeTypeId !== lineageTypeId
+    };
+  }
+
+  if (modeTypeId) {
+    return { typeId: modeTypeId, source: "mode", attemptKind, rawMode, modeConflict: false };
+  }
+
+  const category = getCategoryFromQuizId(raw?.quizId);
+  const catalogTypeId = CATALOG_CATEGORY_TYPE_IDS[category] || "";
+  if (catalogTypeId) {
+    return { typeId: catalogTypeId, source: "catalog", attemptKind, rawMode, modeConflict: false };
+  }
+
+  if (category && category !== "Other") {
+    return { typeId: "standard-practice", source: "catalog", attemptKind, rawMode, modeConflict: false };
+  }
+
+  return { typeId: "unclassified", source: "none", attemptKind, rawMode, modeConflict: false };
+}
+
+// A lineage record answers from its own recorded fields only. Whatever F26-09
+// did not store stays unknown; nothing is back-filled from the quiz id, the
+// title, or a sibling field that merely implies it.
+function readLineageCurriculumScope(lineage) {
+  const scope = {};
+  for (const field of ["professionalYear", "semester", "lab", "curriculumId"]) {
+    const value = readLineageText(lineage, field);
+    if (value) scope[field] = value;
+  }
+
+  const quizWeek = readLineageInteger(lineage, "quizWeek", { minimum: 1 });
+  if (quizWeek !== null) scope.quizWeek = quizWeek;
+  return scope;
+}
+
+function readCatalogCurriculumScope(quizId) {
+  const id = String(quizId ?? "").trim();
+  if (!id) return {};
+
+  let context = null;
+  const adapter = getCurriculumAdapter();
+  if (typeof adapter?.normalizeCurriculumMetadata === "function") {
+    try {
+      context = adapter.normalizeCurriculumMetadata({ quizId: id })?.quiz || null;
+    } catch (error) {
+      console.warn("Curriculum metadata lookup failed for a history record:", error);
+      context = null;
+    }
+  }
+
+  if (!isPlainRecord(context)) context = quizCatalog?.getCurriculumContext?.(id) || null;
+  if (!isPlainRecord(context)) return {};
+
+  const scope = {};
+  for (const field of ["professionalYear", "semester", "lab", "curriculumId", "course"]) {
+    const value = context[field];
+    if (typeof value === "string" && value.trim()) scope[field] = value.trim();
+  }
+
+  const quizWeek = Number(context.quizWeek);
+  if (Number.isInteger(quizWeek) && quizWeek > 0) scope.quizWeek = quizWeek;
+  return scope;
+}
+
+function resolveRecordCurriculum(raw, lineage) {
+  if (lineage) {
+    const scope = readLineageCurriculumScope(lineage);
+    if (Object.keys(scope).length) return { scope, source: "lineage" };
+  }
+
+  const scope = readCatalogCurriculumScope(raw?.quizId);
+  if (Object.keys(scope).length) return { scope, source: "catalog" };
+
+  // Neither source proves curriculum context, so Stats says so.
+  return { scope: {}, source: "unknown" };
+}
+
+function readLineageChain(lineage) {
+  if (!lineage) return null;
+
+  const chain = {};
+  for (const field of ["attemptId", "parentAttemptId", "rootAttemptId", "sourceQuizId"]) {
+    const value = readLineageText(lineage, field);
+    if (value) chain[field] = value;
+  }
+
+  const remixGeneration = readLineageInteger(lineage, "remixGeneration");
+  if (remixGeneration !== null) chain.remixGeneration = remixGeneration;
+
+  const questionCount = readLineageInteger(lineage, "questionCount", { minimum: 1 });
+  if (questionCount !== null) chain.questionCount = questionCount;
+
+  return Object.keys(chain).length ? chain : null;
+}
+
+// Generated history ids end in the attempt's question count, which would split
+// one practice family into a "-q10" and a "-q6" row. The count is dropped from
+// the family identity only; it is still carried on every attempt.
+function stripGeneratedQuestionCount(quizId) {
+  const value = String(quizId ?? "").trim();
+  return value.startsWith("generated-") ? value.replace(/-q\d+$/, "") : value;
+}
+
+function buildHistoryFamilyKey(record, chain) {
+  const sourceQuizId = chain?.sourceQuizId || "";
+  if (sourceQuizId) return `lineage:${sourceQuizId}:${record.attemptTypeId}`;
+
+  const base = stripGeneratedQuestionCount(record.quizId) || "unknown-quiz";
+  return `history:${base}:${record.mode}`;
+}
+
+function buildHistoryFamilyLabel(record) {
+  const week = record.curriculum.quizWeek;
+  if (record.hasLineage && week) {
+    return record.curriculum.lab ? `${record.curriculum.lab} Week ${week}` : `Week ${week}`;
+  }
+
+  return record.title
+    || quizCatalog?.buildDynamicQuizLabel?.(record.quizId)
+    || record.quizId
+    || "Recorded attempt";
+}
+
+function normalizeHistoryRecord(raw, index = 0) {
+  const source = isPlainRecord(raw) ? raw : {};
+  const lineage = getHistoryLineage(source);
+  const attemptType = resolveAttemptType(source, lineage);
+  const curriculum = resolveRecordCurriculum(source, lineage);
+  const timestampMs = normalizeTimestamp(source.timestamp);
+  const chain = readLineageChain(lineage);
+
+  const record = {
+    index,
+    raw: source,
+    quizId: String(source.quizId ?? "").trim(),
+    mode: attemptType.rawMode,
+    title: String(source.title ?? "").trim(),
+    score: toFiniteNumber(source.score),
+    total: toFiniteNumber(source.total),
+    scoreRatio: getScoreRatio(source.score, source.total),
+    bestStreak: toFiniteNumber(source.bestStreak),
+    timestampMs,
+    dayKey: getLocalDayKey(timestampMs),
+    hasLineage: Boolean(lineage),
+    attemptKind: attemptType.attemptKind,
+    attemptTypeId: attemptType.typeId,
+    attemptTypeLabel: ATTEMPT_TYPE_LABELS[attemptType.typeId] || ATTEMPT_TYPE_LABELS.unclassified,
+    attemptTypeSource: attemptType.source,
+    modeConflict: attemptType.modeConflict,
+    curriculum: curriculum.scope,
+    curriculumSource: curriculum.source,
+    curriculumKnown: Boolean(curriculum.scope.professionalYear),
+    categoryLabel: getCategoryFromQuizId(source.quizId)
+  };
+
+  if (chain) record.chain = chain;
+  record.familyKey = buildHistoryFamilyKey(record, chain);
+  record.familyLabel = buildHistoryFamilyLabel(record);
+  return record;
+}
+
+function normalizeHistoryRecords(history) {
+  return (Array.isArray(history) ? history : []).map((raw, index) => normalizeHistoryRecord(raw, index));
+}
+
+function compareRecordsNewestFirst(a, b) {
+  const aTime = a?.timestampMs;
+  const bTime = b?.timestampMs;
+  if (aTime === null && bTime === null) return b.index - a.index;
+  if (aTime === null) return 1;
+  if (bTime === null) return -1;
+  return bTime - aTime || b.index - a.index;
+}
+
+function sortRecordsNewestFirst(records) {
+  return [...(records || [])].sort(compareRecordsNewestFirst);
+}
+
+function getHistoryDateBounds(filter = {}, now = Date.now()) {
+  const rangeId = String(filter?.range || "all");
+
+  if (rangeId === "custom") {
+    const start = parseLocalDayInput(filter?.customStart);
+    const rawEnd = parseLocalDayInput(filter?.customEnd);
+    return { start, end: rawEnd === null ? null : endOfLocalDay(rawEnd) };
+  }
+
+  const range = HISTORY_DATE_RANGES.find((candidate) => candidate.id === rangeId);
+  const days = Number(range?.days);
+  if (!Number.isInteger(days) || days <= 0) return { start: null, end: null };
+
+  return { start: shiftLocalDays(now, -(days - 1)), end: endOfLocalDay(now) };
+}
+
+function matchesHistoryDateBounds(record, bounds) {
+  if (bounds.start === null && bounds.end === null) return true;
+  // An attempt with no usable timestamp cannot be proved to sit inside a
+  // bounded window, so it is disclosed as excluded rather than assumed in.
+  if (record.timestampMs === null) return false;
+  if (bounds.start !== null && record.timestampMs < bounds.start) return false;
+  if (bounds.end !== null && record.timestampMs > bounds.end) return false;
+  return true;
+}
+
+function matchesCurriculumScope(record, filter) {
+  const semester = String(filter?.semester || "all");
+  const lab = String(filter?.lab || "all");
+  const week = String(filter?.week || "all");
+
+  if (semester !== "all" && (record.curriculum.semester || "") !== semester) return false;
+  if (lab !== "all" && (record.curriculum.lab || "") !== lab) return false;
+  if (week !== "all" && String(record.curriculum.quizWeek ?? "") !== week) return false;
+
+  const curriculum = String(filter?.curriculum || "all");
+  if (curriculum === "all") return true;
+  if (curriculum === "unclassified") return !record.curriculumKnown;
+  return record.curriculumKnown && record.curriculum.professionalYear === curriculum;
+}
+
+// The excluded-record disclosure is computed from the live slice: date and
+// attempt-type filters are applied first, then whatever the curriculum-side
+// filters drop for want of proven context is counted exactly.
+function filterHistoryRecords(records, filter = {}, now = Date.now()) {
+  const bounds = getHistoryDateBounds(filter, now);
+  const attemptType = String(filter?.attemptType || "all");
+
+  const undated = [];
+  const baseSlice = [];
+
+  for (const record of records || []) {
+    if (attemptType !== "all" && record.attemptTypeId !== attemptType) continue;
+    if (!matchesHistoryDateBounds(record, bounds)) {
+      if (record.timestampMs === null) undated.push(record);
+      continue;
+    }
+    baseSlice.push(record);
+  }
+
+  const kept = baseSlice.filter((record) => matchesCurriculumScope(record, filter));
+  const keptSet = new Set(kept);
+  const excludedUnclassified = baseSlice.filter((record) => !record.curriculumKnown && !keptSet.has(record));
+
+  return {
+    records: kept,
+    bounds,
+    excludedUnclassifiedCount: excludedUnclassified.length,
+    excludedUndatedCount: undated.length
+  };
+}
+
+function summarizeHistoryRecords(records) {
+  const days = new Set();
+  let totalQuestions = 0;
+  let bestStreak = 0;
+  let unscorableAttempts = 0;
+  const ratios = [];
+
+  for (const record of records || []) {
+    if (Number.isFinite(record.total) && record.total > 0) totalQuestions += record.total;
+    if (record.scoreRatio === null) unscorableAttempts += 1;
+    else ratios.push(record.scoreRatio);
+    if (Number.isFinite(record.bestStreak)) bestStreak = Math.max(bestStreak, record.bestStreak);
+    if (record.dayKey) days.add(record.dayKey);
+  }
+
+  return {
+    attempts: (records || []).length,
+    totalQuestions,
+    averageRatio: averageRatios(ratios),
+    scoredAttempts: ratios.length,
+    unscorableAttempts,
+    bestStreak,
+    studyDays: days.size
+  };
+}
+
+// True only when history is actually at the retention cap and the current view
+// reaches the oldest record still retained.
+function isHistoryRetentionBoundaryReached(allRecords, visibleRecords) {
+  if ((allRecords || []).length < HISTORY_RETENTION_LIMIT) return false;
+  return (visibleRecords || []).some((record) => record.index === 0);
+}
+
+function buildHistoryFamilies(records) {
+  const families = new Map();
+
+  for (const record of records || []) {
+    if (!families.has(record.familyKey)) {
+      families.set(record.familyKey, {
+        key: record.familyKey,
+        label: record.familyLabel,
+        attemptTypeId: record.attemptTypeId,
+        attemptTypeLabel: record.attemptTypeLabel,
+        mode: record.mode,
+        attempts: []
+      });
+    }
+    families.get(record.familyKey).attempts.push(record);
+  }
+
+  return [...families.values()]
+    .map((family) => {
+      const attempts = sortRecordsNewestFirst(family.attempts);
+      const ratios = attempts.map((attempt) => attempt.scoreRatio).filter((ratio) => ratio !== null);
+      const questionCounts = [...new Set(
+        attempts.map((attempt) => attempt.total).filter((total) => Number.isFinite(total) && total > 0)
+      )].sort((a, b) => a - b);
+
+      return {
+        ...family,
+        attempts,
+        attemptCount: attempts.length,
+        questionCounts,
+        // A single averaged score is only honest when every attempt in the
+        // family asked the same number of questions.
+        mixedQuestionCounts: questionCounts.length > 1,
+        averageRatio: questionCounts.length > 1 ? null : averageRatios(ratios),
+        bestRatio: ratios.length ? Math.max(...ratios) : null,
+        latestTimestampMs: attempts.find((attempt) => attempt.timestampMs !== null)?.timestampMs ?? null
+      };
+    })
+    .sort((a, b) => b.attemptCount - a.attemptCount || a.label.localeCompare(b.label));
+}
+
+// Chains associate attempts through the recorded root identity. Scores are
+// never merged, and a chain is never inferred where lineage is absent.
+function buildHistoryChains(records) {
+  const chains = new Map();
+
+  for (const record of records || []) {
+    const rootAttemptId = record.chain?.rootAttemptId || record.chain?.attemptId || "";
+    if (!rootAttemptId) continue;
+    if (!chains.has(rootAttemptId)) chains.set(rootAttemptId, { rootAttemptId, attempts: [] });
+    chains.get(rootAttemptId).attempts.push(record);
+  }
+
+  return [...chains.values()]
+    .filter((chain) => chain.attempts.length > 1)
+    .map((chain) => {
+      const attempts = sortRecordsNewestFirst(chain.attempts);
+      return {
+        ...chain,
+        attempts,
+        attemptCount: attempts.length,
+        quizWeek: attempts.find((attempt) => attempt.curriculum.quizWeek)?.curriculum.quizWeek ?? null,
+        latestTimestampMs: attempts.find((attempt) => attempt.timestampMs !== null)?.timestampMs ?? null
+      };
+    })
+    .sort((a, b) => (b.latestTimestampMs ?? 0) - (a.latestTimestampMs ?? 0));
+}
+
+function countBy(records, resolve) {
+  const counts = new Map();
+  for (const record of records || []) {
+    const key = resolve(record);
+    if (key === "" || key === null || key === undefined) continue;
+    counts.set(key, (counts.get(key) || 0) + 1);
+  }
+  return counts;
+}
+
+function getAvailableAttemptTypes(records) {
+  const counts = countBy(records, (record) => record.attemptTypeId);
+  return ATTEMPT_TYPES
+    .filter((type) => counts.has(type.id))
+    .map((type) => ({ ...type, count: counts.get(type.id) }));
+}
+
+function getAvailableCurriculumOptions(records) {
+  const counts = countBy(records, (record) => record.curriculum.professionalYear || "unclassified");
+  const known = [...counts.keys()]
+    .filter((key) => key !== "unclassified")
+    .sort()
+    .map((key) => ({ id: key, label: key, count: counts.get(key) }));
+
+  if (counts.has("unclassified")) {
+    known.push({ id: "unclassified", label: "Unclassified", count: counts.get("unclassified") });
+  }
+  return known;
+}
+
+// Scope controls are derived from the slice already in view, so they never
+// advertise a semester, lab, or week with no records behind it.
+function getAvailableScopeOptions(records, field) {
+  const counts = countBy(records, (record) => {
+    const value = record.curriculum[field];
+    return value === undefined || value === null ? "" : String(value);
+  });
+
+  return [...counts.entries()]
+    .sort((a, b) => (field === "quizWeek" ? Number(a[0]) - Number(b[0]) : a[0].localeCompare(b[0])))
+    .map(([id, count]) => ({ id, label: field === "quizWeek" ? `Week ${id}` : id, count }));
+}
+
 // Theme toggle
 document.addEventListener("DOMContentLoaded", () => {
   const themeToggle = document.getElementById("theme-toggle");
@@ -1077,118 +1681,127 @@ async function loadStats() {
   renderQuestionReports(questionReports);
   renderMorningWarmups(reviewQueue, history, poolState);
   await renderWeakAreaPlaylists(reviewQueue, poolState);
-  
-  if (history.length === 0) {
-    return; // Show default empty state
+  renderRecordedAttemptDashboard(normalizeHistoryRecords(history));
+}
+
+function renderRecordedAttemptDashboard(records) {
+  renderHistoryOverview(summarizeHistoryRecords(records));
+  renderHistoryFamilies(buildHistoryFamilies(records));
+  renderRecentActivity(sortRecordsNewestFirst(records).slice(0, 10));
+  renderCategoryPerformance(records);
+}
+
+function setTextContent(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function renderHistoryOverview(summary) {
+  setTextContent("total-questions", String(summary.totalQuestions));
+  setTextContent("avg-score", formatRatioPercent(summary.averageRatio));
+  setTextContent("best-streak", String(summary.bestStreak));
+  setTextContent("study-days", String(summary.studyDays));
+}
+
+function renderHistoryFamilies(families) {
+  const container = document.getElementById("quiz-stats");
+  if (!container) return;
+
+  if (!families.length) {
+    container.innerHTML = `<p style="color:var(--muted)">No quiz data yet. Complete some quizzes to see your performance!</p>`;
+    return;
   }
 
-  // Calculate overview stats
-  const totalQuestions = history.reduce((sum, h) => sum + h.total, 0);
-  const avgScore = history.length > 0 
-    ? (history.reduce((sum, h) => sum + (h.score / h.total), 0) / history.length * 100).toFixed(1)
-    : 0;
-  const bestStreak = Math.max(0, ...history.map(h => h.bestStreak || 0));
-  const studyDays = new Set(history.map(h => new Date(h.timestamp).toDateString())).size;
+  container.innerHTML = "";
+  families.forEach((family) => {
+    const div = document.createElement("div");
+    div.className = "flex justify-between items-center p-3 rounded-lg";
+    div.style.background = "var(--accent-light, rgba(139,30,63,0.1))";
 
-  document.getElementById("total-questions").textContent = totalQuestions;
-  document.getElementById("avg-score").textContent = `${avgScore}%`;
-  document.getElementById("best-streak").textContent = bestStreak;
-  document.getElementById("study-days").textContent = studyDays;
+    // Differently sized attempts never collapse into one averaged score.
+    const headline = family.mixedQuestionCounts
+      ? `Best ${formatRatioPercent(family.bestRatio)}`
+      : formatRatioPercent(family.averageRatio);
+    const detail = family.mixedQuestionCounts
+      ? `Mixed sizes: ${family.questionCounts.join(", ")} questions`
+      : `Best: ${formatRatioPercent(family.bestRatio)}`;
+    const modeLabel = family.mode ? `Mode: ${sanitize(family.mode)} · ` : "";
 
-  // Performance by quiz
-  const quizMap = new Map();
-  history.forEach(h => {
-    const key = `${h.quizId}-${h.mode}`;
-    if (!quizMap.has(key)) {
-      quizMap.set(key, { quizId: h.quizId, mode: h.mode, title: h.title, attempts: [], scores: [] });
-    }
-    const quiz = quizMap.get(key);
-    quiz.attempts.push(h);
-    quiz.scores.push((h.score / h.total) * 100);
+    div.innerHTML = `
+      <div>
+        <div class="font-semibold">${sanitize(family.label)}</div>
+        <div class="text-sm" style="color:var(--muted)">${modeLabel}${family.attemptCount} attempt${family.attemptCount === 1 ? "" : "s"}</div>
+      </div>
+      <div class="text-right">
+        <div class="font-semibold" style="color:var(--accent)">${sanitize(headline)}</div>
+        <div class="text-sm" style="color:var(--muted)">${sanitize(detail)}</div>
+      </div>
+    `;
+    container.appendChild(div);
   });
+}
 
-  const quizStatsEl = document.getElementById("quiz-stats");
-  if (quizMap.size > 0) {
-    quizStatsEl.innerHTML = "";
-    Array.from(quizMap.values())
-      .sort((a, b) => b.attempts.length - a.attempts.length)
-      .forEach(quiz => {
-        const avgQuizScore = (quiz.scores.reduce((a, b) => a + b, 0) / quiz.scores.length).toFixed(1);
-        const bestScore = Math.max(...quiz.scores).toFixed(1);
-        
-        const div = document.createElement("div");
-        div.className = "flex justify-between items-center p-3 rounded-lg";
-        div.style.background = "var(--accent-light, rgba(139,30,63,0.1))";
-        div.innerHTML = `
-          <div>
-            <div class="font-semibold">${sanitize(quiz.title || quiz.quizId)}</div>
-            <div class="text-sm" style="color:var(--muted)">Mode: ${sanitize(quiz.mode)} · ${quiz.attempts.length} attempt${quiz.attempts.length === 1 ? '' : 's'}</div>
-          </div>
-          <div class="text-right">
-            <div class="font-semibold" style="color:var(--accent)">${avgQuizScore}%</div>
-            <div class="text-sm" style="color:var(--muted)">Best: ${bestScore}%</div>
-          </div>
-        `;
-        quizStatsEl.appendChild(div);
-      });
+function renderRecentActivity(records) {
+  const container = document.getElementById("recent-activity");
+  if (!container) return;
+
+  if (!records.length) {
+    container.innerHTML = `<p style="color:var(--muted)">No recent activity.</p>`;
+    return;
   }
 
-  // Recent activity
-  const recentActivityEl = document.getElementById("recent-activity");
-  const recentHistory = history.slice(-10).reverse();
-  if (recentHistory.length > 0) {
-    recentActivityEl.innerHTML = "";
-    recentHistory.forEach(h => {
-      const date = new Date(h.timestamp);
-      const timeAgo = getTimeAgo(date);
-      const scorePercent = ((h.score / h.total) * 100).toFixed(0);
-      
-      const div = document.createElement("div");
-      div.className = "flex justify-between items-center";
-      div.innerHTML = `
-        <div>
-          <span class="font-semibold">${sanitize(h.title || h.quizId)}</span>
-          <span class="text-sm" style="color:var(--muted)"> · ${sanitize(h.mode)}</span>
-        </div>
-        <div class="text-sm" style="color:var(--muted)">
-          ${h.score}/${h.total} (${scorePercent}%) · ${timeAgo}
-        </div>
-      `;
-      recentActivityEl.appendChild(div);
-    });
-  }
+  container.innerHTML = "";
+  records.forEach((record) => {
+    const scoreLabel = record.scoreRatio === null
+      ? "Score unavailable"
+      : `${record.score}/${record.total} (${formatRatioPercent(record.scoreRatio, 0)})`;
+    const when = record.timestampMs === null ? "date not recorded" : getTimeAgo(new Date(record.timestampMs));
 
-  // Category breakdown
-  const categoryMap = new Map();
-  history.forEach(h => {
-    const category = getCategoryFromQuizId(h.quizId);
-    if (!categoryMap.has(category)) {
-      categoryMap.set(category, { scores: [], total: 0, correct: 0 });
-    }
-    const cat = categoryMap.get(category);
-    cat.scores.push((h.score / h.total) * 100);
-    cat.total += h.total;
-    cat.correct += h.score;
+    const div = document.createElement("div");
+    div.className = "flex justify-between items-center";
+    div.innerHTML = `
+      <div>
+        <span class="font-semibold">${sanitize(record.title || record.quizId)}</span>
+        <span class="text-sm" style="color:var(--muted)"> · ${sanitize(record.mode)}</span>
+      </div>
+      <div class="text-sm" style="color:var(--muted)">
+        ${sanitize(scoreLabel)} · ${sanitize(when)}
+      </div>
+    `;
+    container.appendChild(div);
   });
+}
 
-  const categoryStatsEl = document.getElementById("category-stats");
-  if (categoryMap.size > 0) {
-    categoryStatsEl.innerHTML = "";
-    Array.from(categoryMap.entries()).forEach(([category, data]) => {
-      const avgScore = (data.scores.reduce((a, b) => a + b, 0) / data.scores.length).toFixed(1);
-      const overallPercent = ((data.correct / data.total) * 100).toFixed(1);
-      
-      const div = document.createElement("div");
-      div.className = "stat-card";
-      div.innerHTML = `
-        <div class="stat-label">${sanitize(category)}</div>
-        <div class="stat-value">${avgScore}%</div>
-        <div class="text-sm mt-2" style="color:var(--muted)">
-          ${data.correct}/${data.total} questions correct
-        </div>
-      `;
-      categoryStatsEl.appendChild(div);
-    });
+function renderCategoryPerformance(records) {
+  const container = document.getElementById("category-stats");
+  if (!container) return;
+
+  const categories = new Map();
+  for (const record of records) {
+    const category = record.categoryLabel || "Other";
+    if (!categories.has(category)) categories.set(category, { ratios: [], total: 0, correct: 0 });
+
+    const bucket = categories.get(category);
+    if (record.scoreRatio !== null) {
+      bucket.ratios.push(record.scoreRatio);
+      bucket.total += record.total;
+      bucket.correct += record.score;
+    }
+  }
+
+  container.innerHTML = "";
+  for (const [category, bucket] of categories.entries()) {
+    const overallRatio = getScoreRatio(bucket.correct, bucket.total);
+    const div = document.createElement("div");
+    div.className = "stat-card";
+    div.innerHTML = `
+      <div class="stat-label">${sanitize(category)}</div>
+      <div class="stat-value">${formatRatioPercent(averageRatios(bucket.ratios))}</div>
+      <div class="text-sm mt-2" style="color:var(--muted)">
+        ${bucket.total > 0 ? `${bucket.correct}/${bucket.total} questions correct (${formatRatioPercent(overallRatio)})` : "No scorable attempts recorded"}
+      </div>
+    `;
+    container.appendChild(div);
   }
 }
 
