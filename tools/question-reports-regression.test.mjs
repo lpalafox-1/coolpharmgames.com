@@ -9,7 +9,8 @@ import { loadBrowserGlobal } from "./browser-global-harness.mjs";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const REPORTS_KEY = "pharmlet.question-reports";
-const FEATURE_TOKEN = "20260831a";
+const REPORTS_TOKEN = "20260831b";
+const ENGINE_TOKEN = "20260831a";
 const PROTECTED_BASELINES = Object.freeze({
   fallSource: "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01",
   fallPolicy: "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171",
@@ -41,9 +42,15 @@ function createStorage(initialRaw = null) {
 }
 
 function loadReportsApi(storage = createStorage(), extras = {}) {
+  const catalog = loadBrowserGlobal("assets/js/quiz-catalog.js").PharmletQuizCatalog;
+  const curriculumMetadata = loadBrowserGlobal("assets/js/curriculum-metadata.js", {
+    PharmletQuizCatalog: catalog
+  }).PharmletCurriculumMetadata;
   return loadBrowserGlobal("assets/js/question-reports.js", {
     localStorage: storage,
     navigator: {},
+    PharmletQuizCatalog: catalog,
+    PharmletCurriculumMetadata: curriculumMetadata,
     ...extras
   }).PharmletQuestionReports;
 }
@@ -146,6 +153,10 @@ test("new static reports use the additive schema without inventing Fall metadata
   assert.equal(reloaded.reportReason, "incorrectAnswer");
   assert.equal(reloaded.note, "Static note");
   assert.deepEqual(reloaded.choices, ["Answer A", "Answer B", "Answer C", "Answer D"]);
+  assert.equal(reloaded.professionalYear, "P1");
+  assert.equal(reloaded.semester, "Fall 2025");
+  assert.equal(reloaded.curriculumId, "p1-fall-2025");
+  assert.equal(reloaded.origin, "static");
   for (const key of [
     "generatorId", "seed", "requestedQuizWeek", "sourceMaterial", "knowledgeDomain",
     "sourceDrugId", "sourceDrugIds", "sourceDrugQuizWeek", "questionVariant",
@@ -267,13 +278,18 @@ test("reporting assets expose the reason workflow without any network submission
   assert.match(quiz, /id="question-report-dialog"/);
   assert.match(quiz, /id="question-report-note"[^>]*maxlength="500"/);
   assert.ok(
-    quiz.indexOf(`assets/js/question-reports.js?v=${FEATURE_TOKEN}`)
-      < quiz.indexOf(`assets/js/quizEngine.js?v=${FEATURE_TOKEN}`),
+    quiz.indexOf(`assets/js/curriculum-metadata.js?v=${REPORTS_TOKEN}`)
+      < quiz.indexOf(`assets/js/question-reports.js?v=${REPORTS_TOKEN}`),
+    "the curriculum adapter must load before the report store"
+  );
+  assert.ok(
+    quiz.indexOf(`assets/js/question-reports.js?v=${REPORTS_TOKEN}`)
+      < quiz.indexOf(`assets/js/quizEngine.js?v=${ENGINE_TOKEN}`),
     "the shared report store must load before the engine"
   );
   assert.ok(
-    stats.indexOf(`assets/js/question-reports.js?v=${FEATURE_TOKEN}`)
-      < stats.indexOf(`assets/js/stats.js?v=${FEATURE_TOKEN}`),
+    stats.indexOf(`assets/js/question-reports.js?v=${REPORTS_TOKEN}`)
+      < stats.indexOf(`assets/js/stats.js?v=${ENGINE_TOKEN}`),
     "the shared report store must load before Stats"
   );
   assert.match(statsScript, /Copy Report/);

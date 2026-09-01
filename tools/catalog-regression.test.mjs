@@ -130,7 +130,26 @@ test("every page consuming the shared quiz catalog uses one cache token", () => 
   }
 
   assert.equal(tokens.size, 1, "quiz catalog consumers must share one cache token");
-  assert.deepEqual([...tokens], ["20260821a"], "the P2F-02 catalog change needs a fresh cache token");
+  assert.deepEqual([...tokens], ["20260831b"], "the P2F-07 curriculum catalog needs a fresh cache token");
+});
+
+test("catalog exposes cloned curriculum context only where repository evidence is reliable", () => {
+  const catalog = loadCatalogApi();
+  const fall = catalog.getCurriculumContext("ceutics-practice-1");
+  assert.equal(fall.professionalYear, "P1");
+  assert.equal(fall.semester, "Fall 2025");
+  assert.equal(fall.course, "Pharmaceutics I");
+  assert.equal(fall.origin, "static");
+
+  const first = catalog.getEntry("ceutics-practice-1");
+  first.curriculum.semester = "Changed outside the catalog";
+  assert.equal(catalog.getEntry("ceutics-practice-1").curriculum.semester, "Fall 2025");
+
+  const sample = catalog.getCurriculumContext("test-sample-3");
+  assert.equal(sample.origin, "static");
+  assert.equal(Object.hasOwn(sample, "professionalYear"), false);
+  assert.equal(Object.hasOwn(sample, "semester"), false);
+  assert.equal(Object.hasOwn(sample, "curriculumId"), false);
 });
 
 test("every static quiz is registered in the runtime catalog", () => {
