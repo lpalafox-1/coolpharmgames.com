@@ -24,6 +24,60 @@
   });
   const CEUTICS2_FINAL_ID = "ceutics2-final";
 
+  const P1_FALL_2025 = Object.freeze({
+    professionalYear: "P1",
+    academicYear: "2025-26",
+    semester: "Fall 2025",
+    curriculumId: "p1-fall-2025"
+  });
+  const P1_SPRING_2026 = Object.freeze({
+    professionalYear: "P1",
+    academicYear: "2025-26",
+    semester: "Spring 2026",
+    curriculumId: "p1-spring-2026"
+  });
+  const curriculum = (base, details = {}) => Object.freeze({ ...base, ...details });
+  const CURRICULUM_CONTEXT_BY_QUIZ_ID = Object.freeze({
+    "chapter1-review": curriculum(P1_FALL_2025, { course: "Pharmaceutical Calculations" }),
+    "chapter2-review": curriculum(P1_FALL_2025, { course: "Pharmaceutical Calculations" }),
+    "chapter3-review": curriculum(P1_FALL_2025, { course: "Pharmaceutical Calculations" }),
+    "chapter4-review": curriculum(P1_FALL_2025, { course: "Pharmaceutical Calculations" }),
+    "chapter5-review": curriculum(P1_FALL_2025, { course: "Pharmaceutical Calculations" }),
+    "practice-e1-exam1-prep-ch1-4": curriculum(P1_FALL_2025, { course: "Pharmaceutical Calculations" }),
+    "practice-e2a-exam2-prep-ch1-5": curriculum(P1_FALL_2025, { course: "Pharmaceutical Calculations" }),
+    "supplemental-exam1-2024": curriculum(P1_FALL_2025, { course: "Pharmaceutical Calculations" }),
+    "ceutics-practice-1": curriculum(P1_FALL_2025, { course: "Pharmaceutics I" }),
+    "ceutics-practice-2": curriculum(P1_FALL_2025, { course: "Pharmaceutics I" }),
+    "lab-quiz1-antihypertensives": curriculum(P1_FALL_2025, { lab: "Lab I" }),
+    "lab-quiz2-antihypertensives": curriculum(P1_FALL_2025, { lab: "Lab I" }),
+    "lab-quiz3-antilipemics": curriculum(P1_FALL_2025, { lab: "Lab I" }),
+    "lab-quiz4-anticoagulants": curriculum(P1_FALL_2025, { lab: "Lab I" }),
+    "lab-quiz5-antiarrhythmics": curriculum(P1_FALL_2025, { lab: "Lab I" }),
+    "cumulative-quiz1-2": curriculum(P1_FALL_2025, { lab: "Lab I" }),
+    "cumulative-quiz1-3": curriculum(P1_FALL_2025, { lab: "Lab I" }),
+    "cumulative-quiz1-4": curriculum(P1_FALL_2025, { lab: "Lab I" }),
+    "cumulative-quiz1-5": curriculum(P1_FALL_2025, { lab: "Lab I" }),
+    "top-drugs-final-mockA": curriculum(P1_FALL_2025, { lab: "Lab I" }),
+    "top-drugs-final-mockB": curriculum(P1_FALL_2025, { lab: "Lab I" }),
+    "top-drugs-final-mockC": curriculum(P1_FALL_2025, { lab: "Lab I" }),
+    "top-drugs-final-mockD": curriculum(P1_FALL_2025, { lab: "Lab I" }),
+    "top-drugs-final-mockE": curriculum(P1_FALL_2025, { lab: "Lab I" }),
+    "popp-practice-exam1": curriculum(P1_FALL_2025, { course: "Principles of Pharmacy Practice I" }),
+    "popp-practice-law": curriculum(P1_FALL_2025, { course: "Principles of Pharmacy Practice I" }),
+    "popp-practice-mock-E1": curriculum(P1_FALL_2025, { course: "Principles of Pharmacy Practice I" }),
+    "basis-practice-exam1": curriculum(P1_FALL_2025, { course: "Basis for Drug Therapy I" }),
+    "basis-practice-mock-E1": curriculum(P1_FALL_2025, { course: "Basis for Drug Therapy I" }),
+    "practice-q2": curriculum(P1_FALL_2025, { course: "Basis for Drug Therapy I" }),
+    "latin-fun": curriculum(P1_FALL_2025),
+    "sig-wildcards": curriculum(P1_FALL_2025),
+    "ceutics2-final": curriculum(P1_SPRING_2026, { course: "Pharmaceutics II" }),
+    "bdt-unit10-quiz8": curriculum(P1_SPRING_2026, { course: "Basis for Drug Therapy II" }),
+    "basis2-quiz9": curriculum(P1_SPRING_2026, { course: "Basis for Drug Therapy II" }),
+    "bdt-unit10-exam4": curriculum(P1_SPRING_2026, { course: "Basis for Drug Therapy II" }),
+    "bdt-unit10-exam4-high-yield": curriculum(P1_SPRING_2026, { course: "Basis for Drug Therapy II" }),
+    "log-lab-final-2": curriculum(P1_SPRING_2026, { lab: "Lab II" })
+  });
+
   const QUIZ_CATALOG = Object.freeze([
     { id: "chapter1-review", title: "Chapter 1 Review", favoriteCategory: "chapter", statsCategory: "Chapter Reviews", modes: ["easy", "hard"], sourceType: "quiz-json", sourcePath: "quizzes/chapter1-review.json", customBuilder: true },
     { id: "chapter2-review", title: "Chapter 2 Review", favoriteCategory: "chapter", statsCategory: "Chapter Reviews", modes: ["easy", "hard"], sourceType: "quiz-json", sourcePath: "quizzes/chapter2-review.json", customBuilder: true },
@@ -66,17 +120,53 @@
     { id: "bdt-unit10-exam4-high-yield", title: "Basis II Exam 4 - High-Yield Draft", favoriteCategory: "practice", statsCategory: "Basis", modes: ["easy"], sourceType: "concept-route", customBuilder: false }
   ]);
 
-  const QUIZ_MAP = new Map(QUIZ_CATALOG.map((entry) => [entry.id, entry]));
+  const QUIZ_MAP = new Map(QUIZ_CATALOG.map((entry) => {
+    const context = CURRICULUM_CONTEXT_BY_QUIZ_ID[entry.id];
+    if (context) entry.curriculum = context;
+    return [entry.id, entry];
+  }));
+
+  function cloneCurriculum(value) {
+    return value && typeof value === "object" ? { ...value } : undefined;
+  }
 
   function cloneEntry(entry) {
     return entry ? {
       ...entry,
-      modes: Array.isArray(entry.modes) ? [...entry.modes] : []
+      modes: Array.isArray(entry.modes) ? [...entry.modes] : [],
+      ...(entry.curriculum ? { curriculum: cloneCurriculum(entry.curriculum) } : {})
     } : null;
   }
 
   function getEntry(id) {
     return cloneEntry(QUIZ_MAP.get(String(id || "").trim()));
+  }
+
+  function getCurriculumContext(id) {
+    const value = String(id || "").trim();
+    if (!value) return null;
+
+    const entry = QUIZ_MAP.get(value);
+    if (entry) {
+      const context = cloneCurriculum(entry.curriculum) || {};
+      context.quizId = value;
+      if (entry.sourceType === "quiz-json") context.origin = "static";
+      if (entry.sourceType === "concept-route" || entry.sourceType === "virtual") context.origin = "generated";
+      if (entry.sourcePath) context.curriculumSource = context.curriculumSource || entry.sourcePath;
+      return context;
+    }
+
+    const dynamicMatch = value.match(/^lab-(1|2)-(?:week-(\d+)|weeks-\d+-\d+|tag-.+)$/);
+    if (!dynamicMatch) return null;
+    const isLabOne = dynamicMatch[1] === "1";
+    return {
+      ...(isLabOne ? P1_FALL_2025 : P1_SPRING_2026),
+      lab: isLabOne ? "Lab I" : "Lab II",
+      quizId: value,
+      ...(dynamicMatch[2] ? { quizWeek: Number(dynamicMatch[2]) } : {}),
+      origin: "generated",
+      curriculumSource: "assets/data/master_pool.json"
+    };
   }
 
   function listCustomBuilderEntries() {
@@ -218,6 +308,7 @@
   global.PharmletQuizCatalog = {
     entries: QUIZ_CATALOG.map(cloneEntry),
     getEntry,
+    getCurriculumContext,
     listCustomBuilderEntries,
     getFavoriteCategoryLabel,
     resolveFavoriteCategory,

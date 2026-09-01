@@ -400,20 +400,20 @@ owner-approved scope and allowed-files contract before execution.
 | P2F-04 | Favorites entry path and library organization | `DONE` | P2F-03 |
 | P2F-05 | Top Drugs Reference v2 performance/current-P2 shortcuts | `DONE` | P2F-04 |
 | P2F-06 | Question Reports v2 reproducibility workflow | `DONE` | P2F-05 |
-| P2F-07 | Additive curriculum metadata contract | `READY` | P2F-06 |
-| P2F-08 | Stats Dashboard v2 | `BLOCKED` | P2F-07 |
+| P2F-07 | Additive curriculum metadata contract | `DONE` | P2F-06 |
+| P2F-08 | Stats Dashboard v2 | `READY` | P2F-07 |
 | P2F-09 | Review Queue v2 + `wrongCounts` correction | `BLOCKED` | P2F-08 |
 | P2F-10 | Mobile/accessibility consistency pass | `BLOCKED` | P2F-09 |
 
-P2F-07 is the sole `READY` task after P2F-06 added a backward-compatible,
-local-only Question Reports v2 schema and capture workflow. Existing reports
-remain readable without migration. New reports record a reason and optional
-note; generated Fall reports retain the existing seed, requested week,
-new/review status, domain, source-drug identity, stable question ID, and
-available variant/strict-answer metadata. Stats now offers concise Copy Report
-and individual Delete actions. The approved `quizEngine.js` change is limited
-to retaining existing quiz metadata for reporting and delegating capture; it
-does not alter scoring, question selection, or generation.
+P2F-08 is the sole `READY` task after P2F-07 added the runtime-only curriculum
+metadata contract documented in `docs/curriculum-metadata-contract.md`.
+Catalog-backed P1 context and the existing Fall generator metadata now
+normalize into separate quiz-level and question-level scopes. Unknown fields
+remain absent, and source records are identified by curriculum ID plus source
+record ID rather than generic name. Question Reports consumes the contract
+additively; Stats history, Review Queue, Favorites, canonical sources,
+generator output, and scoring remain unmigrated and unchanged. The Fall
+generator remains feature-frozen, and F26-MTC-01 remains deferred.
 
 P2F-05 kept the separate 169-record P1 and
 100-record P2 canonical sources behind the existing normalization adapter,

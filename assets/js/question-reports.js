@@ -70,6 +70,16 @@
   function buildReport(input = {}) {
     const questionMetadata = isRecord(input.questionMetadata) ? input.questionMetadata : {};
     const quizMetadata = isRecord(input.quizMetadata) ? input.quizMetadata : {};
+    const curriculumMetadata = root.PharmletCurriculumMetadata?.normalizeCurriculumMetadata?.({
+      quizId: input.quizId,
+      sourceQuizId: input.sourceQuizId,
+      questionId: input.questionId,
+      quizMetadata,
+      questionMetadata,
+      catalogEntry: root.PharmletQuizCatalog?.getEntry?.(input.quizId)
+    });
+    const quizCurriculum = isRecord(curriculumMetadata?.quiz) ? curriculumMetadata.quiz : {};
+    const questionCurriculum = isRecord(curriculumMetadata?.question) ? curriculumMetadata.question : {};
     const timestamp = String(input.timestamp || new Date().toISOString());
     const report = {
       schemaVersion: SCHEMA_VERSION,
@@ -89,24 +99,44 @@
       timestamp
     };
 
-    optionalText(report, "questionId", input.questionId);
+    optionalText(report, "questionId", questionCurriculum.questionId || input.questionId);
     optionalStringArray(report, "choices", input.choices);
     optionalStringArray(report, "acceptedAnswers", input.acceptedAnswers);
-    optionalText(report, "sourceQuizId", input.sourceQuizId || quizMetadata.generatedFrom);
-    optionalText(report, "generatorId", questionMetadata.generatorId || quizMetadata.generator);
-    optionalText(report, "seed", quizMetadata.seed);
+    optionalText(
+      report,
+      "sourceQuizId",
+      input.sourceQuizId || quizMetadata.generatedFrom || quizCurriculum.sourceQuizId
+    );
+    optionalText(report, "professionalYear", quizCurriculum.professionalYear);
+    optionalText(report, "academicYear", quizCurriculum.academicYear);
+    optionalText(report, "semester", quizCurriculum.semester);
+    optionalText(report, "course", quizCurriculum.course);
+    optionalText(report, "lab", quizCurriculum.lab);
+    optionalText(report, "curriculumId", quizCurriculum.curriculumId);
+    optionalText(report, "curriculumSource", quizCurriculum.curriculumSource);
+    optionalText(report, "origin", quizCurriculum.origin);
+    optionalText(report, "generatorId", quizCurriculum.generatorId || questionMetadata.generatorId || quizMetadata.generator);
+    optionalText(report, "seed", quizCurriculum.seed || quizMetadata.seed);
     optionalPositiveInteger(
       report,
       "requestedQuizWeek",
-      questionMetadata.requestedQuizWeek || quizMetadata.quizWeek
+      questionMetadata.requestedQuizWeek || quizCurriculum.quizWeek || quizMetadata.quizWeek
     );
-    optionalText(report, "sourceMaterial", questionMetadata.sourceMaterial);
-    optionalText(report, "knowledgeDomain", questionMetadata.knowledgeDomain);
-    optionalText(report, "sourceDrugId", questionMetadata.sourceDrugId);
-    optionalStringArray(report, "sourceDrugIds", questionMetadata.sourceDrugIds);
-    optionalPositiveInteger(report, "sourceDrugQuizWeek", questionMetadata.sourceDrugQuizWeek);
-    optionalText(report, "questionVariant", questionMetadata.questionVariant);
-    optionalText(report, "brandGenericDirection", questionMetadata.brandGenericDirection);
+    optionalText(report, "sourceMaterial", questionCurriculum.sourceMaterial || questionMetadata.sourceMaterial);
+    optionalText(report, "knowledgeDomain", questionCurriculum.knowledgeDomain || questionMetadata.knowledgeDomain);
+    optionalText(report, "sourceDrugId", questionCurriculum.sourceDrugId || questionMetadata.sourceDrugId);
+    optionalStringArray(report, "sourceDrugIds", questionCurriculum.sourceDrugIds || questionMetadata.sourceDrugIds);
+    optionalPositiveInteger(
+      report,
+      "sourceDrugQuizWeek",
+      questionCurriculum.sourceDrugQuizWeek || questionMetadata.sourceDrugQuizWeek
+    );
+    optionalText(report, "questionVariant", questionCurriculum.questionVariant || questionMetadata.questionVariant);
+    optionalText(
+      report,
+      "brandGenericDirection",
+      questionCurriculum.brandGenericDirection || questionMetadata.brandGenericDirection
+    );
 
     const answerMatching = cloneAnswerMatching(questionMetadata.answerMatching);
     if (answerMatching) report.answerMatching = answerMatching;
