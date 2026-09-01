@@ -47,6 +47,15 @@
 
     #shortcuts-modal { z-index: 100; }
 
+    #question-report-dialog {
+      color: var(--text);
+      background: var(--card);
+    }
+    #question-report-dialog::backdrop {
+      background: rgba(15, 23, 42, .68);
+      backdrop-filter: blur(4px);
+    }
+
     @media (min-width: 1024px) {
       .action-btn { max-width: 250px; padding: 1rem 1.5rem !important; font-size: 0.875rem !important; border-radius: 12px !important; }
       #question-card { padding: 3rem !important; }
@@ -176,10 +185,48 @@
     </div>
   </div>
 
+  <dialog id="question-report-dialog" aria-labelledby="question-report-title" aria-describedby="question-report-form-status" class="w-[min(32rem,calc(100%-2rem))] max-h-[90vh] overflow-y-auto rounded-3xl border border-[var(--ring)] p-0 shadow-2xl">
+    <form id="question-report-form" class="p-5 sm:p-7 space-y-5">
+      <div>
+        <p class="text-xs font-black uppercase tracking-[0.18em] text-[#8b1e3f]">Local question report</p>
+        <h2 id="question-report-title" class="mt-1 text-2xl font-black">What should be reviewed?</h2>
+        <p class="mt-2 text-sm opacity-75">Save a concise reason and optional note, then return to studying.</p>
+      </div>
+
+      <label class="block text-sm font-bold" for="question-report-reason">
+        Reason
+        <select id="question-report-reason" required class="mt-2 min-h-11 w-full rounded-xl border border-[var(--ring)] bg-[var(--bg)] px-3 py-2 text-[var(--text)]">
+          <option value="">Choose a reason</option>
+          <option value="incorrectAnswer">Incorrect answer</option>
+          <option value="sourceMismatch">Source mismatch</option>
+          <option value="ambiguousAnswers">Ambiguous / multiple answers</option>
+          <option value="distractorQuality">Distractor quality</option>
+          <option value="wordingClarity">Wording / clarity</option>
+          <option value="typoFormatting">Typo / formatting</option>
+          <option value="professorStyleMismatch">Professor-style mismatch</option>
+          <option value="other">Other</option>
+        </select>
+      </label>
+
+      <label class="block text-sm font-bold" for="question-report-note">
+        Optional note
+        <textarea id="question-report-note" maxlength="500" rows="4" class="mt-2 w-full rounded-xl border border-[var(--ring)] bg-[var(--bg)] px-3 py-3 text-[var(--text)]" placeholder="What looked wrong, ambiguous, or unclear?"></textarea>
+      </label>
+
+      <p id="question-report-form-status" class="text-xs opacity-70" role="status" aria-live="polite">Reports stay on this browser unless you copy, delete, or clear them.</p>
+
+      <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <button id="cancel-question-report" type="button" class="btn btn-ghost">Cancel</button>
+        <button type="submit" class="btn btn-blue">Save Report</button>
+      </div>
+    </form>
+  </dialog>
+
   <script src="assets/js/quiz-catalog.js?v=20260821a"></script>
   <script src="assets/js/favorites.js?v=20260821a"></script>
   <script src="assets/js/top-drugs-data.js?v=20260419a"></script>
   <script src="assets/js/review-queue-store.js?v=20260819a"></script>
-  <script src="assets/js/quizEngine.js?v=20260819e"></script>
+  <script src="assets/js/question-reports.js?v=20260831a"></script>
+  <script src="assets/js/quizEngine.js?v=20260831a"></script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 # Repository Health Report
 
-_Refreshed 2026-08-27 for F26-08. This report
+_Refreshed 2026-08-31 for P2F-06. This report
 records the verified green repository-health baseline._
 
 ## Current Passing Checks
@@ -39,8 +39,12 @@ while replacing the split Week 1–3 / Week 4–10 presentation with one respons
 unified ten-card semester dashboard. It retained the established launch wiring,
 Week 1 practice distinction, Weeks 2–10 6-new / 4-review representation, and a
 visible Top Drugs Reference path while consolidating future-practice guidance
-into one shared note. P2F-06 — Question Reports v2 reproducibility workflow —
-is again the sole `READY` task; F26-08 did not begin that work.
+into one shared note. P2F-06 preserved the green baseline while adding a
+backward-compatible, local-only Question Reports v2 workflow: reason and note
+capture, compact generated-question trace metadata, concise clipboard output,
+and individual deletion. Legacy reports still render without migration, static
+reports omit unavailable Fall-only fields, and no report is transmitted.
+P2F-07 — Additive curriculum metadata contract — is now the sole `READY` task.
 
 Warnings (informational): `supplemental-exam1-2024.json` has eight questions;
 `test-sample-3.json` has three (a dev-harness fixture). 22 quiz ids are not

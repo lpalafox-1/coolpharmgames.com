@@ -17,6 +17,7 @@ const PLAYLIST_LOOKBACK_DAYS = 7;
 const WARMUP_REVIEW_LOOKBACK_DAYS = 14;
 const reviewQueueStore = window.PharmletReviewQueueStore;
 const quizCatalog = window.PharmletQuizCatalog;
+const questionReportsStore = window.PharmletQuestionReports;
 let weakAreaPlaylistState = null;
 let morningWarmupState = null;
 
@@ -1211,23 +1212,98 @@ function renderQuestionReports(reports) {
     const correctAnswer = sanitize(toPlainText(report.correctAnswer || "—"));
     const userAnswer = sanitize(toPlainText(report.userAnswer || "—"));
     const note = sanitize(toPlainText(report.note || ""));
-    const metaParts = [
+    const legacyMetaParts = [
       report.title || report.quizId || "",
       report.mode || "",
       report.questionFamily || "",
       report.drugGeneric ? `Drug: ${report.drugGeneric}` : ""
     ].filter(Boolean).map((part) => sanitize(part));
-    const when = report.timestamp ? getTimeAgo(new Date(report.timestamp)) : "saved just now";
+    const timestamp = report.timestamp ? new Date(report.timestamp) : null;
+    const when = timestamp && !Number.isNaN(timestamp.getTime()) ? getTimeAgo(timestamp) : "saved locally";
+    const reasonLabel = questionReportsStore?.getReasonLabel?.(report.reportReason) || "";
+    const sourceMaterial = toPlainText(report.sourceMaterial);
+    const answerMatching = report.answerMatching && typeof report.answerMatching === "object"
+      ? [
+        report.answerMatching.spellingSensitive === true
+          ? "spelling-sensitive"
+          : report.answerMatching.spellingSensitive === false
+            ? "spelling-tolerant"
+            : "",
+        report.answerMatching.capitalizationSensitive === true
+          ? "capitalization-sensitive"
+          : report.answerMatching.capitalizationSensitive === false
+            ? "capitalization-insensitive"
+            : ""
+      ].filter(Boolean).join(", ")
+      : "";
+    const traceEntries = [
+      ["Week", report.requestedQuizWeek],
+      ["Domain", report.knowledgeDomain],
+      ["Material", sourceMaterial ? sourceMaterial.charAt(0).toUpperCase() + sourceMaterial.slice(1) : ""],
+      ["Source drug", report.sourceDrugId],
+      ["Source drug records", Array.isArray(report.sourceDrugIds) && report.sourceDrugIds.length > 1 ? report.sourceDrugIds.join(", ") : ""],
+      ["Variant", report.questionVariant],
+      ["Seed", report.seed],
+      ["Question ID", report.questionId],
+      ["Generator", report.generatorId],
+      ["Answer matching", answerMatching]
+    ].filter(([, value]) => value !== undefined && value !== null && String(value).trim());
+    const traceMarkup = traceEntries.length
+      ? `<dl class="mt-3 grid gap-2 sm:grid-cols-2">${traceEntries.map(([label, value]) => `
+          <div class="min-w-0 rounded-lg border border-[var(--ring)] px-3 py-2">
+            <dt class="text-[10px] font-black uppercase tracking-[0.12em]" style="color:var(--muted)">${sanitize(label)}</dt>
+            <dd class="mt-1 break-words text-xs font-semibold">${sanitize(toPlainText(value))}</dd>
+          </div>`).join("")}</dl>`
+      : "";
 
     div.innerHTML = `
       <div class="space-y-2">
-        <div class="font-semibold">${prompt || "Untitled question report"}</div>
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <div class="font-semibold">${prompt || "Untitled question report"}</div>
+          ${reasonLabel ? `<span class="shrink-0 self-start rounded-full border border-[var(--ring)] px-2.5 py-1 text-xs font-bold">${sanitize(reasonLabel)}</span>` : `<span class="shrink-0 self-start rounded-full border border-[var(--ring)] px-2.5 py-1 text-xs" style="color:var(--muted)">Legacy report</span>`}
+        </div>
         <div class="text-sm" style="color:var(--muted)">Expected answer: <span class="font-medium" style="color:var(--text)">${correctAnswer}</span></div>
         <div class="text-sm" style="color:var(--muted)">Your answer: <span class="font-medium" style="color:var(--bad)">${userAnswer}</span></div>
         ${note ? `<div class="text-sm" style="color:var(--muted)">Note: <span class="font-medium" style="color:var(--text)">${note}</span></div>` : ""}
-        <div class="text-xs" style="color:var(--muted)">${metaParts.join(" · ")}${metaParts.length ? " · " : ""}${sanitize(when)}</div>
+        ${traceMarkup}
+        <div class="text-xs" style="color:var(--muted)">${legacyMetaParts.join(" · ")}${legacyMetaParts.length ? " · " : ""}${sanitize(when)}</div>
+        <div class="flex flex-col gap-2 pt-2 sm:flex-row">
+          <button type="button" class="copy-question-report btn btn-blue" aria-label="Copy report for ${prompt || "this question"}">Copy Report</button>
+          <button type="button" class="delete-question-report btn btn-ghost" aria-label="Delete report for ${prompt || "this question"}">Delete</button>
+        </div>
       </div>
     `;
+
+    div.querySelector(".copy-question-report")?.addEventListener("click", async (event) => {
+      const button = event.currentTarget;
+      button.disabled = true;
+      try {
+        if (!questionReportsStore?.copyReport) throw new Error("Question report copying is unavailable.");
+        await questionReportsStore.copyReport(report);
+        button.textContent = "Copied";
+        setQuestionReportStatus("Copied a concise question report to the clipboard.", "good");
+      } catch (error) {
+        setQuestionReportStatus(error?.message || "Unable to copy this report.", "bad");
+      } finally {
+        window.setTimeout(() => {
+          button.textContent = "Copy Report";
+          button.disabled = false;
+        }, 1200);
+      }
+    });
+
+    div.querySelector(".delete-question-report")?.addEventListener("click", () => {
+      if (!confirm("Delete this question report from this browser?")) return;
+      if (!questionReportsStore?.deleteReport) {
+        setQuestionReportStatus("Question report deletion is unavailable.", "bad");
+        return;
+      }
+      questionReportsStore.deleteReport(report);
+      const nextReports = getQuestionReports();
+      renderQuestionReports(nextReports);
+      setQuestionReportStatus("Question report deleted.", "good");
+    });
+
     container.appendChild(div);
   });
 }
@@ -1339,11 +1415,16 @@ function getReviewQueue() {
 }
 
 function getQuestionReports() {
+  if (questionReportsStore?.loadReports) {
+    return questionReportsStore.loadReports()
+      .sort((a, b) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime());
+  }
   try {
     const raw = localStorage.getItem(QUESTION_REPORTS_KEY);
     const parsed = raw ? JSON.parse(raw) : [];
     return Array.isArray(parsed)
-      ? parsed.sort((a, b) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime())
+      ? parsed.filter((report) => report && typeof report === "object" && !Array.isArray(report))
+        .sort((a, b) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime())
       : [];
   } catch {
     return [];
@@ -1419,7 +1500,8 @@ function clearQuestionReports() {
     return;
   }
 
-  localStorage.removeItem(QUESTION_REPORTS_KEY);
+  if (questionReportsStore?.clearReports) questionReportsStore.clearReports();
+  else localStorage.removeItem(QUESTION_REPORTS_KEY);
   renderQuestionReports([]);
   setQuestionReportStatus("Question reports cleared.", "good");
 }

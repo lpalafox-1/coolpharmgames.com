@@ -59,6 +59,7 @@ const state = {
     quizConfig: null,
     activeModeConfig: null,
     configuredModeKey: "",
+    questionReportContext: {},
 
     placeholderQuiz: false,
     modeNotice: "",
@@ -836,11 +837,18 @@ function updateTopDrugsVersionBadge(pool) {
 }
 
 function loadQuestionReports() {
+    if (window.PharmletQuestionReports?.loadReports) {
+        return window.PharmletQuestionReports.loadReports();
+    }
     const parsed = safeReadStorageJson(QUESTION_REPORTS_KEY, []);
     return Array.isArray(parsed) ? parsed : [];
 }
 
 function saveQuestionReports(reports) {
+    if (window.PharmletQuestionReports?.saveReports) {
+        window.PharmletQuestionReports.saveReports(reports);
+        return;
+    }
     localStorage.setItem(QUESTION_REPORTS_KEY, JSON.stringify(reports));
 }
 
@@ -852,9 +860,9 @@ function serializeReportValue(value) {
 
 function buildQuestionReportPayload(question) {
     const rawCorrectAnswer = getCorrectAnswerValue(question);
-    return {
+    const fallback = {
         quizId: quizId || "unknown",
-        title: state.title || quizId || "Quiz",
+        title: state.title || question?.sourceTitle || quizId || "Quiz",
         mode: getHistoryModeLabel(),
         questionNumber: state.index + 1,
         totalQuestions: state.questions.length,
@@ -868,24 +876,44 @@ function buildQuestionReportPayload(question) {
         note: "",
         timestamp: new Date().toISOString()
     };
+    const input = {
+        ...fallback,
+        questionId: question?.id || "",
+        choices: Array.isArray(question?.choices) ? question.choices : question?.options,
+        acceptedAnswers: question?._acceptedAnswers,
+        sourceQuizId: question?.sourceQuizId || "",
+        questionMetadata: question?.metadata,
+        quizMetadata: state.questionReportContext
+    };
+    return window.PharmletQuestionReports?.buildReport
+        ? window.PharmletQuestionReports.buildReport(input)
+        : fallback;
 }
 
 function reportCurrentQuestion() {
     const question = state.questions[state.index];
     if (!question || !question._answered || question._reported) return;
 
+    const payload = buildQuestionReportPayload(question);
+    const handleSaved = () => {
+        question._reported = true;
+        render();
+    };
+
+    if (window.PharmletQuestionReports?.openCaptureDialog?.(payload, handleSaved)) {
+        return;
+    }
+
     const note = window.prompt("Optional note for this report. Example: 'Multiple answers looked correct' or 'Prompt wording felt vague.' Leave blank to save without a note.");
     if (note === null) return;
 
     const reports = loadQuestionReports();
-    const payload = buildQuestionReportPayload(question);
     payload.note = String(note).trim();
+    payload.reportReason = "other";
 
     reports.unshift(payload);
     saveQuestionReports(reports.slice(0, MAX_QUESTION_REPORTS));
-    question._reported = true;
-    render();
-    alert("Question report saved locally. You can review it later on the Stats page.");
+    handleSaved();
 }
 
 function createEmptyTopDrugsSignals() {
@@ -7296,6 +7324,7 @@ async function main() {
         state.generatedQuestionLimit = 0;
         state.generatedAttemptIdentity = null;
         state.adaptiveSummary = null;
+        state.questionReportContext = {};
         let filteredPool = [];
         let fullPool = [];
         let storageKey = null;
@@ -7497,6 +7526,9 @@ async function main() {
                 throw new Error(`Quiz "${quizId}" is not available. Try recreating it from the source page.`);
             }
 
+            state.questionReportContext = data?.metadata && typeof data.metadata === "object" && !Array.isArray(data.metadata)
+                ? { ...data.metadata }
+                : {};
             state.bossMode = Boolean(data?.metadata?.kind === "boss-round" || data?.metadata?.bossRound);
             state.activeModeConfig = getEffectiveQuizModeConfig(data);
             state.configuredModeKey = state.activeModeConfig?._modeKey || "";
