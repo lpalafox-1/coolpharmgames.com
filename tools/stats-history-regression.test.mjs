@@ -121,7 +121,7 @@ function createElementStub() {
     disabled: false,
     hidden: false,
     get innerHTML() { return html; },
-    set innerHTML(value) { html = String(value ?? ""); text = stripTags(html); },
+    set innerHTML(value) { html = String(value ?? ""); text = stripTags(html); element.children.length = 0; },
     get textContent() { return text; },
     set textContent(value) { text = String(value ?? ""); html = escapeHtml(text); },
     get innerText() { return text; },
@@ -140,6 +140,11 @@ function createElementStub() {
     focus() {}
   };
   return element;
+}
+
+function renderedHtml(element) {
+  if (!element) return "";
+  return element.innerHTML + element.children.map(renderedHtml).join("");
 }
 
 // getElementById auto-vivifies, so every render path actually runs instead of
@@ -839,4 +844,444 @@ test("assets/js/stats.js remains a plain top-level browser script", () => {
   assert.doesNotMatch(stats, /^\s*(import|export)\s/m, "Stats must not become an ES module");
   assert.doesNotMatch(stats, /^\(function\s*\(/m, "Stats must not become an IIFE");
   assert.doesNotMatch(stats, /require\(/, "Stats must not adopt a module loader");
+});
+
+// --- T-20 unclassified disclosure count --------------------------------------
+
+test("T-20 the disclosed excluded count equals the records the filter omitted", () => {
+  const sandbox = loadStatsSandbox({ history: [] });
+  const timestamp = localDate(2026, 8, 18).getTime();
+  const records = sandbox.normalizeHistoryRecords([
+    { quizId: "chapter1-review", mode: "easy", score: 8, total: 10, timestamp },
+    { quizId: "generated-mystery-one", mode: "", score: 1, total: 4, timestamp },
+    { quizId: "generated-mystery-two", mode: "", score: 2, total: 4, timestamp },
+    { quizId: "generated-mystery-three", mode: "", score: 3, total: 4, timestamp },
+    { quizId: "generated-custom-quiz-fall-2026-lab3-practice-q10", mode: "easy", score: 9, total: 10, timestamp,
+      attemptLineage: fallLineage() }
+  ]);
+
+  const unclassifiedTotal = records.filter((record) => !record.curriculumKnown).length;
+  assert.equal(unclassifiedTotal, 3);
+
+  // The default All view includes unclassified attempts and discloses nothing.
+  const all = sandbox.filterHistoryRecords(records, { range: "all", curriculum: "all" });
+  assert.equal(all.records.length, 5);
+  assert.equal(all.excludedUnclassifiedCount, 0);
+
+  for (const curriculum of ["P1", "P2"]) {
+    const view = sandbox.filterHistoryRecords(records, { range: "all", curriculum });
+    const omitted = records.length - view.records.length;
+    const omittedUnclassified = records.filter(
+      (record) => !record.curriculumKnown && !view.records.includes(record)
+    ).length;
+    assert.equal(view.excludedUnclassifiedCount, omittedUnclassified, `${curriculum} disclosure must match the omission`);
+    assert.equal(view.excludedUnclassifiedCount, 3);
+    assert.ok(omitted >= view.excludedUnclassifiedCount);
+  }
+
+  // Filtering *to* unclassified excludes nothing unclassified.
+  const only = sandbox.filterHistoryRecords(records, { range: "all", curriculum: "unclassified" });
+  assert.equal(only.records.length, 3);
+  assert.equal(only.excludedUnclassifiedCount, 0);
+});
+
+test("T-20 the rendered disclosure states the live count, never a fixed one", () => {
+  const sandbox = loadStatsSandbox({ history: [] });
+  const timestamp = localDate(2026, 8, 18).getTime();
+  const records = sandbox.normalizeHistoryRecords([
+    { quizId: "chapter1-review", mode: "easy", score: 8, total: 10, timestamp },
+    { quizId: "generated-mystery-one", mode: "", score: 1, total: 4, timestamp },
+    { quizId: "generated-mystery-two", mode: "", score: 2, total: 4, timestamp }
+  ]);
+
+  sandbox.renderRecordedAttemptDashboard(records, { ...sandbox.getDefaultHistoryFilter(), curriculum: "P1" }, timestamp);
+  const disclosure = sandbox.document.getElementById("history-disclosure").textContent;
+  assert.match(disclosure, /^2 recorded attempts are unclassified and are not included in this filtered view\./);
+
+  sandbox.renderRecordedAttemptDashboard(records.slice(0, 2), { ...sandbox.getDefaultHistoryFilter(), curriculum: "P1" }, timestamp);
+  assert.match(
+    sandbox.document.getElementById("history-disclosure").textContent,
+    /^1 recorded attempt is unclassified and is not included in this filtered view\./
+  );
+
+  sandbox.renderRecordedAttemptDashboard(records, sandbox.getDefaultHistoryFilter(), timestamp);
+  assert.equal(sandbox.document.getElementById("history-disclosure").textContent, "");
+});
+
+test("the retention disclosure appears only when the view reaches the oldest record", () => {
+  const sandbox = loadStatsSandbox({ history: [] });
+  // One attempt per calendar day, so a Today window reaches only the newest.
+  const build = (count) => sandbox.normalizeHistoryRecords(
+    Array.from({ length: count }, (_, index) => ({
+      quizId: "chapter1-review", mode: "easy", score: 8, total: 10,
+      timestamp: localDate(2026, 8, 20, 9, 0 - ((count - 1 - index) * 24 * 60)).getTime()
+    }))
+  );
+  const retentionPattern = new RegExp(`most recent ${HISTORY_RETENTION_LIMIT} recorded attempts`);
+  const now = localDate(2026, 8, 20, 12, 0).getTime();
+
+  sandbox.renderRecordedAttemptDashboard(build(HISTORY_RETENTION_LIMIT - 1), sandbox.getDefaultHistoryFilter(), now);
+  assert.doesNotMatch(sandbox.document.getElementById("history-disclosure").textContent, retentionPattern);
+
+  sandbox.renderRecordedAttemptDashboard(build(HISTORY_RETENTION_LIMIT), sandbox.getDefaultHistoryFilter(), now);
+  assert.match(sandbox.document.getElementById("history-disclosure").textContent, retentionPattern);
+
+  // A narrow window that stops short of the oldest record makes no claim.
+  sandbox.renderRecordedAttemptDashboard(build(HISTORY_RETENTION_LIMIT), { ...sandbox.getDefaultHistoryFilter(), range: "today" }, now);
+  assert.doesNotMatch(sandbox.document.getElementById("history-disclosure").textContent, retentionPattern);
+});
+
+// --- T-04 no-write invariant across filter interactions ----------------------
+
+test("T-04 non-destructive filter changes leave every watched store byte-identical", () => {
+  const timestamp = localDate(2026, 8, 18).getTime();
+  const watched = {
+    [REVIEW_KEY]: JSON.stringify([{
+      quizId: "chapter1-review", type: "mcq", prompt: "Legacy prompt",
+      answer: "A", userAnswer: "B", timestamp: "2026-01-01T00:00:00.000Z"
+    }]),
+    [REPORTS_KEY]: JSON.stringify([{ quizId: "chapter1-review", prompt: "Report", timestamp: "2026-01-02T00:00:00.000Z" }]),
+    [FAVORITES_KEY]: JSON.stringify(["ceutics-practice-1"]),
+    [SIGNALS_KEY]: JSON.stringify({ version: 1, updatedAt: 5, missedDrugs: { lisinopril: 2 } }),
+    [RECENT_RUNS_KEY]: JSON.stringify([{ at: 1 }]),
+    [REMIX_REQUEST_KEY]: JSON.stringify({ quizWeek: 3 }),
+    [CUSTOM_QUIZ_KEY]: JSON.stringify({ id: "custom-quiz", questions: [] })
+  };
+
+  const history = [
+    { quizId: "chapter1-review", mode: "easy", score: 8, total: 10, timestamp },
+    { quizId: "generated-custom-quiz-fall-2026-lab3-boss-remix-q6", mode: "bossRemix", score: 4, total: 6, timestamp,
+      attemptLineage: fallLineage({ attemptKind: FALL_BOSS_REMIX_KIND, questionCount: 6, remixGeneration: 1 }) },
+    { quizId: "generated-mystery", mode: "", score: 1, total: 4, timestamp }
+  ];
+
+  const sandbox = loadStatsSandbox({ history, localExtras: watched, sessionExtras: { "pharmlet.session.lastRound.x": "1" } });
+  const records = sandbox.normalizeHistoryRecords(sandbox.getHistory());
+  sandbox.renderRecordedAttemptDashboard(records, sandbox.getDefaultHistoryFilter(), timestamp);
+
+  const localBefore = sandbox.__localStorage.snapshot();
+  const sessionBefore = sandbox.__sessionStorage.snapshot();
+
+  for (const [key, value] of [
+    ["range", "today"], ["range", "7d"], ["range", "30d"], ["range", "custom"],
+    ["customStart", "2026-08-01"], ["customEnd", "2026-08-31"],
+    ["curriculum", "P1"], ["curriculum", "P2"], ["curriculum", "unclassified"], ["curriculum", "all"],
+    ["attemptType", "boss-remixes"], ["attemptType", "standard-practice"], ["attemptType", "all"],
+    ["semester", "Fall 2026"], ["lab", "Lab III"], ["week", "3"],
+    ["range", "all"]
+  ]) {
+    assert.doesNotThrow(() => sandbox.applyHistoryFilterChange(key, value), `changing ${key} must not throw`);
+    assert.equal(sandbox.__localStorage.snapshot(), localBefore, `changing ${key} must not write local storage`);
+    assert.equal(sandbox.__sessionStorage.snapshot(), sessionBefore, `changing ${key} must not write session storage`);
+  }
+});
+
+// --- T-23 region scope --------------------------------------------------------
+
+test("T-23 attempt filters never reach the Review Queue or Question Reports regions", async () => {
+  const timestamp = localDate(2026, 8, 18).getTime();
+  const sandbox = loadStatsSandbox({
+    history: [
+      { quizId: "chapter1-review", mode: "easy", score: 8, total: 10, timestamp },
+      { quizId: "generated-custom-quiz-fall-2026-lab3-practice-q10", mode: "easy", score: 9, total: 10, timestamp,
+        attemptLineage: fallLineage() }
+    ],
+    localExtras: {
+      [REVIEW_KEY]: JSON.stringify([{
+        quizId: "chapter1-review", type: "mcq", prompt: "Which drug is a statin?",
+        answer: "Atorvastatin", userAnswer: "Lisinopril", timestamp: "2026-01-01T00:00:00.000Z"
+      }]),
+      [REPORTS_KEY]: JSON.stringify([{
+        quizId: "chapter1-review", promptText: "A confusing prompt",
+        correctAnswer: "A", userAnswer: "B", timestamp: "2026-01-02T00:00:00.000Z"
+      }])
+    }
+  });
+
+  await sandbox.loadStats();
+  const missedBefore = renderedHtml(sandbox.document.getElementById("missed-stats"));
+  const reportsBefore = renderedHtml(sandbox.document.getElementById("question-reports"));
+  const quizStatsBefore = renderedHtml(sandbox.document.getElementById("quiz-stats"));
+  assert.ok(missedBefore.includes("Atorvastatin"), "the Review Queue region must have rendered");
+  assert.ok(reportsBefore.includes("A confusing prompt"), "the Question Reports region must have rendered");
+
+  // A curriculum the slice really contains, so the history regions must move.
+  const view = sandbox.applyHistoryFilterChange("curriculum", "P2");
+  assert.equal(view.filter.curriculum, "P2", "the selected curriculum is genuinely available");
+  assert.equal(view.records.length, 1, "the history slice narrowed");
+
+  assert.notEqual(renderedHtml(sandbox.document.getElementById("quiz-stats")), quizStatsBefore, "history regions do follow the filter");
+  assert.equal(renderedHtml(sandbox.document.getElementById("missed-stats")), missedBefore, "Most Missed must not follow attempt filters");
+  assert.equal(renderedHtml(sandbox.document.getElementById("question-reports")), reportsBefore, "Question Reports must not follow attempt filters");
+});
+
+test("conditionally shown dashboard regions can actually be hidden", () => {
+  const page = read("stats.html");
+  // Tailwind's grid/flex utilities and .filter-field both set `display`, which
+  // outranks the user-agent [hidden] rule; without this the custom-range and
+  // empty scope fields stay visible after being hidden in JS.
+  assert.match(page, /\[hidden\]\s*\{\s*display:\s*none\s*!important;\s*\}/);
+  for (const id of ["filter-custom-range", "filter-semester-field", "filter-lab-field", "filter-week-field", "fall-chain-section"]) {
+    assert.ok(page.includes(`id="${id}"`), `#${id} must exist to be toggled`);
+  }
+  assert.match(statsSource, /function setFieldHidden\(/);
+});
+
+test("T-23 the page states which regions the attempt filters cover", () => {
+  const page = read("stats.html");
+  assert.match(page, /These filters apply to your saved attempt history only/);
+  assert.match(page, /Lifetime Review Queue weakness memory\. The recorded-attempt filters above do not apply to this section\./);
+  assert.match(page, /Boss Remix deliberately writes no Review Queue or adaptive weakness signals/);
+  assert.match(page, /Saved separately from attempt history; the filters above do not apply here\./);
+  assert.match(page, /not lifetime totals/);
+});
+
+// --- T-09 / T-10 reset semantics ---------------------------------------------
+
+test("T-09 Clear All Stats stays global and keeps only the theme preference", () => {
+  const sandbox = loadStatsSandbox({
+    history: [LEGACY_MINIMAL_RECORD],
+    localExtras: {
+      "pharmlet.theme": "dark",
+      [REVIEW_KEY]: "[]",
+      [REPORTS_KEY]: "[]",
+      [FAVORITES_KEY]: "[]",
+      [SIGNALS_KEY]: "{}",
+      "unrelated.key": "keep-me"
+    },
+    sessionExtras: { "pharmlet.session.lastRound.x": "1", "other.session": "keep-me" }
+  });
+
+  const result = sandbox.clearAllStudyData();
+  assert.equal(result.local, 5, "every non-theme pharmlet local key is cleared");
+  assert.equal(result.session, 1);
+  assert.equal(sandbox.__localStorage.getItem("pharmlet.theme"), "dark", "theme preference survives");
+  assert.equal(sandbox.__localStorage.getItem("unrelated.key"), "keep-me", "foreign keys are untouched");
+  assert.equal(sandbox.__localStorage.getItem(HISTORY_KEY), null);
+  assert.equal(sandbox.__sessionStorage.getItem("other.session"), "keep-me");
+});
+
+test("T-10 Reset Adaptive Memory keeps its narrow generator scope", () => {
+  const sandbox = loadStatsSandbox({
+    history: [LEGACY_MINIMAL_RECORD],
+    localExtras: {
+      [SIGNALS_KEY]: JSON.stringify({ version: 1 }),
+      [RECENT_RUNS_KEY]: JSON.stringify([{ at: 1 }]),
+      [REVIEW_KEY]: "[]",
+      [FAVORITES_KEY]: "[]"
+    },
+    sessionExtras: {
+      "pharmlet.session.lastRound.pharmlet.log-lab-final-2.easy": "1",
+      "pharmlet.session.lastRound.pharmlet.lab1.week3.easy": "1",
+      "pharmlet.session.lastRound.pharmlet.something-else": "1"
+    }
+  });
+
+  const result = sandbox.clearTopDrugsGeneratorMemory();
+  assert.equal(result.local, 2, "only the two adaptive Top Drugs keys are cleared");
+  assert.equal(result.session, 2, "only Top Drugs last-round keys are cleared");
+  assert.equal(sandbox.__localStorage.getItem(HISTORY_KEY), JSON.stringify([LEGACY_MINIMAL_RECORD]), "history survives");
+  assert.equal(sandbox.__localStorage.getItem(REVIEW_KEY), "[]", "the review queue survives");
+  assert.equal(sandbox.__localStorage.getItem(FAVORITES_KEY), "[]", "favorites survive");
+  assert.equal(sandbox.__sessionStorage.getItem("pharmlet.session.lastRound.pharmlet.something-else"), "1");
+});
+
+// --- T-11 backup round trip ---------------------------------------------------
+
+test("T-11 backup keeps version 2 and replace-style import semantics", () => {
+  const historyRaw = JSON.stringify([LEGACY_MINIMAL_RECORD]);
+  const sandbox = loadStatsSandbox({
+    history: historyRaw,
+    localExtras: { [FAVORITES_KEY]: JSON.stringify(["ceutics-practice-1"]), "unrelated.key": "ignored" },
+    sessionExtras: { "pharmlet.session.lastRound.x": "1" }
+  });
+
+  const payload = sandbox.collectProgressBackupData();
+  assert.equal(payload.app, "pharm-let");
+  assert.equal(payload.version, 2, "the backup format stays at version 2");
+  assert.equal(payload.localStorage[HISTORY_KEY], historyRaw);
+  assert.equal(payload.localStorage[FAVORITES_KEY], JSON.stringify(["ceutics-practice-1"]));
+  assert.equal(Object.hasOwn(payload.localStorage, "unrelated.key"), false, "only pharmlet keys are exported");
+  assert.equal(payload.sessionStorage["pharmlet.session.lastRound.x"], "1");
+
+  const parsed = sandbox.parseProgressBackup(JSON.stringify(plain(payload)));
+  assert.equal(parsed.version, 2);
+  assert.throws(() => sandbox.parseProgressBackup("[]"), /localStorage/);
+  assert.throws(
+    () => sandbox.parseProgressBackup(JSON.stringify({ localStorage: { "evil.key": "x" } })),
+    /unexpected key/
+  );
+
+  // Import replaces the existing pharmlet keys rather than merging them.
+  sandbox.confirm = () => true;
+  sandbox.document.getElementById("progress-transfer-data").value = JSON.stringify({
+    app: "pharm-let",
+    version: 2,
+    localStorage: { [HISTORY_KEY]: "[]" },
+    sessionStorage: {}
+  });
+  sandbox.importProgressBackup();
+
+  assert.equal(sandbox.__localStorage.getItem(HISTORY_KEY), "[]");
+  assert.equal(sandbox.__localStorage.getItem(FAVORITES_KEY), null, "import replaces rather than merges");
+  assert.equal(sandbox.__localStorage.getItem("unrelated.key"), "ignored", "foreign keys are left alone");
+  assert.equal(sandbox.__sessionStorage.getItem("pharmlet.session.lastRound.x"), null);
+});
+
+// --- T-14 cache tokens --------------------------------------------------------
+
+test("T-14 only the Stats cache token moved for P2F-08", () => {
+  const statsPage = read("stats.html");
+  const quizPage = read("quiz.html");
+
+  const statsToken = /assets\/js\/stats\.js\?v=([^"'\s>]+)/.exec(statsPage)?.[1];
+  assert.ok(statsToken, "stats.html must load Stats with a cache token");
+  assert.match(statsToken, /^\d{8}[a-z]$/, "the Stats token follows the YYYYMMDD + letter convention");
+  assert.notEqual(statsToken, "20260831a", "a changed Stats bundle needs a fresh token");
+
+  // Every other bundle keeps the token it already had.
+  assert.match(quizPage, /assets\/js\/quizEngine\.js\?v=20260901a/);
+  assert.match(quizPage, /assets\/js\/curriculum-metadata\.js\?v=20260831b/);
+  assert.match(statsPage, /assets\/js\/curriculum-metadata\.js\?v=20260831b/);
+  assert.match(statsPage, /assets\/js\/quiz-catalog\.js\?v=20260831b/);
+  assert.match(statsPage, /assets\/js\/question-reports\.js\?v=20260831b/);
+  assert.match(statsPage, /assets\/js\/review-queue-store\.js\?v=20260819a/);
+  assert.match(statsPage, /assets\/js\/top-drugs-data\.js\?v=20260419a/);
+
+  // The adapter must be in place before Stats consumes it.
+  assert.ok(
+    statsPage.indexOf("assets/js/curriculum-metadata.js") < statsPage.indexOf("assets/js/stats.js"),
+    "the curriculum adapter must load before Stats"
+  );
+});
+
+// --- T-15 deep links ----------------------------------------------------------
+
+test("T-15 both required Stats deep-link anchors survive", () => {
+  const page = read("stats.html");
+  for (const anchor of ["morning-warmup-section", "weak-area-playlists-section"]) {
+    assert.ok(page.includes(`id="${anchor}"`), `#${anchor} must remain a stable deep link`);
+  }
+
+  // The launchers behind those anchors are still wired.
+  assert.match(statsSource, /function launchMorningWarmup\(/);
+  assert.match(statsSource, /function launchWeakAreaPlaylist\(/);
+  assert.match(statsSource, /data-warmup-key/);
+  assert.match(statsSource, /data-playlist-key/);
+  for (const id of ["morning-warmups", "weak-area-playlists", "missed-stats", "question-reports", "category-stats"]) {
+    assert.ok(page.includes(`id="${id}"`), `#${id} must remain available`);
+  }
+});
+
+// --- T-16 no network ----------------------------------------------------------
+
+test("T-16 Stats introduces no network behaviour", () => {
+  for (const pattern of [/\bfetch\s*\(/, /XMLHttpRequest/, /sendBeacon/, /new WebSocket/, /EventSource/, /navigator\.connection/]) {
+    assert.doesNotMatch(statsSource, pattern, `Stats must not use ${pattern}`);
+  }
+  // The page's CSP still restricts connections to same-origin.
+  assert.match(read("stats.html"), /connect-src 'self';/);
+});
+
+// --- T-17 protected hashes ----------------------------------------------------
+
+test("T-17 every protected hash except the approved Stats baseline is unchanged", () => {
+  const contract = read("tools/curriculum-metadata-contract.test.mjs");
+  const readBaseline = (key) => {
+    const match = new RegExp(`${key}: "([0-9a-f]{64})"`).exec(contract);
+    assert.ok(match, `the contract suite must still pin a ${key} baseline`);
+    return match[1];
+  };
+
+  // Values pinned before P2F-08; none of these files are in scope.
+  const UNCHANGED = Object.freeze({
+    fallSource: "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01",
+    fallPolicy: "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171",
+    masterPool: "1fb50e96e60252a9839406d53bc929e9569d76c0ddc2522aff43adf9bdf2a87c",
+    fallGenerator: "39e123b914f665282f6abce23110bf3e2bd4f0bcc1974b7038e0f9384cf9871a",
+    fallLauncher: "255ef32be7b47e3f12f3b02da5db5a91e9040a5ee9fe406f68029e783a98157c",
+    quizEngine: "6dc5c2f6d467742e837435be1d120f1110eb9faacb9d985898efad52a5c8a507",
+    reviewQueueStore: "67e0418362fba9da5abe5e079b2dad5437c543a636b48943e2f8a50e57b47a62",
+    favorites: "b6fbd5bbca17ea150e34e9b29c9e6391b5ae7359d7b6afb18fe6c7e7caed781d"
+  });
+  const PATHS = Object.freeze({
+    fallSource: "assets/data/fall-2026-p2-top-drugs.json",
+    fallPolicy: "assets/data/fall-2026-lab3-quiz-policy.json",
+    masterPool: "assets/data/master_pool.json",
+    fallGenerator: "assets/js/fall-2026-quiz-generator.js",
+    fallLauncher: "assets/js/fall-2026-lab3-launcher.js",
+    quizEngine: "assets/js/quizEngine.js",
+    reviewQueueStore: "assets/js/review-queue-store.js",
+    favorites: "assets/js/favorites.js"
+  });
+
+  for (const [key, expected] of Object.entries(UNCHANGED)) {
+    assert.equal(sha256(PATHS[key]), expected, `${PATHS[key]} must remain byte-identical`);
+    assert.equal(readBaseline(key), expected, `the ${key} baseline must not be moved`);
+  }
+
+  // Stats is the single approved exception, and its baseline tracks the file.
+  assert.equal(readBaseline("stats"), sha256("assets/js/stats.js"), "the Stats baseline must match the shipped file");
+  assert.notEqual(
+    readBaseline("stats"),
+    "707fbf045dd1249989e3edb9c2c13666e9f2369dc75f2d2f52750b9f4688c034",
+    "the Stats baseline moved with the intended change"
+  );
+
+  // Other in-scope modules are untouched by P2F-08.
+  for (const untouched of ["assets/js/curriculum-metadata.js", "assets/js/quiz-catalog.js", "assets/js/question-reports.js"]) {
+    assert.ok(sha256(untouched), `${untouched} must still exist`);
+  }
+  assert.equal(
+    read("tools/fall-2026-lab3-completion-continuation.test.mjs").includes("assets/js/quizEngine.js?v="),
+    true,
+    "the F26-09 engine-token guard stays in place"
+  );
+});
+
+// --- filter derivation --------------------------------------------------------
+
+test("contextual scope options narrow with the selected higher-level slice", () => {
+  const sandbox = loadStatsSandbox({ history: [] });
+  const now = localDate(2026, 8, 20, 12, 0).getTime();
+  const records = sandbox.normalizeHistoryRecords([
+    { quizId: "lab-1-week-2", mode: "easy", score: 8, total: 10, timestamp: now },
+    { quizId: "generated-custom-quiz-fall-2026-lab3-practice-q10", mode: "easy", score: 9, total: 10, timestamp: now,
+      attemptLineage: fallLineage() }
+  ]);
+
+  const all = sandbox.resolveHistoryView(records, sandbox.getDefaultHistoryFilter(), now);
+  deepEqualAcrossRealms(all.options.labs.map((o) => o.id), ["Lab I", "Lab III"]);
+
+  const p2 = sandbox.resolveHistoryView(records, { ...sandbox.getDefaultHistoryFilter(), curriculum: "P2" }, now);
+  deepEqualAcrossRealms(p2.options.labs.map((o) => o.id), ["Lab III"], "labs narrow to the selected curriculum");
+  deepEqualAcrossRealms(p2.options.weeks.map((o) => o.id), ["3"]);
+  assert.equal(p2.records.length, 1);
+
+  // A selection the broader slice no longer contains falls back to All.
+  const stale = sandbox.resolveHistoryView(records, { ...sandbox.getDefaultHistoryFilter(), curriculum: "P2", lab: "Lab I" }, now);
+  assert.equal(stale.filter.lab, "all", "a stale narrower selection is released, not left showing nothing");
+  assert.equal(stale.records.length, 1);
+});
+
+test("a filtered overview reports the selected view, not lifetime totals", () => {
+  const sandbox = loadStatsSandbox({ history: [] });
+  const now = localDate(2026, 8, 20, 12, 0).getTime();
+  const records = sandbox.normalizeHistoryRecords([
+    { quizId: "chapter1-review", mode: "easy", score: 10, total: 10, bestStreak: 10, timestamp: now },
+    { quizId: "chapter2-review", mode: "easy", score: 2, total: 10, bestStreak: 2, timestamp: localDate(2026, 7, 1, 12, 0).getTime() }
+  ]);
+
+  sandbox.renderRecordedAttemptDashboard(records, { ...sandbox.getDefaultHistoryFilter(), range: "today" }, now);
+  const readOverview = (id) => sandbox.document.getElementById(id).textContent;
+  assert.equal(readOverview("total-questions"), "10", "questions come from the selected attempts only");
+  assert.equal(readOverview("avg-score"), "100.0%");
+  assert.equal(readOverview("best-streak"), "10", "the best streak is the best among the selected attempts");
+  assert.equal(readOverview("study-days"), "1", "a Today filter may legitimately show one study day");
+  assert.match(sandbox.document.getElementById("overview-scope").textContent, /not lifetime totals/);
+
+  sandbox.applyHistoryFilterChange("range", "all");
+  assert.equal(readOverview("total-questions"), "20");
+  assert.equal(readOverview("avg-score"), "60.0%");
+  assert.equal(readOverview("study-days"), "2");
 });

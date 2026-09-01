@@ -645,6 +645,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  initHistoryFilterControls();
+
   loadStats().catch((error) => {
     console.error("Unable to load stats:", error);
     setPlaylistStatus("Unable to load weak-area playlists right now.", "bad");
@@ -1684,16 +1686,241 @@ async function loadStats() {
   renderRecordedAttemptDashboard(normalizeHistoryRecords(history));
 }
 
-function renderRecordedAttemptDashboard(records) {
-  renderHistoryOverview(summarizeHistoryRecords(records));
-  renderHistoryFamilies(buildHistoryFamilies(records));
-  renderRecentActivity(sortRecordsNewestFirst(records).slice(0, 10));
-  renderCategoryPerformance(records);
+// --- P2F-08: RECORDED-ATTEMPT DASHBOARD -------------------------------------
+// Filters here scope history-derived regions only. The Review Queue, Most
+// Missed, and Question Reports are separate stores answering a different
+// question, and are never touched by these controls.
+
+let historyDashboardState = null;
+
+const HISTORY_FILTER_CONTROLS = Object.freeze([
+  Object.freeze({ id: "filter-date", key: "range" }),
+  Object.freeze({ id: "filter-curriculum", key: "curriculum" }),
+  Object.freeze({ id: "filter-attempt-type", key: "attemptType" }),
+  Object.freeze({ id: "filter-semester", key: "semester" }),
+  Object.freeze({ id: "filter-lab", key: "lab" }),
+  Object.freeze({ id: "filter-week", key: "week" }),
+  Object.freeze({ id: "filter-custom-start", key: "customStart" }),
+  Object.freeze({ id: "filter-custom-end", key: "customEnd" })
+]);
+
+function getDefaultHistoryFilter() {
+  return {
+    range: "all",
+    curriculum: "all",
+    attemptType: "all",
+    semester: "all",
+    lab: "all",
+    week: "all",
+    customStart: "",
+    customEnd: ""
+  };
+}
+
+function initHistoryFilterControls() {
+  for (const control of HISTORY_FILTER_CONTROLS) {
+    document.getElementById(control.id)?.addEventListener("change", (event) => {
+      applyHistoryFilterChange(control.key, event?.target?.value);
+    });
+  }
+
+  document.getElementById("reset-history-filters")?.addEventListener("click", () => {
+    if (!historyDashboardState) return;
+    renderRecordedAttemptDashboard(historyDashboardState.records, getDefaultHistoryFilter());
+  });
+}
+
+// Changing a filter only re-derives the view; it never writes anything.
+function applyHistoryFilterChange(key, value) {
+  if (!historyDashboardState) return null;
+  const filter = { ...historyDashboardState.filter, [key]: String(value ?? "") };
+  return renderRecordedAttemptDashboard(historyDashboardState.records, filter);
+}
+
+// Each control's options come from the slice its broader controls already
+// selected, so nothing advertises a combination with no records behind it. A
+// selection that the broader slice no longer contains falls back to "all"
+// rather than silently showing an empty dashboard.
+function resolveHistoryView(records, rawFilter, now = Date.now()) {
+  const filter = { ...getDefaultHistoryFilter(), ...(rawFilter || {}) };
+  const dateOnly = { range: filter.range, customStart: filter.customStart, customEnd: filter.customEnd };
+  const sliceFor = (extra) => filterHistoryRecords(records, { ...dateOnly, ...extra }, now).records;
+
+  const attemptTypes = getAvailableAttemptTypes(sliceFor({}));
+  if (filter.attemptType !== "all" && !attemptTypes.some((option) => option.id === filter.attemptType)) {
+    filter.attemptType = "all";
+  }
+
+  const scoped = { attemptType: filter.attemptType };
+  const curricula = getAvailableCurriculumOptions(sliceFor(scoped));
+  if (filter.curriculum !== "all" && !curricula.some((option) => option.id === filter.curriculum)) {
+    filter.curriculum = "all";
+  }
+
+  scoped.curriculum = filter.curriculum;
+  const semesters = getAvailableScopeOptions(sliceFor(scoped), "semester");
+  if (filter.semester !== "all" && !semesters.some((option) => option.id === filter.semester)) {
+    filter.semester = "all";
+  }
+
+  scoped.semester = filter.semester;
+  const labs = getAvailableScopeOptions(sliceFor(scoped), "lab");
+  if (filter.lab !== "all" && !labs.some((option) => option.id === filter.lab)) filter.lab = "all";
+
+  scoped.lab = filter.lab;
+  const weeks = getAvailableScopeOptions(sliceFor(scoped), "quizWeek");
+  if (filter.week !== "all" && !weeks.some((option) => option.id === filter.week)) filter.week = "all";
+
+  const result = filterHistoryRecords(records, filter, now);
+  return {
+    ...result,
+    filter,
+    options: { attemptTypes, curricula, semesters, labs, weeks },
+    summary: summarizeHistoryRecords(result.records),
+    retentionBoundaryReached: isHistoryRetentionBoundaryReached(records, result.records)
+  };
+}
+
+function renderRecordedAttemptDashboard(records, rawFilter, now = Date.now()) {
+  const view = resolveHistoryView(records, rawFilter || getDefaultHistoryFilter(), now);
+  historyDashboardState = { records, filter: view.filter };
+
+  renderHistoryFilterControls(view);
+  renderHistoryScope(view, records);
+  renderHistoryOverview(view.summary);
+  const hasAnyRecords = (records || []).length > 0;
+  renderHistoryFamilies(buildHistoryFamilies(view.records), hasAnyRecords);
+  renderAttemptTypePerformance(view.records, hasAnyRecords);
+  renderHistoryChains(buildHistoryChains(view.records));
+  renderRecentActivity(sortRecordsNewestFirst(view.records).slice(0, 10), hasAnyRecords);
+  renderCategoryPerformance(view.records);
+  return view;
 }
 
 function setTextContent(id, value) {
   const el = document.getElementById(id);
   if (el) el.textContent = value;
+}
+
+function setFieldHidden(id, hidden) {
+  const el = document.getElementById(id);
+  if (el) el.hidden = Boolean(hidden);
+}
+
+function fillSelect(id, options, selected) {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  el.innerHTML = options
+    .map((option) => `<option value="${sanitize(option.id)}"${option.id === selected ? " selected" : ""}>${sanitize(option.label)}</option>`)
+    .join("");
+  el.value = selected;
+}
+
+function withCount(label, count) {
+  return Number.isFinite(count) ? `${label} (${count})` : label;
+}
+
+function renderHistoryFilterControls(view) {
+  const { filter, options } = view;
+
+  fillSelect("filter-date", HISTORY_DATE_RANGES.map((range) => ({ id: range.id, label: range.label })), filter.range);
+  setFieldHidden("filter-custom-range", filter.range !== "custom");
+
+  const customStart = document.getElementById("filter-custom-start");
+  if (customStart) customStart.value = filter.customStart || "";
+  const customEnd = document.getElementById("filter-custom-end");
+  if (customEnd) customEnd.value = filter.customEnd || "";
+
+  fillSelect("filter-curriculum", [
+    { id: "all", label: "All" },
+    ...options.curricula.map((option) => ({ id: option.id, label: withCount(option.label, option.count) }))
+  ], filter.curriculum);
+
+  fillSelect("filter-attempt-type", [
+    { id: "all", label: "All" },
+    ...options.attemptTypes.map((option) => ({ id: option.id, label: withCount(option.label, option.count) }))
+  ], filter.attemptType);
+
+  const scopeFields = [
+    ["filter-semester", "filter-semester-field", options.semesters, filter.semester],
+    ["filter-lab", "filter-lab-field", options.labs, filter.lab],
+    ["filter-week", "filter-week-field", options.weeks, filter.week]
+  ];
+
+  for (const [selectId, fieldId, scopeOptions, selected] of scopeFields) {
+    // A dimension with nothing behind it is hidden rather than implying that
+    // every recorded attempt carries metadata it never had.
+    setFieldHidden(fieldId, scopeOptions.length === 0);
+    fillSelect(selectId, [
+      { id: "all", label: "All" },
+      ...scopeOptions.map((option) => ({ id: option.id, label: withCount(option.label, option.count) }))
+    ], selected);
+  }
+}
+
+function buildHistoryScopeSummary(view, allRecords) {
+  const total = (allRecords || []).length;
+  if (!total) return "No recorded attempts yet.";
+
+  const parts = [`Showing ${view.records.length} of ${total} recorded attempt${total === 1 ? "" : "s"}`];
+  parts.push(HISTORY_DATE_RANGES.find((range) => range.id === view.filter.range)?.label || "All time");
+  if (view.filter.curriculum !== "all") {
+    parts.push(view.filter.curriculum === "unclassified" ? "Unclassified" : view.filter.curriculum);
+  }
+  if (view.filter.attemptType !== "all") {
+    parts.push(ATTEMPT_TYPE_LABELS[view.filter.attemptType] || view.filter.attemptType);
+  }
+  if (view.filter.semester !== "all") parts.push(view.filter.semester);
+  if (view.filter.lab !== "all") parts.push(view.filter.lab);
+  if (view.filter.week !== "all") parts.push(`Week ${view.filter.week}`);
+  return parts.join(" · ");
+}
+
+// Every disclosed count is computed from the live slice, never hardcoded.
+function buildHistoryDisclosure(view) {
+  const notes = [];
+
+  if (view.excludedUnclassifiedCount > 0) {
+    const count = view.excludedUnclassifiedCount;
+    notes.push(`${count} recorded attempt${count === 1 ? " is" : "s are"} unclassified and ${count === 1 ? "is" : "are"} not included in this filtered view.`);
+  }
+
+  if (view.excludedUndatedCount > 0) {
+    const count = view.excludedUndatedCount;
+    notes.push(`${count} recorded attempt${count === 1 ? " has" : "s have"} no saved date, so ${count === 1 ? "it cannot" : "they cannot"} be placed in a date range.`);
+  }
+
+  if (view.retentionBoundaryReached) {
+    notes.push(`This view reaches the oldest attempt still saved: Pharm-let keeps up to the most recent ${HISTORY_RETENTION_LIMIT} recorded attempts on this browser.`);
+  }
+
+  const conflicts = view.records.filter((record) => record.modeConflict).length;
+  if (conflicts > 0) {
+    notes.push(`${conflicts} recorded attempt${conflicts === 1 ? "" : "s"} stored a mode that disagrees with its saved attempt type; the saved attempt type was used and both values were left untouched.`);
+  }
+
+  return notes.join(" ");
+}
+
+function renderHistoryScope(view, allRecords) {
+  setTextContent("history-filter-summary", buildHistoryScopeSummary(view, allRecords));
+  setTextContent("history-disclosure", buildHistoryDisclosure(view));
+
+  const summary = view.summary;
+  let scopeNote = summary.attempts
+    ? `Metrics for the ${summary.attempts} recorded attempt${summary.attempts === 1 ? "" : "s"} in the selected view, not lifetime totals.`
+    : getEmptyHistoryMessage((allRecords || []).length > 0);
+  if (summary.unscorableAttempts > 0) {
+    scopeNote += ` ${summary.unscorableAttempts} attempt${summary.unscorableAttempts === 1 ? "" : "s"} had no usable score and ${summary.unscorableAttempts === 1 ? "is" : "are"} left out of the average.`;
+  }
+  setTextContent("overview-scope", scopeNote);
+}
+
+function getEmptyHistoryMessage(hasAnyRecords) {
+  return hasAnyRecords
+    ? "No recorded attempts match the selected filters."
+    : "No recorded attempts yet. Finish a quiz and it will appear here.";
 }
 
 function renderHistoryOverview(summary) {
@@ -1703,21 +1930,28 @@ function renderHistoryOverview(summary) {
   setTextContent("study-days", String(summary.studyDays));
 }
 
-function renderHistoryFamilies(families) {
+function describeAttempt(record) {
+  const score = record.scoreRatio === null
+    ? "Score unavailable"
+    : `${record.score}/${record.total} (${formatRatioPercent(record.scoreRatio, 0)})`;
+  const when = record.timestampMs === null ? "date not recorded" : getTimeAgo(new Date(record.timestampMs));
+  const notes = [];
+  if (record.chain?.remixGeneration) notes.push(`Remix generation ${record.chain.remixGeneration}`);
+  if (record.modeConflict) notes.push(`stored mode "${record.mode}"`);
+  return { score, when, notes: notes.join(" · ") };
+}
+
+function renderHistoryFamilies(families, hasAnyRecords) {
   const container = document.getElementById("quiz-stats");
   if (!container) return;
 
   if (!families.length) {
-    container.innerHTML = `<p style="color:var(--muted)">No quiz data yet. Complete some quizzes to see your performance!</p>`;
+    container.innerHTML = `<p style="color:var(--muted)">${sanitize(getEmptyHistoryMessage(hasAnyRecords))}</p>`;
     return;
   }
 
   container.innerHTML = "";
   families.forEach((family) => {
-    const div = document.createElement("div");
-    div.className = "flex justify-between items-center p-3 rounded-lg";
-    div.style.background = "var(--accent-light, rgba(139,30,63,0.1))";
-
     // Differently sized attempts never collapse into one averaged score.
     const headline = family.mixedQuestionCounts
       ? `Best ${formatRatioPercent(family.bestRatio)}`
@@ -1726,46 +1960,157 @@ function renderHistoryFamilies(families) {
       ? `Mixed sizes: ${family.questionCounts.join(", ")} questions`
       : `Best: ${formatRatioPercent(family.bestRatio)}`;
     const modeLabel = family.mode ? `Mode: ${sanitize(family.mode)} · ` : "";
+    const attemptRows = family.attempts.map((attempt) => {
+      const described = describeAttempt(attempt);
+      return `<div class="attempt-row">
+          <span>${sanitize(described.score)}</span>
+          <span class="attempt-meta">${sanitize([described.when, described.notes].filter(Boolean).join(" · "))}</span>
+        </div>`;
+    }).join("");
 
+    const div = document.createElement("div");
+    div.className = "p-3 rounded-lg";
+    div.style.background = "var(--accent-light, rgba(139,30,63,0.1))";
     div.innerHTML = `
-      <div>
-        <div class="font-semibold">${sanitize(family.label)}</div>
-        <div class="text-sm" style="color:var(--muted)">${modeLabel}${family.attemptCount} attempt${family.attemptCount === 1 ? "" : "s"}</div>
+      <div class="flex flex-wrap justify-between items-start gap-3">
+        <div class="min-w-0">
+          <div class="font-semibold">${sanitize(family.label)}</div>
+          <div class="mt-1"><span class="attempt-badge">${sanitize(family.attemptTypeLabel)}</span></div>
+          <div class="text-sm mt-1" style="color:var(--muted)">${modeLabel}${family.attemptCount} attempt${family.attemptCount === 1 ? "" : "s"}</div>
+        </div>
+        <div class="text-right">
+          <div class="font-semibold" style="color:var(--accent)">${sanitize(headline)}</div>
+          <div class="text-sm" style="color:var(--muted)">${sanitize(detail)}</div>
+        </div>
       </div>
-      <div class="text-right">
-        <div class="font-semibold" style="color:var(--accent)">${sanitize(headline)}</div>
-        <div class="text-sm" style="color:var(--muted)">${sanitize(detail)}</div>
+      <div class="mt-3">${attemptRows}</div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function buildAttemptTypeStats(records) {
+  const groups = new Map();
+  for (const record of records || []) {
+    if (!groups.has(record.attemptTypeId)) groups.set(record.attemptTypeId, []);
+    groups.get(record.attemptTypeId).push(record);
+  }
+
+  return ATTEMPT_TYPES
+    .filter((type) => groups.has(type.id))
+    .map((type) => {
+      const attempts = groups.get(type.id);
+      const ratios = attempts.map((attempt) => attempt.scoreRatio).filter((ratio) => ratio !== null);
+      return {
+        id: type.id,
+        label: type.label,
+        attemptCount: attempts.length,
+        averageRatio: averageRatios(ratios),
+        bestRatio: ratios.length ? Math.max(...ratios) : null,
+        totalQuestions: attempts.reduce(
+          (sum, attempt) => sum + (Number.isFinite(attempt.total) && attempt.total > 0 ? attempt.total : 0),
+          0
+        )
+      };
+    });
+}
+
+function renderAttemptTypePerformance(records, hasAnyRecords) {
+  const container = document.getElementById("attempt-type-stats");
+  if (!container) return;
+
+  const stats = buildAttemptTypeStats(records);
+  if (!stats.length) {
+    container.innerHTML = `<p style="color:var(--muted)">${sanitize(getEmptyHistoryMessage(hasAnyRecords))}</p>`;
+    return;
+  }
+
+  container.innerHTML = "";
+  stats.forEach((stat) => {
+    const div = document.createElement("div");
+    div.className = "stat-card";
+    div.innerHTML = `
+      <div class="stat-label">${sanitize(stat.label)}</div>
+      <div class="stat-value">${formatRatioPercent(stat.averageRatio)}</div>
+      <div class="text-sm mt-2" style="color:var(--muted)">
+        ${stat.attemptCount} attempt${stat.attemptCount === 1 ? "" : "s"} · ${stat.totalQuestions} question${stat.totalQuestions === 1 ? "" : "s"} · best ${formatRatioPercent(stat.bestRatio)}
       </div>
     `;
     container.appendChild(div);
   });
 }
 
-function renderRecentActivity(records) {
+function describeChainMember(record, chain) {
+  const parts = [record.attemptTypeLabel];
+  const attemptId = record.chain?.attemptId || "";
+  const parentAttemptId = record.chain?.parentAttemptId || "";
+
+  if (attemptId && attemptId === chain.rootAttemptId) {
+    parts.push("start of chain");
+  } else if (parentAttemptId) {
+    const parent = chain.attempts.find((candidate) => candidate.chain?.attemptId === parentAttemptId);
+    parts.push(parent ? `follows ${parent.attemptTypeLabel}` : "continues the chain");
+  }
+
+  if (record.chain?.remixGeneration) parts.push(`Remix generation ${record.chain.remixGeneration}`);
+  return parts.join(" · ");
+}
+
+function renderHistoryChains(chains) {
+  const section = document.getElementById("fall-chain-section");
+  const container = document.getElementById("fall-chains");
+  if (section) section.hidden = chains.length === 0;
+  if (!container) return;
+
+  if (!chains.length) {
+    container.innerHTML = "";
+    return;
+  }
+
+  container.innerHTML = "";
+  chains.forEach((chain) => {
+    // Chains read chronologically, oldest attempt first.
+    const members = [...chain.attempts].reverse().map((record) => {
+      const described = describeAttempt(record);
+      return `<div class="attempt-row">
+          <span>${sanitize(described.score)}</span>
+          <span class="attempt-meta">${sanitize(describeChainMember(record, chain))}</span>
+        </div>`;
+    }).join("");
+
+    const heading = chain.quizWeek ? `Week ${chain.quizWeek} chain` : "Challenge chain";
+    const div = document.createElement("div");
+    div.className = "rounded-xl border border-[var(--ring)] p-4";
+    div.style.background = "var(--accent-light, rgba(139,30,63,0.06))";
+    div.innerHTML = `
+      <div class="font-semibold">${sanitize(heading)} · ${chain.attemptCount} attempt${chain.attemptCount === 1 ? "" : "s"}</div>
+      <div class="mt-2">${members}</div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function renderRecentActivity(records, hasAnyRecords) {
   const container = document.getElementById("recent-activity");
   if (!container) return;
 
   if (!records.length) {
-    container.innerHTML = `<p style="color:var(--muted)">No recent activity.</p>`;
+    container.innerHTML = `<p style="color:var(--muted)">${sanitize(hasAnyRecords ? "No recent activity in the selected view." : "No recent activity yet.")}</p>`;
     return;
   }
 
   container.innerHTML = "";
   records.forEach((record) => {
-    const scoreLabel = record.scoreRatio === null
-      ? "Score unavailable"
-      : `${record.score}/${record.total} (${formatRatioPercent(record.scoreRatio, 0)})`;
-    const when = record.timestampMs === null ? "date not recorded" : getTimeAgo(new Date(record.timestampMs));
-
+    const described = describeAttempt(record);
     const div = document.createElement("div");
-    div.className = "flex justify-between items-center";
+    div.className = "flex flex-wrap justify-between items-center gap-2";
     div.innerHTML = `
-      <div>
+      <div class="min-w-0">
         <span class="font-semibold">${sanitize(record.title || record.quizId)}</span>
-        <span class="text-sm" style="color:var(--muted)"> · ${sanitize(record.mode)}</span>
+        <span class="text-sm" style="color:var(--muted)"> · ${sanitize(record.attemptTypeLabel)}</span>
       </div>
       <div class="text-sm" style="color:var(--muted)">
-        ${sanitize(scoreLabel)} · ${sanitize(when)}
+        ${sanitize(described.score)} · ${sanitize(described.when)}
       </div>
     `;
     container.appendChild(div);
