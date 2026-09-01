@@ -18,8 +18,8 @@ const LEGACY_BASELINE = Object.freeze({
   masterPoolSha256: "1fb50e96e60252a9839406d53bc929e9569d76c0ddc2522aff43adf9bdf2a87c"
 });
 const APPROVED_ENGINE_BASELINE = Object.freeze({
-  reference: "P2F-06 reporting-only metadata hook",
-  sha256: "db7c0c7850135eed1b985b025a0518db4a43913bba17f9b281d8cdb533f2ffaa"
+  reference: "F26-09 completion & continuation engine change",
+  sha256: "6dc5c2f6d467742e837435be1d120f1110eb9faacb9d985898efad52a5c8a507"
 });
 
 function sha256(value) {
