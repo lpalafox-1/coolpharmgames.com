@@ -22,7 +22,7 @@ import { loadBrowserGlobal } from "./browser-global-harness.mjs";
 import { buildFall2026Lab3Payload } from "../assets/js/fall-2026-lab3-launcher.js";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const ENGINE_TOKEN = "20260831c";
+const ENGINE_TOKEN = "20260901a";
 const REMIX_REQUEST_KEY = "pharmlet.fall-2026-lab3.boss-remix-request";
 const CUSTOM_QUIZ_KEY = "pharmlet.custom-quiz";
 const HISTORY_KEY = "pharmlet.history";
@@ -703,15 +703,20 @@ test("the remix falls back to bounded carried items only when fresh material run
   }
 });
 
-test("a remix fails closed when the chain has used every safe fresh candidate", () => {
-  const { questions } = buildFinishedAttempt(1, "f26-09-remix-fail-closed", [0, 1]);
-  const engine = loadEngine({ storage: createStorage() });
+function exhaustedRemixFixture(engine, quizWeek = 1) {
+  const { questions } = buildFinishedAttempt(quizWeek, `f26-09-remix-exhausted-${quizWeek}`, [0, 1]);
   const request = requestFor(engine, questions, { createdAt: 6_000 });
-  const practicePayload = buildPracticePayload(1, "f26-09-remix-fail-closed-fresh");
+  const practicePayload = buildPracticePayload(quizWeek, `f26-09-remix-exhausted-${quizWeek}-fresh`);
   request.chainQuestionIds = [
     ...request.chainQuestionIds,
     ...practicePayload.questions.map(identityOf)
   ];
+  return { questions, request, practicePayload };
+}
+
+test("a remix fails closed when the chain has used every safe fresh candidate", () => {
+  const engine = loadEngine({ storage: createStorage() });
+  const { request, practicePayload } = exhaustedRemixFixture(engine);
 
   assert.equal(
     engine.sandbox.buildFallLab3BossRemixPayload({ request, practicePayload, createdAt: 6_100 }),
@@ -724,8 +729,61 @@ test("a remix fails closed when the chain has used every safe fresh candidate", 
   assert.equal(engine.storage.getItem(REMIX_REQUEST_KEY), null, "the exhausted request is cleared");
   assert.match(
     engine.sandbox.takeFallLab3RemixNotice(),
-    /no fresh Week 1 question left/,
-    "the student is told why a standard practice set is running instead"
+    /every eligible Week 1 question has already been used/,
+    "the student is told why no Boss Remix could be built"
+  );
+});
+
+test("an exhausted Boss Remix stops at a decision point instead of starting a different quiz", () => {
+  const engine = loadEngine({ storage: createStorage() });
+  const { request, practicePayload } = exhaustedRemixFixture(engine);
+
+  engine.storage.setItem(REMIX_REQUEST_KEY, JSON.stringify(request));
+  assert.equal(engine.sandbox.consumeFallLab3BossRemixRequest(practicePayload, 6_200), null);
+  assert.ok(engine.sandbox.peekFallLab3RemixNotice(), "the loader can tell the remix was exhausted");
+
+  assert.equal(engine.sandbox.renderFallLab3RemixExhaustedDecision(practicePayload), true);
+
+  const card = engine.dom.get("question-card");
+  assert.match(card.innerHTML, /No Fresh Boss Remix Available/, "the student gets an explanation, not a quiz");
+  assert.match(card.innerHTML, /every eligible Week 1 question has already been used/);
+  assert.match(card.innerHTML, /only starts if you choose it here/);
+
+  const actionIds = [...String(card.innerHTML).matchAll(/data-completion-action="([^"]+)"/g)].map((match) => match[1]);
+  assert.deepEqual(actionIds, ["start-week-practice", "lab3-hub"], "the decision point offers explicit choices only");
+
+  // Nothing about a Week X practice attempt may have started on its own.
+  assert.equal(run(engine.sandbox, "state.questions.length"), 0, "no questions were loaded");
+  assert.equal(run(engine.sandbox, "state.timerHandle"), null, "no timer was started");
+  assert.equal(engine.location.reloads, 0, "no alternate quiz began as a consequence of Boss Remix");
+  assert.equal(engine.location.href, "", "and nothing navigated away on its own");
+  assert.equal(engine.dom.get("nav-map").style.display, "none", "the live answering surface stays retired");
+  assert.equal(engine.dom.get("check").style.display, "none");
+  assert.match(engine.dom.get("quiz-status").textContent, /nothing has started yet/);
+  assert.deepEqual(
+    JSON.parse(engine.storage.getItem(CUSTOM_QUIZ_KEY) || "null"),
+    null,
+    "the exhausted remix wrote no attempt of its own"
+  );
+  assert.equal(engine.sandbox.peekFallLab3RemixNotice(), "", "the explanation is shown once, not replayed later");
+
+  // The parked Week X practice set starts only from an affirmative choice.
+  const startButton = card.querySelectorAll("[data-completion-action]")[0];
+  assert.equal(startButton.dataset.completionAction, "start-week-practice");
+  assert.equal(engine.sandbox.startFallLab3PreparedWeekPractice(), true);
+  assert.equal(engine.location.reloads, 1, "the standard practice set begins only after the student asks for it");
+});
+
+test("the loader never substitutes a normal practice set for an exhausted remix", () => {
+  assert.equal(
+    engineSource.includes("consumeFallLab3BossRemixRequest(data) || data"),
+    false,
+    "an exhausted remix must not fall through to the launcher-built practice payload"
+  );
+  assert.match(
+    engineSource,
+    /renderFallLab3RemixExhaustedDecision\(data\);\s*\n\s*return;/,
+    "the loader stops at the decision point instead of continuing setup"
   );
 });
 

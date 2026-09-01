@@ -410,9 +410,10 @@ contract.
     has not used, tracked in an additive `metadata.fallLab3.chainQuestionIds`
     record that a Fall Boss Round now also carries. Exact repetition stays with
     Retry Same Boss; carried items are only a bounded fallback when the week's
-    fresh material runs out, and the remix fails closed (no remix, standard
-    practice set plus an explicit note) rather than duplicating or leaking
-    future-week material.
+    fresh material runs out. When no safe fresh question remains, the remix
+    fails closed at a decision point: nothing starts, the student is told why,
+    and the launcher-built Week X practice set begins only if they choose it —
+    never as an automatic substitute for the Boss Remix they asked for.
   - **Deterministic, capped size.** Boss 5 → Remix 6 → Remix 7, then the chain
     is capped: no further "+1" action is advertised, so every displayed
     "Boss Remix +1 (N)" is literally truthful.
@@ -450,7 +451,7 @@ contract.
   deferred.
 - **Engine-change protocol:** `assets/js/quizEngine.js` was the named file in
   scope; `quiz.html` carries the required cache-token bump
-  (`?v=20260831c`), `tools/engine-globals.manifest.json` was regenerated, and the
+  (`?v=20260901a`), `tools/engine-globals.manifest.json` was regenerated, and the
   four committed engine sha256 baselines were re-pinned to the approved F26-09
   engine in the same commit. Coverage lives in
   `tools/fall-2026-lab3-completion-continuation.test.mjs`.

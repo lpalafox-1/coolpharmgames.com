@@ -1896,6 +1896,10 @@ function takeFallLab3RemixNotice() {
     return notice;
 }
 
+function peekFallLab3RemixNotice() {
+    return fallLab3RemixNotice;
+}
+
 // The fresh remix material comes from a normal Week X practice set built by the
 // existing Fall launcher, so the engine never selects Fall source data or the
 // Fall generator itself. The pending request is consumed on the way back in.
@@ -1910,7 +1914,7 @@ function consumeFallLab3BossRemixRequest(data, now = Date.now()) {
 
     const payload = buildFallLab3BossRemixPayload({ request, practicePayload: data, createdAt: now });
     if (!payload) {
-        fallLab3RemixNotice = `Boss Remix had no fresh Week ${Number(request.quizWeek)} question left for this challenge chain, so this is a standard Week ${Number(request.quizWeek)} practice set instead.`;
+        fallLab3RemixNotice = `Boss Remix could not build a safe new challenge: every eligible Week ${Number(request.quizWeek)} question has already been used in this Boss Remix chain, and nothing outside Week ${Number(request.quizWeek)} may be added.`;
         return null;
     }
 
@@ -1955,6 +1959,50 @@ function buildFallLab3HistoryLineage() {
     if (!lineage.curriculumId) lineage.curriculumId = FALL_LAB3_CURRICULUM_ID;
 
     return lineage;
+}
+
+// An exhausted remix must never silently turn into a different quiz. The
+// launcher-built Week X set stays parked in storage until the student asks for
+// it, so Boss Remix, Retry, and New Week X Practice stay distinct actions.
+function renderFallLab3RemixExhaustedDecision(practicePayload) {
+    const quizWeek = Number(practicePayload?.metadata?.quizWeek) || 0;
+    const message = takeFallLab3RemixNotice()
+        || `Boss Remix could not build a safe new challenge for Week ${quizWeek}.`;
+
+    setCompletedAttemptControlsHidden(true);
+    hideQuizSessionNote();
+
+    if (getEl("quiz-title")) getEl("quiz-title").textContent = `Lab III Fall 2026 - Week ${quizWeek} Boss Remix`;
+    if (getEl("quiz-status")) getEl("quiz-status").textContent = "Boss Remix stopped here — nothing has started yet.";
+
+    const card = getEl("question-card");
+    if (!card) return false;
+
+    const actions = [
+        { id: "start-week-practice", tone: "accent", label: `🆕 Start Week ${quizWeek} Practice Set` },
+        { id: "lab3-hub", tone: "ghost", label: "← Return to Lab III Hub" }
+    ];
+
+    card.innerHTML = `<div class="text-center py-10">
+        <h2 class="text-3xl font-black mb-4">No Fresh Boss Remix Available</h2>
+        <p class="text-base opacity-80 max-w-xl mx-auto">${escapeHtml(message)}</p>
+        <p class="text-sm opacity-70 mt-3 max-w-xl mx-auto">Your finished attempts are already saved. Nothing is running right now, so pick what you want next.</p>
+        <div class="flex flex-col gap-3 items-center mt-6">
+            ${buildCompletionActionsMarkup(actions)}
+        </div>
+        <p class="mt-4 text-xs opacity-70 max-w-xl mx-auto">A Week ${quizWeek} practice set is a full 10-question set, not a Boss challenge, so it only starts if you choose it here.</p>
+    </div>`;
+
+    wireCompletionActions(card);
+    return true;
+}
+
+function startFallLab3PreparedWeekPractice() {
+    // The Week X practice payload the launcher already built is still stored;
+    // reloading this route starts it, and only from an explicit student choice.
+    state.progressCompleted = true;
+    location.reload();
+    return true;
 }
 
 function launchFallLab3BossRemix() {
@@ -3829,6 +3877,7 @@ function runCompletionAction(actionId) {
     if (actionId === "retry-attempt") return restartQuiz();
     if (actionId === "boss-remix") return launchFallLab3BossRemix();
     if (actionId === "new-week-practice") return startFallLab3WeekPractice(getFallLab3AttemptContext().quizWeek);
+    if (actionId === "start-week-practice") return startFallLab3PreparedWeekPractice();
     if (actionId === "lab3-hub") return openFallLab3Hub(getFallLab3AttemptContext().quizWeek);
     return undefined;
 }
@@ -8377,7 +8426,15 @@ async function main() {
 
             // A Fall Lab III Boss Remix returns through the existing weekly
             // launcher, so the fresh practice payload becomes the remix attempt.
-            data = consumeFallLab3BossRemixRequest(data) || data;
+            // If no safe fresh challenge can be built, stop at a decision point
+            // rather than starting the differently shaped practice set.
+            const remixPayload = consumeFallLab3BossRemixRequest(data);
+            if (remixPayload) {
+                data = remixPayload;
+            } else if (peekFallLab3RemixNotice()) {
+                renderFallLab3RemixExhaustedDecision(data);
+                return;
+            }
 
             state.questionReportContext = data?.metadata && typeof data.metadata === "object" && !Array.isArray(data.metadata)
                 ? { ...data.metadata }
