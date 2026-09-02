@@ -435,6 +435,24 @@ function matchesHistoryDateBounds(record, bounds) {
   return true;
 }
 
+// The curriculum-scope dimensions a record may or may not have recorded. A
+// record that never stored one of these must not be quietly dropped when that
+// dimension is filtered: absence of the field is not evidence of exclusion.
+const HISTORY_SCOPE_FILTERS = Object.freeze([
+  Object.freeze({ key: "semester", field: "semester", noun: "semester" }),
+  Object.freeze({ key: "lab", field: "lab", noun: "lab" }),
+  Object.freeze({ key: "week", field: "quizWeek", noun: "week" })
+]);
+
+function hasScopeValue(record, field) {
+  const value = record?.curriculum?.[field];
+  return value !== undefined && value !== null && String(value) !== "";
+}
+
+function getActiveScopeFilters(filter) {
+  return HISTORY_SCOPE_FILTERS.filter((scope) => String(filter?.[scope.key] || "all") !== "all");
+}
+
 function matchesCurriculumScope(record, filter) {
   const semester = String(filter?.semester || "all");
   const lab = String(filter?.lab || "all");
@@ -471,12 +489,40 @@ function filterHistoryRecords(records, filter = {}, now = Date.now()) {
 
   const kept = baseSlice.filter((record) => matchesCurriculumScope(record, filter));
   const keptSet = new Set(kept);
-  const excludedUnclassified = baseSlice.filter((record) => !record.curriculumKnown && !keptSet.has(record));
+  const activeScopes = getActiveScopeFilters(filter);
+
+  // Two independent reasons an excluded record deserves an explanation:
+  // its curriculum was never proven, or it is classified but never recorded
+  // the dimension being filtered on. A record can qualify for both; each
+  // sentence is individually true, and `excludedDisclosedCount` counts the
+  // distinct records so callers can assert shown + disclosed + genuinely
+  // out-of-scope == the slice.
+  const excludedUnclassified = [];
+  const missingScopeCounts = {};
+  const disclosed = new Set();
+
+  for (const record of baseSlice) {
+    if (keptSet.has(record)) continue;
+
+    if (!record.curriculumKnown) {
+      excludedUnclassified.push(record);
+      disclosed.add(record);
+    }
+
+    for (const scope of activeScopes) {
+      if (hasScopeValue(record, scope.field)) continue;
+      missingScopeCounts[scope.key] = (missingScopeCounts[scope.key] || 0) + 1;
+      disclosed.add(record);
+    }
+  }
 
   return {
     records: kept,
     bounds,
     excludedUnclassifiedCount: excludedUnclassified.length,
+    missingScopeCounts,
+    excludedMissingScopeCount: Object.values(missingScopeCounts).reduce((sum, count) => sum + count, 0),
+    excludedDisclosedCount: disclosed.size,
     excludedUndatedCount: undated.length
   };
 }
@@ -1737,45 +1783,62 @@ function applyHistoryFilterChange(key, value) {
   return renderRecordedAttemptDashboard(historyDashboardState.records, filter);
 }
 
-// Each control's options come from the slice its broader controls already
-// selected, so nothing advertises a combination with no records behind it. A
-// selection that the broader slice no longer contains falls back to "all"
-// rather than silently showing an empty dashboard.
+// Every control's options are counted against all the OTHER active filters
+// (faceted), so an option never advertises records the current view cannot
+// actually show. A selection is never cleared behind the user's back: one that
+// matches nothing is kept exactly as set, shown with a zero count, and
+// disclosed, so narrowing then widening always returns the user's own choices.
 function resolveHistoryView(records, rawFilter, now = Date.now()) {
   const filter = { ...getDefaultHistoryFilter(), ...(rawFilter || {}) };
-  const dateOnly = { range: filter.range, customStart: filter.customStart, customEnd: filter.customEnd };
-  const sliceFor = (extra) => filterHistoryRecords(records, { ...dateOnly, ...extra }, now).records;
 
-  const attemptTypes = getAvailableAttemptTypes(sliceFor({}));
-  if (filter.attemptType !== "all" && !attemptTypes.some((option) => option.id === filter.attemptType)) {
-    filter.attemptType = "all";
+  // A <select> whose current option list no longer contains its value reports
+  // "" on change. An empty value is the absence of a choice, not a filter, so
+  // it normalizes to "all" instead of rendering as a phantom active filter.
+  for (const key of ["range", "curriculum", "attemptType", "semester", "lab", "week"]) {
+    if (!String(filter[key] ?? "").trim()) filter[key] = "all";
   }
 
-  const scoped = { attemptType: filter.attemptType };
-  const curricula = getAvailableCurriculumOptions(sliceFor(scoped));
-  if (filter.curriculum !== "all" && !curricula.some((option) => option.id === filter.curriculum)) {
-    filter.curriculum = "all";
-  }
+  const facet = (key) => filterHistoryRecords(records, { ...filter, [key]: "all" }, now).records;
 
-  scoped.curriculum = filter.curriculum;
-  const semesters = getAvailableScopeOptions(sliceFor(scoped), "semester");
-  if (filter.semester !== "all" && !semesters.some((option) => option.id === filter.semester)) {
-    filter.semester = "all";
-  }
+  const unmatchedFilters = [];
+  const keepSelection = (options, key, noun, labelFor) => {
+    const selected = String(filter[key] || "all");
+    if (selected === "all" || options.some((option) => option.id === selected)) return options;
 
-  scoped.semester = filter.semester;
-  const labs = getAvailableScopeOptions(sliceFor(scoped), "lab");
-  if (filter.lab !== "all" && !labs.some((option) => option.id === filter.lab)) filter.lab = "all";
+    const label = labelFor(selected);
+    unmatchedFilters.push({ key, noun, label });
+    return [...options, { id: selected, label, count: 0, unmatched: true }];
+  };
 
-  scoped.lab = filter.lab;
-  const weeks = getAvailableScopeOptions(sliceFor(scoped), "quizWeek");
-  if (filter.week !== "all" && !weeks.some((option) => option.id === filter.week)) filter.week = "all";
+  const options = {
+    attemptTypes: keepSelection(
+      getAvailableAttemptTypes(facet("attemptType")),
+      "attemptType", "attempt type", (id) => ATTEMPT_TYPE_LABELS[id] || id
+    ),
+    curricula: keepSelection(
+      getAvailableCurriculumOptions(facet("curriculum")),
+      "curriculum", "curriculum", (id) => (id === "unclassified" ? "Unclassified" : id)
+    ),
+    semesters: keepSelection(
+      getAvailableScopeOptions(facet("semester"), "semester"),
+      "semester", "semester", (id) => id
+    ),
+    labs: keepSelection(
+      getAvailableScopeOptions(facet("lab"), "lab"),
+      "lab", "lab", (id) => id
+    ),
+    weeks: keepSelection(
+      getAvailableScopeOptions(facet("week"), "quizWeek"),
+      "week", "week", (id) => `Week ${id}`
+    )
+  };
 
   const result = filterHistoryRecords(records, filter, now);
   return {
     ...result,
     filter,
-    options: { attemptTypes, curricula, semesters, labs, weeks },
+    options,
+    unmatchedFilters,
     summary: summarizeHistoryRecords(result.records),
     retentionBoundaryReached: isHistoryRetentionBoundaryReached(records, result.records)
   };
@@ -1884,6 +1947,16 @@ function buildHistoryDisclosure(view) {
   if (view.excludedUnclassifiedCount > 0) {
     const count = view.excludedUnclassifiedCount;
     notes.push(`${count} recorded attempt${count === 1 ? " is" : "s are"} unclassified and ${count === 1 ? "is" : "are"} not included in this filtered view.`);
+  }
+
+  for (const scope of HISTORY_SCOPE_FILTERS) {
+    const count = view.missingScopeCounts?.[scope.key] || 0;
+    if (count <= 0) continue;
+    notes.push(`${count} recorded attempt${count === 1 ? " has" : "s have"} no saved ${scope.noun}, so ${count === 1 ? "it is" : "they are"} not included in this filtered view.`);
+  }
+
+  for (const unmatched of view.unmatchedFilters || []) {
+    notes.push(`No recorded attempts in this view match the selected ${unmatched.noun} "${unmatched.label}". That choice was kept as you set it — widen or reset the filters to see more.`);
   }
 
   if (view.excludedUndatedCount > 0) {

@@ -1258,10 +1258,181 @@ test("contextual scope options narrow with the selected higher-level slice", () 
   deepEqualAcrossRealms(p2.options.weeks.map((o) => o.id), ["3"]);
   assert.equal(p2.records.length, 1);
 
-  // A selection the broader slice no longer contains falls back to All.
+  // A selection that matches nothing is KEPT, not silently released, and is
+  // surfaced instead of leaving the user to notice a control changed itself.
   const stale = sandbox.resolveHistoryView(records, { ...sandbox.getDefaultHistoryFilter(), curriculum: "P2", lab: "Lab I" }, now);
-  assert.equal(stale.filter.lab, "all", "a stale narrower selection is released, not left showing nothing");
-  assert.equal(stale.records.length, 1);
+  assert.equal(stale.filter.lab, "Lab I", "the user's own selection survives");
+  assert.equal(stale.filter.curriculum, "P2");
+  assert.equal(stale.records.length, 0);
+  // Neither choice is satisfiable given the other, so both are reported
+  // rather than blaming whichever control happens to be narrower.
+  deepEqualAcrossRealms(stale.unmatchedFilters.map((entry) => entry.key), ["curriculum", "lab"]);
+  assert.ok(stale.options.labs.some((option) => option.id === "Lab I" && option.count === 0),
+    "the unmatched choice stays visible in its control, counted honestly at zero");
+});
+
+test("B1 a scope filter discloses records that never recorded that dimension", () => {
+  const sandbox = loadStatsSandbox({ history: [] });
+  const now = localDate(2026, 8, 20, 12, 0).getTime();
+  // lab-quiz1 carries a lab; the chapter reviews are classified P1 but never
+  // recorded one. Absence of the field is not evidence the attempt is out of
+  // scope, so they must not vanish without a word.
+  const records = sandbox.normalizeHistoryRecords([
+    { quizId: "lab-quiz1-antihypertensives", mode: "easy", score: 8, total: 10, timestamp: now },
+    { quizId: "chapter1-review", mode: "easy", score: 7, total: 10, timestamp: now },
+    { quizId: "chapter2-review", mode: "easy", score: 6, total: 10, timestamp: now }
+  ]);
+  assert.ok(records.every((record) => record.curriculumKnown), "all three are classified, so this is not the unclassified case");
+
+  const view = sandbox.filterHistoryRecords(records, { range: "all", lab: "Lab I" }, now);
+  assert.equal(view.records.length, 1);
+  assert.equal(view.excludedUnclassifiedCount, 0, "these are classified; the unclassified note must not be borrowed");
+  assert.equal(view.missingScopeCounts.lab, 2);
+  assert.equal(view.excludedDisclosedCount, 2);
+
+  sandbox.renderRecordedAttemptDashboard(records, { ...sandbox.getDefaultHistoryFilter(), lab: "Lab I" }, now);
+  assert.match(sandbox.document.getElementById("history-disclosure").textContent,
+    /2 recorded attempts have no saved lab, so they are not included in this filtered view\./);
+});
+
+test("B1 semester and week filters disclose their own missing dimension", () => {
+  const sandbox = loadStatsSandbox({ history: [] });
+  const now = localDate(2026, 8, 20, 12, 0).getTime();
+  const records = sandbox.normalizeHistoryRecords([
+    { quizId: "generated-custom-quiz-fall-2026-lab3-practice-q10", mode: "easy", score: 9, total: 10, timestamp: now,
+      attemptLineage: fallLineage() },
+    // Partial lineage (T-21 shape): recognized kind and week, no semester/lab.
+    { quizId: "generated-custom-quiz-fall-2026-lab3-boss-remix-q6", mode: "bossRemix", score: 4, total: 6, timestamp: now,
+      attemptLineage: { attemptKind: FALL_BOSS_REMIX_KIND, quizWeek: 3 } }
+  ]);
+
+  const bySemester = sandbox.filterHistoryRecords(records, { range: "all", semester: "Fall 2026" }, now);
+  assert.equal(bySemester.records.length, 1);
+  assert.equal(bySemester.missingScopeCounts.semester, 1);
+
+  // Both attempts recorded week 3, so a week filter has nothing to disclose.
+  const byWeek = sandbox.filterHistoryRecords(records, { range: "all", week: "3" }, now);
+  assert.equal(byWeek.records.length, 2);
+  assert.equal(byWeek.missingScopeCounts.week, undefined, "a dimension both records carry raises no note");
+  assert.equal(byWeek.excludedDisclosedCount, 0);
+
+  sandbox.renderRecordedAttemptDashboard(records, { ...sandbox.getDefaultHistoryFilter(), week: "3" }, now);
+  assert.doesNotMatch(sandbox.document.getElementById("history-disclosure").textContent, /no saved week/);
+});
+
+test("B1 shown + disclosed + genuinely out-of-scope always equals the slice", () => {
+  const sandbox = loadStatsSandbox({ history: [] });
+  const now = localDate(2026, 8, 20, 12, 0).getTime();
+  const records = sandbox.normalizeHistoryRecords([
+    { quizId: "lab-quiz1-antihypertensives", mode: "easy", score: 8, total: 10, timestamp: now },
+    { quizId: "chapter1-review", mode: "easy", score: 7, total: 10, timestamp: now },
+    { quizId: "generated-custom-quiz-fall-2026-lab3-practice-q10", mode: "easy", score: 9, total: 10, timestamp: now,
+      attemptLineage: fallLineage() },
+    { quizId: "generated-custom-quiz-fall-2026-lab3-boss-remix-q6", mode: "bossRemix", score: 4, total: 6, timestamp: now,
+      attemptLineage: { attemptKind: FALL_BOSS_REMIX_KIND, quizWeek: 3 } }
+  ]);
+
+  const scopeField = { semester: "semester", lab: "lab", week: "quizWeek" };
+  const combinations = [
+    { lab: "Lab III" }, { lab: "Lab I" }, { semester: "Fall 2026" }, { week: "3" },
+    { curriculum: "P1" }, { curriculum: "P2" }, { curriculum: "unclassified" },
+    { curriculum: "P2", lab: "Lab III" }, { semester: "Fall 2026", lab: "Lab III", week: "3" }
+  ];
+
+  for (const combination of combinations) {
+    const filter = { ...sandbox.getDefaultHistoryFilter(), ...combination };
+    const view = sandbox.filterHistoryRecords(records, filter, now);
+    const active = Object.keys(scopeField).filter((key) => filter[key] !== "all");
+
+    // A dropped record is legitimately out of scope only when it actually
+    // recorded every dimension being filtered on; anything else owes the
+    // reader an explanation.
+    const outOfScope = records.filter((record) => !view.records.includes(record)
+      && record.curriculumKnown
+      && active.every((key) => {
+        const value = record.curriculum[scopeField[key]];
+        return value !== undefined && value !== null && String(value) !== "";
+      }));
+
+    assert.equal(
+      view.records.length + view.excludedDisclosedCount + outOfScope.length,
+      records.length,
+      `every record is shown, disclosed, or provably out of scope for ${JSON.stringify(combination)}`
+    );
+  }
+});
+
+test("B2 filter options are faceted against every other active filter", () => {
+  const sandbox = loadStatsSandbox({ history: [] });
+  const now = localDate(2026, 8, 20, 12, 0).getTime();
+  const records = sandbox.normalizeHistoryRecords([
+    { quizId: "chapter1-review", mode: "easy", score: 8, total: 10, timestamp: now },
+    { quizId: "generated-custom-quiz-fall-2026-lab3-boss-remix-q6", mode: "bossRemix", score: 4, total: 6, timestamp: now,
+      attemptLineage: fallLineage({ attemptKind: FALL_BOSS_REMIX_KIND, questionCount: 6, remixGeneration: 1 }) }
+  ]);
+
+  // The Boss Remix attempt is P2, so a P1 view must not advertise it at all.
+  const p1 = sandbox.resolveHistoryView(records, { ...sandbox.getDefaultHistoryFilter(), curriculum: "P1" }, now);
+  assert.ok(!p1.options.attemptTypes.some((option) => option.id === "boss-remixes"),
+    "an attempt type with no records under the selected curriculum is not offered");
+  deepEqualAcrossRealms(p1.options.attemptTypes.map((option) => option.id), ["standard-practice"]);
+
+  // Faceting is symmetric: the curriculum control is counted against the
+  // selected attempt type, and every offered count is the count you get.
+  const remix = sandbox.resolveHistoryView(records, { ...sandbox.getDefaultHistoryFilter(), attemptType: "boss-remixes" }, now);
+  deepEqualAcrossRealms(remix.options.curricula.map((option) => `${option.id}:${option.count}`), ["P2:1"]);
+
+  for (const option of remix.options.curricula) {
+    const probe = sandbox.resolveHistoryView(records, { ...remix.filter, curriculum: option.id }, now);
+    assert.equal(probe.records.length, option.count, `selecting ${option.id} must yield exactly its advertised count`);
+  }
+});
+
+test("B2 an empty control value is absence of a filter, not a phantom filter", () => {
+  const sandbox = loadStatsSandbox({ history: [] });
+  const now = localDate(2026, 8, 20, 12, 0).getTime();
+  const records = sandbox.normalizeHistoryRecords([
+    { quizId: "chapter1-review", mode: "easy", score: 8, total: 10, timestamp: now },
+    { quizId: "chapter2-review", mode: "easy", score: 6, total: 10, timestamp: now }
+  ]);
+
+  // A <select> reports "" when its value is no longer among its options.
+  const view = sandbox.resolveHistoryView(records, { ...sandbox.getDefaultHistoryFilter(), attemptType: "", lab: "" }, now);
+  assert.equal(view.filter.attemptType, "all");
+  assert.equal(view.filter.lab, "all");
+  assert.equal(view.records.length, 2, "an empty value must not filter anything out");
+  deepEqualAcrossRealms(view.unmatchedFilters, [], "absence of a choice is not an unmatched choice");
+
+  sandbox.renderRecordedAttemptDashboard(records, { ...sandbox.getDefaultHistoryFilter(), attemptType: "" }, now);
+  const summary = sandbox.document.getElementById("history-filter-summary").textContent;
+  assert.doesNotMatch(summary, /·\s*$/, "no trailing separator for a filter that is not set");
+  assert.equal(summary, "Showing 2 of 2 recorded attempts · All time");
+});
+
+test("B2 narrowing then widening never loses a selection the user made", () => {
+  const sandbox = loadStatsSandbox({ history: [] });
+  const now = localDate(2026, 8, 20, 12, 0).getTime();
+  const records = sandbox.normalizeHistoryRecords([
+    { quizId: "chapter1-review", mode: "easy", score: 8, total: 10, timestamp: now },
+    { quizId: "generated-custom-quiz-fall-2026-lab3-practice-q10", mode: "easy", score: 9, total: 10, timestamp: now,
+      attemptLineage: fallLineage() }
+  ]);
+
+  sandbox.renderRecordedAttemptDashboard(records, { ...sandbox.getDefaultHistoryFilter(), curriculum: "P2", lab: "Lab III" }, now);
+
+  // Narrow onto a combination with nothing behind it...
+  const narrowed = sandbox.applyHistoryFilterChange("attemptType", "boss-remixes");
+  assert.equal(narrowed.records.length, 0);
+  assert.equal(narrowed.filter.curriculum, "P2", "the curriculum choice is not collateral damage");
+  assert.equal(narrowed.filter.lab, "Lab III");
+  assert.match(sandbox.document.getElementById("history-disclosure").textContent,
+    /No recorded attempts in this view match the selected attempt type/);
+
+  // ...then widen back and the user's own choices are still exactly as set.
+  const widened = sandbox.applyHistoryFilterChange("attemptType", "all");
+  assert.equal(widened.filter.curriculum, "P2");
+  assert.equal(widened.filter.lab, "Lab III");
+  assert.equal(widened.records.length, 1);
 });
 
 test("a filtered overview reports the selected view, not lifetime totals", () => {
