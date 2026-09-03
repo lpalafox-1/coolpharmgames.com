@@ -1145,7 +1145,7 @@ test("T-14 only the Stats cache token moved for P2F-08", () => {
   assert.match(statsPage, /assets\/js\/curriculum-metadata\.js\?v=20260831b/);
   assert.match(statsPage, /assets\/js\/quiz-catalog\.js\?v=20260831b/);
   assert.match(statsPage, /assets\/js\/question-reports\.js\?v=20260831b/);
-  assert.match(statsPage, /assets\/js\/review-queue-store\.js\?v=20260819a/);
+  assert.match(statsPage, /assets\/js\/review-queue-store\.js\?v=20260903a/);
   assert.match(statsPage, /assets\/js\/top-drugs-data\.js\?v=20260419a/);
 
   // The adapter must be in place before Stats consumes it.
@@ -1201,7 +1201,7 @@ test("T-17 every protected hash except the approved Stats baseline is unchanged"
     fallGenerator: "39e123b914f665282f6abce23110bf3e2bd4f0bcc1974b7038e0f9384cf9871a",
     fallLauncher: "255ef32be7b47e3f12f3b02da5db5a91e9040a5ee9fe406f68029e783a98157c",
     quizEngine: "6dc5c2f6d467742e837435be1d120f1110eb9faacb9d985898efad52a5c8a507",
-    reviewQueueStore: "67e0418362fba9da5abe5e079b2dad5437c543a636b48943e2f8a50e57b47a62",
+    reviewQueueStore: "150c9654d42da61f917ee85728293ade682bb4f72127ee917cb3ac77178670a0",
     favorites: "b6fbd5bbca17ea150e34e9b29c9e6391b5ae7359d7b6afb18fe6c7e7caed781d"
   });
   const PATHS = Object.freeze({

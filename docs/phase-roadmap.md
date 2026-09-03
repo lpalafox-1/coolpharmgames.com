@@ -484,7 +484,7 @@ owner reviews and merges its branch; implementation alone never promotes it to
 | P2F-06 | Question Reports v2 reproducibility workflow | `DONE` | P2F-05 |
 | P2F-07 | Additive curriculum metadata contract | `DONE` | P2F-06 |
 | P2F-08 | Stats Dashboard v2 | `DONE` | P2F-07 |
-| P2F-09 | Review Queue v2 + `wrongCounts` correction | `READY` | P2F-08 |
+| P2F-09 | Review Queue v2 + `wrongCounts` correction | `IN PROGRESS` | P2F-08 |
 | P2F-10 | Mobile/accessibility consistency pass | `BLOCKED` | P2F-09 |
 
 P2F-08 shipped in PR #67 (merge `c7ccf7d`, 2026-09-03), built from `383a1de`,

@@ -119,6 +119,31 @@
     return getTimestamp(a) <= getTimestamp(b) ? normalizeIso(a, b) : normalizeIso(b, a);
   }
 
+  // Aggregate miss/review counters. Presence is controlling: a counter sitting
+  // at 0 still proves the record is already current/aggregate shape, so it can
+  // never be mistaken for an unaggregated legacy record.
+  const AGGREGATE_COUNTER_KEYS = ["missCount", "reviewMissCount", "reviewCorrectCount", "reviewAttemptCount"];
+
+  function hasOwnProperty(target, key) {
+    return Boolean(target) && typeof target === "object" && Object.prototype.hasOwnProperty.call(target, key);
+  }
+
+  function hasAggregateCounters(rawEntry) {
+    return AGGREGATE_COUNTER_KEYS.some((key) => hasOwnProperty(rawEntry, key));
+  }
+
+  function isCountsMap(value) {
+    return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+  }
+
+  // A persisted wrongCounts map is authoritative and is never re-folded into.
+  // The legacy answer alias may be folded exactly once, and only for a record
+  // that predates aggregate counting entirely.
+  function shouldFoldLegacyAnswer(rawEntry) {
+    if (hasOwnProperty(rawEntry, "wrongCounts")) return false;
+    return !hasAggregateCounters(rawEntry);
+  }
+
   function mergeWrongCounts(a, b) {
     const merged = {};
 
@@ -155,8 +180,17 @@
     const legacyUserAnswer = serializeAnswerValue(
       rawEntry.lastUserAnswer ?? rawEntry.userAnswer ?? rawEntry.user ?? rawEntry.selected ?? ""
     );
-    const wrongCounts = mergeWrongCounts(rawEntry.wrongCounts, legacyUserAnswer ? { [legacyUserAnswer]: 1 } : null);
-    const hasAggregateCounts = "missCount" in rawEntry || "reviewMissCount" in rawEntry || "reviewCorrectCount" in rawEntry;
+    // The old implementation folded the answer alias on EVERY normalize pass,
+    // so a single miss grew its own frequency without any new wrong answer
+    // being submitted. The fold is now a one-time legacy conversion, and the
+    // normalized result always carries wrongCounts + counters, which is what
+    // makes re-normalizing a normalized entry a no-op.
+    const foldsLegacyAnswer = Boolean(legacyUserAnswer) && shouldFoldLegacyAnswer(rawEntry);
+    const wrongCounts = mergeWrongCounts(
+      isCountsMap(rawEntry.wrongCounts) ? rawEntry.wrongCounts : null,
+      foldsLegacyAnswer ? { [legacyUserAnswer]: 1 } : null
+    );
+    const hasAggregateCounts = hasAggregateCounters(rawEntry);
 
     const normalized = {
       version: STORAGE_VERSION,
@@ -374,7 +408,6 @@
       existing.key = key;
       existing.reviewAttemptCount += 1;
       existing.lastReviewedAt = timestampIso;
-      existing.lastUserAnswer = userAnswer || existing.lastUserAnswer || "";
 
       if (record.correct) {
         existing.reviewCorrectCount += 1;
@@ -388,6 +421,8 @@
         }
       } else {
         existing.reviewMissCount += 1;
+        // Only a wrong answer updates the "last wrong answer" display value.
+        existing.lastUserAnswer = userAnswer || existing.lastUserAnswer || "";
         existing.clearStreak = 0;
         existing.archived = false;
         existing.masteredAt = null;

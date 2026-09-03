@@ -1,8 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { loadBrowserGlobal } from "./browser-global-harness.mjs";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const storeSource = readFileSync(path.join(repoRoot, "assets/js/review-queue-store.js"), "utf8");
 
 function loadStore() {
   return loadBrowserGlobal("assets/js/review-queue-store.js").PharmletReviewQueueStore;
@@ -51,12 +56,11 @@ test("a missed question creates a v2 entry with the documented key grammar", () 
   assert.equal(entry.clearStreak, 0);
   assert.equal(entry.archived, false);
   assert.equal(entry.lastUserAnswer, "ACE inhibitor");
-  // Characterizes current behavior: normalizeEntry folds userAnswer into
-  // wrongCounts once (legacy-record support), then the miss itself adds one
-  // more — a first miss therefore records 2, and every later normalize pass
-  // re-adds the lastUserAnswer fold. Flagged as a latent display-count quirk.
+  // P2F-09: one genuine miss records exactly one wrong-answer event. The entry
+  // is built with aggregate counters present, so the legacy alias is never
+  // folded on top of the miss itself.
   // (Spread copies the vm-realm object so deep-equal compares same-realm prototypes.)
-  assert.deepEqual({ ...entry.wrongCounts }, { "ACE inhibitor": 2 });
+  assert.deepEqual({ ...entry.wrongCounts }, { "ACE inhibitor": 1 });
   assert.equal(entry.lastMissedAt, "2026-07-01T12:00:00.000Z");
   assert.equal(Object.hasOwn(entry, "metadata"), false, "legacy entries must not gain strict metadata");
   assert.equal(Object.hasOwn(entry, "_acceptedAnswers"), false, "legacy entries must not gain accepted-answer fields");
@@ -130,8 +134,9 @@ test("HTML and plain-text prompts deduplicate to the same entry", () => {
 
   assert.equal(queue.length, 1);
   assert.equal(queue[0].missCount, 2);
-  // 4 = first miss (2, see key-grammar test) + normalize re-fold (1) + second miss (1).
-  assert.deepEqual({ ...queue[0].wrongCounts }, { "ACE inhibitor": 4 });
+  // Two genuine misses of the same wrong answer count exactly twice. The
+  // intervening normalizeQueue pass inside mergeMissedEntries adds nothing.
+  assert.deepEqual({ ...queue[0].wrongCounts }, { "ACE inhibitor": 2 });
 });
 
 test("array answers produce an order-independent signature", () => {
@@ -262,7 +267,239 @@ test("most-missed aggregation groups identical questions across quizzes", () => 
   assert.equal(top.misses, 3);
   assert.equal(top.quizCount, 2);
   assert.equal(top.commonWrong, "ACE inhibitor");
-  // 6 = entry one's stored 2 + two normalize re-folds, plus entry two's
-  // userAnswer folded twice (see the legacy-fold note in the key-grammar test).
-  assert.equal(top.commonWrongCount, 6);
+  // Exactly the stored historical value: both records carry wrongCounts, so
+  // their lastUserAnswer aliases are never folded in on top of it.
+  assert.equal(top.commonWrongCount, 2);
+});
+
+// --- P2F-09 weakness-integrity gates -----------------------------------------
+// wrongCounts is authoritative whenever it exists; the legacy answer alias is a
+// one-time conversion for records that predate aggregate counting.
+
+function plainCounts(entry) {
+  return { ...(entry?.wrongCounts || {}) };
+}
+
+// G1 Idempotence.
+test("G1 normalizeQueue is idempotent across every fixture shape", () => {
+  const store = loadStore();
+  const fixtures = {
+    v2: [{
+      ...missedRecord(), version: 2, key: "k", missCount: 3, reviewMissCount: 1, reviewCorrectCount: 2,
+      reviewAttemptCount: 3, clearStreak: 1, wrongCounts: { "ACE inhibitor": 3 }, lastUserAnswer: "ACE inhibitor"
+    }],
+    legacy: [{
+      quizId: "chapter1-review", prompt: "Metoprolol is which class?", answer: "Beta blocker",
+      userAnswer: "ACE inhibitor", timestamp: "2026-07-01T12:00:00.000Z"
+    }],
+    hybrid: [{ ...missedRecord(), missCount: 2, lastUserAnswer: "Diuretic" }],
+    malformed: [
+      null, 42, "nope", [], {},
+      { prompt: "", answer: "" },
+      { ...missedRecord(), wrongCounts: ["bogus"] },
+      { ...missedRecord(), wrongCounts: { "ACE inhibitor": "many", Diuretic: -4, Statin: null } }
+    ],
+    duplicate: [missedRecord(), missedRecord(), { ...missedRecord(), prompt: "<b>Metoprolol</b> is which class?" }],
+    strictFitb: [{
+      ...missedRecord(), type: "fitb", answer: "Metoprolol",
+      metadata: { answerMatching: { spellingSensitive: true, capitalizationSensitive: false } },
+      _acceptedAnswers: ["Metoprolol", "metoprolol tartrate"]
+    }],
+    mastered: [{ ...missedRecord(), clearStreak: 3, archived: true, masteredAt: "2026-07-02T12:00:00.000Z" }],
+    refreshDue: [{
+      ...missedRecord(), clearStreak: 3, archived: true,
+      masteredAt: new Date(Date.now() - (30 * DAY_MS)).toISOString(),
+      lastReviewedAt: new Date(Date.now() - (30 * DAY_MS)).toISOString(),
+      lastMissedAt: new Date(Date.now() - (40 * DAY_MS)).toISOString(),
+      createdAt: new Date(Date.now() - (60 * DAY_MS)).toISOString()
+    }]
+  };
+
+  for (const [name, fixture] of Object.entries(fixtures)) {
+    const once = store.normalizeQueue(fixture);
+    let current = once;
+    for (let pass = 0; pass < 12; pass += 1) {
+      current = store.normalizeQueue(JSON.parse(JSON.stringify(current)));
+      assert.deepEqual(
+        JSON.parse(JSON.stringify(current)),
+        JSON.parse(JSON.stringify(once)),
+        `${name}: normalize pass ${pass + 2} must be semantically identical to pass 1`
+      );
+    }
+  }
+});
+
+// G2 Authoritative map.
+test("G2 an existing wrongCounts map is never re-folded into", () => {
+  const store = loadStore();
+  for (const alias of ["lastUserAnswer", "userAnswer", "user", "selected"]) {
+    const [entry] = store.normalizeQueue([{
+      ...missedRecord(), userAnswer: undefined, [alias]: "ACE inhibitor",
+      missCount: 4, wrongCounts: { "ACE inhibitor": 4 }
+    }]);
+    assert.deepEqual(plainCounts(entry), { "ACE inhibitor": 4 }, `${alias} must not fold into an existing map`);
+  }
+
+  // Even with legacy fields and counters coexisting alongside the map.
+  const [mixed] = store.normalizeQueue([{
+    ...missedRecord(), user: "Diuretic", selected: "Statin",
+    missCount: 0, reviewMissCount: 0, wrongCounts: { "ACE inhibitor": 7 }
+  }]);
+  assert.deepEqual(plainCounts(mixed), { "ACE inhibitor": 7 });
+});
+
+// G3 Legacy single-miss.
+test("G3 a true legacy record folds its answer alias exactly once", () => {
+  const store = loadStore();
+  for (const alias of ["lastUserAnswer", "userAnswer", "user", "selected"]) {
+    const legacy = {
+      quizId: "chapter1-review", prompt: "Metoprolol is which class?",
+      answer: "Beta blocker", [alias]: "ACE inhibitor", timestamp: "2026-07-01T12:00:00.000Z"
+    };
+    const [entry] = store.normalizeQueue([legacy]);
+    assert.deepEqual(plainCounts(entry), { "ACE inhibitor": 1 }, `${alias} folds once`);
+    assert.equal(entry.missCount, 1, "a bare legacy record is treated as a single miss");
+
+    // The converted result is structurally aggregate, so it cannot fold again.
+    const [again] = store.normalizeQueue([JSON.parse(JSON.stringify(entry))]);
+    assert.deepEqual(plainCounts(again), { "ACE inhibitor": 1 }, `${alias} does not fold a second time`);
+  }
+});
+
+// G4 Ambiguous aggregate.
+test("G4 aggregate counters without wrongCounts normalize to an empty map", () => {
+  const store = loadStore();
+  for (const counter of ["missCount", "reviewMissCount", "reviewCorrectCount", "reviewAttemptCount"]) {
+    for (const value of [0, 5]) {
+      const [entry] = store.normalizeQueue([{
+        quizId: "chapter1-review", prompt: "Metoprolol is which class?", answer: "Beta blocker",
+        lastUserAnswer: "ACE inhibitor", [counter]: value, timestamp: "2026-07-01T12:00:00.000Z"
+      }]);
+      assert.deepEqual(plainCounts(entry), {},
+        `${counter}=${value} proves aggregate shape, so no count may be manufactured`);
+      assert.equal(entry.lastUserAnswer, "ACE inhibitor", "the display value is still preserved");
+    }
+  }
+});
+
+// G5 Historical honesty.
+test("G5 existing positive wrongCounts values are preserved exactly", () => {
+  const store = loadStore();
+  const stored = { "ACE inhibitor": 9, Diuretic: 3, Statin: 1 };
+  const [entry] = store.normalizeQueue([{ ...missedRecord(), missCount: 13, wrongCounts: { ...stored } }]);
+  assert.deepEqual(plainCounts(entry), stored, "no migration, decrement, or redistribution");
+
+  // Inflated legacy data is left exactly as stored - it is never "repaired".
+  const [inflated] = store.normalizeQueue([{ ...missedRecord(), missCount: 1, wrongCounts: { "ACE inhibitor": 47 } }]);
+  assert.deepEqual(plainCounts(inflated), { "ACE inhibitor": 47 });
+});
+
+// G6 Normal miss.
+test("G6 each genuine miss increments exactly one answer exactly once", () => {
+  const store = loadStore();
+  const first = store.mergeMissedEntries([], [missedRecord()]);
+  assert.equal(first[0].missCount, 1);
+  assert.deepEqual(plainCounts(first[0]), { "ACE inhibitor": 1 });
+
+  const second = store.mergeMissedEntries(first, [missedRecord()]);
+  assert.equal(second[0].missCount, 2);
+  assert.deepEqual(plainCounts(second[0]), { "ACE inhibitor": 2 });
+
+  const third = store.mergeMissedEntries(second, [missedRecord({ userAnswer: "Diuretic" })]);
+  assert.equal(third[0].missCount, 3);
+  assert.deepEqual(plainCounts(third[0]), { "ACE inhibitor": 2, Diuretic: 1 },
+    "a different wrong answer increments only itself");
+  assert.equal(third[0].lastUserAnswer, "Diuretic");
+});
+
+// G7 Incorrect review.
+test("G7 one incorrect review increments review counters and one answer key", () => {
+  const store = loadStore();
+  const base = store.mergeMissedEntries([], [missedRecord()]);
+  const after = store.applyReviewResults(base, [{
+    ...missedRecord(), userAnswer: "Diuretic", correct: false, timestamp: "2026-07-05T12:00:00.000Z"
+  }]);
+
+  assert.equal(after[0].reviewAttemptCount, 1);
+  assert.equal(after[0].reviewMissCount, 1);
+  assert.equal(after[0].reviewCorrectCount, 0);
+  assert.deepEqual(plainCounts(after[0]), { "ACE inhibitor": 1, Diuretic: 1 });
+  assert.equal(after[0].lastUserAnswer, "Diuretic");
+  assert.equal(after[0].clearStreak, 0, "mastery resets");
+  assert.equal(after[0].archived, false);
+});
+
+// G8 Correct review.
+test("G8 a correct review never touches wrongCounts or lastUserAnswer", () => {
+  const store = loadStore();
+  const base = store.mergeMissedEntries([], [missedRecord()]);
+  const after = store.applyReviewResults(base, [{
+    ...missedRecord(), userAnswer: "Beta blocker", correct: true, timestamp: "2026-07-05T12:00:00.000Z"
+  }]);
+
+  assert.equal(after[0].reviewAttemptCount, 1);
+  assert.equal(after[0].reviewCorrectCount, 1);
+  assert.equal(after[0].reviewMissCount, 0);
+  assert.equal(after[0].clearStreak, 1, "mastery advances");
+  assert.deepEqual(plainCounts(after[0]), { "ACE inhibitor": 1 }, "wrongCounts untouched");
+  assert.equal(after[0].lastUserAnswer, "ACE inhibitor", "a correct answer is not a wrong answer");
+});
+
+// G9 Mastery regression.
+test("G9 three clean reviews master, and a later genuine miss resets", () => {
+  const store = loadStore();
+  // Mastery age is measured against the wall clock, so a freshly mastered
+  // entry needs recent timestamps or it is legitimately refresh-due.
+  const recent = (daysAgo) => new Date(Date.now() - (daysAgo * DAY_MS)).toISOString();
+  let queue = store.mergeMissedEntries([], [missedRecord({ timestamp: recent(10) })]);
+  for (let i = 3; i >= 1; i -= 1) {
+    queue = store.applyReviewResults(queue, [{
+      ...missedRecord(), correct: true, timestamp: recent(i)
+    }]);
+  }
+  assert.equal(queue[0].clearStreak, 3);
+  assert.equal(queue[0].archived, true, "mastered entries archive");
+  assert.equal(store.getMasterySummary(queue[0]).mastered, true);
+  assert.equal(store.getActiveEntries(queue).length, 0, "mastered entries leave the active view");
+
+  queue = store.mergeMissedEntries(queue, [missedRecord({ timestamp: new Date().toISOString() })]);
+  assert.equal(queue[0].clearStreak, 0, "a genuine miss resets mastery");
+  assert.equal(queue[0].archived, false);
+  assert.equal(queue[0].masteredAt, null);
+
+  // Refresh-due behavior is unchanged.
+  const stale = store.normalizeQueue([{
+    ...missedRecord(), clearStreak: 3, archived: true,
+    masteredAt: new Date(Date.now() - (30 * DAY_MS)).toISOString(),
+    lastReviewedAt: new Date(Date.now() - (30 * DAY_MS)).toISOString(),
+    lastMissedAt: new Date(Date.now() - (40 * DAY_MS)).toISOString(),
+    createdAt: new Date(Date.now() - (60 * DAY_MS)).toISOString()
+  }]);
+  assert.equal(store.isMasteryRefreshDue(stale[0]), true);
+  assert.equal(store.getActiveEntries(stale).length, 1, "refresh-due entries come back into view");
+});
+
+// G14 Storage contract.
+test("G14 storage stays at version 2 with no proactive migration or write-back", () => {
+  const store = loadStore();
+  assert.equal(store.STORAGE_VERSION, 2);
+  assert.match(storeSource, /const STORAGE_VERSION = 2;/);
+
+  // The store is a pure transform: it never reaches storage or the network on
+  // its own, so nothing can be written back or fetched at load time.
+  for (const forbidden of [
+    /localStorage/, /sessionStorage/, /\bfetch\s*\(/, /XMLHttpRequest/,
+    /navigator\.sendBeacon/, /new WebSocket/, /EventSource/
+  ]) {
+    assert.doesNotMatch(storeSource, forbidden, `store must not reference ${forbidden}`);
+  }
+
+  assert.equal(store.normalizeQueue([]).length, 0, "an empty queue stays empty");
+  assert.equal(store.normalizeQueue(null).length, 0);
+
+  // Normalizing does not mutate the caller's stored value.
+  const raw = [{ ...missedRecord(), missCount: 2, wrongCounts: { "ACE inhibitor": 2 } }];
+  const rawString = JSON.stringify(raw);
+  store.normalizeQueue(raw);
+  assert.equal(JSON.stringify(raw), rawString, "input records are not mutated in place");
 });
