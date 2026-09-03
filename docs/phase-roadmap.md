@@ -483,15 +483,16 @@ owner reviews and merges its branch; implementation alone never promotes it to
 | P2F-05 | Top Drugs Reference v2 performance/current-P2 shortcuts | `DONE` | P2F-04 |
 | P2F-06 | Question Reports v2 reproducibility workflow | `DONE` | P2F-05 |
 | P2F-07 | Additive curriculum metadata contract | `DONE` | P2F-06 |
-| P2F-08 | Stats Dashboard v2 | `IN PROGRESS` | P2F-07 |
-| P2F-09 | Review Queue v2 + `wrongCounts` correction | `BLOCKED` | P2F-08 |
+| P2F-08 | Stats Dashboard v2 | `DONE` | P2F-07 |
+| P2F-09 | Review Queue v2 + `wrongCounts` correction | `READY` | P2F-08 |
 | P2F-10 | Mobile/accessibility consistency pass | `BLOCKED` | P2F-09 |
 
-P2F-08 is `IN PROGRESS` on an unmerged implementation branch and is **not**
-shipped. No task in this lane is currently `READY`. P2F-09 is the next task in
-sequence but remains `BLOCKED`: it becomes eligible only after the owner
-reviews and merges P2F-08, and P2F-09 continues to own the known Review Queue
-`wrongCounts` issue, which P2F-08 deliberately does not touch.
+P2F-08 shipped in PR #67 (merge `c7ccf7d`, 2026-09-03), built from `383a1de`,
+`9a0d8d3`, and the review-correction commit `a9a25a9`. P2F-09 is now the sole
+`READY` task and continues to own the known Review Queue `wrongCounts` issue,
+which P2F-08 deliberately did not touch. READY records priority only: P2F-09
+still needs its own owner-approved scope and allowed-files contract before any
+implementation starts.
 
 P2F-08 is read-side only. It adds a Stats-local normalization and provenance
 layer over `pharmlet.history` and introduces zero new writes: history, Review
@@ -522,6 +523,25 @@ Question Reports consumes the contract additively; Review Queue, Favorites,
 canonical sources, generator output, and scoring remain unmigrated and
 unchanged. The Fall generator remains feature-frozen, and F26-MTC-01 remains
 deferred.
+
+### P2F-08 follow-ups accepted as non-blocking at merge
+
+These were identified in final review, judged not to block PR #67, and are
+recorded here so they are not rediscovered from scratch. None of them causes
+Stats to assert something the underlying stores do not support, which is why
+each was accepted. They are candidates for a later Stats pass, not authority to
+change Stats now.
+
+| Item | Observed behavior | Boundary |
+| --- | --- | --- |
+| P2F-08-F1 — additive-reading disclosure | When one excluded record is both unclassified and missing the dimension being filtered on, it is counted in both sentences, so the notes can read as a larger total than the number of records behind them. The distinct count is computed correctly (`excludedDisclosedCount`) but is not rendered; the adjacent "Showing N of M" line remains authoritative. | Presentation only; no count shown is false |
+| P2F-08-F2 — unclassified note without a curriculum filter | Filtering by lab alone can still emit the "N recorded attempts are unclassified" note. Both clauses are true, but it offers a reason the reader did not ask about while the missing-dimension note already explains the exclusion. | Suppress unless a curriculum filter is active |
+| P2F-08-F3 — inverted custom date range | Choosing an end date before the start date yields zero results with no explanation — the only empty state on the page that does not explain itself. "Showing 0 of N" stays accurate. | Needs a range-order notice, not a filter-logic change |
+
+Two further cosmetic notes from the same review: a mixed-size display family
+takes its label from an arbitrary member (the adjacent "Mixed sizes" line
+corrects it in place), and an unmatched scope option is appended after sorting.
+Neither is reachable in a way that misstates data.
 
 P2F-05 kept the separate 169-record P1 and
 100-record P2 canonical sources behind the existing normalization adapter,
