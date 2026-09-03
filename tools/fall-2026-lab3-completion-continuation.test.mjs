@@ -1155,6 +1155,6 @@ test("normal Fall generation semantics are untouched by the continuation work", 
 test("the engine cache token is refreshed for quiz.html only", () => {
   const quiz = read("quiz.html");
   assert.ok(quiz.includes(`assets/js/quizEngine.js?v=${ENGINE_TOKEN}`), "the engine change needs a fresh cache token");
-  assert.ok(read("stats.html").includes("assets/js/stats.js?v=20260901b"), "unrelated bundles keep their tokens");
+  assert.ok(read("stats.html").includes("assets/js/stats.js?v=20260903a"), "unrelated bundles keep their tokens");
   assert.ok(read("lab3-fall-2026.html").includes('src="assets/js/fall-2026-lab3-launcher.js?v=20260827a"'));
 });

@@ -451,16 +451,28 @@
     );
   }
 
-  function getCommonWrongAnswer(entry) {
-    const wrongCounts = entry?.wrongCounts && typeof entry.wrongCounts === "object" ? entry.wrongCounts : {};
+  // Only a positive, finite count is evidence of a real wrong-answer pattern.
+  // Zero, negative, and nonnumeric values are not weak signals to fall back on
+  // - they are no signal, and callers must omit the claim entirely.
+  function getEffectiveWrongCount(value) {
+    const count = Number(value);
+    return Number.isFinite(count) && count > 0 ? count : 0;
+  }
+
+  function getRankedWrongAnswers(entry) {
+    const wrongCounts = isCountsMap(entry?.wrongCounts) ? entry.wrongCounts : {};
     return Object.entries(wrongCounts)
-      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0]?.[0] || "";
+      .map(([answer, count]) => [answer, getEffectiveWrongCount(count)])
+      .filter(([answer, count]) => answer && count > 0)
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+  }
+
+  function getCommonWrongAnswer(entry) {
+    return getRankedWrongAnswers(entry)[0]?.[0] || "";
   }
 
   function getCommonWrongAnswerCount(entry) {
-    const commonWrong = getCommonWrongAnswer(entry);
-    if (!commonWrong) return 0;
-    return Math.max(0, Number(entry?.wrongCounts?.[commonWrong]) || 0);
+    return getRankedWrongAnswers(entry)[0]?.[1] || 0;
   }
 
   function getMasterySummary(entry) {
@@ -552,8 +564,7 @@
 
     return Array.from(groups.values())
       .map((group) => {
-        const commonWrong = Object.entries(group.wrongCounts)
-          .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0] || ["", 0];
+        const commonWrong = getRankedWrongAnswers(group)[0] || ["", 0];
 
         return {
           prompt: group.prompt,
@@ -585,6 +596,7 @@
     getLatestActivityTimestamp,
     getCommonWrongAnswer,
     getCommonWrongAnswerCount,
+    getRankedWrongAnswers,
     getMasterySummary,
     getDisplayTitle,
     getMostMissedQuestions

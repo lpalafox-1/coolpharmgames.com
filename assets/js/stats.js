@@ -1420,10 +1420,10 @@ function buildReviewQueuePlaylistSolution(entry) {
   const temptingWrong = reviewQueueStore ? reviewQueueStore.getCommonWrongAnswer(entry) : "";
   const missCount = reviewQueueStore ? reviewQueueStore.getEntryMissCount(entry) : 1;
 
+  // Same rule as the Review Queue page: no positive wrong-answer count means
+  // no wrong-answer claim. A bare lastUserAnswer is not a substitute.
   if (temptingWrong) {
     parts.push(`Most tempting wrong answer: ${temptingWrong}`);
-  } else if (entry.lastUserAnswer) {
-    parts.push(`Last wrong answer: ${entry.lastUserAnswer}`);
   }
 
   parts.push(`Missed ${missCount} time${missCount === 1 ? "" : "s"}`);
@@ -1436,7 +1436,7 @@ function buildReviewQueuePlaylistQuestion(entry) {
     ? reviewQueueStore.getDisplayTitle(entry)
     : (entry.title || quizCatalog?.getEntry?.(quizId)?.title || quizCatalog?.buildDynamicQuizLabel?.(quizId) || quizId || "Review Queue");
 
-  return {
+  const question = {
     type: entry.type,
     prompt: entry.prompt,
     choices: entry.choices,
@@ -1449,6 +1449,26 @@ function buildReviewQueuePlaylistQuestion(entry) {
       : "Review your previous answer carefully.",
     solution: buildReviewQueuePlaylistSolution(entry)
   };
+
+  // A strict fill-in-the-blank must score identically whether it was launched
+  // from the Review Queue page or from here. The marker is copied only when it
+  // is actually valid, and accepted answers only alongside it, so a missing or
+  // malformed marker can never broaden matching.
+  const answerMatching = entry?.metadata?.answerMatching;
+  if (answerMatching?.spellingSensitive === true
+      && answerMatching?.capitalizationSensitive === false) {
+    question.metadata = {
+      answerMatching: {
+        spellingSensitive: true,
+        capitalizationSensitive: false
+      }
+    };
+    if (Array.isArray(entry?._acceptedAnswers)) {
+      question._acceptedAnswers = [...entry._acceptedAnswers];
+    }
+  }
+
+  return question;
 }
 
 function resolvePlaylistSize(playlist, requestedSize) {
