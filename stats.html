@@ -27,6 +27,22 @@
     .progress-ring { width: 120px; height: 120px; transform: rotate(-90deg); }
     .progress-ring-circle { fill: none; stroke: var(--ring); stroke-width: 8; }
     .progress-ring-fill { fill: none; stroke: var(--accent); stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.5s; }
+
+    /* Recorded-attempt dashboard (P2F-08) */
+    /* A `display` utility class outranks the UA [hidden] rule, so the
+       conditionally shown filter fields need this to actually hide. */
+    [hidden] { display: none !important; }
+    .filter-field { display: flex; flex-direction: column; gap: 0.35rem; }
+    .filter-field > span { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+    .filter-field select, .filter-field input { width: 100%; }
+    .scope-note { font-size: 0.875rem; color: var(--muted); }
+    .attempt-badge { display: inline-block; border: 1px solid var(--ring); border-radius: 999px; padding: 0.1rem 0.6rem; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+    .attempt-row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem 1rem; padding: 0.4rem 0; border-top: 1px solid var(--ring); font-size: 0.875rem; }
+    .attempt-row:first-child { border-top: 0; }
+    .attempt-row .attempt-meta { color: var(--muted); }
+    @media (max-width: 480px) {
+      .stat-value { font-size: 1.6rem; }
+    }
   </style>
 </head>
 
@@ -44,9 +60,65 @@
   </header>
 
   <main class="max-w-6xl mx-auto p-6">
+    <!-- Recorded-attempt filters -->
+    <section class="mb-8">
+      <div class="card p-4">
+        <h2 class="text-2xl font-bold mb-1">Recorded Attempts</h2>
+        <p class="scope-note mb-4">
+          These filters apply to your saved attempt history only: the overview metrics, Performance by Quiz,
+          Performance by Attempt Type, challenge chains, Recent Activity, and Performance by Category.
+          They do not filter the Review Queue or Question Reports below.
+        </p>
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <label class="filter-field">
+            <span>Date range</span>
+            <select id="filter-date"></select>
+          </label>
+          <label class="filter-field">
+            <span>Curriculum</span>
+            <select id="filter-curriculum"></select>
+          </label>
+          <label class="filter-field">
+            <span>Attempt type</span>
+            <select id="filter-attempt-type"></select>
+          </label>
+          <label class="filter-field" id="filter-semester-field">
+            <span>Semester</span>
+            <select id="filter-semester"></select>
+          </label>
+          <label class="filter-field" id="filter-lab-field">
+            <span>Lab</span>
+            <select id="filter-lab"></select>
+          </label>
+          <label class="filter-field" id="filter-week-field">
+            <span>Week</span>
+            <select id="filter-week"></select>
+          </label>
+        </div>
+        <div id="filter-custom-range" class="grid gap-3 sm:grid-cols-2 mt-3" hidden>
+          <label class="filter-field">
+            <span>From</span>
+            <input id="filter-custom-start" type="date" />
+          </label>
+          <label class="filter-field">
+            <span>To</span>
+            <input id="filter-custom-end" type="date" />
+          </label>
+        </div>
+        <div class="flex flex-col gap-3 mt-4 sm:flex-row sm:items-center sm:justify-between">
+          <p id="history-filter-summary" class="scope-note">Showing every recorded attempt.</p>
+          <button id="reset-history-filters" class="btn btn-ghost" type="button">Reset Filters</button>
+        </div>
+        <p id="history-disclosure" class="scope-note mt-3"></p>
+      </div>
+    </section>
+
     <!-- Overview Stats -->
     <section class="mb-8">
-      <h2 class="text-2xl font-bold mb-4">Your Study Overview</h2>
+      <h2 class="text-2xl font-bold mb-1">Your Study Overview</h2>
+      <p id="overview-scope" class="scope-note mb-4">
+        Metrics for the recorded attempts in the selected view, not lifetime totals.
+      </p>
       <div class="grid md:grid-cols-4 gap-4">
         <div class="stat-card">
           <div class="stat-label">Total Questions</div>
@@ -69,10 +141,17 @@
 
     <!-- Most Missed Questions -->
     <section class="mb-8">
-      <h2 class="text-2xl font-bold mb-4">Most Missed Questions</h2>
+      <h2 class="text-2xl font-bold mb-1">Most Missed Questions</h2>
+      <p class="scope-note mb-4">
+        Lifetime Review Queue weakness memory. The recorded-attempt filters above do not apply to this section.
+      </p>
       <div class="card p-4">
         <p class="text-sm mb-4" style="color:var(--muted)">
           Shows the prompts you miss most often, the correct answer, and the wrong answer you tend to pick instead.
+        </p>
+        <p class="text-sm mb-4" style="color:var(--muted)">
+          Boss Remix deliberately writes no Review Queue or adaptive weakness signals, so a rough Boss Remix can
+          appear in your recorded attempts above without ever creating an entry here.
         </p>
         <div id="missed-stats" class="space-y-3">
           <p style="color:var(--muted)">No missed-question data yet.</p>
@@ -124,6 +203,29 @@
       </div>
     </section>
 
+    <!-- Performance by Attempt Type -->
+    <section class="mb-8">
+      <h2 class="text-2xl font-bold mb-1">Performance by Attempt Type</h2>
+      <p class="scope-note mb-4">
+        How normal practice, Boss Rounds, and Boss Remixes performed across the selected recorded attempts.
+      </p>
+      <div class="grid md:grid-cols-3 gap-4" id="attempt-type-stats">
+        <!-- Populated by JS -->
+      </div>
+    </section>
+
+    <!-- Fall Lab III challenge chains -->
+    <section class="mb-8" id="fall-chain-section" hidden>
+      <h2 class="text-2xl font-bold mb-1">Challenge Chains</h2>
+      <p class="scope-note mb-4">
+        Attempts that share a recorded challenge chain. Each attempt keeps its own score and question count;
+        chain members are never averaged together.
+      </p>
+      <div class="card p-4">
+        <div id="fall-chains" class="space-y-4"></div>
+      </div>
+    </section>
+
     <!-- Recent Activity -->
     <section class="mb-8">
       <h2 class="text-2xl font-bold mb-4">Recent Activity</h2>
@@ -136,7 +238,10 @@
 
     <section class="mb-8">
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
-        <h2 class="text-2xl font-bold">Question Reports</h2>
+        <div>
+          <h2 class="text-2xl font-bold">Question Reports</h2>
+          <p class="scope-note">Saved separately from attempt history; the filters above do not apply here.</p>
+        </div>
         <div class="flex flex-col gap-3 sm:flex-row">
           <button id="export-question-reports" class="btn btn-blue" type="button">Export Reports</button>
           <button id="clear-question-reports" class="btn btn-ghost" type="button">Clear Reports</button>
@@ -157,7 +262,8 @@
 
     <!-- Category Breakdown -->
     <section class="mb-8">
-      <h2 class="text-2xl font-bold mb-4">Performance by Category</h2>
+      <h2 class="text-2xl font-bold mb-1">Performance by Category</h2>
+      <p class="scope-note mb-4">Categories across the selected recorded attempts.</p>
       <div class="grid md:grid-cols-3 gap-4" id="category-stats">
         <!-- Populated by JS -->
       </div>
@@ -205,10 +311,11 @@
     </section>
   </main>
 
+  <script src="assets/js/curriculum-metadata.js?v=20260831b"></script>
   <script src="assets/js/quiz-catalog.js?v=20260831b"></script>
   <script src="assets/js/top-drugs-data.js?v=20260419a"></script>
   <script src="assets/js/review-queue-store.js?v=20260819a"></script>
   <script src="assets/js/question-reports.js?v=20260831b"></script>
-  <script src="assets/js/stats.js?v=20260831a" defer></script>
+  <script src="assets/js/stats.js?v=20260901b" defer></script>
 </body>
 </html>

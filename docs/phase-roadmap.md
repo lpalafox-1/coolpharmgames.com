@@ -466,10 +466,13 @@ contract.
 
 ## Phase 2 Facelift lane
 
-This is the active product sequence. Exactly one task is `READY`; satisfying a
-dependency does not automatically change a later task's status. READY records
-priority, not blanket implementation authority: each task still needs its
-owner-approved scope and allowed-files contract before execution.
+This is the active product sequence. Exactly one task is active at a time,
+either `READY` or `IN PROGRESS`; satisfying a dependency does not automatically
+change a later task's status. READY records priority, not blanket
+implementation authority: each task still needs its owner-approved scope and
+allowed-files contract before execution. A task stays `IN PROGRESS` until the
+owner reviews and merges its branch; implementation alone never promotes it to
+`DONE`, and never promotes the next task to `READY`.
 
 | Task | Deliverable | Status | Depends on |
 | --- | --- | --- | --- |
@@ -480,19 +483,45 @@ owner-approved scope and allowed-files contract before execution.
 | P2F-05 | Top Drugs Reference v2 performance/current-P2 shortcuts | `DONE` | P2F-04 |
 | P2F-06 | Question Reports v2 reproducibility workflow | `DONE` | P2F-05 |
 | P2F-07 | Additive curriculum metadata contract | `DONE` | P2F-06 |
-| P2F-08 | Stats Dashboard v2 | `READY` | P2F-07 |
+| P2F-08 | Stats Dashboard v2 | `IN PROGRESS` | P2F-07 |
 | P2F-09 | Review Queue v2 + `wrongCounts` correction | `BLOCKED` | P2F-08 |
 | P2F-10 | Mobile/accessibility consistency pass | `BLOCKED` | P2F-09 |
 
-P2F-08 is the sole `READY` task after P2F-07 added the runtime-only curriculum
-metadata contract documented in `docs/curriculum-metadata-contract.md`.
-Catalog-backed P1 context and the existing Fall generator metadata now
-normalize into separate quiz-level and question-level scopes. Unknown fields
-remain absent, and source records are identified by curriculum ID plus source
-record ID rather than generic name. Question Reports consumes the contract
-additively; Stats history, Review Queue, Favorites, canonical sources,
-generator output, and scoring remain unmigrated and unchanged. The Fall
-generator remains feature-frozen, and F26-MTC-01 remains deferred.
+P2F-08 is `IN PROGRESS` on an unmerged implementation branch and is **not**
+shipped. No task in this lane is currently `READY`. P2F-09 is the next task in
+sequence but remains `BLOCKED`: it becomes eligible only after the owner
+reviews and merges P2F-08, and P2F-09 continues to own the known Review Queue
+`wrongCounts` issue, which P2F-08 deliberately does not touch.
+
+P2F-08 is read-side only. It adds a Stats-local normalization and provenance
+layer over `pharmlet.history` and introduces zero new writes: history, Review
+Queue, favorites, top-drug signals, recent-run memory, and Boss Remix request
+state are never written, and a Stats visit leaves raw history byte-identical.
+Attempts are classified from the F26-09 `attemptLineage` contract first, the
+stored `mode` second, and the catalog heuristic last; when a recognized lineage
+kind disagrees with the stored mode, lineage classifies the attempt, both raw
+values are preserved, and the conflict is recorded rather than repaired. Boss
+Remix now reads as its own attempt category instead of disappearing into
+generic Generated Sets. Curriculum context comes only from lineage or the
+P2F-07 adapter/catalog: pre-lineage `generated-*` identities are never parsed
+for a week number, and unproven context stays unclassified and is disclosed by
+count. Recorded-attempt filters scope history-derived regions only; Most Missed
+(lifetime Review Queue weakness) and Question Reports are separate stores and
+say so on the page. Differently sized attempts — a 10-question practice set and
+a 6-question Boss Remix — are associated through the recorded chain identity
+but never merged into one averaged score. The 200-record retention cap,
+backup version 2 and its replace-style import, Clear All Stats, and Reset
+Adaptive Quiz Memory keep their existing semantics.
+
+P2F-07 added the runtime-only curriculum metadata contract documented in
+`docs/curriculum-metadata-contract.md`. Catalog-backed P1 context and the
+existing Fall generator metadata normalize into separate quiz-level and
+question-level scopes. Unknown fields remain absent, and source records are
+identified by curriculum ID plus source record ID rather than generic name.
+Question Reports consumes the contract additively; Review Queue, Favorites,
+canonical sources, generator output, and scoring remain unmigrated and
+unchanged. The Fall generator remains feature-frozen, and F26-MTC-01 remains
+deferred.
 
 P2F-05 kept the separate 169-record P1 and
 100-record P2 canonical sources behind the existing normalization adapter,
