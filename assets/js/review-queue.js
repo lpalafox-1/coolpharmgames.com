@@ -246,13 +246,14 @@ function populateQuizFilter(queue, selectedValue) {
 function buildReviewSolutionText(entry) {
   const parts = [];
   const temptingWrong = reviewQueueStore ? reviewQueueStore.getCommonWrongAnswer(entry) : "";
-  const lastWrong = entry.lastUserAnswer || "";
   const missCount = reviewQueueStore ? reviewQueueStore.getEntryMissCount(entry) : 1;
 
+  // With no positive wrong-answer count there is nothing to claim. A bare
+  // lastUserAnswer is uncorroborated - it may be a single stale value or, in
+  // legacy data, never have been a counted miss at all - so the claim is
+  // omitted rather than dressed up as a pattern.
   if (temptingWrong) {
     parts.push(`Most tempting wrong answer: ${temptingWrong}`);
-  } else if (lastWrong) {
-    parts.push(`Last wrong answer: ${lastWrong}`);
   }
 
   parts.push(`Missed ${missCount} time${missCount === 1 ? "" : "s"}`);

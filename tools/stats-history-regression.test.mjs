@@ -1145,7 +1145,7 @@ test("T-14 only the Stats cache token moved for P2F-08", () => {
   assert.match(statsPage, /assets\/js\/curriculum-metadata\.js\?v=20260831b/);
   assert.match(statsPage, /assets\/js\/quiz-catalog\.js\?v=20260831b/);
   assert.match(statsPage, /assets\/js\/question-reports\.js\?v=20260831b/);
-  assert.match(statsPage, /assets\/js\/review-queue-store\.js\?v=20260819a/);
+  assert.match(statsPage, /assets\/js\/review-queue-store\.js\?v=20260903a/);
   assert.match(statsPage, /assets\/js\/top-drugs-data\.js\?v=20260419a/);
 
   // The adapter must be in place before Stats consumes it.
@@ -1201,7 +1201,7 @@ test("T-17 every protected hash except the approved Stats baseline is unchanged"
     fallGenerator: "39e123b914f665282f6abce23110bf3e2bd4f0bcc1974b7038e0f9384cf9871a",
     fallLauncher: "255ef32be7b47e3f12f3b02da5db5a91e9040a5ee9fe406f68029e783a98157c",
     quizEngine: "6dc5c2f6d467742e837435be1d120f1110eb9faacb9d985898efad52a5c8a507",
-    reviewQueueStore: "67e0418362fba9da5abe5e079b2dad5437c543a636b48943e2f8a50e57b47a62",
+    reviewQueueStore: "169c528d77fe0a185b801c7bcc61949adad803eeb839be96fa1354dbe9937ba3",
     favorites: "b6fbd5bbca17ea150e34e9b29c9e6391b5ae7359d7b6afb18fe6c7e7caed781d"
   });
   const PATHS = Object.freeze({
@@ -1455,4 +1455,115 @@ test("a filtered overview reports the selected view, not lifetime totals", () =>
   assert.equal(readOverview("total-questions"), "20");
   assert.equal(readOverview("avg-score"), "60.0%");
   assert.equal(readOverview("study-days"), "2");
+});
+
+// --- P2F-09 Stats-side Review Queue gates ------------------------------------
+
+function strictFitbEntry(overrides = {}) {
+  return {
+    quizId: "chapter1-review",
+    title: "Chapter 1 Review",
+    type: "fitb",
+    prompt: "Generic name for Lopressor?",
+    answer: "Metoprolol",
+    answerText: "Metoprolol",
+    userAnswer: "metaprolol",
+    missCount: 2,
+    wrongCounts: { metaprolol: 2 },
+    lastUserAnswer: "metaprolol",
+    timestamp: "2026-08-01T12:00:00.000Z",
+    metadata: { answerMatching: { spellingSensitive: true, capitalizationSensitive: false } },
+    _acceptedAnswers: ["Metoprolol", "Metoprolol tartrate"],
+    ...overrides
+  };
+}
+
+// G12 Stats strict-FITB parity.
+test("G12 a Stats-launched review question keeps the strict FITB contract", () => {
+  const sandbox = loadStatsSandbox({ history: [], localExtras: { [REVIEW_KEY]: JSON.stringify([strictFitbEntry()]) } });
+  const [entry] = sandbox.getReviewQueue();
+  const question = sandbox.buildReviewQueuePlaylistQuestion(entry);
+
+  assert.equal(question.answer, "Metoprolol", "the expected answer is preserved exactly");
+  assert.equal(question.metadata.answerMatching.spellingSensitive, true);
+  assert.equal(question.metadata.answerMatching.capitalizationSensitive, false);
+  deepEqualAcrossRealms(question._acceptedAnswers, ["Metoprolol", "Metoprolol tartrate"],
+    "every accepted answer survives the launch");
+});
+
+test("G12 a missing or malformed strict marker never broadens matching", () => {
+  const malformed = [
+    { metadata: undefined },
+    { metadata: {} },
+    { metadata: { answerMatching: {} } },
+    { metadata: { answerMatching: { spellingSensitive: false, capitalizationSensitive: false } } },
+    { metadata: { answerMatching: { spellingSensitive: true, capitalizationSensitive: true } } },
+    { metadata: { answerMatching: { spellingSensitive: "true", capitalizationSensitive: false } } }
+  ];
+
+  for (const overrides of malformed) {
+    const sandbox = loadStatsSandbox({
+      history: [],
+      localExtras: { [REVIEW_KEY]: JSON.stringify([strictFitbEntry(overrides)]) }
+    });
+    const [entry] = sandbox.getReviewQueue();
+    const question = sandbox.buildReviewQueuePlaylistQuestion(entry);
+    assert.equal(Object.hasOwn(question, "metadata"), false,
+      `${JSON.stringify(overrides)} must not produce a strict marker`);
+    assert.equal(Object.hasOwn(question, "_acceptedAnswers"), false,
+      `${JSON.stringify(overrides)} must not carry accepted answers`);
+  }
+
+  // A valid marker with a non-array accepted-answer value keeps the marker but
+  // adds no accepted answers.
+  const sandbox = loadStatsSandbox({
+    history: [],
+    localExtras: { [REVIEW_KEY]: JSON.stringify([strictFitbEntry({ _acceptedAnswers: "Metoprolol" })]) }
+  });
+  const [entry] = sandbox.getReviewQueue();
+  const question = sandbox.buildReviewQueuePlaylistQuestion(entry);
+  assert.equal(question.metadata.answerMatching.spellingSensitive, true);
+  assert.equal(Object.hasOwn(question, "_acceptedAnswers"), false);
+});
+
+// G11/G12 parity: the two launch paths must agree.
+test("G11 direct and Stats launches build the same strict scoring contract", () => {
+  const reviewSource = read("assets/js/review-queue.js");
+  const statsSource = read("assets/js/stats.js");
+
+  // Both gate on the same validated marker shape before copying anything.
+  for (const [name, source] of [["review-queue.js", reviewSource], ["stats.js", statsSource]]) {
+    assert.match(source, /answerMatching\?\.spellingSensitive === true/, `${name} validates spelling sensitivity`);
+    assert.match(source, /answerMatching\?\.capitalizationSensitive === false/, `${name} validates capitalization`);
+    assert.match(source, /Array\.isArray\([^)]*_acceptedAnswers\)/, `${name} copies accepted answers only as an array`);
+  }
+});
+
+// G13 Stats read-only boundary for the review queue.
+test("G13 Stats never writes pharmlet.review-queue", () => {
+  const queue = [strictFitbEntry(), { ...strictFitbEntry(), quizId: "chapter2-review", prompt: "Another prompt?" }];
+  const raw = JSON.stringify(queue);
+  const sandbox = loadStatsSandbox({
+    history: [
+      { quizId: "chapter1-review", mode: "easy", score: 8, total: 10, timestamp: Date.now() },
+      { quizId: "chapter2-review", mode: "easy", score: 5, total: 10, timestamp: Date.now() - 86400000 }
+    ],
+    localExtras: { [REVIEW_KEY]: raw }
+  });
+
+  const readBack = () => sandbox.__localStorage.raw(REVIEW_KEY);
+  assert.equal(readBack(), raw, "loading Stats leaves the queue untouched");
+
+  sandbox.renderMostMissedQuestions(sandbox.getReviewQueue());
+  assert.equal(readBack(), raw, "rendering Most Missed leaves the queue untouched");
+
+  const records = sandbox.normalizeHistoryRecords(sandbox.getHistory());
+  for (const change of [["range", "7"], ["curriculum", "P1"], ["attemptType", "all"], ["range", "all"]]) {
+    sandbox.renderRecordedAttemptDashboard(records, { ...sandbox.getDefaultHistoryFilter(), [change[0]]: change[1] });
+    assert.equal(readBack(), raw, `filter ${change[0]}=${change[1]} leaves the queue untouched`);
+  }
+
+  // Building a playlist reads the queue but must not rewrite it.
+  sandbox.buildReviewQueuePlaylistQuestion(sandbox.getReviewQueue()[0]);
+  assert.equal(readBack(), raw, "playlist construction leaves the queue untouched");
 });
