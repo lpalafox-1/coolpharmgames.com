@@ -37,11 +37,13 @@ const HISTORY_RETENTION_LIMIT = 200;
 const FALL_LAB3_PRACTICE_KIND = "fall-2026-lab3-practice";
 const FALL_LAB3_BOSS_ROUND_KIND = "boss-round";
 const FALL_LAB3_BOSS_REMIX_KIND = "fall-2026-lab3-boss-remix";
+const FALL_LAB3_ADAPTIVE_KIND = "fall-2026-lab3-adaptive";
 
 const ATTEMPT_TYPES = Object.freeze([
   Object.freeze({ id: "fall-lab3-practice", label: "Fall Lab III Practice" }),
   Object.freeze({ id: "boss-rounds", label: "Boss Rounds" }),
   Object.freeze({ id: "boss-remixes", label: "Boss Remixes" }),
+  Object.freeze({ id: "fall-lab3-adaptive", label: "Adaptive Practice" }),
   Object.freeze({ id: "adaptive-playlists", label: "Adaptive Playlists" }),
   Object.freeze({ id: "generated-sets", label: "Generated Sets / Morning Warm-Ups" }),
   Object.freeze({ id: "standard-practice", label: "Standard Practice" }),
@@ -57,7 +59,8 @@ const ATTEMPT_TYPE_LABELS = Object.freeze(
 const ATTEMPT_KIND_TYPE_IDS = Object.freeze({
   [FALL_LAB3_PRACTICE_KIND]: "fall-lab3-practice",
   [FALL_LAB3_BOSS_ROUND_KIND]: "boss-rounds",
-  [FALL_LAB3_BOSS_REMIX_KIND]: "boss-remixes"
+  [FALL_LAB3_BOSS_REMIX_KIND]: "boss-remixes",
+  [FALL_LAB3_ADAPTIVE_KIND]: "fall-lab3-adaptive"
 });
 
 // History `mode` labels the engine writes for generated attempts. Only the

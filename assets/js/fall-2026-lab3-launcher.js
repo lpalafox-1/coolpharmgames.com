@@ -2,8 +2,16 @@ import {
   WEEK_1_PRACTICE_NOTE,
   generateFall2026Quiz
 } from "./fall-2026-quiz-generator.js?v=20260827a";
+import {
+  ADAPTIVE_MEMORY_KEY,
+  buildFall2026AdaptivePayload,
+  normalizeAdaptiveMemory,
+  recordAdaptiveRound
+} from "./fall-2026-adaptive-practice.js?v=20260904a";
 
 const CUSTOM_QUIZ_KEY = "pharmlet.custom-quiz";
+const HISTORY_KEY = "pharmlet.history";
+const REVIEW_KEY = "pharmlet.review-queue";
 const SUPPORTED_WEEKS = new Set(Array.from({ length: 10 }, (_, index) => index + 1));
 const TIMER_SECONDS = 10 * 60;
 const DRUG_DATA_URL = "assets/data/fall-2026-p2-top-drugs.json";
@@ -94,6 +102,74 @@ export async function launchFall2026Lab3Practice(quizWeek, options = {}) {
   return payload;
 }
 
+function readJson(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    const parsed = raw ? JSON.parse(raw) : null;
+    return parsed ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+// Review Queue entries are read through the shared store when it is present so
+// this file never restates the store's normalization rules. Without it the raw
+// array is used as-is; the adaptive module reads defensively either way.
+function readReviewEntries() {
+  const raw = readJson(REVIEW_KEY, []);
+  const queue = Array.isArray(raw) ? raw : [];
+  const store = globalThis.PharmletReviewQueueStore;
+  try {
+    return store?.normalizeQueue ? store.normalizeQueue(queue) : queue;
+  } catch {
+    return queue;
+  }
+}
+
+export function createFall2026AdaptiveSeed(targetWeek) {
+  requireSupportedWeek(targetWeek);
+  const values = new Uint32Array(4);
+  globalThis.crypto.getRandomValues(values);
+  return `fall-2026-lab3-adaptive-week-${targetWeek}-${Array.from(values, (value) => value.toString(16).padStart(8, "0")).join("")}`;
+}
+
+// Signals are re-read at launch time, so the next round always reflects the
+// results of the previous one rather than a precomputed sequence.
+export async function launchFall2026Lab3Adaptive(targetWeek, options = {}) {
+  requireSupportedWeek(targetWeek);
+  const { drugData, policy } = options.drugData && options.policy
+    ? options
+    : await loadSources();
+  const seed = options.seed || createFall2026AdaptiveSeed(targetWeek);
+  const memory = normalizeAdaptiveMemory(readJson(ADAPTIVE_MEMORY_KEY, null));
+
+  const payload = buildFall2026AdaptivePayload({
+    drugData,
+    policy,
+    targetWeek,
+    seed,
+    reviewEntries: readReviewEntries(),
+    historyEntries: readJson(HISTORY_KEY, []),
+    memory
+  });
+
+  const { selection, ...storedPayload } = payload;
+  localStorage.setItem(CUSTOM_QUIZ_KEY, JSON.stringify(storedPayload));
+
+  // Anti-repetition memory only. This is the sole store adaptive writes; it
+  // never touches history, the Review Queue, or any adaptive weakness signal.
+  try {
+    localStorage.setItem(ADAPTIVE_MEMORY_KEY, JSON.stringify(
+      recordAdaptiveRound({ memory, questions: payload.questions, targetWeek })
+    ));
+  } catch (error) {
+    console.warn("Unable to record the adaptive round:", error);
+  }
+
+  window.location.assign("quiz.html?id=custom-quiz");
+  return payload;
+}
+
 function setLaunchState(activeWeek, message = "") {
   document.querySelectorAll("[data-launch-week]").forEach((button) => {
     const week = Number(button.dataset.launchWeek);
@@ -121,10 +197,52 @@ async function handleLaunch(quizWeek) {
   }
 }
 
+function setAdaptiveState(busy, message = "") {
+  const button = document.getElementById("adaptive-launch");
+  if (button) {
+    button.disabled = busy;
+    button.setAttribute("aria-busy", String(busy));
+    const idleLabel = button.dataset.idleLabel || button.textContent.trim();
+    button.dataset.idleLabel = idleLabel;
+    button.textContent = busy ? "Building your adaptive round…" : idleLabel;
+  }
+
+  const status = document.getElementById("adaptive-status");
+  if (status) {
+    status.textContent = message;
+    status.classList.toggle("hidden", !message);
+  }
+}
+
+function getSelectedAdaptiveWeek() {
+  const select = document.getElementById("adaptive-week");
+  const week = Number(select?.value);
+  return SUPPORTED_WEEKS.has(week) ? week : null;
+}
+
+async function handleAdaptiveLaunch() {
+  const targetWeek = getSelectedAdaptiveWeek();
+  if (!targetWeek) {
+    setAdaptiveState(false, "Choose a week to practice through first.");
+    return;
+  }
+
+  setAdaptiveState(true, `Reviewing your saved Pharm-let performance through Week ${targetWeek}…`);
+  try {
+    await launchFall2026Lab3Adaptive(targetWeek);
+  } catch (error) {
+    console.error("Fall 2026 Lab III adaptive launch failed:", error);
+    setAdaptiveState(false, error.message || "Unable to build an adaptive round right now.");
+  }
+}
+
 function initializePage() {
   document.querySelectorAll("[data-launch-week]").forEach((button) => {
     button.addEventListener("click", () => handleLaunch(Number(button.dataset.launchWeek)));
   });
+
+  document.getElementById("adaptive-launch")?.addEventListener("click", handleAdaptiveLaunch);
+  document.getElementById("adaptive-week")?.addEventListener("change", () => setAdaptiveState(false, ""));
 
   const themeToggle = document.getElementById("theme-toggle");
   const themeLabel = document.getElementById("theme-label");
