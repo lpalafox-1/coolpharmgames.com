@@ -229,8 +229,8 @@ fixed: review-queue `wrongCounts` re-fold inflation (see P2B-10).
 
 ### P2B-10 — Review-queue wrongCounts correction
 
-- **Phase:** 2B · **Status:** `DEFERRED` (moved to P2F-09; pending explicit
-  owner approval and **never eligible as a separate autonomous task**)
+- **Phase:** 2B · **Status:** `DONE` (delivered as P2F-09, PR #69, merge
+  `3c7bbf153783af2fc0287500f59b7be72ce906b1`, 2026-09-04)
 - **Objective:** Fix the latent inflation in
   `assets/js/review-queue-store.js` (`normalizeEntry` re-folds
   `lastUserAnswer` into `wrongCounts` on every normalize pass) and update the
@@ -422,7 +422,8 @@ contract.
     global week value.
   - **No longitudinal writes.** A completed remix saves its own history entry
     and high score, but never feeds the review queue, `wrongCounts`, or adaptive
-    memory; P2F-09 and F26-10 still own those semantics. Normal quiz and Boss
+    memory. P2F-09 has since corrected the review-queue side of those
+    semantics; F26-10 still owns adaptive selection. Normal quiz and Boss
     Round behavior outside the remix is unchanged.
 - **Delivered (history provenance):** a remix records the distinct history mode
   `bossRemix` through the existing generated-attempt identity machinery, plus one
@@ -456,6 +457,16 @@ contract.
   engine in the same commit. Coverage lives in
   `tools/fall-2026-lab3-completion-continuation.test.mjs`.
 
+### Fall sequencing — next planned work
+
+The next planned Fall task is a **bounded generator-fidelity audit**, and it
+comes *before* F26-10 adaptive practice. F26-10 must not be started ahead of
+it: adaptive selection is only as trustworthy as the material and the signals
+it selects from, so the audit establishes that baseline first. Neither is
+authorized by any status change elsewhere in this document; each still needs
+its own owner-approved scope and allowed-files contract. The Fall generator,
+launcher, policy, and canonical data remain feature-frozen until then.
+
 ### Deferred Fall engine issue
 
 | Task | Status | Boundary |
@@ -466,9 +477,10 @@ contract.
 
 ## Phase 2 Facelift lane
 
-This is the active product sequence. Exactly one task is active at a time,
-either `READY` or `IN PROGRESS`; satisfying a dependency does not automatically
-change a later task's status. READY records priority, not blanket
+This is the active product sequence. At most one task is active at a time,
+either `READY` or `IN PROGRESS` — and between a merge and the owner's next
+authorization there may legitimately be none; satisfying a dependency does not
+automatically change a later task's status. READY records priority, not blanket
 implementation authority: each task still needs its owner-approved scope and
 allowed-files contract before execution. A task stays `IN PROGRESS` until the
 owner reviews and merges its branch; implementation alone never promotes it to
@@ -484,15 +496,51 @@ owner reviews and merges its branch; implementation alone never promotes it to
 | P2F-06 | Question Reports v2 reproducibility workflow | `DONE` | P2F-05 |
 | P2F-07 | Additive curriculum metadata contract | `DONE` | P2F-06 |
 | P2F-08 | Stats Dashboard v2 | `DONE` | P2F-07 |
-| P2F-09 | Review Queue v2 + `wrongCounts` correction | `IN PROGRESS` | P2F-08 |
+| P2F-09 | Review Queue v2 + `wrongCounts` correction | `DONE` | P2F-08 |
 | P2F-10 | Mobile/accessibility consistency pass | `BLOCKED` | P2F-09 |
 
 P2F-08 shipped in PR #67 (merge `c7ccf7d`, 2026-09-03), built from `383a1de`,
-`9a0d8d3`, and the review-correction commit `a9a25a9`. P2F-09 is now the sole
-`READY` task and continues to own the known Review Queue `wrongCounts` issue,
-which P2F-08 deliberately did not touch. READY records priority only: P2F-09
-still needs its own owner-approved scope and allowed-files contract before any
-implementation starts.
+`9a0d8d3`, and the review-correction commit `a9a25a9`.
+
+P2F-09 shipped in PR #69 (merge `3c7bbf153783af2fc0287500f59b7be72ce906b1`,
+2026-09-04) with final implementation head
+`8ad6ecdde1ab42aa91e5d654fca512442c42c25b`, built from `2a2a80f`
+(stop `wrongCounts` inflation on normalize), `4b568d9` (preserve trustworthy
+consumer signals), and the review-correction commit `8ad6ecd` (keep the
+ranking helper private). It closed the long-standing Review Queue
+`wrongCounts` inflation that P2F-08 deliberately did not touch: normalization
+is idempotent, a persisted `wrongCounts` map is authoritative, a legacy answer
+alias folds exactly once, correct reviews no longer contaminate wrong-answer
+state, and no consumer falls back to an uncorroborated `lastUserAnswer`.
+Historical counts were deliberately not repaired — see the accepted follow-up
+below.
+
+P2F-09 follow-ups accepted as non-blocking at merge:
+
+- **P2F-09-F1** — a correct review for an absent queue key can initialize
+  `lastUserAnswer` with the correct answer. Currently non-user-visible because
+  no consumer treats `lastUserAnswer` as wrong-answer evidence: `wrongCounts`
+  is unaffected, so the common-wrong signal stays empty and both consumers omit
+  the claim. The cause is `buildEmptyEntry` normalizing the review record,
+  which seeds `lastUserAnswer` from the answer aliases regardless of whether
+  the review was correct. Reachable only when the entry disappears between
+  quiz launch and completion. Not a defect to fix blind — any fix must not
+  turn into a broader missing-entry redesign.
+- **Historical answer frequencies remain legacy best-effort.** Counts already
+  stored in a browser may be inflated by the pre-P2F-09 bug and were
+  deliberately not migrated, decremented, or inferred, because legitimate
+  wrong-answer events cannot be distinguished from phantom folds without
+  guessing. Exactness is guaranteed only for events recorded from P2F-09
+  forward. `wrongCounts` must not become a hard adaptive-selection signal for
+  F26-10 without a separate provenance/trust strategy; `missCount`,
+  `reviewMissCount`, and mastery fields were never affected by the bug and may
+  be considered independently.
+
+**No Phase 2 Facelift task is currently `READY`.** P2F-10 remains `BLOCKED`:
+the P2F-09 merge records that its dependency is satisfied, but it does not by
+itself authorize P2F-10 implementation, which still needs its own
+owner-approved scope and allowed-files contract. The next planned work is Fall,
+not P2F-10 — see the Fall sequencing note above.
 
 P2F-08 is read-side only. It adds a Stats-local normalization and provenance
 layer over `pharmlet.history` and introduces zero new writes: history, Review
