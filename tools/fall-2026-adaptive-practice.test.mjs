@@ -47,6 +47,8 @@ function missedEntry(question, overrides = {}) {
 }
 
 const fingerprints = (questions) => new Set(questions.map(adaptive.getQuestionFingerprint));
+const toComparablePrompt = (question) =>
+  String(question?.prompt ?? "").replace(/<[^>]*>/g, "").replace(/\s+/g, "").toLowerCase();
 
 // --- curriculum scope ---------------------------------------------------------
 
@@ -349,6 +351,194 @@ test("changed performance changes the next round", () => {
     after.questions.map(adaptive.getQuestionFingerprint),
     "different weaknesses must produce a different round"
   );
+});
+
+// --- malformed history hardening (B1) -------------------------------------------
+
+test("B1 a malformed score never produces NaN in recent accuracy or candidate scores", () => {
+  const fall = (overrides) => ({
+    quizId: "generated-custom-quiz-fall-2026-lab3-practice-q10", mode: "easy",
+    timestamp: NOW - DAY, attemptLineage: { attemptKind: "fall-2026-lab3-practice", quizWeek: 3 },
+    ...overrides
+  });
+
+  const malformed = [
+    fall({ total: 10, score: "not-a-number" }),
+    fall({ total: 10, score: Infinity }),
+    fall({ total: 10, score: -Infinity }),
+    fall({ total: 10, score: NaN }),
+    fall({ total: 10, score: null }),
+    fall({ total: 10, score: {} }),
+    fall({ total: 10, score: undefined }),
+    fall({ total: 10, score: "" }),
+    fall({ total: 10, score: true }),
+    fall({ total: 10, score: [] }),
+    fall({ total: 0, score: 5 }),
+    fall({ total: "ten", score: 5 })
+  ];
+
+  for (const entry of malformed) {
+    const signals = adaptive.buildAdaptiveSignals({ historyEntries: [entry], now: NOW });
+    assert.equal(signals.recentAccuracy, null,
+      `${JSON.stringify(entry.score)}/${JSON.stringify(entry.total)} must count as absent evidence`);
+  }
+
+  // Malformed mixed with valid records: only the valid ones count.
+  const mixed = adaptive.buildAdaptiveSignals({
+    historyEntries: [...malformed, fall({ total: 10, score: 4 })], now: NOW
+  });
+  assert.equal(mixed.recentAccuracy, 0.4, "a valid record still drives accuracy");
+  assert.ok(Number.isFinite(mixed.recentAccuracy));
+
+  // Every candidate score stays finite under malformed history.
+  const candidates = pool();
+  const reviewEntries = candidates.slice(0, 4).map((question) => missedEntry(question));
+  const signals = adaptive.buildAdaptiveSignals({ reviewEntries, historyEntries: malformed, now: NOW });
+  const weakness = adaptive.buildConceptWeakness(candidates, signals);
+  for (const candidate of candidates) {
+    assert.ok(Number.isFinite(adaptive.scoreCandidate(candidate, signals, weakness)),
+      "no candidate score may be NaN or Infinity");
+  }
+});
+
+test("B1 malformed-only history selects identically to no history", () => {
+  const reviewEntries = pool().slice(0, 4).map((question) => missedEntry(question));
+  const malformed = [
+    { total: 10, score: "not-a-number", timestamp: NOW, attemptLineage: { attemptKind: "fall-2026-lab3-practice" } },
+    { total: 10, score: Infinity, timestamp: NOW, attemptLineage: { attemptKind: "fall-2026-lab3-practice" } }
+  ];
+  const withMalformed = build({ reviewEntries, historyEntries: malformed });
+  const withNone = build({ reviewEntries, historyEntries: [] });
+  assert.deepEqual(
+    withMalformed.questions.map(adaptive.getQuestionFingerprint),
+    withNone.questions.map(adaptive.getQuestionFingerprint),
+    "malformed history must not perturb ranking"
+  );
+});
+
+// --- content identity (B2) ------------------------------------------------------
+
+test("B2 adaptive identity is content, not generator id", () => {
+  const sameContentDifferentIds = [
+    { id: "gen-week-01-aaa", prompt: "<b>Metoprolol</b> is which class?", answer: "Beta blocker" },
+    { id: "gen-week-07-zzz", prompt: "Metoprolol is which class?", answer: "Beta blocker" }
+  ];
+  assert.equal(
+    adaptive.getQuestionFingerprint(sameContentDifferentIds[0]),
+    adaptive.getQuestionFingerprint(sameContentDifferentIds[1]),
+    "the same question under different ids is one adaptive question"
+  );
+
+  const sameIdDifferentContent = [
+    { id: "identical-id", prompt: "Metoprolol is which class?", answer: "Beta blocker" },
+    { id: "identical-id", prompt: "Enalapril is which class?", answer: "ACE inhibitor" }
+  ];
+  assert.notEqual(
+    adaptive.getQuestionFingerprint(sameIdDifferentContent[0]),
+    adaptive.getQuestionFingerprint(sameIdDifferentContent[1]),
+    "colliding ids must not merge different questions"
+  );
+
+  // Array answers and strict FITB answers stay safe and order-independent.
+  assert.equal(
+    adaptive.getQuestionFingerprint({ prompt: "Brands?", answer: ["Zestril", "Prinivil"] }),
+    adaptive.getQuestionFingerprint({ prompt: "Brands?", answer: ["Prinivil", "Zestril"] })
+  );
+  assert.notEqual(
+    adaptive.getQuestionFingerprint({ prompt: "Generic for Vasotec?", answer: "Enalapril" }),
+    adaptive.getQuestionFingerprint({ prompt: "Generic for Vasotec?", answer: "Lisinopril" })
+  );
+
+  // Identity must not be derivable from drug metadata alone.
+  assert.notEqual(
+    adaptive.getQuestionFingerprint({ prompt: "A?", answer: "X", metadata: { sourceDrugId: "d1" } }),
+    adaptive.getQuestionFingerprint({ prompt: "B?", answer: "Y", metadata: { sourceDrugId: "d1" } }),
+    "two questions about one drug are still two questions"
+  );
+});
+
+test("B2 no duplicate content survives pooling or selection, across seeds and weeks", () => {
+  for (const targetWeek of [1, 4, 10]) {
+    const candidates = pool(targetWeek, `b2-${targetWeek}`);
+    const keys = candidates.map(adaptive.getQuestionFingerprint);
+    assert.equal(new Set(keys).size, keys.length,
+      `week ${targetWeek} pool contains duplicate-content entries`);
+    assert.ok(keys.every(Boolean), "every pooled question must yield an identity");
+
+    const payload = build({ targetWeek, seed: `b2-${targetWeek}` });
+    const roundKeys = payload.questions.map(adaptive.getQuestionFingerprint);
+    assert.equal(roundKeys.length, adaptive.ADAPTIVE_ROUND_SIZE,
+      `week ${targetWeek} must still assemble a full round`);
+    assert.equal(new Set(roundKeys).size, roundKeys.length,
+      `week ${targetWeek} round repeated content`);
+  }
+
+  // Repeated generation across many seeds must not create duplicate content
+  // merely because generator ids differ between runs.
+  const merged = new Map();
+  for (const seed of ["s1", "s2", "s3", "s4"]) {
+    for (const question of pool(6, seed)) {
+      const key = adaptive.getQuestionFingerprint(question);
+      const existing = merged.get(key);
+      if (existing) {
+        assert.equal(toComparablePrompt(existing), toComparablePrompt(question),
+          "one adaptive identity must always mean one question");
+      }
+      merged.set(key, question);
+    }
+  }
+  assert.ok(merged.size > 100, `cross-seed corpus should be broad, got ${merged.size}`);
+});
+
+// --- mastered evidence (I1) -----------------------------------------------------
+
+test("I1 mastered material stops feeding the active concept-weakness rollup", () => {
+  const candidates = pool();
+  const question = candidates[0];
+  const drug = question.metadata.sourceDrugId;
+  const domain = question.metadata.knowledgeDomain;
+
+  // Historical misses, but the current recency-resolved state is mastered.
+  const masteredNow = adaptive.buildAdaptiveSignals({
+    reviewEntries: [missedEntry(question, {
+      missCount: 6, reviewMissCount: 3, clearStreak: 3, archived: true,
+      masteredAt: new Date(NOW - DAY).toISOString(),
+      lastReviewedAt: new Date(NOW - DAY).toISOString(),
+      lastMissedAt: new Date(NOW - (20 * DAY)).toISOString()
+    })],
+    now: NOW
+  });
+  const masteredRollup = adaptive.buildConceptWeakness(candidates, masteredNow);
+  assert.equal(masteredRollup.drugs.get(drug) || 0, 0,
+    "a mastered item must not keep its drug looking weak");
+  assert.equal(masteredRollup.domains.get(domain) || 0, 0,
+    "a mastered item must not keep its domain looking weak");
+
+  // The stored evidence is still there - it simply does not drive the rollup.
+  const performance = masteredNow.byPerformanceKey.get(adaptive.getPerformanceKey(question));
+  assert.equal(performance.missCount, 6, "historical misses remain recorded");
+  assert.equal(performance.mastered, true);
+
+  // An active, non-mastered miss still contributes.
+  const activeNow = adaptive.buildAdaptiveSignals({
+    reviewEntries: [missedEntry(question, { missCount: 6, reviewMissCount: 3 })], now: NOW
+  });
+  const activeRollup = adaptive.buildConceptWeakness(candidates, activeNow);
+  assert.ok((activeRollup.drugs.get(drug) || 0) > 0, "active weakness still rolls up to the drug");
+  assert.ok((activeRollup.domains.get(domain) || 0) > 0, "active weakness still rolls up to the domain");
+});
+
+// --- generator token parity -----------------------------------------------------
+
+test("adaptive and the normal launcher import the same frozen generator build", () => {
+  const generatorImport = /fall-2026-quiz-generator\.js\?v=([0-9a-z]+)/;
+  const adaptiveToken = generatorImport.exec(read("assets/js/fall-2026-adaptive-practice.js"))?.[1];
+  const launcherToken = generatorImport.exec(read("assets/js/fall-2026-lab3-launcher.js"))?.[1];
+
+  assert.ok(adaptiveToken, "the adaptive module must import the generator with a pinned token");
+  assert.ok(launcherToken, "the launcher must import the generator with a pinned token");
+  assert.equal(adaptiveToken, launcherToken,
+    "adaptive and normal practice must run the identical frozen generator build");
 });
 
 // --- trust boundary -----------------------------------------------------------

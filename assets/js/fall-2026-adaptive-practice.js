@@ -121,11 +121,35 @@ export function assertAdaptiveWeek(targetWeek) {
 
 // --- question identity --------------------------------------------------------
 
-// Exact-item identity, used to avoid serving the same question twice.
+// Whitespace-free comparison form. A candidate's prompt is read as HTML and a
+// stored Review Queue entry's `promptText` has already had its tags removed by
+// the store, which does not insert a space where a tag was. That makes
+// "dizziness ?" and "dizziness?" the same question written two ways, so every
+// space is dropped before comparing rather than merely collapsed.
+function toComparableText(value) {
+  return normalizeText(value).replace(/\s+/g, "");
+}
+
+// Adaptive identity is CONTENT, never a generator id. Preferring `question.id`
+// would tie deduplication and anti-repetition to whether generator ids happen
+// to be stable, positional, or seed-dependent - two seeds can emit the same
+// question under different ids, and adaptive would then serve it twice. The
+// generator and its ids are unchanged; adaptive simply does not depend on them.
+function buildContentKey(source) {
+  const prompt = toComparableText(source?.promptText || source?.prompt);
+  const rawAnswer = source?.answer !== undefined ? source.answer : source?.answerText;
+  const answer = Array.isArray(rawAnswer)
+    ? serializeAnswer(rawAnswer).replace(/\s+/g, "")
+    : toComparableText(rawAnswer);
+  if (!prompt || !answer) return "";
+  return `${prompt}||${answer}`;
+}
+
+// Exact-question identity, used to avoid serving the same question twice.
+// Same prompt+answer is the same adaptive question even under different ids;
+// different prompt+answer stays distinct even if ids collide.
 export function getQuestionFingerprint(question) {
-  const id = String(question?.id || "").trim();
-  if (id) return `id:${id}`;
-  return `pa:${normalizeText(question?.prompt)}||${serializeAnswer(question?.answer)}`;
+  return buildContentKey(question);
 }
 
 // Coarser identity: the drug/knowledge-domain pairing being tested. Used to
@@ -138,24 +162,11 @@ export function getQuestionConceptKey(question) {
   return `${drug}::${domain}`;
 }
 
-// Whitespace-free comparison form. A candidate's prompt is read as HTML and a
-// stored Review Queue entry's `promptText` has already had its tags removed by
-// the store, which does not insert a space where a tag was. That makes
-// "dizziness ?" and "dizziness?" the same question written two ways, so every
-// space is dropped before comparing rather than merely collapsed.
-function toComparableText(value) {
-  return normalizeText(value).replace(/\s+/g, "");
-}
-
 // The key a Review Queue entry and a candidate question share when they are
-// the same question. Prompt plus answer only - never an inferred drug match.
+// the same question. Prompt plus answer only - never an inferred drug match,
+// and the same content basis adaptive uses for question identity.
 export function getPerformanceKey(source) {
-  const prompt = toComparableText(source?.promptText || source?.prompt);
-  const answer = Array.isArray(source?.answer !== undefined ? source.answer : source?.answerText)
-    ? serializeAnswer(source?.answer !== undefined ? source.answer : source?.answerText).replace(/\s+/g, "")
-    : toComparableText(source?.answer !== undefined ? source.answer : source?.answerText);
-  if (!prompt || !answer) return "";
-  return `${prompt}||${answer}`;
+  return buildContentKey(source);
 }
 
 export function getQuestionWeek(question) {
@@ -261,6 +272,26 @@ function buildExposure(memory) {
 
 // --- signals ------------------------------------------------------------------
 
+// Number() maps null, "", [] and true onto finite numbers, so coercing first
+// would silently read a missing score as 0% - a substantive claim invented from
+// absent data. Only a real number, or a non-empty numeric string, counts.
+function toFiniteNumber(value) {
+  if (typeof value === "number") return Number.isFinite(value) ? value : null;
+  if (typeof value === "string" && value.trim() !== "") {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+}
+
+// Returns a clamped ratio, or null when the record cannot be trusted at all.
+function toAttemptRatio(entry) {
+  const score = toFiniteNumber(entry?.score);
+  const total = toFiniteNumber(entry?.total);
+  if (score === null || total === null || total <= 0) return null;
+  return Math.max(0, Math.min(1, score / total));
+}
+
 function isMastered(entry) {
   return Boolean(entry?.archived) || positiveInt(entry?.clearStreak) >= MASTERED_STREAK_TARGET;
 }
@@ -337,12 +368,10 @@ export function buildAdaptiveSignals({ reviewEntries = [], historyEntries = [], 
       const kind = String(entry?.attemptLineage?.attemptKind || "").trim();
       return kind ? FALL_HISTORY_KINDS.has(kind) : false;
     })
-    .map((entry) => ({
-      at: toTimestamp(entry.timestamp),
-      ratio: positiveInt(entry.total) > 0
-        ? Math.max(0, Math.min(1, Number(entry.score) / Number(entry.total)))
-        : null
-    }))
+    .map((entry) => ({ at: toTimestamp(entry.timestamp), ratio: toAttemptRatio(entry) }))
+    // A record only contributes when BOTH values are finite and total > 0. A
+    // valid total with a nonnumeric score previously produced NaN here, which
+    // propagated into recentAccuracy and then into every candidate score.
     .filter((entry) => entry.ratio !== null)
     .sort((a, b) => b.at - a.at);
 
@@ -370,6 +399,13 @@ export function buildConceptWeakness(candidates, signals) {
   for (const candidate of candidates) {
     const performance = signals.byPerformanceKey.get(getPerformanceKey(candidate));
     if (!performance) continue;
+
+    // Material whose CURRENT recency-resolved state is mastered stops feeding
+    // the active rollup. Its historical misses stay stored and the item itself
+    // remains eligible through the mastery/refresh path, but old evidence must
+    // not make sibling questions about that drug or domain look weak forever.
+    if (performance.mastered) continue;
+
     const misses = performance.missCount + performance.reviewMissCount;
     if (misses <= 0) continue;
 
@@ -450,7 +486,7 @@ export function scoreCandidate(candidate, signals, conceptWeakness) {
 
   // A struggling student gets more weakness emphasis; a strong one gets more
   // breadth. Bounded and deterministic - it shifts emphasis, never eligibility.
-  if (signals.recentAccuracy !== null && performance) {
+  if (Number.isFinite(signals.recentAccuracy) && performance) {
     score += (1 - signals.recentAccuracy) * 0.5;
   }
 
