@@ -94,9 +94,10 @@ reproduction fields; its existing schema version and legacy loading behavior
 remain unchanged.
 
 P2F-07 does not migrate or rewrite `pharmlet.history`,
-`pharmlet.review-queue`, or `pharmlet.favorites`. P2F-08 and P2F-09 may adopt
-this contract for new Stats and Review Queue records while continuing to read
-older partial records. Favorites remains a quiz-ID string array.
+`pharmlet.review-queue`, or `pharmlet.favorites`. P2F-08 and P2F-09 have since
+shipped and both held that line: each reads this contract and older partial
+records without migrating either store. Favorites remains a quiz-ID string
+array.
 
 Canonical P1/P2 data, Fall policy, generator output, scoring, and quiz answers
 are outside this adapter and remain unchanged.
