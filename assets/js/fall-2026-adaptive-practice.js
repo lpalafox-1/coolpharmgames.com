@@ -34,11 +34,11 @@ export const ADAPTIVE_MEMORY_ROUNDS = 5;
 export const ADAPTIVE_BUCKET_TARGETS = Object.freeze({
   weakness: 4,
   refresh: 2,
-  underexposed: 2,
+  coverage: 2,
   balanced: 2
 });
 
-export const ADAPTIVE_BUCKET_ORDER = Object.freeze(["weakness", "refresh", "underexposed", "balanced"]);
+export const ADAPTIVE_BUCKET_ORDER = Object.freeze(["weakness", "refresh", "coverage", "balanced"]);
 
 const MASTERED_STREAK_TARGET = 3;
 const MASTERED_REFRESH_DAYS = 21;
@@ -52,7 +52,7 @@ export const ADAPTIVE_WEIGHTS = Object.freeze({
   missRecency: 1.5,       // recent misses matter more than old ones
   drugWeakness: 1.1,      // other questions about the same drug are weak
   domainWeakness: 0.6,    // this knowledge domain is weak generally
-  neverPracticed: 1.2,    // no exposure on record at all
+  freshCoverage: 1.2,     // no weakness evidence and not served recently
   refreshDue: 2.4,        // mastered long enough ago to be worth revisiting
   masteryPenalty: 2.2,    // currently strong material steps aside
   repeatFingerprint: 5.0, // served very recently as the identical item
@@ -290,24 +290,44 @@ const FALL_HISTORY_KINDS = new Set([
 export function buildAdaptiveSignals({ reviewEntries = [], historyEntries = [], memory = null, now = Date.now() } = {}) {
   const byPerformanceKey = new Map();
 
+  // The same prompt+answer can hold SEPARATE Review Queue entries, because the
+  // queue keys on quizId and normal Week Practice, Boss rounds, and Adaptive
+  // Practice carry different source ids. Miss counts are cumulative evidence
+  // and are summed, but mastery is a point-in-time state: OR-ing it across
+  // duplicates would let a stale mastered copy mask a newer active miss and
+  // hide material the student is currently getting wrong. Mastery, clear
+  // streak, and refresh-due therefore come from the most recently active
+  // duplicate only.
   for (const entry of reviewEntries) {
     if (!isRecord(entry)) continue;
     const key = getPerformanceKey(entry);
     if (!key) continue;
 
-    const missCount = positiveInt(entry.missCount);
-    const reviewMissCount = positiveInt(entry.reviewMissCount);
     const lastMissedAt = toTimestamp(entry.lastMissedAt);
+    const activityAt = Math.max(
+      lastMissedAt,
+      toTimestamp(entry.lastReviewedAt),
+      toTimestamp(entry.masteredAt),
+      toTimestamp(entry.createdAt)
+    );
+    const entryMastered = isMastered(entry);
     const existing = byPerformanceKey.get(key);
-    const record = {
-      missCount: (existing?.missCount || 0) + missCount,
-      reviewMissCount: (existing?.reviewMissCount || 0) + reviewMissCount,
-      clearStreak: Math.max(existing?.clearStreak || 0, positiveInt(entry.clearStreak)),
-      mastered: Boolean(existing?.mastered) || isMastered(entry),
-      refreshDue: Boolean(existing?.refreshDue) || isRefreshDue(entry, now),
-      lastMissedAt: Math.max(existing?.lastMissedAt || 0, lastMissedAt)
-    };
-    byPerformanceKey.set(key, record);
+
+    // Newer state wins. On an exact tie the ACTIVE state wins, so a duplicate
+    // never hides current weakness through timestamp coincidence.
+    const stateWins = !existing
+      || activityAt > existing.activityAt
+      || (activityAt === existing.activityAt && existing.mastered && !entryMastered);
+
+    byPerformanceKey.set(key, {
+      missCount: (existing?.missCount || 0) + positiveInt(entry.missCount),
+      reviewMissCount: (existing?.reviewMissCount || 0) + positiveInt(entry.reviewMissCount),
+      lastMissedAt: Math.max(existing?.lastMissedAt || 0, lastMissedAt),
+      activityAt: Math.max(existing?.activityAt || 0, activityAt),
+      clearStreak: stateWins ? positiveInt(entry.clearStreak) : existing.clearStreak,
+      mastered: stateWins ? entryMastered : existing.mastered,
+      refreshDue: stateWins ? isRefreshDue(entry, now) : existing.refreshDue
+    });
   }
 
   // Recent Fall attempt performance, used only to modulate emphasis.
@@ -368,6 +388,11 @@ function saturate(value, scale) {
   return numeric / (numeric + scale);
 }
 
+// Buckets describe what the evidence supports, not what the student has lived
+// through. "coverage" means: nothing on record marks this as a weakness, and
+// adaptive has not served it recently - so it is good breadth material. It is
+// NOT a claim that the question has never been practiced, which this app has
+// no trustworthy curriculum-safe way to know.
 export function classifyCandidate(candidate, signals, conceptWeakness) {
   const performance = signals.byPerformanceKey.get(getPerformanceKey(candidate));
   if (performance?.refreshDue) return "refresh";
@@ -377,10 +402,10 @@ export function classifyCandidate(candidate, signals, conceptWeakness) {
 
   if (!performance) {
     const conceptKey = getQuestionConceptKey(candidate);
-    const seen = signals.exposure.concepts.get(conceptKey) || 0;
+    const servedRecently = signals.exposure.concepts.get(conceptKey) || 0;
     const drug = String(candidate?.metadata?.sourceDrugId || "").trim();
     const drugIsWeak = (conceptWeakness?.drugs.get(drug) || 0) > 0;
-    if (!seen && !drugIsWeak) return "underexposed";
+    if (!servedRecently && !drugIsWeak) return "coverage";
   }
 
   return "balanced";
@@ -408,7 +433,11 @@ export function scoreCandidate(candidate, signals, conceptWeakness) {
     else if (performance.mastered) score -= weights.masteryPenalty;
     else score -= weights.masteryPenalty * 0.25 * saturate(performance.clearStreak, 2);
   } else {
-    score += weights.neverPracticed;
+    // No Review Queue entry means no RECORDED WEAKNESS EVIDENCE. It does not
+    // prove the student never practiced this: a normal Week Practice item
+    // answered correctly never enters the queue at all. The boost is therefore
+    // for coverage breadth, not for a claim about lifetime exposure.
+    score += weights.freshCoverage;
   }
 
   score += weights.drugWeakness * saturate(conceptWeakness.drugs.get(drug) || 0, 3);
@@ -490,7 +519,7 @@ export function selectAdaptiveRound({
   const chosen = [];
   const usedFingerprints = new Set();
   const usedConcepts = new Set();
-  const counts = { weakness: 0, refresh: 0, underexposed: 0, balanced: 0 };
+  const counts = { weakness: 0, refresh: 0, coverage: 0, balanced: 0 };
 
   const servedLastRound = signals.exposure.lastRoundFingerprints || new Set();
 

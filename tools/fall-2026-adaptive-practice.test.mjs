@@ -158,10 +158,10 @@ test("refresh-due mastered material returns and is bucketed as refresh", () => {
   assert.ok(payload.metadata.adaptive.bucketCounts.refresh > 0, "refresh-due material must come back");
 });
 
-test("underexposed material receives coverage", () => {
+test("coverage material is included and spreads across concepts", () => {
   const payload = build();
-  assert.ok(payload.metadata.adaptive.bucketCounts.underexposed > 0,
-    "with no history everything is underexposed and must be covered");
+  assert.ok(payload.metadata.adaptive.bucketCounts.coverage > 0,
+    "material with no recorded weakness evidence must still be covered");
   const concepts = new Set(payload.questions.map(adaptive.getQuestionConceptKey));
   assert.ok(concepts.size >= 8, `a round should spread across concepts, got ${concepts.size}`);
 });
@@ -193,7 +193,96 @@ test("performance keys survive the Review Queue store's own prompt stripping", (
     `store-shaped entries must drive the weakness bucket, got ${payload.metadata.adaptive.bucketCounts.weakness}`);
 });
 
-// --- freshness ----------------------------------------------------------------// --- freshness ----------------------------------------------------------------
+test("absence from the Review Queue is never treated as proof of never practicing", () => {
+  // A correctly answered normal Week Practice item never enters the Review
+  // Queue, so an absent entry proves only that no weakness was recorded.
+  const source = read("assets/js/fall-2026-adaptive-practice.js");
+  assert.doesNotMatch(source, /neverPracticed/, "no 'never practiced' claim may remain");
+  assert.doesNotMatch(source, /underexposed/, "the bucket is coverage, not proven underexposure");
+  assert.match(source, /freshCoverage/);
+  assert.ok(Object.hasOwn(adaptive.ADAPTIVE_BUCKET_TARGETS, "coverage"));
+  assert.equal(Object.hasOwn(adaptive.ADAPTIVE_BUCKET_TARGETS, "underexposed"), false);
+
+  // Freshness may still be driven by adaptive memory, which IS trustworthy
+  // because adaptive itself wrote it.
+  const candidates = pool();
+  const served = candidates.slice(0, 6);
+  const memory = adaptive.recordAdaptiveRound({ memory: null, questions: served, targetWeek: 6, at: NOW });
+  const withMemory = adaptive.buildAdaptiveSignals({ memory, now: NOW });
+  const withoutMemory = adaptive.buildAdaptiveSignals({ memory: null, now: NOW });
+  const weakness = adaptive.buildConceptWeakness(candidates, withMemory);
+  assert.equal(adaptive.classifyCandidate(served[0], withMemory, weakness), "balanced",
+    "recently served material is no longer fresh coverage");
+  assert.equal(adaptive.classifyCandidate(served[0], withoutMemory, weakness), "coverage",
+    "unserved material with no weakness evidence is coverage material");
+});
+
+// --- duplicate performance state across quiz ids --------------------------------
+
+test("a newer active miss is not masked by an older mastered duplicate", () => {
+  const question = pool()[0];
+  const older = {
+    quizId: "fall-2026-lab3-week-3-practice",
+    prompt: question.prompt, answer: question.answer,
+    missCount: 1, reviewMissCount: 0, clearStreak: 3, archived: true,
+    masteredAt: new Date(NOW - (30 * DAY)).toISOString(),
+    lastReviewedAt: new Date(NOW - (30 * DAY)).toISOString(),
+    lastMissedAt: new Date(NOW - (45 * DAY)).toISOString()
+  };
+  const newer = {
+    quizId: "fall-2026-lab3-week-6-adaptive",
+    prompt: question.prompt, answer: question.answer,
+    missCount: 3, reviewMissCount: 1, clearStreak: 0, archived: false,
+    lastMissedAt: new Date(NOW - (1 * DAY)).toISOString(),
+    createdAt: new Date(NOW - (2 * DAY)).toISOString()
+  };
+
+  for (const order of [[older, newer], [newer, older]]) {
+    const signals = adaptive.buildAdaptiveSignals({ reviewEntries: order, now: NOW });
+    const performance = signals.byPerformanceKey.get(adaptive.getPerformanceKey(question));
+    assert.ok(performance, "both entries must resolve to one performance key");
+    assert.equal(performance.mastered, false, "the stale mastered copy must not win");
+    assert.equal(performance.refreshDue, false);
+    assert.equal(performance.clearStreak, 0);
+    assert.equal(performance.missCount, 4, "miss evidence stays cumulative");
+    assert.equal(performance.reviewMissCount, 1);
+
+    const weakness = adaptive.buildConceptWeakness([question], signals);
+    assert.equal(adaptive.classifyCandidate(question, signals, weakness), "weakness",
+      "current weakness must classify as weakness regardless of entry order");
+  }
+});
+
+test("a newer legitimate mastery wins over an older miss", () => {
+  const question = pool()[1];
+  const older = {
+    quizId: "fall-2026-lab3-week-3-practice",
+    prompt: question.prompt, answer: question.answer,
+    missCount: 4, reviewMissCount: 2, clearStreak: 0, archived: false,
+    lastMissedAt: new Date(NOW - (30 * DAY)).toISOString()
+  };
+  const newer = {
+    quizId: "fall-2026-lab3-week-6-adaptive",
+    prompt: question.prompt, answer: question.answer,
+    missCount: 0, reviewMissCount: 0, clearStreak: 3, archived: true,
+    masteredAt: new Date(NOW - (1 * DAY)).toISOString(),
+    lastReviewedAt: new Date(NOW - (1 * DAY)).toISOString()
+  };
+
+  for (const order of [[older, newer], [newer, older]]) {
+    const signals = adaptive.buildAdaptiveSignals({ reviewEntries: order, now: NOW });
+    const performance = signals.byPerformanceKey.get(adaptive.getPerformanceKey(question));
+    assert.equal(performance.mastered, true, "the newer mastered state must win");
+    assert.equal(performance.clearStreak, 3);
+    assert.equal(performance.refreshDue, false, "freshly mastered is not refresh-due");
+
+    const weakness = adaptive.buildConceptWeakness([question], signals);
+    assert.notEqual(adaptive.classifyCandidate(question, signals, weakness), "weakness",
+      "mastered material must not be reported as current weakness");
+  }
+});
+
+// --- freshness ----------------------------------------------------------------
 
 test("recent adaptive items are suppressed when alternatives exist", () => {
   const reviewEntries = pool().slice(0, 5).map((question) => missedEntry(question));
@@ -317,13 +406,48 @@ test("adaptive memory normalizes defensively and never grows without bound", () 
 
 // --- contracts preserved ------------------------------------------------------
 
-test("strict FITB answer contracts survive selection unchanged", () => {
+test("the candidate corpus really contains strict brand/generic FITB questions", () => {
   const candidates = pool(10, "fitb-scan");
   const strict = candidates.filter((q) => q?.metadata?.answerMatching?.spellingSensitive === true
-    || Array.isArray(q?._acceptedAnswers));
-  const payload = build({ targetWeek: 10, seed: "fitb-scan" });
-  const byFingerprint = new Map(candidates.map((q) => [adaptive.getQuestionFingerprint(q), q]));
+    && q?.metadata?.answerMatching?.capitalizationSensitive === false);
 
+  assert.ok(strict.length > 0, "the corpus must contain strict FITB material to test");
+  assert.ok(strict.some((q) => q.type === "short"), "strict FITB is a short-answer form");
+  assert.ok(strict.some((q) => q.metadata.knowledgeDomain === "brandGeneric"),
+    "strict FITB covers brand/generic recognition");
+  assert.ok(strict.some((q) => Array.isArray(q._acceptedAnswers) && q._acceptedAnswers.length > 0),
+    "at least one strict question must carry accepted answers, or the pass-through proof is vacuous");
+});
+
+test("a strict FITB candidate passes through selection with its contract intact", () => {
+  const candidates = pool(10, "fitb-scan");
+  const signals = adaptive.buildAdaptiveSignals({ now: NOW });
+
+  // Drive a specific strict question through the real selector rather than
+  // hoping a random round happens to pick one.
+  const strictWithAccepted = candidates.find((q) =>
+    q?.metadata?.answerMatching?.spellingSensitive === true
+    && Array.isArray(q?._acceptedAnswers) && q._acceptedAnswers.length > 0);
+  assert.ok(strictWithAccepted, "corpus must supply a strict question with accepted answers");
+
+  const round = adaptive.selectAdaptiveRound({
+    candidates: [strictWithAccepted, ...candidates.slice(0, 20)], signals, seed: "fitb-passthrough"
+  });
+  const selected = round.questions.find((q) =>
+    adaptive.getQuestionFingerprint(q) === adaptive.getQuestionFingerprint(strictWithAccepted));
+  assert.ok(selected, "the strict question must be selectable");
+
+  assert.deepEqual(selected.answer, strictWithAccepted.answer, "exact answer preserved");
+  assert.deepEqual(selected.metadata.answerMatching, {
+    spellingSensitive: true, capitalizationSensitive: false
+  }, "the strict marker is preserved exactly");
+  assert.deepEqual(selected._acceptedAnswers, strictWithAccepted._acceptedAnswers,
+    "every accepted answer is preserved");
+  assert.ok(selected._acceptedAnswers.length > 0, "the accepted-answer proof is non-vacuous");
+
+  // The same holds for everything a real payload emits.
+  const byFingerprint = new Map(candidates.map((q) => [adaptive.getQuestionFingerprint(q), q]));
+  const payload = build({ targetWeek: 10, seed: "fitb-scan" });
   for (const question of payload.questions) {
     const source = byFingerprint.get(adaptive.getQuestionFingerprint(question));
     assert.ok(source, "every selected question must come from the generated pool");
@@ -332,7 +456,6 @@ test("strict FITB answer contracts survive selection unchanged", () => {
     assert.deepEqual(question.metadata?.answerMatching, source.metadata?.answerMatching);
     assert.deepEqual(question._acceptedAnswers, source._acceptedAnswers);
   }
-  assert.ok(strict.length >= 0);
 });
 
 test("adaptive attempts carry their own lineage kind and scope", () => {
