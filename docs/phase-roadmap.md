@@ -510,8 +510,9 @@ consumer signals), and the review-correction commit `8ad6ecd` (keep the
 ranking helper private). It closed the long-standing Review Queue
 `wrongCounts` inflation that P2F-08 deliberately did not touch: normalization
 is idempotent, a persisted `wrongCounts` map is authoritative, a legacy answer
-alias folds exactly once, correct reviews no longer contaminate wrong-answer
-state, and no consumer falls back to an uncorroborated `lastUserAnswer`.
+alias folds exactly once, correct reviews no longer overwrite an existing
+entry's `lastUserAnswer` or increment `wrongCounts`, and no consumer falls back
+to an uncorroborated `lastUserAnswer`.
 Historical counts were deliberately not repaired — see the accepted follow-up
 below.
 
