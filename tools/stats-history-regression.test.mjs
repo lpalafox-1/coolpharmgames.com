@@ -1201,7 +1201,7 @@ test("T-17 every protected hash except the approved Stats baseline is unchanged"
     fallGenerator: "39e123b914f665282f6abce23110bf3e2bd4f0bcc1974b7038e0f9384cf9871a",
     fallLauncher: "255ef32be7b47e3f12f3b02da5db5a91e9040a5ee9fe406f68029e783a98157c",
     quizEngine: "6dc5c2f6d467742e837435be1d120f1110eb9faacb9d985898efad52a5c8a507",
-    reviewQueueStore: "cd3b94aac2a420b604e6e6a30b6e0792b948a455c76e6419ca09c14105f1c335",
+    reviewQueueStore: "169c528d77fe0a185b801c7bcc61949adad803eeb839be96fa1354dbe9937ba3",
     favorites: "b6fbd5bbca17ea150e34e9b29c9e6391b5ae7359d7b6afb18fe6c7e7caed781d"
   });
   const PATHS = Object.freeze({

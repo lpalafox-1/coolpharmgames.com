@@ -560,6 +560,23 @@ test("G10 consumers omit the wrong-answer claim when no signal exists", () => {
   assert.match(statsSource, /Most tempting wrong answer/);
 });
 
+test("the wrong-answer ranking helper stays private to the store", () => {
+  const store = loadStore();
+  // It is an internal implementation detail of the common-wrong signal, not a
+  // supported consumer entry point; no page or the engine calls it.
+  assert.equal("getRankedWrongAnswers" in store, false,
+    "getRankedWrongAnswers must not be part of the public Store API");
+  assert.match(storeSource, /function getRankedWrongAnswers\(/,
+    "the helper itself remains, privately");
+
+  // Keeping it private must not change what the public API reports.
+  const [entry] = store.normalizeQueue([{
+    ...missedRecord(), missCount: 6, wrongCounts: { "ACE inhibitor": -2, Diuretic: 4, Statin: 1 }
+  }]);
+  assert.equal(store.getCommonWrongAnswer(entry), "Diuretic");
+  assert.equal(store.getCommonWrongAnswerCount(entry), 4);
+});
+
 // G15 Cache tokens.
 test("G15 all three store consumers share the new token and the engine stays put", () => {
   const pages = ["quiz.html", "review-queue.html", "stats.html"];

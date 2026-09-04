@@ -596,7 +596,6 @@
     getLatestActivityTimestamp,
     getCommonWrongAnswer,
     getCommonWrongAnswerCount,
-    getRankedWrongAnswers,
     getMasterySummary,
     getDisplayTitle,
     getMostMissedQuestions
