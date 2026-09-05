@@ -459,13 +459,58 @@ contract.
 
 ### Fall sequencing — next planned work
 
-The next planned Fall task is a **bounded generator-fidelity audit**, and it
-comes *before* F26-10 adaptive practice. F26-10 must not be started ahead of
-it: adaptive selection is only as trustworthy as the material and the signals
-it selects from, so the audit establishes that baseline first. Neither is
-authorized by any status change elsewhere in this document; each still needs
-its own owner-approved scope and allowed-files contract. The Fall generator,
-launcher, policy, and canonical data remain feature-frozen until then.
+The bounded generator-fidelity audit ran as Phase 0 of F26-10 rather than as a
+separate branch. Two of its four checks passed and two failed; the failures are
+deferred to a separate task rather than being fixed inside F26-10 (see F26-11
+below). The Fall generator, policy, and canonical data remain feature-frozen.
+
+### F26-10 — Performance-Guided Adaptive Practice
+
+- **Status:** `IN PROGRESS` (owner-authorized 2026-09-04; generator-free path)
+- **Objective:** an additive Adaptive Practice mode for Fall Lab III Weeks 1–10
+  that builds a fresh 10-question round from the student's own longitudinal
+  performance. Normal Week Practice, Boss Round, Boss Remix, scoring, weekly
+  eligibility, and the shared generator are unchanged.
+- **Phase 0 result (bounded generator-fidelity check):** verified against a
+  2,500-question corpus generated through the real launcher.
+  - **PASS** — NOT/EXCEPT generation is source-safe. All emitted negatives are
+    `notFdaIndicationRecognition`; across 76 distinct items the keyed answer
+    genuinely lacks the indication and every distractor genuinely has it, with
+    brand and generic choices both resolving to canonical records.
+  - **PASS** — no future-week leakage, 0 violations across the corpus.
+  - **FAIL, deferred** — direct brand → FDA-indication stems are never
+    generated (0 brand stem references in the corpus).
+  - **FAIL, deferred** — the cross-drug `What is NOT an ADR for either of the
+    Thiazide Diuretics?` form does not exist.
+- **Selection trust boundary:** historical `wrongCounts` is deliberately never
+  read. Pre-P2F-09 values may carry normalization inflation (see P2F-09-F1 and
+  the legacy best-effort note), so answer-frequency magnitude has no influence
+  on selection. `missCount`, `reviewMissCount`, `clearStreak`, archived and
+  refresh-due state, miss recency, exposure, and recent attempt history are
+  used instead; none was affected by that bug.
+- **Boundaries:** `assets/js/fall-2026-quiz-generator.js`, `quizEngine.js`, the
+  engine manifest, canonical Fall data, and the quiz policy are byte-identical.
+  Adaptive writes exactly one additive store,
+  `pharmlet.fall-2026-lab3.adaptive-memory`, used only for anti-repetition; it
+  never writes history or the Review Queue.
+
+### F26-11 — Bounded official-quiz-fidelity forms (deferred from F26-10)
+
+- **Status:** `DEFERRED` — needs its own owner-approved scope and allowed-files
+  contract; **not** authorized by F26-10.
+- **Scope:** the two Phase 0 failures above. Both require touching the shared
+  Fall generator's question-construction path, which F26-10 was explicitly
+  forbidden to do because that path also feeds normal Week Practice, whose
+  composition must not change.
+  - Direct brand → FDA-indication stems. The machinery exists
+    (`createMcqStemReference("brand")`, `selectMcqStemReference`,
+    `isBrandOnlyReferenceSafe`) but the composition route the launcher uses
+    never produces a stem reference, so brands appear only as choice values.
+  - Cross-drug NOT-an-ADR stems. Needs a drug-group stem concept, an
+    ADR-domain negative, and a guarantee that the keyed answer is provably
+    absent from every canonical drug the stem covers.
+
+### Deferred Fall engine issue
 
 ### Deferred Fall engine issue
 

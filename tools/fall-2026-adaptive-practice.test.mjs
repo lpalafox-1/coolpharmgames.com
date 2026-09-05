@@ -1,0 +1,732 @@
+// F26-10 Performance-Guided Adaptive Practice.
+//
+// Adaptive selection is a ranking layer over the unmodified Fall generator, so
+// these tests assert two separate things: that ranking responds to real
+// longitudinal signals, and that it can never widen curriculum scope, change
+// question correctness, or disturb the existing Fall practice paths.
+import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import test from "node:test";
+import { fileURLToPath } from "node:url";
+import * as adaptive from "../assets/js/fall-2026-adaptive-practice.js";
+import { buildFall2026Lab3Payload } from "../assets/js/fall-2026-lab3-launcher.js";
+
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const read = (relativePath) => readFileSync(path.join(repoRoot, relativePath), "utf8");
+const sha256 = (relativePath) => createHash("sha256").update(readFileSync(path.join(repoRoot, relativePath))).digest("hex");
+
+const drugData = JSON.parse(read("assets/data/fall-2026-p2-top-drugs.json"));
+const policy = JSON.parse(read("assets/data/fall-2026-lab3-quiz-policy.json"));
+const NOW = Date.UTC(2026, 8, 4, 12, 0, 0);
+const DAY = 24 * 60 * 60 * 1000;
+
+function build(overrides = {}) {
+  return adaptive.buildFall2026AdaptivePayload({
+    drugData, policy, targetWeek: 6, seed: "f26-10-test", now: NOW, ...overrides
+  });
+}
+
+function pool(targetWeek = 6, seed = "f26-10-test") {
+  return adaptive.buildAdaptiveCandidatePool({ drugData, policy, targetWeek, seed });
+}
+
+function missedEntry(question, overrides = {}) {
+  return {
+    quizId: "fall-2026-lab3-week-3-practice",
+    prompt: question.prompt,
+    answer: question.answer,
+    missCount: 4,
+    reviewMissCount: 2,
+    clearStreak: 0,
+    archived: false,
+    lastMissedAt: new Date(NOW - (2 * DAY)).toISOString(),
+    ...overrides
+  };
+}
+
+const fingerprints = (questions) => new Set(questions.map(adaptive.getQuestionFingerprint));
+const toComparablePrompt = (question) =>
+  String(question?.prompt ?? "").replace(/<[^>]*>/g, "").replace(/\s+/g, "").toLowerCase();
+
+// --- curriculum scope ---------------------------------------------------------
+
+test("Week 1 adaptive contains only Week 1 material", () => {
+  const payload = build({ targetWeek: 1 });
+  assert.equal(payload.questions.length, adaptive.ADAPTIVE_ROUND_SIZE);
+  for (const question of payload.questions) {
+    for (const week of adaptive.getQuestionSourceWeeks(question)) {
+      assert.equal(week, 1, "a Week 1 round may only use Week 1 material");
+    }
+  }
+});
+
+test("Week 10 may use Weeks 1-10 but never beyond", () => {
+  const payload = build({ targetWeek: 10, seed: "week-10-scope" });
+  const weeks = new Set(payload.questions.flatMap(adaptive.getQuestionSourceWeeks));
+  assert.ok(Math.max(...weeks) <= 10);
+  assert.ok(Math.min(...weeks) >= 1);
+});
+
+test("no future-week leakage across a large seed corpus", () => {
+  let checked = 0;
+  for (let targetWeek = 1; targetWeek <= 10; targetWeek += 1) {
+    for (let seed = 0; seed < 6; seed += 1) {
+      const payload = build({ targetWeek, seed: `corpus-${targetWeek}-${seed}` });
+      assert.equal(payload.questions.length, adaptive.ADAPTIVE_ROUND_SIZE,
+        `week ${targetWeek} seed ${seed} must still fill a full round`);
+      for (const question of payload.questions) {
+        checked += 1;
+        for (const week of adaptive.getQuestionSourceWeeks(question)) {
+          assert.ok(week <= targetWeek,
+            `week ${targetWeek} seed ${seed}: material from week ${week} leaked`);
+        }
+      }
+    }
+  }
+  assert.ok(checked >= 600, `corpus should be large; checked ${checked}`);
+});
+
+// --- signal responsiveness ----------------------------------------------------
+
+test("repeated genuine misses measurably increase selection priority", () => {
+  const candidates = pool();
+  const weak = candidates.slice(0, 5);
+  const reviewEntries = weak.map((question) => missedEntry(question));
+
+  const baseline = build();
+  const weighted = build({ reviewEntries });
+
+  const baselineHits = weak.filter((q) => fingerprints(baseline.questions).has(adaptive.getQuestionFingerprint(q))).length;
+  const weightedHits = weak.filter((q) => fingerprints(weighted.questions).has(adaptive.getQuestionFingerprint(q))).length;
+  assert.ok(weightedHits > baselineHits,
+    `missed material must surface more often (baseline ${baselineHits}, weighted ${weightedHits})`);
+  assert.ok(weighted.metadata.adaptive.bucketCounts.weakness > 0, "the weakness bucket must be used");
+
+  // Score, not just placement, must respond.
+  const signalsWith = adaptive.buildAdaptiveSignals({ reviewEntries, now: NOW });
+  const signalsWithout = adaptive.buildAdaptiveSignals({ reviewEntries: [], now: NOW });
+  const weakness = adaptive.buildConceptWeakness(candidates, signalsWith);
+  const none = adaptive.buildConceptWeakness(candidates, signalsWithout);
+  assert.ok(
+    adaptive.scoreCandidate(weak[0], signalsWith, weakness) > adaptive.scoreCandidate(weak[0], signalsWithout, none),
+    "a missed question must score above its unmissed self"
+  );
+});
+
+test("mastered material is deprioritized but stays eligible", () => {
+  const candidates = pool();
+  const mastered = candidates.slice(0, 6);
+  const reviewEntries = mastered.map((question) => missedEntry(question, {
+    missCount: 1, reviewMissCount: 0, clearStreak: 3, archived: true,
+    masteredAt: new Date(NOW - (2 * DAY)).toISOString(),
+    lastReviewedAt: new Date(NOW - (2 * DAY)).toISOString()
+  }));
+
+  const signals = adaptive.buildAdaptiveSignals({ reviewEntries, now: NOW });
+  const weakness = adaptive.buildConceptWeakness(candidates, signals);
+  const neutral = adaptive.buildAdaptiveSignals({ reviewEntries: [], now: NOW });
+  const neutralWeakness = adaptive.buildConceptWeakness(candidates, neutral);
+
+  assert.ok(
+    adaptive.scoreCandidate(mastered[0], signals, weakness)
+      < adaptive.scoreCandidate(mastered[0], neutral, neutralWeakness),
+    "mastered material must score below neutral material"
+  );
+
+  // Deprioritized, not banned: it can still be drawn when the pool is small.
+  const tiny = adaptive.selectAdaptiveRound({
+    candidates: mastered, signals, seed: "mastered-eligible", size: 4
+  });
+  assert.equal(tiny.questions.length, 4, "mastered material remains selectable");
+});
+
+test("refresh-due mastered material returns and is bucketed as refresh", () => {
+  const candidates = pool();
+  const stale = candidates.slice(0, 4);
+  const reviewEntries = stale.map((question) => missedEntry(question, {
+    missCount: 1, reviewMissCount: 0, clearStreak: 3, archived: true,
+    masteredAt: new Date(NOW - (40 * DAY)).toISOString(),
+    lastReviewedAt: new Date(NOW - (40 * DAY)).toISOString(),
+    lastMissedAt: new Date(NOW - (60 * DAY)).toISOString()
+  }));
+
+  const signals = adaptive.buildAdaptiveSignals({ reviewEntries, now: NOW });
+  const weakness = adaptive.buildConceptWeakness(candidates, signals);
+  assert.equal(adaptive.classifyCandidate(stale[0], signals, weakness), "refresh");
+
+  const payload = build({ reviewEntries });
+  assert.ok(payload.metadata.adaptive.bucketCounts.refresh > 0, "refresh-due material must come back");
+});
+
+test("coverage material is included and spreads across concepts", () => {
+  const payload = build();
+  assert.ok(payload.metadata.adaptive.bucketCounts.coverage > 0,
+    "material with no recorded weakness evidence must still be covered");
+  const concepts = new Set(payload.questions.map(adaptive.getQuestionConceptKey));
+  assert.ok(concepts.size >= 8, `a round should spread across concepts, got ${concepts.size}`);
+});
+
+test("performance keys survive the Review Queue store's own prompt stripping", () => {
+  // The store removes HTML tags WITHOUT inserting a space, so its promptText
+  // reads "dizziness?" where the candidate's HTML yields "dizziness ?". A round
+  // trip through that shape must still match, or every weakness signal is
+  // silently lost in the browser while unit fixtures still pass.
+  const candidate = pool()[0];
+  const storeStyle = {
+    promptText: String(candidate.prompt).replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim(),
+    answer: candidate.answer
+  };
+  assert.equal(adaptive.getPerformanceKey(storeStyle), adaptive.getPerformanceKey(candidate),
+    "store-normalized prompts must key identically to candidate prompts");
+
+  // And the signal must actually land end to end.
+  const weak = pool().slice(0, 5).map((question) => ({
+    quizId: "fall-2026-lab3-week-3-practice",
+    promptText: String(question.prompt).replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim(),
+    prompt: question.prompt,
+    answer: question.answer,
+    missCount: 5, reviewMissCount: 2, clearStreak: 0, archived: false,
+    lastMissedAt: new Date(NOW - (2 * DAY)).toISOString()
+  }));
+  const payload = build({ reviewEntries: weak });
+  assert.ok(payload.metadata.adaptive.bucketCounts.weakness >= 3,
+    `store-shaped entries must drive the weakness bucket, got ${payload.metadata.adaptive.bucketCounts.weakness}`);
+});
+
+test("absence from the Review Queue is never treated as proof of never practicing", () => {
+  // A correctly answered normal Week Practice item never enters the Review
+  // Queue, so an absent entry proves only that no weakness was recorded.
+  const source = read("assets/js/fall-2026-adaptive-practice.js");
+  assert.doesNotMatch(source, /neverPracticed/, "no 'never practiced' claim may remain");
+  assert.doesNotMatch(source, /underexposed/, "the bucket is coverage, not proven underexposure");
+  assert.match(source, /freshCoverage/);
+  assert.ok(Object.hasOwn(adaptive.ADAPTIVE_BUCKET_TARGETS, "coverage"));
+  assert.equal(Object.hasOwn(adaptive.ADAPTIVE_BUCKET_TARGETS, "underexposed"), false);
+
+  // Freshness may still be driven by adaptive memory, which IS trustworthy
+  // because adaptive itself wrote it.
+  const candidates = pool();
+  const served = candidates.slice(0, 6);
+  const memory = adaptive.recordAdaptiveRound({ memory: null, questions: served, targetWeek: 6, at: NOW });
+  const withMemory = adaptive.buildAdaptiveSignals({ memory, now: NOW });
+  const withoutMemory = adaptive.buildAdaptiveSignals({ memory: null, now: NOW });
+  const weakness = adaptive.buildConceptWeakness(candidates, withMemory);
+  assert.equal(adaptive.classifyCandidate(served[0], withMemory, weakness), "balanced",
+    "recently served material is no longer fresh coverage");
+  assert.equal(adaptive.classifyCandidate(served[0], withoutMemory, weakness), "coverage",
+    "unserved material with no weakness evidence is coverage material");
+});
+
+// --- duplicate performance state across quiz ids --------------------------------
+
+test("a newer active miss is not masked by an older mastered duplicate", () => {
+  const question = pool()[0];
+  const older = {
+    quizId: "fall-2026-lab3-week-3-practice",
+    prompt: question.prompt, answer: question.answer,
+    missCount: 1, reviewMissCount: 0, clearStreak: 3, archived: true,
+    masteredAt: new Date(NOW - (30 * DAY)).toISOString(),
+    lastReviewedAt: new Date(NOW - (30 * DAY)).toISOString(),
+    lastMissedAt: new Date(NOW - (45 * DAY)).toISOString()
+  };
+  const newer = {
+    quizId: "fall-2026-lab3-week-6-adaptive",
+    prompt: question.prompt, answer: question.answer,
+    missCount: 3, reviewMissCount: 1, clearStreak: 0, archived: false,
+    lastMissedAt: new Date(NOW - (1 * DAY)).toISOString(),
+    createdAt: new Date(NOW - (2 * DAY)).toISOString()
+  };
+
+  for (const order of [[older, newer], [newer, older]]) {
+    const signals = adaptive.buildAdaptiveSignals({ reviewEntries: order, now: NOW });
+    const performance = signals.byPerformanceKey.get(adaptive.getPerformanceKey(question));
+    assert.ok(performance, "both entries must resolve to one performance key");
+    assert.equal(performance.mastered, false, "the stale mastered copy must not win");
+    assert.equal(performance.refreshDue, false);
+    assert.equal(performance.clearStreak, 0);
+    assert.equal(performance.missCount, 4, "miss evidence stays cumulative");
+    assert.equal(performance.reviewMissCount, 1);
+
+    const weakness = adaptive.buildConceptWeakness([question], signals);
+    assert.equal(adaptive.classifyCandidate(question, signals, weakness), "weakness",
+      "current weakness must classify as weakness regardless of entry order");
+  }
+});
+
+test("a newer legitimate mastery wins over an older miss", () => {
+  const question = pool()[1];
+  const older = {
+    quizId: "fall-2026-lab3-week-3-practice",
+    prompt: question.prompt, answer: question.answer,
+    missCount: 4, reviewMissCount: 2, clearStreak: 0, archived: false,
+    lastMissedAt: new Date(NOW - (30 * DAY)).toISOString()
+  };
+  const newer = {
+    quizId: "fall-2026-lab3-week-6-adaptive",
+    prompt: question.prompt, answer: question.answer,
+    missCount: 0, reviewMissCount: 0, clearStreak: 3, archived: true,
+    masteredAt: new Date(NOW - (1 * DAY)).toISOString(),
+    lastReviewedAt: new Date(NOW - (1 * DAY)).toISOString()
+  };
+
+  for (const order of [[older, newer], [newer, older]]) {
+    const signals = adaptive.buildAdaptiveSignals({ reviewEntries: order, now: NOW });
+    const performance = signals.byPerformanceKey.get(adaptive.getPerformanceKey(question));
+    assert.equal(performance.mastered, true, "the newer mastered state must win");
+    assert.equal(performance.clearStreak, 3);
+    assert.equal(performance.refreshDue, false, "freshly mastered is not refresh-due");
+
+    const weakness = adaptive.buildConceptWeakness([question], signals);
+    assert.notEqual(adaptive.classifyCandidate(question, signals, weakness), "weakness",
+      "mastered material must not be reported as current weakness");
+  }
+});
+
+// --- freshness ----------------------------------------------------------------
+
+test("recent adaptive items are suppressed when alternatives exist", () => {
+  const reviewEntries = pool().slice(0, 5).map((question) => missedEntry(question));
+  const first = build({ reviewEntries });
+  const memory = adaptive.recordAdaptiveRound({
+    memory: null, questions: first.questions, targetWeek: 6, at: NOW
+  });
+  const second = build({ reviewEntries, memory, now: NOW + (60 * 60 * 1000) });
+
+  const overlap = second.questions.filter((q) => fingerprints(first.questions).has(adaptive.getQuestionFingerprint(q))).length;
+  assert.ok(overlap <= 3, `a follow-up round must mostly move on, overlap was ${overlap}`);
+  assert.equal(second.questions.length, adaptive.ADAPTIVE_ROUND_SIZE);
+});
+
+test("a prior miss raises priority without pinning the identical item forever", () => {
+  const candidates = pool();
+  const weak = candidates.slice(0, 3);
+  const reviewEntries = weak.map((question) => missedEntry(question));
+
+  let memory = null;
+  const appearances = new Map();
+  for (let round = 0; round < 4; round += 1) {
+    const payload = build({ reviewEntries, memory, now: NOW + (round * 60 * 60 * 1000) });
+    for (const question of payload.questions) {
+      const key = adaptive.getQuestionFingerprint(question);
+      appearances.set(key, (appearances.get(key) || 0) + 1);
+    }
+    memory = adaptive.recordAdaptiveRound({
+      memory, questions: payload.questions, targetWeek: 6, at: NOW + (round * 60 * 60 * 1000)
+    });
+  }
+
+  const worst = Math.max(...appearances.values());
+  assert.ok(worst < 4, `no item may appear in every round; worst was ${worst}`);
+  assert.ok(appearances.size >= 20, `four rounds should span material; saw ${appearances.size} distinct items`);
+});
+
+test("no duplicate fingerprints within a round", () => {
+  for (let targetWeek = 1; targetWeek <= 10; targetWeek += 1) {
+    const payload = build({ targetWeek, seed: `dupes-${targetWeek}` });
+    assert.equal(fingerprints(payload.questions).size, payload.questions.length,
+      `week ${targetWeek} round repeated a question`);
+  }
+});
+
+// --- determinism and adaptation -----------------------------------------------
+
+test("identical history, memory and seed give identical output", () => {
+  const reviewEntries = pool().slice(0, 4).map((question) => missedEntry(question));
+  const memory = adaptive.recordAdaptiveRound({
+    memory: null, questions: pool().slice(4, 8), targetWeek: 6, at: NOW
+  });
+  const a = build({ reviewEntries, memory });
+  const b = build({ reviewEntries, memory });
+  assert.deepEqual(JSON.parse(JSON.stringify(a.questions)), JSON.parse(JSON.stringify(b.questions)));
+});
+
+test("changed performance changes the next round", () => {
+  const candidates = pool();
+  const before = build({ reviewEntries: candidates.slice(0, 4).map((q) => missedEntry(q)) });
+  const after = build({ reviewEntries: candidates.slice(40, 44).map((q) => missedEntry(q)) });
+  assert.notDeepEqual(
+    before.questions.map(adaptive.getQuestionFingerprint),
+    after.questions.map(adaptive.getQuestionFingerprint),
+    "different weaknesses must produce a different round"
+  );
+});
+
+// --- malformed history hardening (B1) -------------------------------------------
+
+test("B1 a malformed score never produces NaN in recent accuracy or candidate scores", () => {
+  const fall = (overrides) => ({
+    quizId: "generated-custom-quiz-fall-2026-lab3-practice-q10", mode: "easy",
+    timestamp: NOW - DAY, attemptLineage: { attemptKind: "fall-2026-lab3-practice", quizWeek: 3 },
+    ...overrides
+  });
+
+  const malformed = [
+    fall({ total: 10, score: "not-a-number" }),
+    fall({ total: 10, score: Infinity }),
+    fall({ total: 10, score: -Infinity }),
+    fall({ total: 10, score: NaN }),
+    fall({ total: 10, score: null }),
+    fall({ total: 10, score: {} }),
+    fall({ total: 10, score: undefined }),
+    fall({ total: 10, score: "" }),
+    fall({ total: 10, score: true }),
+    fall({ total: 10, score: [] }),
+    fall({ total: 0, score: 5 }),
+    fall({ total: "ten", score: 5 })
+  ];
+
+  for (const entry of malformed) {
+    const signals = adaptive.buildAdaptiveSignals({ historyEntries: [entry], now: NOW });
+    assert.equal(signals.recentAccuracy, null,
+      `${JSON.stringify(entry.score)}/${JSON.stringify(entry.total)} must count as absent evidence`);
+  }
+
+  // Malformed mixed with valid records: only the valid ones count.
+  const mixed = adaptive.buildAdaptiveSignals({
+    historyEntries: [...malformed, fall({ total: 10, score: 4 })], now: NOW
+  });
+  assert.equal(mixed.recentAccuracy, 0.4, "a valid record still drives accuracy");
+  assert.ok(Number.isFinite(mixed.recentAccuracy));
+
+  // Every candidate score stays finite under malformed history.
+  const candidates = pool();
+  const reviewEntries = candidates.slice(0, 4).map((question) => missedEntry(question));
+  const signals = adaptive.buildAdaptiveSignals({ reviewEntries, historyEntries: malformed, now: NOW });
+  const weakness = adaptive.buildConceptWeakness(candidates, signals);
+  for (const candidate of candidates) {
+    assert.ok(Number.isFinite(adaptive.scoreCandidate(candidate, signals, weakness)),
+      "no candidate score may be NaN or Infinity");
+  }
+});
+
+test("B1 malformed-only history selects identically to no history", () => {
+  const reviewEntries = pool().slice(0, 4).map((question) => missedEntry(question));
+  const malformed = [
+    { total: 10, score: "not-a-number", timestamp: NOW, attemptLineage: { attemptKind: "fall-2026-lab3-practice" } },
+    { total: 10, score: Infinity, timestamp: NOW, attemptLineage: { attemptKind: "fall-2026-lab3-practice" } }
+  ];
+  const withMalformed = build({ reviewEntries, historyEntries: malformed });
+  const withNone = build({ reviewEntries, historyEntries: [] });
+  assert.deepEqual(
+    withMalformed.questions.map(adaptive.getQuestionFingerprint),
+    withNone.questions.map(adaptive.getQuestionFingerprint),
+    "malformed history must not perturb ranking"
+  );
+});
+
+// --- content identity (B2) ------------------------------------------------------
+
+test("B2 adaptive identity is content, not generator id", () => {
+  const sameContentDifferentIds = [
+    { id: "gen-week-01-aaa", prompt: "<b>Metoprolol</b> is which class?", answer: "Beta blocker" },
+    { id: "gen-week-07-zzz", prompt: "Metoprolol is which class?", answer: "Beta blocker" }
+  ];
+  assert.equal(
+    adaptive.getQuestionFingerprint(sameContentDifferentIds[0]),
+    adaptive.getQuestionFingerprint(sameContentDifferentIds[1]),
+    "the same question under different ids is one adaptive question"
+  );
+
+  const sameIdDifferentContent = [
+    { id: "identical-id", prompt: "Metoprolol is which class?", answer: "Beta blocker" },
+    { id: "identical-id", prompt: "Enalapril is which class?", answer: "ACE inhibitor" }
+  ];
+  assert.notEqual(
+    adaptive.getQuestionFingerprint(sameIdDifferentContent[0]),
+    adaptive.getQuestionFingerprint(sameIdDifferentContent[1]),
+    "colliding ids must not merge different questions"
+  );
+
+  // Array answers and strict FITB answers stay safe and order-independent.
+  assert.equal(
+    adaptive.getQuestionFingerprint({ prompt: "Brands?", answer: ["Zestril", "Prinivil"] }),
+    adaptive.getQuestionFingerprint({ prompt: "Brands?", answer: ["Prinivil", "Zestril"] })
+  );
+  assert.notEqual(
+    adaptive.getQuestionFingerprint({ prompt: "Generic for Vasotec?", answer: "Enalapril" }),
+    adaptive.getQuestionFingerprint({ prompt: "Generic for Vasotec?", answer: "Lisinopril" })
+  );
+
+  // Identity must not be derivable from drug metadata alone.
+  assert.notEqual(
+    adaptive.getQuestionFingerprint({ prompt: "A?", answer: "X", metadata: { sourceDrugId: "d1" } }),
+    adaptive.getQuestionFingerprint({ prompt: "B?", answer: "Y", metadata: { sourceDrugId: "d1" } }),
+    "two questions about one drug are still two questions"
+  );
+});
+
+test("B2 no duplicate content survives pooling or selection, across seeds and weeks", () => {
+  for (const targetWeek of [1, 4, 10]) {
+    const candidates = pool(targetWeek, `b2-${targetWeek}`);
+    const keys = candidates.map(adaptive.getQuestionFingerprint);
+    assert.equal(new Set(keys).size, keys.length,
+      `week ${targetWeek} pool contains duplicate-content entries`);
+    assert.ok(keys.every(Boolean), "every pooled question must yield an identity");
+
+    const payload = build({ targetWeek, seed: `b2-${targetWeek}` });
+    const roundKeys = payload.questions.map(adaptive.getQuestionFingerprint);
+    assert.equal(roundKeys.length, adaptive.ADAPTIVE_ROUND_SIZE,
+      `week ${targetWeek} must still assemble a full round`);
+    assert.equal(new Set(roundKeys).size, roundKeys.length,
+      `week ${targetWeek} round repeated content`);
+  }
+
+  // Repeated generation across many seeds must not create duplicate content
+  // merely because generator ids differ between runs.
+  const merged = new Map();
+  for (const seed of ["s1", "s2", "s3", "s4"]) {
+    for (const question of pool(6, seed)) {
+      const key = adaptive.getQuestionFingerprint(question);
+      const existing = merged.get(key);
+      if (existing) {
+        assert.equal(toComparablePrompt(existing), toComparablePrompt(question),
+          "one adaptive identity must always mean one question");
+      }
+      merged.set(key, question);
+    }
+  }
+  assert.ok(merged.size > 100, `cross-seed corpus should be broad, got ${merged.size}`);
+});
+
+// --- mastered evidence (I1) -----------------------------------------------------
+
+test("I1 mastered material stops feeding the active concept-weakness rollup", () => {
+  const candidates = pool();
+  const question = candidates[0];
+  const drug = question.metadata.sourceDrugId;
+  const domain = question.metadata.knowledgeDomain;
+
+  // Historical misses, but the current recency-resolved state is mastered.
+  const masteredNow = adaptive.buildAdaptiveSignals({
+    reviewEntries: [missedEntry(question, {
+      missCount: 6, reviewMissCount: 3, clearStreak: 3, archived: true,
+      masteredAt: new Date(NOW - DAY).toISOString(),
+      lastReviewedAt: new Date(NOW - DAY).toISOString(),
+      lastMissedAt: new Date(NOW - (20 * DAY)).toISOString()
+    })],
+    now: NOW
+  });
+  const masteredRollup = adaptive.buildConceptWeakness(candidates, masteredNow);
+  assert.equal(masteredRollup.drugs.get(drug) || 0, 0,
+    "a mastered item must not keep its drug looking weak");
+  assert.equal(masteredRollup.domains.get(domain) || 0, 0,
+    "a mastered item must not keep its domain looking weak");
+
+  // The stored evidence is still there - it simply does not drive the rollup.
+  const performance = masteredNow.byPerformanceKey.get(adaptive.getPerformanceKey(question));
+  assert.equal(performance.missCount, 6, "historical misses remain recorded");
+  assert.equal(performance.mastered, true);
+
+  // An active, non-mastered miss still contributes.
+  const activeNow = adaptive.buildAdaptiveSignals({
+    reviewEntries: [missedEntry(question, { missCount: 6, reviewMissCount: 3 })], now: NOW
+  });
+  const activeRollup = adaptive.buildConceptWeakness(candidates, activeNow);
+  assert.ok((activeRollup.drugs.get(drug) || 0) > 0, "active weakness still rolls up to the drug");
+  assert.ok((activeRollup.domains.get(domain) || 0) > 0, "active weakness still rolls up to the domain");
+});
+
+// --- generator token parity -----------------------------------------------------
+
+test("adaptive and the normal launcher import the same frozen generator build", () => {
+  const generatorImport = /fall-2026-quiz-generator\.js\?v=([0-9a-z]+)/;
+  const adaptiveToken = generatorImport.exec(read("assets/js/fall-2026-adaptive-practice.js"))?.[1];
+  const launcherToken = generatorImport.exec(read("assets/js/fall-2026-lab3-launcher.js"))?.[1];
+
+  assert.ok(adaptiveToken, "the adaptive module must import the generator with a pinned token");
+  assert.ok(launcherToken, "the launcher must import the generator with a pinned token");
+  assert.equal(adaptiveToken, launcherToken,
+    "adaptive and normal practice must run the identical frozen generator build");
+});
+
+// --- trust boundary -----------------------------------------------------------
+
+test("historical wrongCounts magnitude does not control hard selection", () => {
+  const candidates = pool();
+  const base = candidates.slice(0, 5).map((question) => missedEntry(question));
+  const inflated = base.map((entry) => ({ ...entry, wrongCounts: { phantom: 9999, other: 4321 } }));
+  const deflated = base.map((entry) => ({ ...entry, wrongCounts: {} }));
+
+  const a = build({ reviewEntries: base });
+  const b = build({ reviewEntries: inflated });
+  const c = build({ reviewEntries: deflated });
+  const ids = (payload) => payload.questions.map(adaptive.getQuestionFingerprint);
+  assert.deepEqual(ids(b), ids(a), "inflated answer frequencies must not change selection");
+  assert.deepEqual(ids(c), ids(a), "absent answer frequencies must not change selection");
+
+  // And the module must never read the field - property access, not the word,
+  // since the header comment documents deliberately ignoring it.
+  const source = read("assets/js/fall-2026-adaptive-practice.js");
+  const codeOnly = source.split("\n").filter((line) => !line.trim().startsWith("//")).join("\n");
+  assert.doesNotMatch(codeOnly, /[.\[]\s*["']?wrongCounts/, "adaptive must not read wrongCounts");
+});
+
+test("malformed or empty history falls back to balanced practice", () => {
+  const shapes = [
+    { reviewEntries: [], historyEntries: [], memory: null },
+    { reviewEntries: [null, 42, "x", {}, []], historyEntries: [null, "y"], memory: "not json" },
+    { reviewEntries: [{ prompt: "", answer: "" }], historyEntries: [{ total: 0, score: 5 }], memory: { rounds: "no" } },
+    { reviewEntries: [{ prompt: "x", answer: "y", missCount: -3, clearStreak: "many" }], memory: { rounds: [null, 7] } }
+  ];
+  for (const shape of shapes) {
+    const payload = build(shape);
+    assert.equal(payload.questions.length, adaptive.ADAPTIVE_ROUND_SIZE,
+      `malformed input ${JSON.stringify(shape).slice(0, 60)} must still yield a full round`);
+    assert.equal(fingerprints(payload.questions).size, adaptive.ADAPTIVE_ROUND_SIZE);
+  }
+});
+
+test("adaptive memory normalizes defensively and never grows without bound", () => {
+  assert.deepEqual(adaptive.normalizeAdaptiveMemory(null).rounds, []);
+  assert.deepEqual(adaptive.normalizeAdaptiveMemory("garbage").rounds, []);
+  assert.deepEqual(adaptive.normalizeAdaptiveMemory({ rounds: [{}, null] }).rounds, []);
+
+  let memory = null;
+  for (let round = 0; round < 12; round += 1) {
+    memory = adaptive.recordAdaptiveRound({
+      memory, questions: pool().slice(round, round + 3), targetWeek: 6, at: NOW + round
+    });
+  }
+  assert.ok(memory.rounds.length <= adaptive.ADAPTIVE_MEMORY_ROUNDS,
+    `memory kept ${memory.rounds.length} rounds`);
+  assert.equal(memory.version, adaptive.ADAPTIVE_MEMORY_VERSION);
+});
+
+// --- contracts preserved ------------------------------------------------------
+
+test("the candidate corpus really contains strict brand/generic FITB questions", () => {
+  const candidates = pool(10, "fitb-scan");
+  const strict = candidates.filter((q) => q?.metadata?.answerMatching?.spellingSensitive === true
+    && q?.metadata?.answerMatching?.capitalizationSensitive === false);
+
+  assert.ok(strict.length > 0, "the corpus must contain strict FITB material to test");
+  assert.ok(strict.some((q) => q.type === "short"), "strict FITB is a short-answer form");
+  assert.ok(strict.some((q) => q.metadata.knowledgeDomain === "brandGeneric"),
+    "strict FITB covers brand/generic recognition");
+  assert.ok(strict.some((q) => Array.isArray(q._acceptedAnswers) && q._acceptedAnswers.length > 0),
+    "at least one strict question must carry accepted answers, or the pass-through proof is vacuous");
+});
+
+test("a strict FITB candidate passes through selection with its contract intact", () => {
+  const candidates = pool(10, "fitb-scan");
+  const signals = adaptive.buildAdaptiveSignals({ now: NOW });
+
+  // Drive a specific strict question through the real selector rather than
+  // hoping a random round happens to pick one.
+  const strictWithAccepted = candidates.find((q) =>
+    q?.metadata?.answerMatching?.spellingSensitive === true
+    && Array.isArray(q?._acceptedAnswers) && q._acceptedAnswers.length > 0);
+  assert.ok(strictWithAccepted, "corpus must supply a strict question with accepted answers");
+
+  const round = adaptive.selectAdaptiveRound({
+    candidates: [strictWithAccepted, ...candidates.slice(0, 20)], signals, seed: "fitb-passthrough"
+  });
+  const selected = round.questions.find((q) =>
+    adaptive.getQuestionFingerprint(q) === adaptive.getQuestionFingerprint(strictWithAccepted));
+  assert.ok(selected, "the strict question must be selectable");
+
+  assert.deepEqual(selected.answer, strictWithAccepted.answer, "exact answer preserved");
+  assert.deepEqual(selected.metadata.answerMatching, {
+    spellingSensitive: true, capitalizationSensitive: false
+  }, "the strict marker is preserved exactly");
+  assert.deepEqual(selected._acceptedAnswers, strictWithAccepted._acceptedAnswers,
+    "every accepted answer is preserved");
+  assert.ok(selected._acceptedAnswers.length > 0, "the accepted-answer proof is non-vacuous");
+
+  // The same holds for everything a real payload emits.
+  const byFingerprint = new Map(candidates.map((q) => [adaptive.getQuestionFingerprint(q), q]));
+  const payload = build({ targetWeek: 10, seed: "fitb-scan" });
+  for (const question of payload.questions) {
+    const source = byFingerprint.get(adaptive.getQuestionFingerprint(question));
+    assert.ok(source, "every selected question must come from the generated pool");
+    assert.deepEqual(question.answer, source.answer, "answers are passed through untouched");
+    assert.deepEqual(question.choices, source.choices, "choices are passed through untouched");
+    assert.deepEqual(question.metadata?.answerMatching, source.metadata?.answerMatching);
+    assert.deepEqual(question._acceptedAnswers, source._acceptedAnswers);
+  }
+});
+
+test("adaptive attempts carry their own lineage kind and scope", () => {
+  const payload = build({ targetWeek: 7, seed: "lineage" });
+  assert.equal(payload.metadata.kind, "fall-2026-lab3-adaptive");
+  assert.equal(payload.metadata.kind, adaptive.ADAPTIVE_KIND);
+  assert.equal(payload.metadata.adaptiveTargetWeek, 7);
+  assert.equal(payload.metadata.quizWeek, 7);
+  assert.equal(payload.metadata.generator, "fall-2026-p2-lab3-deterministic-generator");
+  assert.equal(payload.metadata.generatedFrom, "fall-2026-lab3-week-7-adaptive");
+  assert.match(payload.title, /Adaptive Practice/);
+
+  // The engine recognizes Fall material by generator id on each question, so
+  // adaptive provenance flows through without any engine change.
+  for (const question of payload.questions) {
+    assert.equal(question.metadata.generatorId, "fall-2026-p2-lab3-deterministic-generator");
+  }
+});
+
+test("Stats classifies fall-2026-lab3-adaptive as its own attempt type", () => {
+  const stats = read("assets/js/stats.js");
+  assert.match(stats, /const FALL_LAB3_ADAPTIVE_KIND = "fall-2026-lab3-adaptive";/);
+  assert.match(stats, /id: "fall-lab3-adaptive", label: "Adaptive Practice"/);
+  assert.match(stats, /\[FALL_LAB3_ADAPTIVE_KIND\]: "fall-lab3-adaptive"/);
+});
+
+test("normal Week Practice output is unchanged by F26-10", () => {
+  // Byte-identical composition for the same week and seed as before the change.
+  for (const quizWeek of [1, 2, 5, 10]) {
+    const seed = `unchanged-week-${quizWeek}`;
+    const payload = buildFall2026Lab3Payload({ drugData, policy, quizWeek, seed });
+    assert.equal(payload.metadata.kind, "fall-2026-lab3-practice");
+    assert.equal(payload.questions.length, 10);
+    assert.equal(payload.metadata.composition.totalItemTarget, 10);
+    assert.equal(payload.metadata.composition.newMaterialItemTarget, quizWeek === 1 ? 10 : 6);
+    assert.equal(payload.metadata.composition.reviewMaterialItemTarget, quizWeek === 1 ? 0 : 4);
+    assert.deepEqual(
+      JSON.parse(JSON.stringify(payload)),
+      JSON.parse(JSON.stringify(buildFall2026Lab3Payload({ drugData, policy, quizWeek, seed }))),
+      "normal practice stays deterministic"
+    );
+    assert.equal(payload.title, `Lab III Fall 2026 - Week ${quizWeek} Practice`);
+  }
+});
+
+test("the generator, engine, canonical data, and policy are untouched", () => {
+  assert.equal(sha256("assets/js/fall-2026-quiz-generator.js"),
+    "39e123b914f665282f6abce23110bf3e2bd4f0bcc1974b7038e0f9384cf9871a", "generator must not change");
+  assert.equal(sha256("assets/js/quizEngine.js"),
+    "6dc5c2f6d467742e837435be1d120f1110eb9faacb9d985898efad52a5c8a507", "engine must not change");
+  assert.equal(sha256("assets/data/fall-2026-p2-top-drugs.json"),
+    "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01", "canonical drug data must not change");
+  assert.equal(sha256("assets/data/fall-2026-lab3-quiz-policy.json"),
+    "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171", "quiz policy must not change");
+
+  // Adaptive never generates material of its own.
+  const source = read("assets/js/fall-2026-adaptive-practice.js");
+  assert.match(source, /import \{ generateFall2026Quiz \}/, "adaptive must reuse the shared generator");
+  assert.doesNotMatch(source, /localStorage|sessionStorage/, "the adaptive module is a pure transform");
+});
+
+test("adaptive writes only its own memory key", () => {
+  const launcher = read("assets/js/fall-2026-lab3-launcher.js");
+  const writes = [...launcher.matchAll(/localStorage\.setItem\(\s*([A-Za-z_$][\w$]*)/g)].map((m) => m[1]);
+  assert.deepEqual([...new Set(writes)].sort(), ["ADAPTIVE_MEMORY_KEY", "CUSTOM_QUIZ_KEY"],
+    "the launcher may only write the custom-quiz payload and adaptive memory");
+  assert.match(launcher, /ADAPTIVE_MEMORY_KEY/);
+  assert.doesNotMatch(launcher, /localStorage\.setItem\(\s*REVIEW_KEY/, "adaptive must never write the Review Queue");
+  assert.doesNotMatch(launcher, /localStorage\.setItem\(\s*HISTORY_KEY/, "adaptive must never write history");
+});
+
+test("the hub offers Adaptive Practice without AI language", () => {
+  const hub = read("lab3-fall-2026.html");
+  assert.match(hub, /id="adaptive-launch"/);
+  assert.match(hub, /id="adaptive-week"/);
+  assert.match(hub, /Adaptive Practice/);
+  assert.doesNotMatch(hub, /AI-powered|AI powered|artificial intelligence/i);
+
+  // Normal Week Practice stays visible and unchanged.
+  for (let week = 1; week <= 10; week += 1) {
+    assert.match(hub, new RegExp(`data-launch-week="${week}"`), `Week ${week} practice must remain available`);
+  }
+  assert.match(hub, /assets\/js\/fall-2026-lab3-launcher\.js\?v=20260904a/);
+});
