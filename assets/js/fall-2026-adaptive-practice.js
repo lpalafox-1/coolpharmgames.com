@@ -329,7 +329,7 @@ export function buildAdaptiveSignals({ reviewEntries = [], historyEntries = [], 
   // hide material the student is currently getting wrong. Mastery, clear
   // streak, and refresh-due therefore come from the most recently active
   // duplicate only.
-  for (const entry of reviewEntries) {
+for (const entry of (Array.isArray(reviewEntries) ? reviewEntries : [])) {
     if (!isRecord(entry)) continue;
     const key = getPerformanceKey(entry);
     if (!key) continue;
