@@ -16,7 +16,7 @@ const PROTECTED_BASELINES = Object.freeze({
   fallSource: "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01",
   fallPolicy: "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171",
   fallGenerator: "39e123b914f665282f6abce23110bf3e2bd4f0bcc1974b7038e0f9384cf9871a",
-  fallLauncher: "e62430108dde5a88ce67a9f9be815ae93c48a93b1b4c61290968fd36bdb8d360",
+  fallLauncher: "e421d13fa1525f2c236b37c37795ba6e8f2d7daf53344b72989204455ea2eef6",
   masterPool: "1fb50e96e60252a9839406d53bc929e9569d76c0ddc2522aff43adf9bdf2a87c"
 });
 

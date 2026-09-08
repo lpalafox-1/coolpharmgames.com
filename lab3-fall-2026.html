@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Lab III Fall 2026 Practice — Pharm-let</title>
-  <meta name="description" content="Generate Fall 2026 P2 Lab III Top Drug practice for Weeks 1 through 10." />
+  <meta name="description" content="Start performance-guided Adaptive Practice for Fall 2026 Lab III Top Drugs, or choose Standard Weekly Practice for Weeks 1–10." />
   <meta name="theme-color" content="#8b1e3f" />
   <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
   <meta http-equiv="Content-Security-Policy"
@@ -24,36 +24,26 @@
   </script>
   <link rel="stylesheet" href="assets/css/styles.css" />
   <style>
+    html { scroll-padding-top: 1rem; }
+    main { --study-accent: #8b1e3f; }
+    .dark main { --study-accent: #fda4af; }
+    main a:focus-visible, main button:focus-visible, header a:focus-visible,
+    header button:focus-visible, main select:focus-visible {
+      outline: 3px solid var(--study-accent, var(--accent));
+      outline-offset: 4px;
+    }
+    #adaptive-practice, #standard-weekly-practice { scroll-margin-top: 1rem; }
+    .adaptive-card { border-top: 4px solid var(--accent); }
+    .practice-eyebrow { color: var(--study-accent); }
+    .adaptive-controls { border-radius: 1rem; background: color-mix(in srgb, var(--accent) 6%, var(--card)); }
+    #adaptive-week, #adaptive-launch { min-height: 3rem; }
+    #adaptive-launch:disabled { opacity: .6; cursor: not-allowed; }
+    #adaptive-launch[aria-busy="true"] { cursor: progress; }
+    .resource-link { display: inline-flex; align-items: center; font-size: .875rem; }
     .lab3-hero {
       background:
         radial-gradient(760px 340px at 5% -20%, rgba(139, 30, 63, .18), transparent 48%),
         linear-gradient(180deg, rgba(139, 30, 63, .035), transparent 80%);
-    }
-    .semester-summary {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: .65rem;
-    }
-    .semester-stat {
-      min-height: 3.75rem;
-      border: 1px solid var(--ring);
-      border-radius: 1rem;
-      background: color-mix(in srgb, var(--card) 88%, transparent);
-      padding: .6rem .75rem;
-    }
-    .semester-stat strong,
-    .semester-stat span { display: block; }
-    .semester-stat strong {
-      color: var(--accent);
-      font-size: 1rem;
-      line-height: 1.15;
-    }
-    .semester-stat span {
-      margin-top: .22rem;
-      color: var(--muted);
-      font-size: .72rem;
-      font-weight: 700;
-      line-height: 1.25;
     }
     .semester-note {
       border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--ring));
@@ -75,13 +65,13 @@
       flex: none;
       border-radius: .85rem;
       background: color-mix(in srgb, var(--accent) 12%, var(--card));
-      color: var(--accent);
+      color: var(--study-accent);
       font-size: .82rem;
       font-weight: 900;
       letter-spacing: .04em;
     }
     .week-contract {
-      color: var(--accent);
+      color: var(--study-accent);
       font-size: .72rem;
       font-weight: 900;
       letter-spacing: .01em;
@@ -107,13 +97,6 @@
     }
     .dark .week-card { box-shadow: none; }
     @media (max-width: 420px) {
-      .semester-summary { gap: .45rem; }
-      .semester-stat {
-        min-height: 3.9rem;
-        padding: .55rem .45rem;
-      }
-      .semester-stat strong { font-size: .9rem; }
-      .semester-stat span { font-size: .66rem; }
       .week-card {
         min-height: 10.5rem;
         padding: .75rem;
@@ -136,24 +119,58 @@
       <div class="max-w-6xl mx-auto px-4 py-5 sm:py-8">
         <div class="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p class="text-xs font-black uppercase tracking-[0.22em] text-[var(--accent)]">Pharm-let · Longitudinal Lab III</p>
+            <p class="practice-eyebrow text-xs font-black uppercase tracking-[0.22em]">Pharm-let · Longitudinal Lab III</p>
             <h1 class="mt-2 max-w-3xl text-3xl sm:text-5xl font-black tracking-tight">Fall 2026 Top Drugs Practice</h1>
-            <p class="mt-2 max-w-2xl text-sm sm:text-base leading-relaxed" style="color:var(--muted)">Practice any week from 1 through 10. Each launch builds a fresh 10-question set from the official Fall P2 source.</p>
+            <p class="mt-2 max-w-2xl text-sm sm:text-base leading-relaxed" style="color:var(--muted)">Start with Adaptive Practice, or choose a standard weekly set. Both use the official Fall P2 source for Weeks 1–10.</p>
           </div>
-        </div>
-
-        <div class="semester-summary mt-4" role="list" aria-label="Fall Lab III practice summary">
-          <div class="semester-stat" role="listitem"><strong>10 Weeks</strong><span>All available</span></div>
-          <div class="semester-stat" role="listitem"><strong>10 Questions</strong><span>Every practice set</span></div>
-          <div class="semester-stat" role="listitem"><strong>6 New + 4 Review</strong><span>Weeks 2–10</span></div>
         </div>
       </div>
     </section>
 
-    <section class="max-w-6xl mx-auto px-4 py-5 sm:py-8" aria-labelledby="semester-practice-heading">
+    <section id="adaptive-practice" class="max-w-6xl mx-auto px-4 pt-5 sm:pt-8" aria-labelledby="adaptive-practice-heading" tabindex="-1">
+      <div class="adaptive-card card p-4 sm:p-6 grid md:grid-cols-[1.15fr_1fr] gap-5 sm:gap-8">
+        <div>
+          <p class="practice-eyebrow text-xs font-black uppercase tracking-[0.18em]">Recommended study path</p>
+          <h2 id="adaptive-practice-heading" class="mt-2 text-2xl sm:text-3xl font-black">Adaptive Practice</h2>
+          <p class="mt-3 text-sm sm:text-base leading-relaxed" style="color:var(--muted)">Each 10-question round uses your saved performance to focus practice and revisit material. Questions are selected when you start; the round stays fixed as you work.</p>
+          <p class="mt-3 text-sm leading-relaxed" style="color:var(--muted)">No saved history yet? You’ll get balanced practice within your chosen range.</p>
+        </div>
+        <div class="adaptive-controls p-4 sm:p-5">
+          <label for="adaptive-week" class="block text-sm font-bold">Practice through</label>
+          <select id="adaptive-week" class="mt-2 w-full" required aria-describedby="adaptive-scope-note adaptive-selection-summary">
+            <option value="" selected>Choose a week</option>
+            <option value="1">Week 1</option>
+            <option value="2">Week 2</option>
+            <option value="3">Week 3</option>
+            <option value="4">Week 4</option>
+            <option value="5">Week 5</option>
+            <option value="6">Week 6</option>
+            <option value="7">Week 7</option>
+            <option value="8">Week 8</option>
+            <option value="9">Week 9</option>
+            <option value="10">Week 10</option>
+          </select>
+          <p id="adaptive-scope-note" class="mt-2 text-sm leading-relaxed" style="color:var(--muted)">Your content ceiling: Week 4 includes only Weeks 1–4. Choose the range you want to study.</p>
+          <p id="adaptive-selection-summary" class="mt-3 text-sm font-semibold" role="status" aria-live="polite" aria-atomic="true">Choose a week to enable Adaptive Practice.</p>
+          <button id="adaptive-launch" type="button" data-idle-label="Start Adaptive Practice" disabled
+            class="btn btn-blue mt-3 w-full" aria-describedby="adaptive-selection-summary">Start Adaptive Practice</button>
+          <div id="adaptive-status" class="hidden mt-3 text-sm leading-relaxed" role="status" aria-live="polite" aria-atomic="true"></div>
+          <noscript><p class="mt-3 text-sm">Enable JavaScript to choose a week and launch practice.</p></noscript>
+        </div>
+      </div>
+    </section>
+
+    <nav class="max-w-6xl mx-auto px-4 pt-4 flex flex-wrap gap-2" aria-label="Study resources">
+      <a href="top-drugs-quicksheet.html" class="resource-link btn btn-ghost">Top Drugs Reference</a>
+      <a href="review-queue.html" class="resource-link btn btn-ghost">Review Queue</a>
+      <a href="stats.html" class="resource-link btn btn-ghost">Stats</a>
+    </nav>
+
+    <section id="standard-weekly-practice" class="max-w-6xl mx-auto px-4 py-6 sm:py-8" aria-labelledby="semester-practice-heading" tabindex="-1">
       <div>
-        <p class="text-xs font-black uppercase tracking-[0.2em] text-[var(--accent)]">Semester practice</p>
-        <h2 id="semester-practice-heading" class="mt-1 text-2xl sm:text-3xl font-black">Choose a week</h2>
+        <p class="practice-eyebrow text-xs font-black uppercase tracking-[0.2em]">Weekly alternative · Weeks 1–10</p>
+        <h2 id="semester-practice-heading" class="mt-1 text-2xl sm:text-3xl font-black">Standard Weekly Practice</h2>
+        <p class="mt-2 max-w-3xl text-sm leading-relaxed" style="color:var(--muted)">Fresh 10-question sets using the weekly composition, without personalized selection. Week 1 uses Week 1 only; Weeks 2–10 use 6 new + 4 cumulative-review questions.</p>
       </div>
 
       <div id="launch-status" class="hidden mb-5 rounded-2xl border border-[var(--ring)] bg-[var(--card)] px-4 py-3 text-sm" role="status" aria-live="polite"></div>
@@ -243,61 +260,9 @@
       </div>
     </section>
 
-    <section class="max-w-6xl mx-auto px-4 pb-6" aria-labelledby="adaptive-practice-heading">
-      <div class="card p-4 sm:p-5">
-        <p class="text-xs font-black uppercase tracking-[0.18em] text-[var(--accent)]">Performance-guided</p>
-        <h2 id="adaptive-practice-heading" class="mt-1 text-lg sm:text-xl font-black">Adaptive Practice</h2>
-        <p class="mt-2 text-sm leading-relaxed" style="color:var(--muted)">
-          Builds a fresh 10-question round from your own saved Pharm-let results: what you have missed, what you have
-          not practiced much, and what you mastered long enough ago to be worth revisiting. Each round is chosen when
-          you start it, so finishing one changes what the next one asks. This is separate from Week Practice above,
-          which is unchanged.
-        </p>
-
-        <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
-          <label class="flex flex-col gap-1 text-sm sm:max-w-xs w-full">
-            <span class="text-xs font-black uppercase tracking-[0.12em]" style="color:var(--muted)">Practice through</span>
-            <select id="adaptive-week" class="w-full" aria-describedby="adaptive-scope-note">
-              <option value="1">Week 1</option>
-              <option value="2">Week 2</option>
-              <option value="3">Week 3</option>
-              <option value="4">Week 4</option>
-              <option value="5">Week 5</option>
-              <option value="6" selected>Week 6</option>
-              <option value="7">Week 7</option>
-              <option value="8">Week 8</option>
-              <option value="9">Week 9</option>
-              <option value="10">Week 10</option>
-            </select>
-          </label>
-          <button id="adaptive-launch" type="button" data-idle-label="Start Adaptive Practice"
-            class="btn btn-blue w-full sm:w-auto" aria-describedby="adaptive-scope-note">Start Adaptive Practice</button>
-        </div>
-
-        <p id="adaptive-scope-note" class="mt-3 text-xs sm:text-sm leading-relaxed" style="color:var(--muted)">
-          Scope is cumulative and never runs ahead of the week you pick: choosing Week 6 draws on Weeks 1–6 only.
-          With no saved results yet, the round is simply balanced practice across that range.
-        </p>
-        <div id="adaptive-status" class="hidden mt-3 rounded-2xl border border-[var(--ring)] bg-[var(--card)] px-4 py-3 text-sm" role="status" aria-live="polite"></div>
-      </div>
-    </section>
-
-    <section class="max-w-6xl mx-auto px-4 pb-12" aria-labelledby="study-resources-heading">
-      <div class="card p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <p class="text-xs font-black uppercase tracking-[0.18em] text-[var(--accent)]">Study resources</p>
-          <h2 id="study-resources-heading" class="mt-1 text-lg font-black">Review alongside practice</h2>
-        </div>
-        <div class="flex flex-wrap gap-2">
-          <a href="top-drugs-quicksheet.html" class="resource-link btn btn-ghost">Top Drugs Reference</a>
-          <a href="review-queue.html" class="resource-link btn btn-ghost">Review Queue</a>
-          <a href="stats.html" class="resource-link btn btn-ghost">Stats</a>
-        </div>
-      </div>
-    </section>
   </main>
 
   <script src="assets/js/review-queue-store.js?v=20260903a"></script>
-  <script type="module" src="assets/js/fall-2026-lab3-launcher.js?v=20260904a"></script>
+  <script type="module" src="assets/js/fall-2026-lab3-launcher.js?v=20260907a"></script>
 </body>
 </html>
