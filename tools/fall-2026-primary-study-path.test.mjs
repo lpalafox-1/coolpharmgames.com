@@ -205,6 +205,61 @@ test("adaptive setup starts empty and refuses unsupported values even when its c
   });
 });
 
+test("the visible scope summary always describes the week actually selected", async () => {
+  await withHub({}, async ({ document }) => {
+    const select = document.getElementById("adaptive-week");
+    const summary = document.getElementById("adaptive-selection-summary");
+    const scopeNote = document.getElementById("adaptive-scope-note");
+
+    // Nothing may assert a ceiling before the student has chosen one. A
+    // hardcoded "Week 4" note previously survived every other assertion in
+    // this suite because they only checked button state and payload scope.
+    assert.match(summary.textContent, /choose a week/i);
+    assert.doesNotMatch(summary.textContent, /Week\s*\d/,
+      "the initial summary must not name any week");
+    assert.doesNotMatch(scopeNote.textContent, /Week\s*\d/,
+      "the scope note must stay generic until a week is chosen");
+    assert.match(scopeNote.textContent, /never includes material after the week you choose/i);
+
+    for (const targetWeek of [1, 4, 10, 7, 2]) {
+      select.value = String(targetWeek);
+      await select.dispatch("change");
+
+      assert.match(summary.textContent, new RegExp(`Week ${targetWeek}\\b`),
+        `selecting Week ${targetWeek} must name Week ${targetWeek}`);
+      assert.match(summary.textContent, /content ceiling/i,
+        `selecting Week ${targetWeek} must state the ceiling`);
+
+      // No other week may be named, so a stale ceiling cannot linger.
+      const namedWeeks = [...summary.textContent.matchAll(/Week\s*(\d+)/g)].map((m) => Number(m[1]));
+      const strayWeeks = namedWeeks.filter((week) => week !== targetWeek);
+      assert.deepEqual(strayWeeks, [],
+        `Week ${targetWeek} summary named other weeks: ${strayWeeks.join(", ")}`);
+
+      if (targetWeek > 1) {
+        assert.match(summary.textContent, new RegExp(`Weeks 1[–-]${targetWeek}`),
+          `Week ${targetWeek} must show the inclusive Weeks 1-${targetWeek} range`);
+      }
+    }
+
+    // Returning to an invalid or empty target restores the prompt.
+    for (const invalid of ["", "0", "11", "2.5", "invalid"]) {
+      select.value = invalid;
+      await select.dispatch("change");
+      assert.match(summary.textContent, /choose a week/i,
+        `${invalid || "empty"} must restore the choose-a-week message`);
+      assert.doesNotMatch(summary.textContent, /Week\s*\d/,
+        `${invalid || "empty"} must not leave a stale week named`);
+    }
+
+    // The summary is still the button's accessible description.
+    assert.equal(document.getElementById("adaptive-launch").getAttribute("aria-describedby"),
+      "adaptive-selection-summary");
+    assert.equal(select.getAttribute("aria-describedby"),
+      "adaptive-scope-note adaptive-selection-summary");
+  });
+});
+
 test("every adaptive target launches through real selection, retains its lineage, and writes only launch-time anti-repetition memory", async () => {
   for (const targetWeek of allWeeks) {
     await withHub({ initial: { [HISTORY_KEY]: "[ ]", [REVIEW_KEY]: "[ ]" } }, async ({ document, localStorage, navigations }) => {

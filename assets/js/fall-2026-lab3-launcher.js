@@ -246,11 +246,27 @@ function getSelectedAdaptiveWeek() {
 // The adaptive button stays unavailable until the student has actually chosen a
 // target, and while any launch is running. There is deliberately no default
 // week: course progress cannot be inferred from the calendar.
+// The visible summary must always describe the CURRENT selection. A static
+// ceiling sentence would keep asserting one week no matter what the student
+// picked, which is worse than saying nothing.
+function describeAdaptiveSelection(targetWeek) {
+  if (targetWeek === null) return "Choose a week to enable Adaptive Practice.";
+  if (targetWeek === 1) {
+    return "Week 1 selected. Your content ceiling is Week 1: this round uses Week 1 material only.";
+  }
+  return `Week ${targetWeek} selected. Your content ceiling is Week ${targetWeek}: this round can use Weeks 1–${targetWeek} and nothing after Week ${targetWeek}.`;
+}
+
 function syncAdaptiveAvailability() {
   const button = document.getElementById("adaptive-launch");
   const select = document.getElementById("adaptive-week");
+  const targetWeek = getSelectedAdaptiveWeek();
+
   if (select) select.disabled = launchInFlight;
-  if (button) button.disabled = launchInFlight || getSelectedAdaptiveWeek() === null;
+  if (button) button.disabled = launchInFlight || targetWeek === null;
+
+  const summary = document.getElementById("adaptive-selection-summary");
+  if (summary) summary.textContent = describeAdaptiveSelection(targetWeek);
 }
 
 function setWeeklyControlsDisabled(disabled) {
