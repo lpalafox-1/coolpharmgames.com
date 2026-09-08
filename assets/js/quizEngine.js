@@ -450,6 +450,8 @@ const FALL_LAB3_GENERATOR_ID = "fall-2026-p2-lab3-deterministic-generator";
 const FALL_LAB3_HUB_PAGE = "lab3-fall-2026.html";
 const FALL_LAB3_PRACTICE_KIND = "fall-2026-lab3-practice";
 const FALL_LAB3_BOSS_REMIX_KIND = "fall-2026-lab3-boss-remix";
+const FALL_LAB3_ADAPTIVE_KIND = "fall-2026-lab3-adaptive";
+const FALL_LAB3_ADAPTIVE_REQUEST_KEY = "pharmlet.fall-2026-lab3.adaptive-request";
 const FALL_LAB3_MIN_WEEK = 1;
 const FALL_LAB3_MAX_WEEK = 10;
 const FALL_LAB3_BOSS_BASE_SIZE = 5;
@@ -2034,6 +2036,54 @@ function launchFallLab3BossRemix() {
 
     state.progressCompleted = true;
     location.href = `${FALL_LAB3_HUB_PAGE}?week=${context.quizWeek}`;
+    return true;
+}
+
+// Number() turns true into 1 and null, "" and [] into 0, so coercing blindly
+// would invent a Week 1 target out of a malformed payload. Only a real number
+// or a numeric string names a week.
+function toFallLab3WeekNumber(value) {
+    const numeric = typeof value === "number"
+        ? value
+        : (typeof value === "string" && value.trim() !== "" ? Number(value) : NaN);
+    return Number.isInteger(numeric) && numeric >= FALL_LAB3_MIN_WEEK && numeric <= FALL_LAB3_MAX_WEEK
+        ? numeric
+        : 0;
+}
+
+// Adaptive provenance comes from the attempt payload the launcher already
+// wrote. The engine reads the recorded target week; it never guesses one.
+function getFallLab3AdaptiveContext(metadata = state.attemptMetadata) {
+    const attemptMetadata = metadata && typeof metadata === "object" && !Array.isArray(metadata) ? metadata : {};
+    if (String(attemptMetadata.kind || "") !== FALL_LAB3_ADAPTIVE_KIND) {
+        return { active: false, targetWeek: 0 };
+    }
+
+    const targetWeek = toFallLab3WeekNumber(attemptMetadata.adaptiveTargetWeek);
+    return { active: targetWeek > 0, targetWeek };
+}
+
+// Hands off to the Lab III launcher, which owns adaptive selection. The engine
+// deliberately does not build, rank, or re-select anything here: it only names
+// the ceiling the completed attempt already established, so the next round is
+// recomputed from the performance this attempt just saved.
+function startFallLab3AdaptiveRound(targetWeek) {
+    const week = toFallLab3WeekNumber(targetWeek);
+    if (!week) return false;
+
+    clearFallLab3BossRemixRequest();
+    try {
+        localStorage.setItem(FALL_LAB3_ADAPTIVE_REQUEST_KEY, JSON.stringify({
+            targetWeek: week,
+            createdAt: Date.now()
+        }));
+    } catch (error) {
+        console.warn("Unable to request a new adaptive round:", error);
+        return false;
+    }
+
+    state.progressCompleted = true;
+    location.href = FALL_LAB3_HUB_PAGE;
     return true;
 }
 
@@ -3821,8 +3871,24 @@ function getCompletionContinuationActions({
     bossQuestionCount = 0,
     remixSize = 0,
     generatedPayload = false,
-    fall = { active: false, quizWeek: 0 }
+    fall = { active: false, quizWeek: 0 },
+    adaptive = { active: false, targetWeek: 0 }
 } = {}) {
+    // Adaptive Practice gets its own short fork. The generic Fall menu offers
+    // five or six continuations, which buries the one natural next step after
+    // an adaptive round. Boss Round, Boss Remix, and New Week X Practice Set
+    // stay available for standard weekly practice and are omitted here.
+    if (adaptive.active && !reviewMode && !bossMode) {
+        const adaptiveActions = [];
+        if (missedCount > 0) {
+            adaptiveActions.push({ id: "review-missed", tone: "review", label: `🎯 Review ${missedCount} Missed` });
+        }
+        adaptiveActions.push({ id: "new-adaptive-round", tone: "primary", label: "🧠 New Adaptive Round" });
+        adaptiveActions.push({ id: "retry-attempt", tone: "accent", label: "🔁 Retry This Set" });
+        adaptiveActions.push({ id: "lab3-hub", tone: "ghost", label: "← Return to Lab III Hub" });
+        return adaptiveActions;
+    }
+
     const actions = [];
 
     if (missedCount > 0) {
@@ -3876,6 +3942,7 @@ function runCompletionAction(actionId) {
     if (actionId === "boss-round") return launchBossRound();
     if (actionId === "retry-attempt") return restartQuiz();
     if (actionId === "boss-remix") return launchFallLab3BossRemix();
+    if (actionId === "new-adaptive-round") return startFallLab3AdaptiveRound(getFallLab3AdaptiveContext().targetWeek);
     if (actionId === "new-week-practice") return startFallLab3WeekPractice(getFallLab3AttemptContext().quizWeek);
     if (actionId === "start-week-practice") return startFallLab3PreparedWeekPractice();
     if (actionId === "lab3-hub") return openFallLab3Hub(getFallLab3AttemptContext().quizWeek);
@@ -8120,6 +8187,7 @@ function showResults() {
         : "";
     const bossQuestions = !state.reviewMode && !state.bossMode ? buildBossRoundQuestions(state.questions) : [];
     const fallContext = getFallLab3AttemptContext();
+    const adaptiveContext = getFallLab3AdaptiveContext();
     const remixSize = state.reviewMode ? 0 : getFallLab3RemixPreviewSize(state.questions, fallContext);
     const continuationActions = getCompletionContinuationActions({
         reviewMode: state.reviewMode,
@@ -8128,7 +8196,8 @@ function showResults() {
         bossQuestionCount: bossQuestions.length,
         remixSize,
         generatedPayload: GENERATED_QUIZ_IDS.has(quizId),
-        fall: fallContext
+        fall: fallContext,
+        adaptive: adaptiveContext
     });
     const continuationMarkup = buildCompletionActionsMarkup(continuationActions);
     const savedNote = state.reviewMode
@@ -8136,7 +8205,9 @@ function showResults() {
         : remixAttempt
         ? `<p class="text-sm opacity-70 mt-2">✅ Saved to this browser: this Boss Remix attempt's history and high score. Boss Remix stays a bounded challenge, so it does not feed lifetime weakness, review-queue, or adaptive memory.</p>`
         : `<p class="text-sm opacity-70 mt-2">✅ Saved to this browser: history, high score, and review queue. Nothing else is needed to keep this attempt.</p>`;
-    const continuationNote = fallContext.active
+    const continuationNote = adaptiveContext.active && !state.reviewMode && !state.bossMode
+        ? `<p class="mt-4 text-xs opacity-70 max-w-xl mx-auto">New Adaptive Round builds a fresh 10-question round through Week ${adaptiveContext.targetWeek}, chosen from the performance you just saved, so it can differ from this one. Retry This Set repeats these exact questions.</p>`
+        : fallContext.active
         ? `<p class="mt-4 text-xs opacity-70 max-w-xl mx-auto">${state.bossMode ? "Retry Same Boss" : "Retry This Set"} repeats these exact questions. ${remixSize > 0
             ? `Boss Remix +1 assembles a new ${remixSize}-question Week ${fallContext.quizWeek} challenge aimed at the drugs and domains you missed here.`
             : `This Boss Remix chain is complete at ${FALL_LAB3_REMIX_MAX_SIZE} questions.`} New Week ${fallContext.quizWeek} Practice Set generates a full 10-question practice set.</p>`

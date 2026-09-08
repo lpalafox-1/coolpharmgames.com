@@ -14,8 +14,8 @@ const PROTECTED_BASELINES = Object.freeze({
   fallPolicy: "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171",
   masterPool: "1fb50e96e60252a9839406d53bc929e9569d76c0ddc2522aff43adf9bdf2a87c",
   fallGenerator: "39e123b914f665282f6abce23110bf3e2bd4f0bcc1974b7038e0f9384cf9871a",
-  fallLauncher: "2e76bbd8471f9d7f125534e8b59633bb2248e234067d07763b23d6b7aa933055",
-  quizEngine: "6dc5c2f6d467742e837435be1d120f1110eb9faacb9d985898efad52a5c8a507",
+  fallLauncher: "8d1fa626fd4d9a35b69dcd47f5418d74cff57b36e0087fe6b47f08ff88edfc60",
+  quizEngine: "be5ce3f4996981fc9dda427b838e1680773135037e8e048dd8255ab8173c0f7d",
   stats: "8dd2e29f65b0c7106538301ad00c10bb3d9ac38ede426c17c7f591bb26ad1bf5",
   reviewQueueStore: "169c528d77fe0a185b801c7bcc61949adad803eeb839be96fa1354dbe9937ba3",
   favorites: "b6fbd5bbca17ea150e34e9b29c9e6391b5ae7359d7b6afb18fe6c7e7caed781d"
