@@ -134,6 +134,31 @@ function readReviewEntries() {
   }
 }
 
+const ADAPTIVE_REQUEST_KEY = "pharmlet.fall-2026-lab3.adaptive-request";
+const ADAPTIVE_REQUEST_MAX_AGE_MS = 10 * 60 * 1000;
+
+// Read-and-remove. The request is spent whether or not it turns out valid, so
+// a stale or malformed one cannot re-fire on the next visit.
+export function consumeAdaptiveRoundRequest(now = Date.now()) {
+  let saved = null;
+  try {
+    const raw = localStorage.getItem(ADAPTIVE_REQUEST_KEY);
+    if (raw === null) return 0;
+    localStorage.removeItem(ADAPTIVE_REQUEST_KEY);
+    saved = JSON.parse(raw);
+  } catch {
+    try { localStorage.removeItem(ADAPTIVE_REQUEST_KEY); } catch { /* nothing to clear */ }
+    return 0;
+  }
+
+  if (!saved || typeof saved !== "object") return 0;
+  const targetWeek = Number(saved.targetWeek);
+  const createdAt = Number(saved.createdAt);
+  if (!SUPPORTED_WEEKS.has(targetWeek)) return 0;
+  if (!Number.isFinite(createdAt) || now - createdAt > ADAPTIVE_REQUEST_MAX_AGE_MS) return 0;
+  return targetWeek;
+}
+
 export function createFall2026AdaptiveSeed(targetWeek) {
   requireSupportedWeek(targetWeek);
   const values = new Uint32Array(4);
@@ -323,6 +348,21 @@ function initializePage() {
 
   if (themeLabel) {
     themeLabel.textContent = document.documentElement.classList.contains("dark") ? "Light" : "Dark";
+  }
+
+  // Bounded, single-use handoff from the completion screen's "New Adaptive
+  // Round". A request is written only by a real completion click, is consumed
+  // on read, and expires, so a bookmarked or shared URL can never generate a
+  // round - the ?adaptive= query parameter deliberately does nothing.
+  const adaptiveRequestWeek = consumeAdaptiveRoundRequest();
+  if (SUPPORTED_WEEKS.has(adaptiveRequestWeek)) {
+    const select = document.getElementById("adaptive-week");
+    if (select) {
+      select.value = String(adaptiveRequestWeek);
+      syncAdaptiveAvailability();
+    }
+    handleAdaptiveLaunch();
+    return;
   }
 
   const requestedWeek = Number(new URLSearchParams(window.location.search).get("week"));

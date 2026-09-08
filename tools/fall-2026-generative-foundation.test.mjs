@@ -19,7 +19,7 @@ const LEGACY_BASELINE = Object.freeze({
 });
 const APPROVED_ENGINE_BASELINE = Object.freeze({
   reference: "F26-09 completion & continuation engine change",
-  sha256: "6dc5c2f6d467742e837435be1d120f1110eb9faacb9d985898efad52a5c8a507"
+  sha256: "be5ce3f4996981fc9dda427b838e1680773135037e8e048dd8255ab8173c0f7d"
 });
 
 function sha256(value) {

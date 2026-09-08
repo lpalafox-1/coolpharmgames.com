@@ -24,7 +24,7 @@ const FALL_UI_BASELINES = Object.freeze({
   drugData: "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01",
   policy: "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171",
   generator: "39e123b914f665282f6abce23110bf3e2bd4f0bcc1974b7038e0f9384cf9871a",
-  launcher: "2e76bbd8471f9d7f125534e8b59633bb2248e234067d07763b23d6b7aa933055"
+  launcher: "ba0e8034f7f976193c6be09d454fb24723ccbc14d3ec08dac58338e5bbaa093e"
 });
 
 const LEGACY_HOME_HREFS = [
