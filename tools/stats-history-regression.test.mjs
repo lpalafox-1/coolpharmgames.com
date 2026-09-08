@@ -1199,7 +1199,7 @@ test("T-17 every protected hash except the approved Stats baseline is unchanged"
     fallPolicy: "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171",
     masterPool: "1fb50e96e60252a9839406d53bc929e9569d76c0ddc2522aff43adf9bdf2a87c",
     fallGenerator: "39e123b914f665282f6abce23110bf3e2bd4f0bcc1974b7038e0f9384cf9871a",
-    fallLauncher: "ba0e8034f7f976193c6be09d454fb24723ccbc14d3ec08dac58338e5bbaa093e",
+    fallLauncher: "8d1fa626fd4d9a35b69dcd47f5418d74cff57b36e0087fe6b47f08ff88edfc60",
     quizEngine: "be5ce3f4996981fc9dda427b838e1680773135037e8e048dd8255ab8173c0f7d",
     reviewQueueStore: "169c528d77fe0a185b801c7bcc61949adad803eeb839be96fa1354dbe9937ba3",
     favorites: "b6fbd5bbca17ea150e34e9b29c9e6391b5ae7359d7b6afb18fe6c7e7caed781d"

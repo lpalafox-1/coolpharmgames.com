@@ -151,11 +151,21 @@ export function consumeAdaptiveRoundRequest(now = Date.now()) {
     return 0;
   }
 
-  if (!saved || typeof saved !== "object") return 0;
-  const targetWeek = Number(saved.targetWeek);
-  const createdAt = Number(saved.createdAt);
+  if (!saved || typeof saved !== "object" || Array.isArray(saved)) return 0;
+
+  // Strict, not coercive. This request is written internally with real numbers,
+  // so anything else is malformed - and Number() would otherwise turn true into
+  // 1, "1" into 1, and [1] into 1, letting a corrupt request auto-launch Week 1.
+  const { targetWeek, createdAt } = saved;
+  if (typeof targetWeek !== "number" || !Number.isInteger(targetWeek)) return 0;
   if (!SUPPORTED_WEEKS.has(targetWeek)) return 0;
-  if (!Number.isFinite(createdAt) || now - createdAt > ADAPTIVE_REQUEST_MAX_AGE_MS) return 0;
+  if (typeof createdAt !== "number" || !Number.isFinite(createdAt)) return 0;
+
+  // A future-dated request would otherwise have negative age and slip past the
+  // expiry check entirely.
+  const age = now - createdAt;
+  if (age < 0 || age > ADAPTIVE_REQUEST_MAX_AGE_MS) return 0;
+
   return targetWeek;
 }
 

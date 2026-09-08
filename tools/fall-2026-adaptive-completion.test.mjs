@@ -235,20 +235,36 @@ test("the adaptive request is single use, expiring, and not replayable from a UR
     return globalThis.localStorage;
   };
 
-  // A valid request is honored exactly once.
-  const valid = store(JSON.stringify({ targetWeek: 7, createdAt: now }));
-  assert.equal(consumeAdaptiveRoundRequest(now), 7);
-  assert.equal(valid.getItem(ADAPTIVE_REQUEST_KEY), null, "the request is consumed on read");
-  assert.equal(consumeAdaptiveRoundRequest(now), 0, "a spent request cannot fire twice");
+  // Every genuinely numeric supported week is honored exactly once.
+  for (const targetWeek of [1, 7, 10]) {
+    const valid = store(JSON.stringify({ targetWeek, createdAt: now }));
+    assert.equal(consumeAdaptiveRoundRequest(now), targetWeek);
+    assert.equal(valid.getItem(ADAPTIVE_REQUEST_KEY), null, "the request is consumed on read");
+    assert.equal(consumeAdaptiveRoundRequest(now), 0, "a spent request cannot fire twice");
+  }
 
-  // Expired, malformed, and out-of-range requests are refused and cleared.
+  // Expired, malformed, coercible, and out-of-range requests are refused and
+  // cleared. Number() would map true, "1" and [1] onto Week 1, so the consumer
+  // must reject by type rather than coerce.
   for (const [label, value] of [
     ["expired", JSON.stringify({ targetWeek: 7, createdAt: now - (11 * 60 * 1000) })],
+    ["future dated", JSON.stringify({ targetWeek: 7, createdAt: now + (5 * 60 * 1000) })],
     ["no timestamp", JSON.stringify({ targetWeek: 7 })],
+    ["string timestamp", JSON.stringify({ targetWeek: 7, createdAt: String(now) })],
+    ["null timestamp", JSON.stringify({ targetWeek: 7, createdAt: null })],
     ["week 0", JSON.stringify({ targetWeek: 0, createdAt: now })],
     ["week 11", JSON.stringify({ targetWeek: 11, createdAt: now })],
+    ["week 2.5", JSON.stringify({ targetWeek: 2.5, createdAt: now })],
+    ["targetWeek true", JSON.stringify({ targetWeek: true, createdAt: now })],
+    ["targetWeek false", JSON.stringify({ targetWeek: false, createdAt: now })],
+    ["targetWeek \"1\"", JSON.stringify({ targetWeek: "1", createdAt: now })],
+    ["targetWeek [1]", JSON.stringify({ targetWeek: [1], createdAt: now })],
+    ["targetWeek []", JSON.stringify({ targetWeek: [], createdAt: now })],
+    ["targetWeek null", JSON.stringify({ targetWeek: null, createdAt: now })],
+    ["targetWeek object", JSON.stringify({ targetWeek: { valueOf: 1 }, createdAt: now })],
     ["not json", "{ broken"],
-    ["not an object", '"7"']
+    ["not an object", '"7"'],
+    ["an array", "[7]"]
   ]) {
     const storage = store(value);
     assert.equal(consumeAdaptiveRoundRequest(now), 0, `${label} must not launch`);
