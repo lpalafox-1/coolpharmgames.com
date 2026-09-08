@@ -38,7 +38,15 @@ function loadSources() {
     sourcePromise = Promise.all([
       fetchJson(DRUG_DATA_URL),
       fetchJson(POLICY_URL)
-    ]).then(([drugData, policy]) => ({ drugData, policy }));
+    ])
+      .then(([drugData, policy]) => ({ drugData, policy }))
+      // A rejected promise must not stay cached. Otherwise one transient
+      // network failure poisons every later attempt until a full page reload,
+      // and the retry the error message invites can never succeed.
+      .catch((error) => {
+        sourcePromise = undefined;
+        throw error;
+      });
   }
   return sourcePromise;
 }
@@ -188,19 +196,32 @@ function setLaunchState(activeWeek, message = "") {
 }
 
 async function handleLaunch(quizWeek) {
+  if (launchInFlight) return;
+
+  launchInFlight = true;
+  syncAdaptiveAvailability();
   setLaunchState(quizWeek, `Building a fresh Week ${quizWeek} practice set from the Fall 2026 source data…`);
   try {
     await launchFall2026Lab3Practice(quizWeek);
   } catch (error) {
     console.error("Fall 2026 Lab III launch failed:", error);
+    launchInFlight = false;
     setLaunchState(null, error.message || "Unable to generate this practice set.");
+    syncAdaptiveAvailability();
+    return;
   }
+  launchInFlight = false;
+  syncAdaptiveAvailability();
 }
+
+// One launch at a time across both study paths. Without this, a second click
+// during the ~1s adaptive pool build could start a competing round and leave
+// two payloads racing for the same custom-quiz key.
+let launchInFlight = false;
 
 function setAdaptiveState(busy, message = "") {
   const button = document.getElementById("adaptive-launch");
   if (button) {
-    button.disabled = busy;
     button.setAttribute("aria-busy", String(busy));
     const idleLabel = button.dataset.idleLabel || button.textContent.trim();
     button.dataset.idleLabel = idleLabel;
@@ -212,6 +233,8 @@ function setAdaptiveState(busy, message = "") {
     status.textContent = message;
     status.classList.toggle("hidden", !message);
   }
+
+  syncAdaptiveAvailability();
 }
 
 function getSelectedAdaptiveWeek() {
@@ -220,20 +243,64 @@ function getSelectedAdaptiveWeek() {
   return SUPPORTED_WEEKS.has(week) ? week : null;
 }
 
-async function handleAdaptiveLaunch() {
+// The adaptive button stays unavailable until the student has actually chosen a
+// target, and while any launch is running. There is deliberately no default
+// week: course progress cannot be inferred from the calendar.
+// The visible summary must always describe the CURRENT selection. A static
+// ceiling sentence would keep asserting one week no matter what the student
+// picked, which is worse than saying nothing.
+function describeAdaptiveSelection(targetWeek) {
+  if (targetWeek === null) return "Choose a week to enable Adaptive Practice.";
+  if (targetWeek === 1) {
+    return "Week 1 selected. Your content ceiling is Week 1: this round uses Week 1 material only.";
+  }
+  return `Week ${targetWeek} selected. Your content ceiling is Week ${targetWeek}: this round can use Weeks 1–${targetWeek} and nothing after Week ${targetWeek}.`;
+}
+
+function syncAdaptiveAvailability() {
+  const button = document.getElementById("adaptive-launch");
+  const select = document.getElementById("adaptive-week");
   const targetWeek = getSelectedAdaptiveWeek();
-  if (!targetWeek) {
+
+  if (select) select.disabled = launchInFlight;
+  if (button) button.disabled = launchInFlight || targetWeek === null;
+
+  const summary = document.getElementById("adaptive-selection-summary");
+  if (summary) summary.textContent = describeAdaptiveSelection(targetWeek);
+}
+
+function setWeeklyControlsDisabled(disabled) {
+  document.querySelectorAll("[data-launch-week]").forEach((button) => {
+    button.disabled = disabled;
+  });
+}
+
+async function handleAdaptiveLaunch() {
+  if (launchInFlight) return;
+
+  // Validated in the handler, not only through the disabled attribute, so a
+  // dispatched or scripted click cannot bypass the target requirement.
+  const targetWeek = getSelectedAdaptiveWeek();
+  if (targetWeek === null) {
     setAdaptiveState(false, "Choose a week to practice through first.");
     return;
   }
 
+  launchInFlight = true;
+  setWeeklyControlsDisabled(true);
   setAdaptiveState(true, `Reviewing your saved Pharm-let performance through Week ${targetWeek}…`);
   try {
     await launchFall2026Lab3Adaptive(targetWeek);
   } catch (error) {
     console.error("Fall 2026 Lab III adaptive launch failed:", error);
+    launchInFlight = false;
+    setWeeklyControlsDisabled(false);
     setAdaptiveState(false, error.message || "Unable to build an adaptive round right now.");
+    return;
   }
+  launchInFlight = false;
+  setWeeklyControlsDisabled(false);
+  setAdaptiveState(false, "");
 }
 
 function initializePage() {
@@ -243,6 +310,7 @@ function initializePage() {
 
   document.getElementById("adaptive-launch")?.addEventListener("click", handleAdaptiveLaunch);
   document.getElementById("adaptive-week")?.addEventListener("change", () => setAdaptiveState(false, ""));
+  syncAdaptiveAvailability();
 
   const themeToggle = document.getElementById("theme-toggle");
   const themeLabel = document.getElementById("theme-label");

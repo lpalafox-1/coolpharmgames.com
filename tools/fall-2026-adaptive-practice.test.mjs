@@ -728,5 +728,5 @@ test("the hub offers Adaptive Practice without AI language", () => {
   for (let week = 1; week <= 10; week += 1) {
     assert.match(hub, new RegExp(`data-launch-week="${week}"`), `Week ${week} practice must remain available`);
   }
-  assert.match(hub, /assets\/js\/fall-2026-lab3-launcher\.js\?v=20260904a/);
+  assert.match(hub, /assets\/js\/fall-2026-lab3-launcher\.js\?v=20260907a/);
 });

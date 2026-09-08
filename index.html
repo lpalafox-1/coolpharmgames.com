@@ -4,9 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Pharm-let — Class of 2029 Study Hub</title>
-  <meta name="description" content="Class of 2029 study hub featuring Fall 2026 P2 Lab III practice plus the complete P1 and Spring 2026 study library." />
+  <meta name="description" content="Start Adaptive Lab III Practice for Fall 2026 P2 Top Drugs, with Standard Weekly Practice and the complete P1 study library close at hand." />
   <meta property="og:title" content="Pharm-let — Class of 2029 Study Hub" />
-  <meta property="og:description" content="Fall 2026 P2 practice and the continuing Class of 2029 quiz, review, and progress hub." />
+  <meta property="og:description" content="Adaptive Lab III Practice, standard weekly sets, and the continuing Class of 2029 study hub." />
   <meta property="og:image" content="assets/og.png" />
   <meta name="theme-color" content="#8b1e3f" />
   <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
@@ -47,7 +47,9 @@
     .utility-summary::-webkit-details-marker{display:none}
     .utility-summary::after{content:"+";font-size:1.25rem;color:var(--muted)}
     details[open]>.utility-summary::after{content:"−"}
-    @media (max-width:640px){.lab-week-link{font-size:.8rem!important;padding-left:.35rem!important;padding-right:.35rem!important}}
+    #lab3-current a:focus-visible,#welcome a:focus-visible{outline:3px solid var(--accent);outline-offset:4px}
+    .dark #lab3-current a:focus-visible,.dark #welcome a:focus-visible{outline-color:#fda4af}
+    @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
     .progress-mini { @apply h-1 w-full bg-gray-200 dark:bg-gray-700 rounded-full mt-2 overflow-hidden; }
     .progress-fill { @apply h-full bg-[#8b1e3f] transition-all duration-500; }
   </style>
@@ -73,10 +75,11 @@
     <div class="card max-w-xl w-full p-6">
       <p class="text-xs font-black uppercase tracking-[0.2em] text-[var(--accent)]">Current semester</p>
       <h1 class="mt-2 text-2xl font-black">P2 Fall 2026 is ready</h1>
-      <p class="mt-2 text-sm leading-relaxed" style="color:var(--muted)">Start Lab III Weeks 1–10 practice or open the unified Top Drugs Reference. Your complete P1 library remains inside the study hub.</p>
-      <div class="mt-5 grid sm:grid-cols-2 gap-2">
-        <a href="lab3-fall-2026.html" class="btn btn-blue text-center">Open Lab III</a>
-        <a href="top-drugs-quicksheet.html" class="btn btn-ghost text-center">Top Drugs Reference</a>
+      <p class="mt-2 text-sm leading-relaxed" style="color:var(--muted)">Start with Adaptive Lab III Practice: choose your week range for a 10-question round guided by saved performance. Standard weekly sets and your complete P1 library are also available.</p>
+      <div class="mt-5 grid gap-2">
+        <a href="lab3-fall-2026.html#adaptive-practice" class="btn btn-blue text-center">Adaptive Lab III Practice</a>
+        <a href="lab3-fall-2026.html#standard-weekly-practice" class="btn btn-ghost text-center">Standard Weekly Practice</a>
+        <a href="top-drugs-quicksheet.html" class="mt-1 text-sm text-center underline">Top Drugs Reference</a>
       </div>
       <div class="mt-4 flex flex-wrap gap-2 border-t border-[var(--ring)] pt-4">
         <button id="start-now" class="btn btn-ghost">Explore Study Hub</button>
@@ -98,7 +101,7 @@
           <div class="mt-2 flex flex-wrap items-end justify-between gap-3">
             <div>
               <h1 id="current-semester-heading" class="text-3xl md:text-4xl font-black tracking-tight">P2 Fall 2026</h1>
-              <p class="mt-2 max-w-2xl text-sm md:text-lg" style="color:var(--muted)">Your live coursework comes first. Practice Lab III or review the official P2 Top Drugs source in one tap.</p>
+              <p class="mt-2 max-w-2xl text-sm md:text-lg" style="color:var(--muted)">Make Adaptive Lab III Practice your starting point. Choose how far to study, then focus each new round with your saved performance.</p>
             </div>
             <div id="resume-wrap" style="display:none;">
               <a id="resume-link" class="btn btn-ghost border-2 border-[var(--accent)] inline-flex items-center justify-center" href="#">Resume last quiz</a>
@@ -112,14 +115,20 @@
                 <span class="text-xs font-black uppercase tracking-widest text-[#8b1e3f] dark:text-rose-200">Lab III</span>
               </div>
               <h2 class="mt-2 text-2xl font-black">Top Drug Practice</h2>
-              <p class="mt-1 text-sm leading-relaxed" style="color:var(--muted)">Fresh 10-question practice with strict Brand / Generic recall.</p>
-              <div class="mt-3 grid grid-cols-4 gap-2">
-                <a href="lab3-fall-2026.html?week=1" data-live-week="1" class="btn btn-blue lab-week-link text-center">Week 1</a>
+              <p class="mt-1 text-sm leading-relaxed" style="color:var(--muted)">10-question rounds with strict Brand / Generic recall. Adaptive Practice is recommended; standard weekly sets remain available.</p>
+              <div class="mt-4 grid gap-2">
+                <a href="lab3-fall-2026.html#adaptive-practice" class="btn btn-blue text-center">Adaptive Lab III Practice</a>
+                <a href="lab3-fall-2026.html#standard-weekly-practice" class="btn btn-ghost text-center">Standard Weekly Practice</a>
+              </div>
+              <p class="mt-3 text-xs leading-relaxed" style="color:var(--muted)">Choose a curriculum target from Weeks 1–10. New to Pharm-let? Adaptive Practice starts with balanced practice in your range.</p>
+              <p class="mt-2 text-xs leading-relaxed" style="color:var(--muted)">Week 1 is a practice configuration using Week 1 material only—not a claim about official quiz composition. Weeks 2–10 use 6 new + 4 cumulative review; open the Hub for Weeks 4–10 study-ahead practice.</p>
+              <p class="mt-3 text-[11px] font-black uppercase tracking-[0.14em]" style="color:var(--muted)">Jump straight to a week</p>
+              <div class="mt-1.5 grid grid-cols-4 gap-2">
+                <a href="lab3-fall-2026.html?week=1" data-live-week="1" class="btn btn-ghost lab-week-link text-center">Week 1</a>
                 <a href="lab3-fall-2026.html?week=2" data-live-week="2" class="btn btn-ghost lab-week-link text-center">Week 2</a>
                 <a href="lab3-fall-2026.html?week=3" data-live-week="3" class="btn btn-ghost lab-week-link text-center">Week 3</a>
                 <a href="lab3-fall-2026.html" class="btn btn-ghost lab-week-link text-center">Hub</a>
               </div>
-              <p class="mt-2 text-xs leading-relaxed" style="color:var(--muted)">Week 1 is a practice configuration using Week 1 material only—not a claim about official quiz composition. Weeks 2–10 use 6 new + 4 cumulative review; open the Hub for Weeks 4–10 study-ahead practice.</p>
             </article>
 
             <article id="top-drugs-reference-current" class="card p-4 md:p-6 border border-sky-500/30 bg-sky-500/10">
