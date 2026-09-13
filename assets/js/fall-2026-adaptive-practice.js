@@ -23,8 +23,10 @@
 // Adaptive rounds follow faculty weekly shape using sourceDrugQuizWeek only:
 // Week 1 is ten current-week items; Weeks 2–10 are six current then four prior.
 // Domain counts, fingerprints, and concepts carry from the current fill into
-// the review fill so the combined ten share one F26-17 cap. A short bucket
-// may complete the ten from the other source-safe bucket.
+// the review fill so the combined ten share one F26-17 cap. If the current
+// six saturate domains the review pool still needs, those current items are
+// rebalanced before remainder-current fallback. A short bucket may still
+// complete the ten from the other source-safe bucket when 6+4 is impossible.
 
 import { generateFall2026Quiz } from "./fall-2026-quiz-generator.js?v=20260827a";
 
@@ -579,10 +581,22 @@ function copySelectionState(inherited) {
   };
 }
 
+function emptyBucketCounts() {
+  return { weakness: 0, refresh: 0, coverage: 0, balanced: 0 };
+}
+
 function addBucketCounts(left, right) {
-  const next = { weakness: 0, refresh: 0, coverage: 0, balanced: 0 };
+  const next = emptyBucketCounts();
   for (const key of Object.keys(next)) {
     next[key] = (Number(left?.[key]) || 0) + (Number(right?.[key]) || 0);
+  }
+  return next;
+}
+
+function bucketCountsFromSelection(selection) {
+  const next = emptyBucketCounts();
+  for (const entry of selection || []) {
+    if (next[entry?.bucket] !== undefined) next[entry.bucket] += 1;
   }
   return next;
 }
@@ -596,6 +610,117 @@ function countWeekComposition(questions, targetWeek) {
     else if (sourceWeek >= 1 && sourceWeek < targetWeek) reviewItemCount += 1;
   }
   return { currentItemCount, reviewItemCount };
+}
+
+function questionDomain(question) {
+  const metadata = isRecord(question?.metadata) ? question.metadata : {};
+  return String(metadata.knowledgeDomain || "").trim();
+}
+
+function stateFromQuestions(questions) {
+  const state = copySelectionState(null);
+  for (const question of questions) {
+    const fingerprint = getQuestionFingerprint(question);
+    const conceptKey = getQuestionConceptKey(question);
+    const domain = questionDomain(question);
+    if (fingerprint) state.usedFingerprints.add(fingerprint);
+    if (conceptKey) state.usedConcepts.add(conceptKey);
+    if (domain) state.domainCounts.set(domain, (state.domainCounts.get(domain) || 0) + 1);
+  }
+  return state;
+}
+
+function unusedCandidates(candidates, usedFingerprints) {
+  return candidates.filter((candidate) => {
+    const fingerprint = getQuestionFingerprint(candidate);
+    return fingerprint && !usedFingerprints.has(fingerprint);
+  });
+}
+
+function lowestBlockingCurrentIndex(questions, selection, reviewDomains) {
+  let bestIndex = -1;
+  let bestScore = Infinity;
+  for (let index = 0; index < questions.length; index += 1) {
+    const domain = questionDomain(questions[index]);
+    if (!reviewDomains.has(domain)) continue;
+    const score = Number(selection[index]?.score);
+    const comparable = Number.isFinite(score) ? score : Infinity;
+    if (comparable < bestScore || (comparable === bestScore && index > bestIndex)) {
+      bestScore = comparable;
+      bestIndex = index;
+    }
+  }
+  return bestIndex;
+}
+
+function rebalanceCurrentForReview({
+  currentQuestions,
+  currentSelection,
+  currentCandidates,
+  reviewCandidates,
+  signals,
+  seed
+}) {
+  let questions = [...currentQuestions];
+  let selection = [...currentSelection];
+
+  for (let attempt = 0; attempt < currentQuestions.length; attempt += 1) {
+    const currentState = stateFromQuestions(questions);
+    const reviewRound = selectAdaptiveRound({
+      candidates: reviewCandidates,
+      signals,
+      seed: `${seed}::review-rebalance-${attempt}`,
+      size: ADAPTIVE_REVIEW_ITEM_TARGET,
+      inherited: currentState
+    });
+    if (reviewRound.questions.length >= ADAPTIVE_REVIEW_ITEM_TARGET) {
+      return { questions, selection, reviewRound };
+    }
+
+    const unusedReview = unusedCandidates(reviewCandidates, currentState.usedFingerprints);
+    if (!unusedReview.length) return null;
+
+    const reviewDomains = new Set(unusedReview.map(questionDomain).filter(Boolean));
+    if (!reviewDomains.size) return null;
+
+    const dropIndex = lowestBlockingCurrentIndex(questions, selection, reviewDomains);
+    if (dropIndex < 0) return null;
+
+    const remainingQuestions = questions.filter((_, index) => index !== dropIndex);
+    const remainingSelection = selection.filter((_, index) => index !== dropIndex);
+    const remainingFingerprints = new Set(
+      remainingQuestions.map((question) => getQuestionFingerprint(question))
+    );
+    const backfillPool = unusedCandidates(currentCandidates, remainingFingerprints)
+      .filter((candidate) => {
+        const domain = questionDomain(candidate);
+        return domain && !reviewDomains.has(domain);
+      });
+    const backfillRound = selectAdaptiveRound({
+      candidates: backfillPool,
+      signals,
+      seed: `${seed}::rebalance-backfill-${attempt}`,
+      size: 1,
+      inherited: stateFromQuestions(remainingQuestions)
+    });
+    if (backfillRound.questions.length !== 1) return null;
+
+    questions = remainingQuestions.concat(backfillRound.questions);
+    selection = remainingSelection.concat(backfillRound.selection);
+  }
+
+  const currentState = stateFromQuestions(questions);
+  const reviewRound = selectAdaptiveRound({
+    candidates: reviewCandidates,
+    signals,
+    seed: `${seed}::review-rebalance-final`,
+    size: ADAPTIVE_REVIEW_ITEM_TARGET,
+    inherited: currentState
+  });
+  if (reviewRound.questions.length >= ADAPTIVE_REVIEW_ITEM_TARGET) {
+    return { questions, selection, reviewRound };
+  }
+  return null;
 }
 
 export function selectAdaptiveRound({
@@ -775,13 +900,14 @@ export function composeAdaptiveRound({
     state = round.state;
   };
 
-  takeRound(selectAdaptiveRound({
+  const currentRound = selectAdaptiveRound({
     candidates: current,
     signals,
     seed: week === 1 ? seed : `${seed}::current`,
     size: currentTarget,
     inherited: state
-  }));
+  });
+  takeRound(currentRound);
 
   if (questions.length < ADAPTIVE_ROUND_SIZE && reviewTarget > 0) {
     const reviewSize = questions.length === currentTarget
@@ -794,6 +920,33 @@ export function composeAdaptiveRound({
       size: reviewSize,
       inherited: state
     }));
+  }
+
+  const { currentItemCount: filledCurrent, reviewItemCount: filledReview } = countWeekComposition(
+    questions,
+    week
+  );
+  const unusedReviewRemain = unusedCandidates(review, state.usedFingerprints).length > 0;
+  if (
+    reviewTarget > 0
+    && filledCurrent === currentTarget
+    && filledReview < reviewTarget
+    && unusedReviewRemain
+  ) {
+    const rebalanced = rebalanceCurrentForReview({
+      currentQuestions: questions.slice(0, currentTarget),
+      currentSelection: selection.slice(0, currentTarget),
+      currentCandidates: current,
+      reviewCandidates: review,
+      signals,
+      seed
+    });
+    if (rebalanced) {
+      questions = rebalanced.questions.concat(rebalanced.reviewRound.questions);
+      selection = rebalanced.selection.concat(rebalanced.reviewRound.selection);
+      bucketCounts = bucketCountsFromSelection(selection);
+      state = rebalanced.reviewRound.state;
+    }
   }
 
   if (questions.length < ADAPTIVE_ROUND_SIZE) {

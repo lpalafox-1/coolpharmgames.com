@@ -737,6 +737,97 @@ test("shared domain cap applies across the combined 6+4, not per bucket", () => 
   assert.ok(adrCount <= 4, `combined ADR count was ${adrCount}`);
 });
 
+test("a feasible 6+4 is not abandoned when current fill saturates review domains", () => {
+  // 24 current + 16 prior. Greedy current fill takes 3 ADR + 3 FDA; the shared
+  // cap then allows only 1 prior ADR + 1 prior FDA; remainder would add 2
+  // current Brand/Generic → 8+2. A valid 6+4 exists: current 2 ADR + 2 FDA +
+  // 2 B/G, then prior 2 ADR + 2 FDA.
+  const currentAdr = Array.from({ length: 8 }, (_, index) => makeAdaptiveItem({
+    id: `sat-cur-adr-${index}`, domain: "topAdverseReactions", drug: `sat-cur-adr-${index}`,
+    week: 6, sourceWeek: 6
+  }));
+  const currentFda = Array.from({ length: 8 }, (_, index) => makeAdaptiveItem({
+    id: `sat-cur-fda-${index}`, domain: "fdaIndication", drug: `sat-cur-fda-${index}`,
+    week: 6, sourceWeek: 6
+  }));
+  const currentBg = Array.from({ length: 8 }, (_, index) => makeAdaptiveItem({
+    id: `sat-cur-bg-${index}`, domain: "brandGeneric", drug: `sat-cur-bg-${index}`,
+    week: 6, sourceWeek: 6
+  }));
+  const reviewAdr = Array.from({ length: 8 }, (_, index) => makeAdaptiveItem({
+    id: `sat-rev-adr-${index}`, domain: "topAdverseReactions", drug: `sat-rev-adr-${index}`,
+    week: 6, sourceWeek: 2
+  }));
+  const reviewFda = Array.from({ length: 8 }, (_, index) => makeAdaptiveItem({
+    id: `sat-rev-fda-${index}`, domain: "fdaIndication", drug: `sat-rev-fda-${index}`,
+    week: 6, sourceWeek: 3
+  }));
+  const currentItems = [...currentAdr, ...currentFda, ...currentBg];
+  const reviewItems = [...reviewAdr, ...reviewFda];
+  const candidates = [...currentItems, ...reviewItems];
+  const signals = adaptive.buildAdaptiveSignals({
+    reviewEntries: [
+      ...[...currentAdr, ...currentFda, ...reviewAdr, ...reviewFda].map((question) => (
+        missedEntry(question, { missCount: 6, reviewMissCount: 3 })
+      )),
+      // Light B/G misses keep those items in the weakness bucket so the
+      // coverage/balanced targets do not already insert them into the current
+      // six. ADR/FDA still outscore them, so greedy current is 3+3.
+      ...currentBg.map((question) => missedEntry(question, { missCount: 1, reviewMissCount: 0 }))
+    ],
+    now: NOW
+  });
+  const seed = "f26-19-rebalance-6-4";
+
+  const greedyCurrent = adaptive.selectAdaptiveRound({
+    candidates: currentItems, signals, seed: `${seed}::current`, size: 6
+  });
+  const greedyDomains = {};
+  for (const question of greedyCurrent.questions) {
+    const domain = question.metadata.knowledgeDomain;
+    greedyDomains[domain] = (greedyDomains[domain] || 0) + 1;
+  }
+  assert.equal(currentItems.length, 24);
+  assert.equal(reviewItems.length, 16);
+  assert.equal(greedyCurrent.questions.length, 6);
+  assert.equal(greedyDomains.topAdverseReactions, 3, `greedy current ADR: ${JSON.stringify(greedyDomains)}`);
+  assert.equal(greedyDomains.fdaIndication, 3, `greedy current FDA: ${JSON.stringify(greedyDomains)}`);
+  assert.equal(greedyDomains.brandGeneric || 0, 0, "greedy current must not already take B/G");
+
+  const round = adaptive.composeAdaptiveRound({
+    candidates, signals, seed, targetWeek: 6
+  });
+  const currentChosen = round.questions.filter((question) => question.metadata.sourceDrugQuizWeek === 6);
+  const reviewChosen = round.questions.filter((question) => {
+    const week = question.metadata.sourceDrugQuizWeek;
+    return week >= 1 && week < 6;
+  });
+  const currentDomains = {};
+  for (const question of currentChosen) {
+    const domain = question.metadata.knowledgeDomain;
+    currentDomains[domain] = (currentDomains[domain] || 0) + 1;
+  }
+  const reviewDomains = {};
+  for (const question of reviewChosen) {
+    const domain = question.metadata.knowledgeDomain;
+    reviewDomains[domain] = (reviewDomains[domain] || 0) + 1;
+  }
+  const adrCount = round.questions.filter((question) => (
+    question.metadata.knowledgeDomain === "topAdverseReactions"
+  )).length;
+
+  assert.equal(round.questions.length, 10);
+  assert.equal(round.composition.currentItemCount, 6);
+  assert.equal(round.composition.reviewItemCount, 4);
+  assert.equal(round.composition.fallback, false);
+  assert.equal(currentChosen.length, 6);
+  assert.equal(reviewChosen.length, 4);
+  assert.ok((currentDomains.brandGeneric || 0) >= 2,
+    `rebalanced current must include B/G so review can fill: ${JSON.stringify(currentDomains)}`);
+  assert.equal((reviewDomains.topAdverseReactions || 0) + (reviewDomains.fdaIndication || 0), 4);
+  assert.ok(adrCount <= 4, `combined ADR count was ${adrCount}`);
+});
+
 test("a thin current-week pool still yields ten items and records fallback", () => {
   const current = Array.from({ length: 2 }, (_, index) => makeAdaptiveItem({
     id: `thin-cur-${index}`, domain: "fdaIndication", drug: `thin-cur-${index}`,
