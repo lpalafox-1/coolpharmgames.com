@@ -21,6 +21,8 @@
 const GENERATOR_ID = "fall-2026-p2-lab3-deterministic-generator";
 const MCQ_CHOICE_COUNT = 4;
 const WEEK_1_PRACTICE_QUESTION_COUNT = 10;
+const WEEK_FOCUS_MODE = "week-focus";
+const WEEK_FOCUS_QUESTION_COUNT = 10;
 const COURSE_STYLE_ID = "fall-2026-lab3-course-calibrated-v1";
 const BRAND_GENERIC_RECOGNITION_RATE = 0.25;
 const FDA_NOT_VARIANT_RATE = 0.25;
@@ -3163,6 +3165,44 @@ function materializeCalibratedPracticeQuestions(context, selectedCandidates, rng
   });
 }
 
+function generateNewMaterialPracticeQuiz({
+  context,
+  quizWeek,
+  questionCount,
+  seed,
+  rng,
+  extra = {}
+}) {
+  const randomSource = resolveRandomSource({ quizWeek, seed, rng });
+  const newCandidates = buildCandidatesFromContext(context, quizWeek, "new");
+  const selectedNew = selectPracticeQuestionCandidates({
+    candidates: newCandidates,
+    count: questionCount,
+    rng: randomSource.rng
+  });
+  const materialized = materializeCalibratedPracticeQuestions(
+    context,
+    selectedNew,
+    randomSource.rng
+  );
+  const guardedQuestions = applyQuizLevelBrandGenericLeakageGuard(context, materialized);
+  const questions = shuffleCopy(guardedQuestions, randomSource.rng);
+
+  return {
+    status: "generated",
+    quizWeek,
+    seed: randomSource.seed,
+    randomSource: randomSource.randomSource,
+    composition: {
+      newMaterialItemTarget: questionCount,
+      reviewMaterialItemTarget: 0,
+      totalItemTarget: questionCount
+    },
+    questions,
+    ...extra
+  };
+}
+
 export function generateFall2026Quiz({
   drugData,
   policy,
@@ -3175,6 +3215,29 @@ export function generateFall2026Quiz({
   const context = createContext(drugData, policy);
   assertQuizWeek(context, quizWeek);
 
+  if (mode === WEEK_FOCUS_MODE) {
+    if (questionCount !== WEEK_FOCUS_QUESTION_COUNT) {
+      fail(
+        "INVALID_WEEK_FOCUS_CONFIGURATION",
+        `Week Focus requires mode "${WEEK_FOCUS_MODE}" and exactly ${WEEK_FOCUS_QUESTION_COUNT} questions.`,
+        { questionCount }
+      );
+    }
+
+    return generateNewMaterialPracticeQuiz({
+      context,
+      quizWeek,
+      questionCount,
+      seed,
+      rng,
+      extra: {
+        id: `fall-2026-p2-lab3-week-${String(quizWeek).padStart(2, "0")}-week-focus`,
+        title: `Lab III Fall 2026 - Week ${quizWeek} Focus`,
+        mode: WEEK_FOCUS_MODE
+      }
+    });
+  }
+
   if (quizWeek === context.week1.quizWeek) {
     if (mode === "practice") {
       if (questionCount !== WEEK_1_PRACTICE_QUESTION_COUNT) {
@@ -3185,38 +3248,20 @@ export function generateFall2026Quiz({
         );
       }
 
-      const randomSource = resolveRandomSource({ quizWeek, seed, rng });
-      const newCandidates = buildCandidatesFromContext(context, quizWeek, "new");
-      const selectedNew = selectPracticeQuestionCandidates({
-        candidates: newCandidates,
-        count: questionCount,
-        rng: randomSource.rng
-      });
-      const materialized = materializeCalibratedPracticeQuestions(
+      return generateNewMaterialPracticeQuiz({
         context,
-        selectedNew,
-        randomSource.rng
-      );
-      const guardedQuestions = applyQuizLevelBrandGenericLeakageGuard(context, materialized);
-      const questions = shuffleCopy(guardedQuestions, randomSource.rng);
-
-      return {
-        status: "generated",
-        id: "fall-2026-p2-lab3-week-01-practice",
-        title: "Lab III Fall 2026 - Week 1 Practice",
         quizWeek,
-        mode,
-        practiceConfiguration: true,
-        practiceNote: WEEK_1_PRACTICE_NOTE,
-        seed: randomSource.seed,
-        randomSource: randomSource.randomSource,
-        composition: {
-          newMaterialItemTarget: questionCount,
-          reviewMaterialItemTarget: 0,
-          totalItemTarget: questionCount
-        },
-        questions
-      };
+        questionCount,
+        seed,
+        rng,
+        extra: {
+          id: "fall-2026-p2-lab3-week-01-practice",
+          title: "Lab III Fall 2026 - Week 1 Practice",
+          mode,
+          practiceConfiguration: true,
+          practiceNote: WEEK_1_PRACTICE_NOTE
+        }
+      });
     }
 
     if (mode !== undefined || questionCount !== undefined) {

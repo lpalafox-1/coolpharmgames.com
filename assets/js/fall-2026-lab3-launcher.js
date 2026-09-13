@@ -1,7 +1,7 @@
 import {
   WEEK_1_PRACTICE_NOTE,
   generateFall2026Quiz
-} from "./fall-2026-quiz-generator.js?v=20260827a";
+} from "./fall-2026-quiz-generator.js?v=20260913a";
 import {
   ADAPTIVE_MEMORY_KEY,
   buildFall2026AdaptivePayload,
@@ -58,6 +58,9 @@ export function createFall2026PracticeSeed(quizWeek) {
   return `fall-2026-lab3-week-${quizWeek}-${Array.from(values, (value) => value.toString(16).padStart(8, "0")).join("")}`;
 }
 
+export const WEEK_FOCUS_KIND = "fall-2026-lab3-week-focus";
+const WEEK_FOCUS_QUESTION_COUNT = 10;
+
 export function buildFall2026Lab3Payload({ drugData, policy, quizWeek, seed }) {
   requireSupportedWeek(quizWeek);
   const generated = generateFall2026Quiz({
@@ -104,6 +107,65 @@ export async function launchFall2026Lab3Practice(quizWeek, options = {}) {
     : await loadSources();
   const seed = options.seed || createFall2026PracticeSeed(quizWeek);
   const payload = buildFall2026Lab3Payload({ drugData, policy, quizWeek, seed });
+
+  localStorage.setItem(CUSTOM_QUIZ_KEY, JSON.stringify(payload));
+  window.location.assign("quiz.html?id=custom-quiz");
+  return payload;
+}
+
+export function createFall2026WeekFocusSeed(quizWeek) {
+  requireSupportedWeek(quizWeek);
+  const values = new Uint32Array(4);
+  globalThis.crypto.getRandomValues(values);
+  return `fall-2026-lab3-week-focus-week-${quizWeek}-${Array.from(values, (value) => value.toString(16).padStart(8, "0")).join("")}`;
+}
+
+export function buildFall2026WeekFocusPayload({ drugData, policy, quizWeek, seed }) {
+  requireSupportedWeek(quizWeek);
+  const generated = generateFall2026Quiz({
+    drugData,
+    policy,
+    quizWeek,
+    seed,
+    mode: "week-focus",
+    questionCount: WEEK_FOCUS_QUESTION_COUNT
+  });
+
+  if (generated.status !== "generated" || generated.questions.length !== WEEK_FOCUS_QUESTION_COUNT) {
+    throw new Error(`Week ${quizWeek} Focus did not produce a complete 10-question set.`);
+  }
+
+  const title = `Lab III Fall 2026 - Week ${quizWeek} Focus`;
+  const sourceQuizId = `fall-2026-lab3-week-${quizWeek}-week-focus`;
+
+  return {
+    id: "custom-quiz",
+    title,
+    metadata: {
+      kind: WEEK_FOCUS_KIND,
+      generator: "fall-2026-p2-lab3-deterministic-generator",
+      generatedFrom: sourceQuizId,
+      sourceTitle: title,
+      quizWeek,
+      seed: generated.seed,
+      timerSeconds: TIMER_SECONDS,
+      composition: { ...generated.composition }
+    },
+    questions: generated.questions.map((question) => ({
+      ...question,
+      sourceQuizId,
+      sourceTitle: title
+    }))
+  };
+}
+
+export async function launchFall2026Lab3WeekFocus(quizWeek, options = {}) {
+  requireSupportedWeek(quizWeek);
+  const { drugData, policy } = options.drugData && options.policy
+    ? options
+    : await loadSources();
+  const seed = options.seed || createFall2026WeekFocusSeed(quizWeek);
+  const payload = buildFall2026WeekFocusPayload({ drugData, policy, quizWeek, seed });
 
   localStorage.setItem(CUSTOM_QUIZ_KEY, JSON.stringify(payload));
   window.location.assign("quiz.html?id=custom-quiz");
@@ -213,45 +275,78 @@ export async function launchFall2026Lab3Adaptive(targetWeek, options = {}) {
   return payload;
 }
 
-function setLaunchState(activeWeek, message = "") {
-  document.querySelectorAll("[data-launch-week]").forEach((button) => {
-    const week = Number(button.dataset.launchWeek);
-    button.disabled = activeWeek !== null;
-    button.setAttribute("aria-busy", String(activeWeek === week));
+function getSelectedWeeklyWeek() {
+  const select = document.getElementById("weekly-week");
+  const week = Number(select?.value);
+  return SUPPORTED_WEEKS.has(week) ? week : null;
+}
+
+function describeWeeklySelection(quizWeek) {
+  if (quizWeek === null) return "Choose a week to enable Standard Weekly Practice.";
+  if (quizWeek === 1) {
+    return "Week 1 selected. This round uses Week 1 material only, with no prior-week review.";
+  }
+  return `Week ${quizWeek} selected. This round uses 6 new Week ${quizWeek} items and 4 cumulative-review items.`;
+}
+
+function syncWeeklyAvailability() {
+  const button = document.getElementById("weekly-launch");
+  const select = document.getElementById("weekly-week");
+  const quizWeek = getSelectedWeeklyWeek();
+
+  if (select) select.disabled = launchInFlight;
+  if (button) button.disabled = launchInFlight || quizWeek === null;
+
+  const summary = document.getElementById("weekly-selection-summary");
+  if (summary) summary.textContent = describeWeeklySelection(quizWeek);
+}
+
+function setWeeklyLaunchState(busy, message = "") {
+  const button = document.getElementById("weekly-launch");
+  if (button) {
+    button.setAttribute("aria-busy", String(busy));
     const idleLabel = button.dataset.idleLabel || button.textContent.trim();
     button.dataset.idleLabel = idleLabel;
-    button.textContent = activeWeek === week ? `Generating Week ${week}…` : idleLabel;
-  });
+    button.textContent = busy ? "Building your weekly practice set…" : idleLabel;
+  }
 
   const status = document.getElementById("launch-status");
   if (status) {
     status.textContent = message;
     status.classList.toggle("hidden", !message);
   }
+
+  syncWeeklyAvailability();
 }
 
-async function handleLaunch(quizWeek) {
+async function handleWeeklyLaunch() {
   if (launchInFlight) return;
 
+  const quizWeek = getSelectedWeeklyWeek();
+  if (quizWeek === null) {
+    setWeeklyLaunchState(false, "Choose a week to practice first.");
+    return;
+  }
+
   launchInFlight = true;
-  syncAdaptiveAvailability();
-  setLaunchState(quizWeek, `Building a fresh Week ${quizWeek} practice set from the Fall 2026 source data…`);
+  syncAllLaunchAvailability();
+  setWeeklyLaunchState(true, `Building a fresh Week ${quizWeek} practice set from the Fall 2026 source data…`);
   try {
     await launchFall2026Lab3Practice(quizWeek);
   } catch (error) {
     console.error("Fall 2026 Lab III launch failed:", error);
     launchInFlight = false;
-    setLaunchState(null, error.message || "Unable to generate this practice set.");
-    syncAdaptiveAvailability();
+    setWeeklyLaunchState(false, error.message || "Unable to generate this practice set.");
+    syncAllLaunchAvailability();
     return;
   }
   launchInFlight = false;
-  syncAdaptiveAvailability();
+  syncAllLaunchAvailability();
 }
 
-// One launch at a time across both study paths. Without this, a second click
-// during the ~1s adaptive pool build could start a competing round and leave
-// two payloads racing for the same custom-quiz key.
+// One launch at a time across the three study paths. Without this, a second
+// click during the ~1s adaptive pool build could start a competing round and
+// leave two payloads racing for the same custom-quiz key.
 let launchInFlight = false;
 
 function setAdaptiveState(busy, message = "") {
@@ -304,10 +399,51 @@ function syncAdaptiveAvailability() {
   if (summary) summary.textContent = describeAdaptiveSelection(targetWeek);
 }
 
-function setWeeklyControlsDisabled(disabled) {
-  document.querySelectorAll("[data-launch-week]").forEach((button) => {
-    button.disabled = disabled;
-  });
+function getSelectedWeekFocusWeek() {
+  const select = document.getElementById("week-focus-week");
+  const week = Number(select?.value);
+  return SUPPORTED_WEEKS.has(week) ? week : null;
+}
+
+function describeWeekFocusSelection(quizWeek) {
+  if (quizWeek === null) return "Choose a week to enable Week Focus.";
+  return `Week ${quizWeek} selected. This round uses Week ${quizWeek} material only, with no prior-week review.`;
+}
+
+function syncWeekFocusAvailability() {
+  const button = document.getElementById("week-focus-launch");
+  const select = document.getElementById("week-focus-week");
+  const quizWeek = getSelectedWeekFocusWeek();
+
+  if (select) select.disabled = launchInFlight;
+  if (button) button.disabled = launchInFlight || quizWeek === null;
+
+  const summary = document.getElementById("week-focus-selection-summary");
+  if (summary) summary.textContent = describeWeekFocusSelection(quizWeek);
+}
+
+function setWeekFocusState(busy, message = "") {
+  const button = document.getElementById("week-focus-launch");
+  if (button) {
+    button.setAttribute("aria-busy", String(busy));
+    const idleLabel = button.dataset.idleLabel || button.textContent.trim();
+    button.dataset.idleLabel = idleLabel;
+    button.textContent = busy ? "Building your Week Focus set…" : idleLabel;
+  }
+
+  const status = document.getElementById("week-focus-status");
+  if (status) {
+    status.textContent = message;
+    status.classList.toggle("hidden", !message);
+  }
+
+  syncWeekFocusAvailability();
+}
+
+function syncAllLaunchAvailability() {
+  syncAdaptiveAvailability();
+  syncWeekFocusAvailability();
+  syncWeeklyAvailability();
 }
 
 async function handleAdaptiveLaunch() {
@@ -322,30 +458,56 @@ async function handleAdaptiveLaunch() {
   }
 
   launchInFlight = true;
-  setWeeklyControlsDisabled(true);
+  syncAllLaunchAvailability();
   setAdaptiveState(true, `Reviewing your saved Pharm-let performance through Week ${targetWeek}…`);
   try {
     await launchFall2026Lab3Adaptive(targetWeek);
   } catch (error) {
     console.error("Fall 2026 Lab III adaptive launch failed:", error);
     launchInFlight = false;
-    setWeeklyControlsDisabled(false);
     setAdaptiveState(false, error.message || "Unable to build an adaptive round right now.");
+    syncAllLaunchAvailability();
     return;
   }
   launchInFlight = false;
-  setWeeklyControlsDisabled(false);
   setAdaptiveState(false, "");
+  syncAllLaunchAvailability();
+}
+
+async function handleWeekFocusLaunch() {
+  if (launchInFlight) return;
+
+  const quizWeek = getSelectedWeekFocusWeek();
+  if (quizWeek === null) {
+    setWeekFocusState(false, "Choose a week to focus first.");
+    return;
+  }
+
+  launchInFlight = true;
+  syncAllLaunchAvailability();
+  setWeekFocusState(true, `Building a Week ${quizWeek} Focus set from the Fall 2026 source data…`);
+  try {
+    await launchFall2026Lab3WeekFocus(quizWeek);
+  } catch (error) {
+    console.error("Fall 2026 Lab III Week Focus launch failed:", error);
+    launchInFlight = false;
+    setWeekFocusState(false, error.message || "Unable to generate this Week Focus set.");
+    syncAllLaunchAvailability();
+    return;
+  }
+  launchInFlight = false;
+  setWeekFocusState(false, "");
+  syncAllLaunchAvailability();
 }
 
 function initializePage() {
-  document.querySelectorAll("[data-launch-week]").forEach((button) => {
-    button.addEventListener("click", () => handleLaunch(Number(button.dataset.launchWeek)));
-  });
-
   document.getElementById("adaptive-launch")?.addEventListener("click", handleAdaptiveLaunch);
   document.getElementById("adaptive-week")?.addEventListener("change", () => setAdaptiveState(false, ""));
-  syncAdaptiveAvailability();
+  document.getElementById("week-focus-launch")?.addEventListener("click", handleWeekFocusLaunch);
+  document.getElementById("week-focus-week")?.addEventListener("change", () => setWeekFocusState(false, ""));
+  document.getElementById("weekly-launch")?.addEventListener("click", handleWeeklyLaunch);
+  document.getElementById("weekly-week")?.addEventListener("change", () => setWeeklyLaunchState(false, ""));
+  syncAllLaunchAvailability();
 
   const themeToggle = document.getElementById("theme-toggle");
   const themeLabel = document.getElementById("theme-label");
@@ -377,7 +539,9 @@ function initializePage() {
 
   const requestedWeek = Number(new URLSearchParams(window.location.search).get("week"));
   if (SUPPORTED_WEEKS.has(requestedWeek)) {
-    handleLaunch(requestedWeek);
+    const select = document.getElementById("weekly-week");
+    if (select) select.value = String(requestedWeek);
+    syncAllLaunchAvailability();
   }
 }
 

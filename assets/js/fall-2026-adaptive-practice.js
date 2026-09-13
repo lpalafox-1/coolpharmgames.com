@@ -29,7 +29,7 @@
 // combined capacity may stay in or enter the current six. A short bucket may
 // still complete the ten from the other source-safe bucket when 6+4 is impossible.
 
-import { generateFall2026Quiz } from "./fall-2026-quiz-generator.js?v=20260827a";
+import { generateFall2026Quiz } from "./fall-2026-quiz-generator.js?v=20260913a";
 
 export const ADAPTIVE_KIND = "fall-2026-lab3-adaptive";
 export const ADAPTIVE_MEMORY_KEY = "pharmlet.fall-2026-lab3.adaptive-memory";

@@ -6,9 +6,13 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { loadBrowserGlobal } from "./browser-global-harness.mjs";
 import {
+  WEEK_FOCUS_KIND,
   buildFall2026Lab3Payload,
-  launchFall2026Lab3Practice
+  buildFall2026WeekFocusPayload,
+  launchFall2026Lab3Practice,
+  launchFall2026Lab3WeekFocus
 } from "../assets/js/fall-2026-lab3-launcher.js";
+import { buildFall2026AdaptivePayload } from "../assets/js/fall-2026-adaptive-practice.js";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const drugData = JSON.parse(
@@ -23,8 +27,8 @@ const FALL_LAB3_WEEKS = Array.from({ length: 10 }, (_, index) => index + 1);
 const FALL_UI_BASELINES = Object.freeze({
   drugData: "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01",
   policy: "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171",
-  generator: "a2d57983327ae3bcd8881168bf391ffafbce4ea5ac45d79d8f1ac971844af970",
-  launcher: "8d1fa626fd4d9a35b69dcd47f5418d74cff57b36e0087fe6b47f08ff88edfc60"
+  generator: "f678d7a766a3f1594b89110019829d93cabfd2df0cefaadf906dba301748946a",
+  launcher: "fbfbcfff55096152f8c5f64f06fedeb898ce995713c18f7d492f729bc4efb1fc"
 });
 
 const LEGACY_HOME_HREFS = [
@@ -107,18 +111,6 @@ function htmlText(source) {
     .replace(/&nbsp;/g, " ")
     .replace(/\s+/g, " ")
     .trim();
-}
-
-function cardForWeek(page, quizWeek) {
-  const openingTagPattern = new RegExp(
-    `<article\\b(?=[^>]*\\bid="week-${quizWeek}")(?=[^>]*\\bdata-week-card="${quizWeek}")[^>]*>`,
-    "i"
-  );
-  const openingTag = openingTagPattern.exec(page);
-  assert.ok(openingTag, `hub is missing the unified Week ${quizWeek} card`);
-  const end = page.indexOf("</article>", openingTag.index + openingTag[0].length);
-  assert.notEqual(end, -1, `Week ${quizWeek} card is not closed`);
-  return page.slice(openingTag.index, end + "</article>".length);
 }
 
 function sha256File(relativePath) {
@@ -328,7 +320,7 @@ test("homepage exposes direct Fall launches while preserving every legacy study 
   assert.ok(homepage.includes("P1 Fall 2025"));
 });
 
-test("the hub shows Week Focus as Coming Soon without a Week Focus launcher", () => {
+test("the hub shows a Week Focus launcher with its own week select and start control", () => {
   const page = readFileSync(path.join(repoRoot, "lab3-fall-2026.html"), "utf8");
   const adaptiveIndex = page.indexOf('id="adaptive-practice"');
   const weekFocusIndex = page.indexOf('id="week-focus"');
@@ -343,79 +335,189 @@ test("the hub shows Week Focus as Coming Soon without a Week Focus launcher", ()
   assert.ok(weekFocusIndex < weeklyIndex, "Week Focus must precede Standard Weekly Practice");
 
   const weekFocus = page.slice(weekFocusIndex, resourcesIndex);
+  const adaptive = page.slice(adaptiveIndex, weekFocusIndex);
   assert.match(htmlText(weekFocus), /Week Focus/);
-  assert.match(htmlText(weekFocus), /Coming Soon/);
+  assert.doesNotMatch(htmlText(weekFocus), /Coming Soon/);
   assert.match(htmlText(weekFocus), /selected week only/i);
   assert.match(htmlText(weekFocus), /no cumulative review/i);
   assert.match(htmlText(weekFocus), /Adaptive Practice through Week X/i);
-  assert.doesNotMatch(weekFocus, /<select\b/i);
-  assert.doesNotMatch(weekFocus, /<button\b/i);
-  assert.doesNotMatch(weekFocus, /\bdata-week-card\b|\bdata-launch-week\b|id="adaptive-week"/);
+  assert.match(weekFocus, /id="week-focus-week"/);
+  assert.match(weekFocus, /id="week-focus-launch"/);
+  assert.match(weekFocus, /<select\b[^>]*\bid="week-focus-week"/i);
+  assert.match(weekFocus, /<button\b[^>]*\bid="week-focus-launch"/i);
+  assert.doesNotMatch(weekFocus, /\bdata-week-card\b|\bdata-launch-week\b|id="adaptive-week"|id="adaptive-launch"/);
   assert.doesNotMatch(weekFocus, /href="quiz\.html/);
   assert.doesNotMatch(weekFocus, /href="[^"]+"/i);
 
-  const cardTags = [...page.matchAll(/<article\b[^>]*\bdata-week-card="(\d+)"[^>]*>/g)];
-  const launchButtons = [...page.matchAll(/<button\b[^>]*\bdata-launch-week="(\d+)"[^>]*>/g)];
-  assert.deepEqual(cardTags.map((match) => Number(match[1])), FALL_LAB3_WEEKS);
-  assert.deepEqual(launchButtons.map((match) => Number(match[1])), FALL_LAB3_WEEKS);
-  assert.ok(page.includes('src="assets/js/fall-2026-lab3-launcher.js?v=20260907a"'));
+  assert.match(adaptive, /id="adaptive-week"/);
+  assert.match(adaptive, /id="adaptive-launch"/);
+  assert.doesNotMatch(adaptive, /id="week-focus-week"|id="week-focus-launch"|id="weekly-week"|id="weekly-launch"/);
+
+  assert.doesNotMatch(page, /\bdata-week-card\b|\bdata-launch-week\b/);
+  assert.ok(page.includes('src="assets/js/fall-2026-lab3-launcher.js?v=20260912b"'));
 });
 
-test("Fall Lab III hub exposes ten unified visible week cards with ten native launch buttons", () => {
+test("the hub has three distinct week selects for Adaptive, Week Focus, and Standard Weekly", () => {
   const page = readFileSync(path.join(repoRoot, "lab3-fall-2026.html"), "utf8");
-  const cardTags = [...page.matchAll(/<article\b[^>]*\bdata-week-card="(\d+)"[^>]*>/g)];
-  const launchButtons = [...page.matchAll(/<button\b[^>]*\bdata-launch-week="(\d+)"[^>]*>/g)];
-  const cardWeeks = cardTags.map((match) => Number(match[1]));
-  const launchWeeks = launchButtons
-    .map((match) => Number(match[1]));
+  const adaptive = page.slice(page.indexOf('id="adaptive-practice"'), page.indexOf('id="week-focus"'));
+  const weekFocus = page.slice(page.indexOf('id="week-focus"'), page.indexOf('aria-label="Study resources"'));
+  const weekly = page.slice(page.indexOf('id="standard-weekly-practice"'));
 
-  assert.deepEqual(cardWeeks, FALL_LAB3_WEEKS);
-  assert.deepEqual(launchWeeks, FALL_LAB3_WEEKS);
-  for (const quizWeek of FALL_LAB3_WEEKS) {
-    const card = cardForWeek(page, quizWeek);
-    const openingTag = card.slice(0, card.indexOf(">") + 1);
-    const matchingButtons = [...card.matchAll(new RegExp(
-      `<button\\b[^>]*\\bdata-launch-week="${quizWeek}"[^>]*>`,
-      "g"
-    ))];
+  assert.match(adaptive, /id="adaptive-week"/);
+  assert.match(adaptive, /id="adaptive-launch"/);
+  assert.match(weekFocus, /id="week-focus-week"/);
+  assert.match(weekFocus, /id="week-focus-launch"/);
+  assert.match(weekly, /id="weekly-week"/);
+  assert.match(weekly, /id="weekly-launch"/);
+  assert.match(weekly, /id="launch-status"/);
+  assert.match(weekly, /id="semester-practice-note"/);
 
-    assert.equal(matchingButtons.length, 1, `Week ${quizWeek} needs one native launch button`);
-    assert.match(htmlText(card), new RegExp(`\\bWeek ${quizWeek}\\b`));
-    assert.match(htmlText(card), new RegExp(`Start Week ${quizWeek}`));
-    assert.doesNotMatch(openingTag, /\bhidden\b|aria-hidden="true"/i);
-    assert.doesNotMatch(matchingButtons[0][0], /\sdisabled(?:\s|=|>)/i);
-    assert.doesNotMatch(matchingButtons[0][0], /aria-disabled="true"/i);
+  const selectIds = [...page.matchAll(/<select\b[^>]*\bid="([^"]+)"/g)].map((match) => match[1]);
+  assert.deepEqual(selectIds, ["adaptive-week", "week-focus-week", "weekly-week"]);
+  assert.equal(new Set(selectIds).size, 3);
+  assert.doesNotMatch(page, /\bdata-week-card\b|\bdata-launch-week\b|<article\b/);
+});
+
+test("Week 6 Week Focus is ten current-week items and not Adaptive", () => {
+  const payload = buildFall2026WeekFocusPayload({
+    drugData, policy, quizWeek: 6, seed: "f26-20-launch-week-6"
+  });
+  assert.equal(payload.questions.length, 10);
+  assert.equal(payload.metadata.kind, WEEK_FOCUS_KIND);
+  assert.equal(payload.metadata.kind, "fall-2026-lab3-week-focus");
+  assert.notEqual(payload.metadata.kind, "fall-2026-lab3-adaptive");
+  assert.deepEqual(payload.metadata.composition, {
+    newMaterialItemTarget: 10,
+    reviewMaterialItemTarget: 0,
+    totalItemTarget: 10
+  });
+  assert.ok(payload.questions.every((question) => question.metadata.sourceDrugQuizWeek === 6));
+  assert.ok(payload.questions.every((question) => question.metadata.sourceMaterial === "new"));
+});
+
+test("Week 1 Week Focus is ten current items and zero review", () => {
+  const payload = buildFall2026WeekFocusPayload({
+    drugData, policy, quizWeek: 1, seed: "f26-20-launch-week-1"
+  });
+  assert.equal(payload.questions.length, 10);
+  assert.equal(payload.metadata.composition.reviewMaterialItemTarget, 0);
+  assert.equal(
+    payload.questions.filter((question) => question.metadata.sourceMaterial === "review").length,
+    0
+  );
+  assert.ok(payload.questions.every((question) => question.metadata.sourceDrugQuizWeek === 1));
+});
+
+test("standard weekly Week 6 stays 6+4 after Week Focus", () => {
+  const payload = build(6, "f26-20-weekly-week-6");
+  assert.equal(payload.metadata.kind, "fall-2026-lab3-practice");
+  assert.deepEqual(payload.metadata.composition, {
+    newMaterialItemTarget: 6,
+    reviewMaterialItemTarget: 4,
+    totalItemTarget: 10
+  });
+});
+
+test("Adaptive through Week 6 stays 6+4 after Week Focus", () => {
+  const payload = buildFall2026AdaptivePayload({
+    drugData, policy, targetWeek: 6, seed: "f26-20-adaptive-week-6"
+  });
+  assert.equal(payload.metadata.kind, "fall-2026-lab3-adaptive");
+  assert.equal(payload.questions.length, 10);
+  assert.equal(payload.metadata.adaptive.composition.currentItemCount, 6);
+  assert.equal(payload.metadata.adaptive.composition.reviewItemCount, 4);
+  assert.equal(payload.metadata.adaptive.composition.fallback, false);
+});
+
+test("Weekly launch does not write adaptive-request or adaptive memory", async () => {
+  const previousLocalStorage = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
+  const previousWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
+  const storage = createStorageStub();
+  let assignedUrl = "";
+
+  Object.defineProperty(globalThis, "localStorage", {
+    configurable: true,
+    value: storage
+  });
+  Object.defineProperty(globalThis, "window", {
+    configurable: true,
+    value: { location: { assign(url) { assignedUrl = url; } } }
+  });
+
+  try {
+    const payload = await launchFall2026Lab3Practice(6, {
+      drugData,
+      policy,
+      seed: "f26-20-weekly-no-adaptive-request"
+    });
+    const persisted = JSON.parse(storage.getItem("pharmlet.custom-quiz"));
+    assert.deepEqual(persisted, payload);
+    assert.equal(persisted.metadata.kind, "fall-2026-lab3-practice");
+    assert.deepEqual(persisted.metadata.composition, {
+      newMaterialItemTarget: 6,
+      reviewMaterialItemTarget: 4,
+      totalItemTarget: 10
+    });
+    assert.equal(storage.getItem("pharmlet.fall-2026-lab3.adaptive-request"), null);
+    assert.equal(storage.getItem("pharmlet.fall-2026-lab3.adaptive-memory"), null);
+    assert.equal(assignedUrl, "quiz.html?id=custom-quiz");
+  } finally {
+    if (previousLocalStorage) Object.defineProperty(globalThis, "localStorage", previousLocalStorage);
+    else delete globalThis.localStorage;
+    if (previousWindow) Object.defineProperty(globalThis, "window", previousWindow);
+    else delete globalThis.window;
   }
 });
 
-test("the unified cards communicate Week 1 and Weeks 2-10 practice structure without second-class future-week noise", () => {
-  const page = readFileSync(path.join(repoRoot, "lab3-fall-2026.html"), "utf8");
-  const week1 = htmlText(cardForWeek(page, 1));
+test("Week Focus launch does not write adaptive-request or adaptive memory", async () => {
+  const previousLocalStorage = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
+  const previousWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
+  const storage = createStorageStub();
+  let assignedUrl = "";
 
-  assert.match(week1, /10 Questions/);
-  assert.match(week1, /Week 1 Content/);
-  assert.match(week1, /Practice (?:Configuration|setup)/i);
-  assert.match(week1, /no prior(?:-| )week review/i);
-  assert.match(week1, /not[^.]{0,100}official[^.]{0,100}composition/i);
-  assert.doesNotMatch(week1, /6 New|4 Review/);
+  Object.defineProperty(globalThis, "localStorage", {
+    configurable: true,
+    value: storage
+  });
+  Object.defineProperty(globalThis, "window", {
+    configurable: true,
+    value: { location: { assign(url) { assignedUrl = url; } } }
+  });
+
+  try {
+    const payload = await launchFall2026Lab3WeekFocus(6, {
+      drugData,
+      policy,
+      seed: "f26-20-no-adaptive-request"
+    });
+    const persisted = JSON.parse(storage.getItem("pharmlet.custom-quiz"));
+    assert.deepEqual(persisted, payload);
+    assert.equal(persisted.metadata.kind, WEEK_FOCUS_KIND);
+    assert.equal(storage.getItem("pharmlet.fall-2026-lab3.adaptive-request"), null);
+    assert.equal(storage.getItem("pharmlet.fall-2026-lab3.adaptive-memory"), null);
+    assert.equal(assignedUrl, "quiz.html?id=custom-quiz");
+  } finally {
+    if (previousLocalStorage) Object.defineProperty(globalThis, "localStorage", previousLocalStorage);
+    else delete globalThis.localStorage;
+    if (previousWindow) Object.defineProperty(globalThis, "window", previousWindow);
+    else delete globalThis.window;
+  }
+});
+
+test("Standard Weekly copy keeps Week 1 vs 6+4 structure without a card grid", () => {
+  const page = readFileSync(path.join(repoRoot, "lab3-fall-2026.html"), "utf8");
+  const weekly = page.slice(page.indexOf('id="standard-weekly-practice"'));
+  const weeklyText = htmlText(weekly);
+
+  assert.match(weeklyText, /Standard Weekly Practice/);
+  assert.match(weeklyText, /Week 1 uses Week 1 only/i);
+  assert.match(weeklyText, /6 new \+ 4 cumulative-review/i);
+  assert.match(weekly, /id="weekly-week"/);
+  assert.match(weekly, /id="weekly-launch"/);
+  assert.doesNotMatch(weekly, /\bdata-week-card\b|\bdata-launch-week\b|<article\b/);
   assert.ok(!page.includes(WEEK_1_NOTE), "hub should use concise Week 1 wording instead of the full payload note");
-
-  for (const quizWeek of FALL_LAB3_WEEKS.slice(1)) {
-    const card = cardForWeek(page, quizWeek);
-    const text = htmlText(card);
-    assert.match(text, /10 Questions/, `Week ${quizWeek} must show its question count`);
-    assert.match(text, /6 New • 4 Review/, `Week ${quizWeek} must show the shared composition`);
-  }
-
-  for (const quizWeek of FALL_LAB3_WEEKS.slice(3)) {
-    const card = cardForWeek(page, quizWeek);
-    assert.doesNotMatch(
-      htmlText(card),
-      /study[- ]ahead|future quiz|coming soon|not available|unavailable/i,
-      `Week ${quizWeek} must not carry repetitive future-week labeling`
-    );
-  }
   assert.doesNotMatch(page, /study-ahead-launch|id="study-ahead-heading"|id="study-ahead-note"/i);
+  assert.doesNotMatch(weeklyText, /study[- ]ahead|coming soon|not available|unavailable/i);
 });
 
 test("the hub uses one concise future-practice note and keeps Top Drugs Reference secondary but reachable", () => {
@@ -449,10 +551,11 @@ test("the F26-08 presentation-only change preserves launch wiring, cache tokens,
     "utf8"
   );
 
-  assert.ok(page.includes('src="assets/js/fall-2026-lab3-launcher.js?v=20260907a"'));
-  assert.ok(launcher.includes('from "./fall-2026-quiz-generator.js?v=20260827a"'));
+  assert.ok(page.includes('src="assets/js/fall-2026-lab3-launcher.js?v=20260912b"'));
+  assert.ok(launcher.includes('from "./fall-2026-quiz-generator.js?v=20260913a"'));
   assert.ok(launcher.includes('window.location.assign("quiz.html?id=custom-quiz")'));
-  assert.ok(launcher.includes('document.querySelectorAll("[data-launch-week]")'));
+  assert.ok(launcher.includes('getElementById("weekly-launch")'));
+  assert.doesNotMatch(launcher, /data-launch-week/);
   assert.deepEqual({
     drugData: sha256File("assets/data/fall-2026-p2-top-drugs.json"),
     policy: sha256File("assets/data/fall-2026-lab3-quiz-policy.json"),
