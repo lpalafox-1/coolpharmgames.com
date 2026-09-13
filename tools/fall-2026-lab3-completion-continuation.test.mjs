@@ -35,7 +35,7 @@ const LIFETIME_MEMORY_KEYS = [
 const PROTECTED_FALL_BASELINES = Object.freeze({
   drugData: "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01",
   policy: "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171",
-  generator: "39e123b914f665282f6abce23110bf3e2bd4f0bcc1974b7038e0f9384cf9871a",
+  generator: "6492c2ec20d1e75863176979fdad91f8e34f74dda427946272b978e775fe3fec",
   launcher: "8d1fa626fd4d9a35b69dcd47f5418d74cff57b36e0087fe6b47f08ff88edfc60"
 });
 
@@ -650,12 +650,12 @@ test("the remix is assembled from fresh identities aimed at the missed drugs and
 });
 
 test("a weak drug can return through a different safe question identity", () => {
-  const { questions } = buildFinishedAttempt(9, "f26-09-remix-same-drug-new-form", [1, 2]);
+  const { questions } = buildFinishedAttempt(9, "f26-11-remix-same-drug-0", [1, 2]);
   const engine = loadEngine();
   const request = requestFor(engine, questions, { createdAt: 4_000 });
   const payload = plain(engine.sandbox.buildFallLab3BossRemixPayload({
     request,
-    practicePayload: buildPracticePayload(9, "f26-09-remix-same-drug-new-form-fresh"),
+    practicePayload: buildPracticePayload(9, "f26-11-remix-same-drug-0-fresh"),
     createdAt: 4_100
   }));
 
@@ -672,10 +672,10 @@ test("a weak drug can return through a different safe question identity", () => 
 });
 
 test("the remix falls back to bounded carried items only when fresh material runs out", () => {
-  const { questions } = buildFinishedAttempt(6, "f26-09-remix-fallback", [0, 1, 2]);
+  const { questions } = buildFinishedAttempt(6, "f26-11-remix-fallback-0", [0, 1, 2]);
   const engine = loadEngine();
   const request = requestFor(engine, questions, { createdAt: 5_000 });
-  const practicePayload = buildPracticePayload(6, "f26-09-remix-fallback-fresh");
+  const practicePayload = buildPracticePayload(6, "f26-11-remix-fallback-0-fresh");
 
   // Only two fresh identities are left anywhere in the chain.
   const survivors = practicePayload.questions.slice(0, 2).map(identityOf);
