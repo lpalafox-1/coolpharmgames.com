@@ -801,11 +801,12 @@ function assertLegalClosedGroup(question, sourceData = drugData) {
     assertSourceDrugInMaterialCohort(member, question, question.id);
     assert.ok(member.quizWeek <= question.metadata.requestedQuizWeek);
   }
+  const memberClasses = members.map((member) => String(member.drugClass ?? "").trim());
   const memberConcepts = members.map((member) => deriveDrugClassQuizConcept(member.drugClass));
-  assert.ok(memberConcepts.every(Boolean), `${question.id} must not group empty class concepts`);
+  assert.ok(memberClasses.every(Boolean), `${question.id} must not group empty canonical classes`);
   if (group.grouping === "exactQuizConcept") {
-    assert.equal(new Set(memberConcepts).size, 1);
-    assert.equal(memberConcepts[0], group.label);
+    assert.equal(new Set(memberClasses).size, 1);
+    assert.equal(memberClasses[0], group.label);
     assert.deepEqual(group.memberQuizConcepts, [group.label]);
     assert.equal(group.familyId, undefined);
   } else {
@@ -829,6 +830,16 @@ function assertLegalClosedGroup(question, sourceData = drugData) {
       group.memberSourceDrugIds.includes(thiazideCombination.id) && group.label === "Thiazide Diuretic",
       false,
       `${question.id} merged an unapproved thiazide family`
+    );
+  }
+  const hctz = sourceData.drugs.find((drug) => drug.genericName === "Hydrochlorothiazide");
+  const chlorthalidone = sourceData.drugs.find((drug) => drug.genericName === "Chlorthalidone");
+  if (hctz && chlorthalidone) {
+    assert.equal(
+      group.memberSourceDrugIds.includes(hctz.id)
+        && group.memberSourceDrugIds.includes(chlorthalidone.id),
+      false,
+      `${question.id} grouped HCTZ with chlorthalidone without an approved family`
     );
   }
   return members;
@@ -2696,10 +2707,15 @@ test("closed-group ADR forms fail closed for 1-member classes, empty intersectio
         assert.notEqual(group.label, deriveDrugClassQuizConcept(nebivolol.drugClass));
         if (question.metadata.questionVariant === "classCommonAdrRecognition") {
           assert.notEqual(group.label, "ACEI", "ACEI has an empty exact-key ADR intersection");
+          assert.notEqual(
+            group.label,
+            "ACEI, Antihypertensive",
+            "ACEI has an empty exact-key ADR intersection"
+          );
         }
         if (
           question.metadata.questionVariant === "familyNotAdrRecognition"
-          && group.label === "ACEI"
+          && (group.label === "ACEI" || group.label === "ACEI, Antihypertensive")
         ) {
           assert.notEqual(normalizeChoice(question.answer), normalizeChoice("Increased serum creatinine"));
         }
@@ -2826,6 +2842,79 @@ test("review/new week split keeps same-class members in separate closed groups",
       }
     }
   }
+});
+
+test("canonical HCTZ and chlorthalidone do not form a closed group without an approved family", () => {
+  const hctz = drugData.drugs.find((drug) => drug.genericName === "Hydrochlorothiazide");
+  const chlorthalidone = drugData.drugs.find((drug) => drug.genericName === "Chlorthalidone");
+  assert.equal(hctz.drugClass, "Thiazide Diuretic, Antihypertensive");
+  assert.equal(chlorthalidone.drugClass, "Thiazide Diuretic");
+  assert.equal(hctz.quizWeek, chlorthalidone.quizWeek);
+  assert.equal(deriveDrugClassQuizConcept(hctz.drugClass), deriveDrugClassQuizConcept(chlorthalidone.drugClass));
+  assert.deepEqual(getDrugClassQuizFamilyConcepts(hctz.drugClass), []);
+  assert.deepEqual(getDrugClassQuizFamilyConcepts(chlorthalidone.drugClass), []);
+
+  const fixture = clone(drugData);
+  const fixtureHctz = fixture.drugs.find((drug) => drug.id === hctz.id);
+  const fixtureChlorthalidone = fixture.drugs.find((drug) => drug.id === chlorthalidone.id);
+  assert.notEqual(fixtureHctz.drugClass, fixtureChlorthalidone.drugClass);
+
+  for (let seedIndex = 0; seedIndex < 40; seedIndex += 1) {
+    const official = generatePractice(2, `hctz-chlorthalidone-official-${seedIndex}`);
+    const cloned = generateFall2026Quiz({
+      drugData: fixture,
+      policy,
+      quizWeek: 2,
+      seed: `hctz-chlorthalidone-cloned-${seedIndex}`
+    });
+    for (const question of [...official.questions, ...cloned.questions]) {
+      if (!isClosedGroupAdrForm(question)) continue;
+      const memberIds = question.metadata.closedGroup.memberSourceDrugIds;
+      const groupedPair = memberIds.includes(hctz.id) && memberIds.includes(chlorthalidone.id);
+      assert.equal(
+        groupedPair && question.metadata.questionVariant === "classCommonAdrRecognition",
+        false,
+        "classCommonAdrRecognition must refuse HCTZ + chlorthalidone"
+      );
+      assert.equal(
+        groupedPair && question.metadata.questionVariant === "familyNotAdrRecognition",
+        false,
+        "familyNotAdrRecognition must refuse HCTZ + chlorthalidone"
+      );
+    }
+  }
+});
+
+test("identical canonical drugClass strings still form closed groups", () => {
+  const atenolol = drugData.drugs.find((drug) => drug.genericName === "Atenolol");
+  const metoprolol = drugData.drugs.find((drug) => drug.genericName === "Metoprolol");
+  assert.equal(atenolol.drugClass, "β-Adrenergic Blocker, Cardioselective");
+  assert.equal(metoprolol.drugClass, atenolol.drugClass);
+  assert.equal(atenolol.quizWeek, metoprolol.quizWeek);
+
+  let sawExactPair = false;
+  for (let quizWeek = 4; quizWeek <= 5; quizWeek += 1) {
+    for (let seedIndex = 0; seedIndex < 64; seedIndex += 1) {
+      const result = generatePractice(quizWeek, `identical-canonical-class-${quizWeek}-${seedIndex}`);
+      for (const question of result.questions) {
+        if (!isClosedGroupAdrForm(question)) continue;
+        const memberIds = question.metadata.closedGroup.memberSourceDrugIds;
+        if (
+          question.metadata.closedGroup.grouping === "exactQuizConcept"
+          && memberIds.includes(atenolol.id)
+          && memberIds.includes(metoprolol.id)
+        ) {
+          assert.equal(question.metadata.closedGroup.label, atenolol.drugClass);
+          assert.ok(
+            question.metadata.questionVariant === "classCommonAdrRecognition"
+              || question.metadata.questionVariant === "familyNotAdrRecognition"
+          );
+          sawExactPair = true;
+        }
+      }
+    }
+  }
+  assert.equal(sawExactPair, true, "two identical canonical cardioselective class rows must still group");
 });
 
 test("unapproved thiazide-like classes are not merged without an owner-approved family", () => {

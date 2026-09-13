@@ -1953,21 +1953,25 @@ function collectDistinctSafeAtomicFacts(drugs, domainId) {
   return [...byKey.values()];
 }
 
+function getCanonicalDrugClass(sourceDrugClass) {
+  return String(sourceDrugClass ?? "").trim();
+}
+
 function getClosedClassGroups(context, sourceDrug, quizWeek, materialType) {
   const eligibleDrugs = getMaterialEligibleDrugs(context, quizWeek, materialType);
   const weekRange = getMaterialChoiceWeekRange(materialType, quizWeek);
   if (!weekRange || weekRange[1] < weekRange[0]) return [];
   const groups = [];
-  const quizConcept = deriveDrugClassQuizConcept(sourceDrug.drugClass);
-  if (quizConcept) {
+  const canonicalClass = getCanonicalDrugClass(sourceDrug.drugClass);
+  if (canonicalClass) {
     const members = eligibleDrugs.filter((drug) => (
-      deriveDrugClassQuizConcept(drug.drugClass) === quizConcept
+      getCanonicalDrugClass(drug.drugClass) === canonicalClass
     ));
     if (members.length >= 2 && members.some((drug) => drug.id === sourceDrug.id)) {
       groups.push({
         grouping: "exactQuizConcept",
-        label: quizConcept,
-        memberQuizConcepts: [quizConcept],
+        label: canonicalClass,
+        memberQuizConcepts: [canonicalClass],
         members,
         eligibleChoiceQuizWeekRange: weekRange
       });
