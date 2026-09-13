@@ -19,6 +19,15 @@
 // four items is allowed). Further same-domain picks pay a rising penalty when
 // other source-safe domains remain eligible in the current pass. This is not
 // a six-domain quota and is not baked into scoreCandidate.
+//
+// Adaptive rounds follow faculty weekly shape using sourceDrugQuizWeek only:
+// Week 1 is ten current-week items; Weeks 2–10 are six current then four prior.
+// Domain counts, fingerprints, and concepts carry from the current fill into
+// the review fill so the combined ten share one F26-17 cap. If the current
+// six saturate domains that actually starve the review fill, those current
+// items are rebalanced before remainder-current fallback. Domains with spare
+// combined capacity may stay in or enter the current six. A short bucket may
+// still complete the ten from the other source-safe bucket when 6+4 is impossible.
 
 import { generateFall2026Quiz } from "./fall-2026-quiz-generator.js?v=20260827a";
 
@@ -26,6 +35,8 @@ export const ADAPTIVE_KIND = "fall-2026-lab3-adaptive";
 export const ADAPTIVE_MEMORY_KEY = "pharmlet.fall-2026-lab3.adaptive-memory";
 export const ADAPTIVE_MEMORY_VERSION = 1;
 export const ADAPTIVE_ROUND_SIZE = 10;
+export const ADAPTIVE_CURRENT_ITEM_TARGET = 6;
+export const ADAPTIVE_REVIEW_ITEM_TARGET = 4;
 export const ADAPTIVE_MIN_WEEK = 1;
 export const ADAPTIVE_MAX_WEEK = 10;
 export const ADAPTIVE_TIMER_SECONDS = 10 * 60;
@@ -543,12 +554,254 @@ export function buildAdaptiveCandidatePool({ drugData, policy, targetWeek, seed,
 
 // --- selection ------------------------------------------------------------------
 
+export function getAdaptiveSourceDrugQuizWeek(question) {
+  return positiveInt(question?.metadata?.sourceDrugQuizWeek);
+}
+
+export function partitionAdaptiveCandidates(candidates, targetWeek) {
+  const week = Number(targetWeek);
+  const current = [];
+  const review = [];
+  for (const candidate of candidates) {
+    const sourceWeek = getAdaptiveSourceDrugQuizWeek(candidate);
+    if (!sourceWeek) continue;
+    if (sourceWeek === week) current.push(candidate);
+    else if (sourceWeek >= 1 && sourceWeek < week) review.push(candidate);
+  }
+  return { current, review };
+}
+
+function copySelectionState(inherited) {
+  const source = inherited && typeof inherited === "object" ? inherited : {};
+  return {
+    usedFingerprints: new Set(source.usedFingerprints || []),
+    usedConcepts: new Set(source.usedConcepts || []),
+    domainCounts: source.domainCounts instanceof Map
+      ? new Map(source.domainCounts)
+      : new Map()
+  };
+}
+
+function emptyBucketCounts() {
+  return { weakness: 0, refresh: 0, coverage: 0, balanced: 0 };
+}
+
+function addBucketCounts(left, right) {
+  const next = emptyBucketCounts();
+  for (const key of Object.keys(next)) {
+    next[key] = (Number(left?.[key]) || 0) + (Number(right?.[key]) || 0);
+  }
+  return next;
+}
+
+function bucketCountsFromSelection(selection) {
+  const next = emptyBucketCounts();
+  for (const entry of selection || []) {
+    if (next[entry?.bucket] !== undefined) next[entry.bucket] += 1;
+  }
+  return next;
+}
+
+function countWeekComposition(questions, targetWeek) {
+  let currentItemCount = 0;
+  let reviewItemCount = 0;
+  for (const question of questions) {
+    const sourceWeek = getAdaptiveSourceDrugQuizWeek(question);
+    if (sourceWeek === targetWeek) currentItemCount += 1;
+    else if (sourceWeek >= 1 && sourceWeek < targetWeek) reviewItemCount += 1;
+  }
+  return { currentItemCount, reviewItemCount };
+}
+
+function questionDomain(question) {
+  const metadata = isRecord(question?.metadata) ? question.metadata : {};
+  return String(metadata.knowledgeDomain || "").trim();
+}
+
+function stateFromQuestions(questions) {
+  const state = copySelectionState(null);
+  for (const question of questions) {
+    const fingerprint = getQuestionFingerprint(question);
+    const conceptKey = getQuestionConceptKey(question);
+    const domain = questionDomain(question);
+    if (fingerprint) state.usedFingerprints.add(fingerprint);
+    if (conceptKey) state.usedConcepts.add(conceptKey);
+    if (domain) state.domainCounts.set(domain, (state.domainCounts.get(domain) || 0) + 1);
+  }
+  return state;
+}
+
+function unusedCandidates(candidates, usedFingerprints) {
+  return candidates.filter((candidate) => {
+    const fingerprint = getQuestionFingerprint(candidate);
+    return fingerprint && !usedFingerprints.has(fingerprint);
+  });
+}
+
+function countDomains(questions) {
+  const counts = new Map();
+  for (const question of questions) {
+    const domain = questionDomain(question);
+    if (!domain) continue;
+    counts.set(domain, (counts.get(domain) || 0) + 1);
+  }
+  return counts;
+}
+
+function incrementDomainCounts(domainCounts, domain) {
+  const next = new Map(domainCounts);
+  next.set(domain, (next.get(domain) || 0) + 1);
+  return next;
+}
+
+// Matches canTakeForDomainBalance: a 5th same-domain pick is blocked while
+// another domain remains eligible. Do not loosen this combined-10 cap.
+const ADAPTIVE_DOMAIN_COMBINED_CAP = 4;
+const ADAPTIVE_DOMAIN_STEEP_COUNT = 3;
+
+function unusedReviewHasOtherDomain(unusedByDomain, exceptDomain) {
+  for (const [domain, count] of unusedByDomain) {
+    if (domain && domain !== exceptDomain && count > 0) return true;
+  }
+  return false;
+}
+
+function reviewFillCapacity(domainCounts, unusedByDomain) {
+  let total = 0;
+  for (const [domain, unused] of unusedByDomain) {
+    if (!domain || unused <= 0) continue;
+    const already = domainCounts.get(domain) || 0;
+    const capped = unusedReviewHasOtherDomain(unusedByDomain, domain);
+    const room = capped ? Math.max(0, ADAPTIVE_DOMAIN_COMBINED_CAP - already) : unused;
+    total += Math.min(unused, room);
+  }
+  return total;
+}
+
+function isBlockingDomain(domain, domainCounts, unusedByDomain) {
+  if (!domain) return false;
+  const already = domainCounts.get(domain) || 0;
+  const unused = unusedByDomain.get(domain) || 0;
+  if (already < ADAPTIVE_DOMAIN_STEEP_COUNT) return false;
+  if (unused <= 0) return false;
+  return reviewFillCapacity(
+    incrementDomainCounts(domainCounts, domain),
+    unusedByDomain
+  ) < ADAPTIVE_REVIEW_ITEM_TARGET;
+}
+
+function domainPreservesReviewCapacity(domain, domainCounts, unusedByDomain) {
+  if (!domain) return false;
+  const before = reviewFillCapacity(domainCounts, unusedByDomain);
+  const after = reviewFillCapacity(incrementDomainCounts(domainCounts, domain), unusedByDomain);
+  return after >= before;
+}
+
+function blockingCurrentDomains(questions, unusedReview) {
+  const domainCounts = countDomains(questions);
+  const unusedByDomain = countDomains(unusedReview);
+  const blocking = new Set();
+  for (const domain of unusedByDomain.keys()) {
+    if (isBlockingDomain(domain, domainCounts, unusedByDomain)) blocking.add(domain);
+  }
+  return blocking;
+}
+
+function lowestBlockingCurrentIndex(questions, selection, blockingDomains) {
+  let bestIndex = -1;
+  let bestScore = Infinity;
+  for (let index = 0; index < questions.length; index += 1) {
+    const domain = questionDomain(questions[index]);
+    if (!blockingDomains.has(domain)) continue;
+    const score = Number(selection[index]?.score);
+    const comparable = Number.isFinite(score) ? score : Infinity;
+    if (comparable < bestScore || (comparable === bestScore && index > bestIndex)) {
+      bestScore = comparable;
+      bestIndex = index;
+    }
+  }
+  return bestIndex;
+}
+
+function rebalanceCurrentForReview({
+  currentQuestions,
+  currentSelection,
+  currentCandidates,
+  reviewCandidates,
+  signals,
+  seed
+}) {
+  let questions = [...currentQuestions];
+  let selection = [...currentSelection];
+
+  for (let attempt = 0; attempt < currentQuestions.length; attempt += 1) {
+    const currentState = stateFromQuestions(questions);
+    const reviewRound = selectAdaptiveRound({
+      candidates: reviewCandidates,
+      signals,
+      seed: `${seed}::review-rebalance-${attempt}`,
+      size: ADAPTIVE_REVIEW_ITEM_TARGET,
+      inherited: currentState
+    });
+    if (reviewRound.questions.length >= ADAPTIVE_REVIEW_ITEM_TARGET) {
+      return { questions, selection, reviewRound };
+    }
+
+    const unusedReview = unusedCandidates(reviewCandidates, currentState.usedFingerprints);
+    if (!unusedReview.length) return null;
+
+    const blockingDomains = blockingCurrentDomains(questions, unusedReview);
+    if (!blockingDomains.size) return null;
+
+    const dropIndex = lowestBlockingCurrentIndex(questions, selection, blockingDomains);
+    if (dropIndex < 0) return null;
+
+    const remainingQuestions = questions.filter((_, index) => index !== dropIndex);
+    const remainingSelection = selection.filter((_, index) => index !== dropIndex);
+    const remainingFingerprints = new Set(
+      remainingQuestions.map((question) => getQuestionFingerprint(question))
+    );
+    const remainingCounts = countDomains(remainingQuestions);
+    const unusedByDomain = countDomains(unusedReview);
+    const backfillPool = unusedCandidates(currentCandidates, remainingFingerprints)
+      .filter((candidate) => {
+        const domain = questionDomain(candidate);
+        return domainPreservesReviewCapacity(domain, remainingCounts, unusedByDomain);
+      });
+    const backfillRound = selectAdaptiveRound({
+      candidates: backfillPool,
+      signals,
+      seed: `${seed}::rebalance-backfill-${attempt}`,
+      size: 1,
+      inherited: stateFromQuestions(remainingQuestions)
+    });
+    if (backfillRound.questions.length !== 1) return null;
+
+    questions = remainingQuestions.concat(backfillRound.questions);
+    selection = remainingSelection.concat(backfillRound.selection);
+  }
+
+  const currentState = stateFromQuestions(questions);
+  const reviewRound = selectAdaptiveRound({
+    candidates: reviewCandidates,
+    signals,
+    seed: `${seed}::review-rebalance-final`,
+    size: ADAPTIVE_REVIEW_ITEM_TARGET,
+    inherited: currentState
+  });
+  if (reviewRound.questions.length >= ADAPTIVE_REVIEW_ITEM_TARGET) {
+    return { questions, selection, reviewRound };
+  }
+  return null;
+}
+
 export function selectAdaptiveRound({
   candidates = [],
   signals,
   seed = "",
   size = ADAPTIVE_ROUND_SIZE,
-  targets = ADAPTIVE_BUCKET_TARGETS
+  targets = ADAPTIVE_BUCKET_TARGETS,
+  inherited = null
 } = {}) {
   const conceptWeakness = buildConceptWeakness(candidates, signals);
   const rng = createRng(`${seed}::selection`);
@@ -567,9 +820,7 @@ export function selectAdaptiveRound({
     .sort((a, b) => b.score - a.score || a.jitter - b.jitter || a.index - b.index);
 
   const chosen = [];
-  const usedFingerprints = new Set();
-  const usedConcepts = new Set();
-  const domainCounts = new Map();
+  const { usedFingerprints, usedConcepts, domainCounts } = copySelectionState(inherited);
   const counts = { weakness: 0, refresh: 0, coverage: 0, balanced: 0 };
 
   const servedLastRound = signals.exposure.lastRoundFingerprints || new Set();
@@ -689,7 +940,111 @@ export function selectAdaptiveRound({
       score: entry.score
     })),
     bucketCounts: counts,
-    poolSize: candidates.length
+    poolSize: candidates.length,
+    state: {
+      usedFingerprints,
+      usedConcepts,
+      domainCounts
+    }
+  };
+}
+
+export function composeAdaptiveRound({
+  candidates = [],
+  signals,
+  seed = "",
+  targetWeek
+} = {}) {
+  const week = assertAdaptiveWeek(targetWeek);
+  const { current, review } = partitionAdaptiveCandidates(candidates, week);
+  const currentTarget = week === 1 ? ADAPTIVE_ROUND_SIZE : ADAPTIVE_CURRENT_ITEM_TARGET;
+  const reviewTarget = week === 1 ? 0 : ADAPTIVE_REVIEW_ITEM_TARGET;
+
+  let questions = [];
+  let selection = [];
+  let bucketCounts = { weakness: 0, refresh: 0, coverage: 0, balanced: 0 };
+  let state = copySelectionState(null);
+
+  const takeRound = (round) => {
+    questions = questions.concat(round.questions);
+    selection = selection.concat(round.selection);
+    bucketCounts = addBucketCounts(bucketCounts, round.bucketCounts);
+    state = round.state;
+  };
+
+  const currentRound = selectAdaptiveRound({
+    candidates: current,
+    signals,
+    seed: week === 1 ? seed : `${seed}::current`,
+    size: currentTarget,
+    inherited: state
+  });
+  takeRound(currentRound);
+
+  if (questions.length < ADAPTIVE_ROUND_SIZE && reviewTarget > 0) {
+    const reviewSize = questions.length === currentTarget
+      ? reviewTarget
+      : ADAPTIVE_ROUND_SIZE - questions.length;
+    takeRound(selectAdaptiveRound({
+      candidates: review,
+      signals,
+      seed: `${seed}::review`,
+      size: reviewSize,
+      inherited: state
+    }));
+  }
+
+  const { currentItemCount: filledCurrent, reviewItemCount: filledReview } = countWeekComposition(
+    questions,
+    week
+  );
+  const unusedReviewRemain = unusedCandidates(review, state.usedFingerprints).length > 0;
+  if (
+    reviewTarget > 0
+    && filledCurrent === currentTarget
+    && filledReview < reviewTarget
+    && unusedReviewRemain
+  ) {
+    const rebalanced = rebalanceCurrentForReview({
+      currentQuestions: questions.slice(0, currentTarget),
+      currentSelection: selection.slice(0, currentTarget),
+      currentCandidates: current,
+      reviewCandidates: review,
+      signals,
+      seed
+    });
+    if (rebalanced) {
+      questions = rebalanced.questions.concat(rebalanced.reviewRound.questions);
+      selection = rebalanced.selection.concat(rebalanced.reviewRound.selection);
+      bucketCounts = bucketCountsFromSelection(selection);
+      state = rebalanced.reviewRound.state;
+    }
+  }
+
+  if (questions.length < ADAPTIVE_ROUND_SIZE) {
+    takeRound(selectAdaptiveRound({
+      candidates: current,
+      signals,
+      seed: `${seed}::remainder`,
+      size: ADAPTIVE_ROUND_SIZE - questions.length,
+      inherited: state
+    }));
+  }
+
+  const { currentItemCount, reviewItemCount } = countWeekComposition(questions, week);
+  return {
+    questions,
+    selection,
+    bucketCounts,
+    poolSize: current.length + review.length,
+    composition: {
+      currentItemTarget: currentTarget,
+      reviewItemTarget: reviewTarget,
+      currentItemCount,
+      reviewItemCount,
+      fallback: currentItemCount !== currentTarget || reviewItemCount !== reviewTarget
+    },
+    state
   };
 }
 
@@ -709,7 +1064,7 @@ export function buildFall2026AdaptivePayload({
   const week = assertAdaptiveWeek(targetWeek);
   const candidates = buildAdaptiveCandidatePool({ drugData, policy, targetWeek: week, seed, roundsPerWeek });
   const signals = buildAdaptiveSignals({ reviewEntries, historyEntries, memory, now });
-  const round = selectAdaptiveRound({ candidates, signals, seed });
+  const round = composeAdaptiveRound({ candidates, signals, seed, targetWeek: week });
 
   if (!round.questions.length) {
     throw new Error(`Adaptive Practice could not assemble a round for Week ${week}.`);
@@ -743,6 +1098,7 @@ export function buildFall2026AdaptivePayload({
         poolSize: round.poolSize,
         bucketCounts: { ...round.bucketCounts },
         bucketTargets: { ...ADAPTIVE_BUCKET_TARGETS },
+        composition: { ...round.composition },
         signalBasis: {
           reviewEntries: reviewEntries.length,
           fallAttempts: signals.recentFallAttempts,
