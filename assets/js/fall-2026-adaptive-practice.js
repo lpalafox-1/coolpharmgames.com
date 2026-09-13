@@ -19,6 +19,12 @@
 // four items is allowed). Further same-domain picks pay a rising penalty when
 // other source-safe domains remain eligible in the current pass. This is not
 // a six-domain quota and is not baked into scoreCandidate.
+//
+// Adaptive rounds follow faculty weekly shape using sourceDrugQuizWeek only:
+// Week 1 is ten current-week items; Weeks 2–10 are six current then four prior.
+// Domain counts, fingerprints, and concepts carry from the current fill into
+// the review fill so the combined ten share one F26-17 cap. A short bucket
+// may complete the ten from the other source-safe bucket.
 
 import { generateFall2026Quiz } from "./fall-2026-quiz-generator.js?v=20260827a";
 
@@ -26,6 +32,8 @@ export const ADAPTIVE_KIND = "fall-2026-lab3-adaptive";
 export const ADAPTIVE_MEMORY_KEY = "pharmlet.fall-2026-lab3.adaptive-memory";
 export const ADAPTIVE_MEMORY_VERSION = 1;
 export const ADAPTIVE_ROUND_SIZE = 10;
+export const ADAPTIVE_CURRENT_ITEM_TARGET = 6;
+export const ADAPTIVE_REVIEW_ITEM_TARGET = 4;
 export const ADAPTIVE_MIN_WEEK = 1;
 export const ADAPTIVE_MAX_WEEK = 10;
 export const ADAPTIVE_TIMER_SECONDS = 10 * 60;
@@ -543,12 +551,60 @@ export function buildAdaptiveCandidatePool({ drugData, policy, targetWeek, seed,
 
 // --- selection ------------------------------------------------------------------
 
+export function getAdaptiveSourceDrugQuizWeek(question) {
+  return positiveInt(question?.metadata?.sourceDrugQuizWeek);
+}
+
+export function partitionAdaptiveCandidates(candidates, targetWeek) {
+  const week = Number(targetWeek);
+  const current = [];
+  const review = [];
+  for (const candidate of candidates) {
+    const sourceWeek = getAdaptiveSourceDrugQuizWeek(candidate);
+    if (!sourceWeek) continue;
+    if (sourceWeek === week) current.push(candidate);
+    else if (sourceWeek >= 1 && sourceWeek < week) review.push(candidate);
+  }
+  return { current, review };
+}
+
+function copySelectionState(inherited) {
+  const source = inherited && typeof inherited === "object" ? inherited : {};
+  return {
+    usedFingerprints: new Set(source.usedFingerprints || []),
+    usedConcepts: new Set(source.usedConcepts || []),
+    domainCounts: source.domainCounts instanceof Map
+      ? new Map(source.domainCounts)
+      : new Map()
+  };
+}
+
+function addBucketCounts(left, right) {
+  const next = { weakness: 0, refresh: 0, coverage: 0, balanced: 0 };
+  for (const key of Object.keys(next)) {
+    next[key] = (Number(left?.[key]) || 0) + (Number(right?.[key]) || 0);
+  }
+  return next;
+}
+
+function countWeekComposition(questions, targetWeek) {
+  let currentItemCount = 0;
+  let reviewItemCount = 0;
+  for (const question of questions) {
+    const sourceWeek = getAdaptiveSourceDrugQuizWeek(question);
+    if (sourceWeek === targetWeek) currentItemCount += 1;
+    else if (sourceWeek >= 1 && sourceWeek < targetWeek) reviewItemCount += 1;
+  }
+  return { currentItemCount, reviewItemCount };
+}
+
 export function selectAdaptiveRound({
   candidates = [],
   signals,
   seed = "",
   size = ADAPTIVE_ROUND_SIZE,
-  targets = ADAPTIVE_BUCKET_TARGETS
+  targets = ADAPTIVE_BUCKET_TARGETS,
+  inherited = null
 } = {}) {
   const conceptWeakness = buildConceptWeakness(candidates, signals);
   const rng = createRng(`${seed}::selection`);
@@ -567,9 +623,7 @@ export function selectAdaptiveRound({
     .sort((a, b) => b.score - a.score || a.jitter - b.jitter || a.index - b.index);
 
   const chosen = [];
-  const usedFingerprints = new Set();
-  const usedConcepts = new Set();
-  const domainCounts = new Map();
+  const { usedFingerprints, usedConcepts, domainCounts } = copySelectionState(inherited);
   const counts = { weakness: 0, refresh: 0, coverage: 0, balanced: 0 };
 
   const servedLastRound = signals.exposure.lastRoundFingerprints || new Set();
@@ -689,7 +743,83 @@ export function selectAdaptiveRound({
       score: entry.score
     })),
     bucketCounts: counts,
-    poolSize: candidates.length
+    poolSize: candidates.length,
+    state: {
+      usedFingerprints,
+      usedConcepts,
+      domainCounts
+    }
+  };
+}
+
+export function composeAdaptiveRound({
+  candidates = [],
+  signals,
+  seed = "",
+  targetWeek
+} = {}) {
+  const week = assertAdaptiveWeek(targetWeek);
+  const { current, review } = partitionAdaptiveCandidates(candidates, week);
+  const currentTarget = week === 1 ? ADAPTIVE_ROUND_SIZE : ADAPTIVE_CURRENT_ITEM_TARGET;
+  const reviewTarget = week === 1 ? 0 : ADAPTIVE_REVIEW_ITEM_TARGET;
+
+  let questions = [];
+  let selection = [];
+  let bucketCounts = { weakness: 0, refresh: 0, coverage: 0, balanced: 0 };
+  let state = copySelectionState(null);
+
+  const takeRound = (round) => {
+    questions = questions.concat(round.questions);
+    selection = selection.concat(round.selection);
+    bucketCounts = addBucketCounts(bucketCounts, round.bucketCounts);
+    state = round.state;
+  };
+
+  takeRound(selectAdaptiveRound({
+    candidates: current,
+    signals,
+    seed: week === 1 ? seed : `${seed}::current`,
+    size: currentTarget,
+    inherited: state
+  }));
+
+  if (questions.length < ADAPTIVE_ROUND_SIZE && reviewTarget > 0) {
+    const reviewSize = questions.length === currentTarget
+      ? reviewTarget
+      : ADAPTIVE_ROUND_SIZE - questions.length;
+    takeRound(selectAdaptiveRound({
+      candidates: review,
+      signals,
+      seed: `${seed}::review`,
+      size: reviewSize,
+      inherited: state
+    }));
+  }
+
+  if (questions.length < ADAPTIVE_ROUND_SIZE) {
+    takeRound(selectAdaptiveRound({
+      candidates: current,
+      signals,
+      seed: `${seed}::remainder`,
+      size: ADAPTIVE_ROUND_SIZE - questions.length,
+      inherited: state
+    }));
+  }
+
+  const { currentItemCount, reviewItemCount } = countWeekComposition(questions, week);
+  return {
+    questions,
+    selection,
+    bucketCounts,
+    poolSize: current.length + review.length,
+    composition: {
+      currentItemTarget: currentTarget,
+      reviewItemTarget: reviewTarget,
+      currentItemCount,
+      reviewItemCount,
+      fallback: currentItemCount !== currentTarget || reviewItemCount !== reviewTarget
+    },
+    state
   };
 }
 
@@ -709,7 +839,7 @@ export function buildFall2026AdaptivePayload({
   const week = assertAdaptiveWeek(targetWeek);
   const candidates = buildAdaptiveCandidatePool({ drugData, policy, targetWeek: week, seed, roundsPerWeek });
   const signals = buildAdaptiveSignals({ reviewEntries, historyEntries, memory, now });
-  const round = selectAdaptiveRound({ candidates, signals, seed });
+  const round = composeAdaptiveRound({ candidates, signals, seed, targetWeek: week });
 
   if (!round.questions.length) {
     throw new Error(`Adaptive Practice could not assemble a round for Week ${week}.`);
@@ -743,6 +873,7 @@ export function buildFall2026AdaptivePayload({
         poolSize: round.poolSize,
         bucketCounts: { ...round.bucketCounts },
         bucketTargets: { ...ADAPTIVE_BUCKET_TARGETS },
+        composition: { ...round.composition },
         signalBasis: {
           reviewEntries: reviewEntries.length,
           fallAttempts: signals.recentFallAttempts,

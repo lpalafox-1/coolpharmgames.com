@@ -563,7 +563,7 @@ test("historical wrongCounts magnitude does not control hard selection", () => {
   assert.doesNotMatch(codeOnly, /[.\[]\s*["']?wrongCounts/, "adaptive must not read wrongCounts");
 });
 
-function makeAdaptiveItem({ id, domain, drug, week = 3 }) {
+function makeAdaptiveItem({ id, domain, drug, week = 3, sourceWeek = week }) {
   return {
     id: `f26-17-${id}`,
     type: domain === "brandGeneric" ? "short" : "mcq",
@@ -574,8 +574,9 @@ function makeAdaptiveItem({ id, domain, drug, week = 3 }) {
       knowledgeDomain: domain,
       sourceDrugId: drug,
       requestedQuizWeek: week,
+      sourceDrugQuizWeek: sourceWeek,
       generatorId: adaptive.ADAPTIVE_GENERATOR_ID,
-      sourceMaterial: "new"
+      sourceMaterial: sourceWeek === week ? "new" : "review"
     }
   };
 }
@@ -637,6 +638,150 @@ test("an ADR-only pool may still emit an ADR-heavy round", () => {
     round.questions.filter((question) => question.metadata.knowledgeDomain === "topAdverseReactions").length,
     10,
     "a source-safe ADR-only pool must not be starved by domain balance"
+  );
+});
+
+test("Week 6 adaptive uses six current-week and four prior-week source drugs", () => {
+  const payload = build({ targetWeek: 6, seed: "f26-19-week-6" });
+  const current = payload.questions.filter((question) => (
+    question.metadata.sourceDrugQuizWeek === 6
+  ));
+  const review = payload.questions.filter((question) => {
+    const week = question.metadata.sourceDrugQuizWeek;
+    return week >= 1 && week < 6;
+  });
+  assert.equal(payload.questions.length, 10);
+  assert.equal(current.length, 6);
+  assert.equal(review.length, 4);
+  assert.equal(payload.metadata.adaptive.composition.currentItemCount, 6);
+  assert.equal(payload.metadata.adaptive.composition.reviewItemCount, 4);
+  assert.equal(payload.metadata.adaptive.composition.fallback, false);
+  for (const question of payload.questions) {
+    assert.ok(question.metadata.sourceDrugQuizWeek);
+    assert.ok(question.metadata.sourceDrugQuizWeek <= 6);
+    assert.ok(
+      question.metadata.sourceDrugQuizWeek === 6
+        || question.metadata.sourceDrugQuizWeek < 6
+    );
+  }
+});
+
+test("Week 1 adaptive is ten current-week items", () => {
+  const payload = build({ targetWeek: 1, seed: "f26-19-week-1" });
+  assert.equal(payload.questions.length, 10);
+  assert.equal(payload.metadata.adaptive.composition.currentItemCount, 10);
+  assert.equal(payload.metadata.adaptive.composition.reviewItemCount, 0);
+  assert.equal(payload.metadata.adaptive.composition.fallback, false);
+  for (const question of payload.questions) {
+    assert.equal(question.metadata.sourceDrugQuizWeek, 1);
+  }
+});
+
+test("adaptive composition never includes a source week after the target", () => {
+  for (let targetWeek = 1; targetWeek <= 10; targetWeek += 1) {
+    const payload = build({ targetWeek, seed: `f26-19-ceiling-${targetWeek}` });
+    for (const question of payload.questions) {
+      assert.ok(question.metadata.sourceDrugQuizWeek <= targetWeek);
+      for (const week of adaptive.getQuestionSourceWeeks(question)) {
+        assert.ok(week <= targetWeek, `week ${targetWeek} leaked source week ${week}`);
+      }
+    }
+  }
+});
+
+test("shared domain cap applies across the combined 6+4, not per bucket", () => {
+  const currentAdr = Array.from({ length: 8 }, (_, index) => makeAdaptiveItem({
+    id: `cur-adr-${index}`, domain: "topAdverseReactions", drug: `cur-adr-${index}`,
+    week: 6, sourceWeek: 6
+  }));
+  const reviewAdr = Array.from({ length: 8 }, (_, index) => makeAdaptiveItem({
+    id: `rev-adr-${index}`, domain: "topAdverseReactions", drug: `rev-adr-${index}`,
+    week: 6, sourceWeek: 2
+  }));
+  const currentOther = [
+    ...Array.from({ length: 4 }, (_, index) => makeAdaptiveItem({
+      id: `cur-fda-${index}`, domain: "fdaIndication", drug: `cur-fda-${index}`,
+      week: 6, sourceWeek: 6
+    })),
+    ...Array.from({ length: 4 }, (_, index) => makeAdaptiveItem({
+      id: `cur-bg-${index}`, domain: "brandGeneric", drug: `cur-bg-${index}`,
+      week: 6, sourceWeek: 6
+    }))
+  ];
+  const reviewOther = [
+    ...Array.from({ length: 4 }, (_, index) => makeAdaptiveItem({
+      id: `rev-fda-${index}`, domain: "fdaIndication", drug: `rev-fda-${index}`,
+      week: 6, sourceWeek: 3
+    })),
+    ...Array.from({ length: 4 }, (_, index) => makeAdaptiveItem({
+      id: `rev-bg-${index}`, domain: "brandGeneric", drug: `rev-bg-${index}`,
+      week: 6, sourceWeek: 4
+    }))
+  ];
+  const candidates = [...currentAdr, ...reviewAdr, ...currentOther, ...reviewOther];
+  const signals = adaptive.buildAdaptiveSignals({
+    reviewEntries: [...currentAdr, ...reviewAdr].map((question) => (
+      missedEntry(question, { missCount: 6, reviewMissCount: 3 })
+    )),
+    now: NOW
+  });
+  const round = adaptive.composeAdaptiveRound({
+    candidates, signals, seed: "f26-19-shared-adr-cap", targetWeek: 6
+  });
+  const adrCount = round.questions.filter((question) => (
+    question.metadata.knowledgeDomain === "topAdverseReactions"
+  )).length;
+  assert.equal(round.questions.length, 10);
+  assert.equal(round.composition.currentItemCount, 6);
+  assert.equal(round.composition.reviewItemCount, 4);
+  assert.ok(adrCount <= 4, `combined ADR count was ${adrCount}`);
+});
+
+test("a thin current-week pool still yields ten items and records fallback", () => {
+  const current = Array.from({ length: 2 }, (_, index) => makeAdaptiveItem({
+    id: `thin-cur-${index}`, domain: "fdaIndication", drug: `thin-cur-${index}`,
+    week: 6, sourceWeek: 6
+  }));
+  const review = Array.from({ length: 16 }, (_, index) => makeAdaptiveItem({
+    id: `thin-rev-${index}`, domain: "brandGeneric", drug: `thin-rev-${index}`,
+    week: 6, sourceWeek: (index % 5) + 1
+  }));
+  const round = adaptive.composeAdaptiveRound({
+    candidates: [...current, ...review],
+    signals: adaptive.buildAdaptiveSignals({ now: NOW }),
+    seed: "f26-19-thin-current",
+    targetWeek: 6
+  });
+  assert.equal(round.questions.length, 10);
+  assert.equal(round.composition.currentItemCount, 2);
+  assert.equal(round.composition.reviewItemCount, 8);
+  assert.equal(round.composition.fallback, true);
+});
+
+test("items missing sourceDrugQuizWeek are excluded from adaptive composition", () => {
+  const current = Array.from({ length: 6 }, (_, index) => makeAdaptiveItem({
+    id: `ok-cur-${index}`, domain: "fdaIndication", drug: `ok-cur-${index}`,
+    week: 6, sourceWeek: 6
+  }));
+  const review = Array.from({ length: 4 }, (_, index) => makeAdaptiveItem({
+    id: `ok-rev-${index}`, domain: "brandGeneric", drug: `ok-rev-${index}`,
+    week: 6, sourceWeek: 2
+  }));
+  const missing = makeAdaptiveItem({
+    id: "missing-week", domain: "topAdverseReactions", drug: "missing-week",
+    week: 6, sourceWeek: 6
+  });
+  delete missing.metadata.sourceDrugQuizWeek;
+  const round = adaptive.composeAdaptiveRound({
+    candidates: [...current, ...review, missing],
+    signals: adaptive.buildAdaptiveSignals({ now: NOW }),
+    seed: "f26-19-missing-week",
+    targetWeek: 6
+  });
+  assert.equal(round.questions.length, 10);
+  assert.equal(
+    round.questions.some((question) => question.id === missing.id),
+    false
   );
 });
 
