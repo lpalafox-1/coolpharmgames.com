@@ -1,7 +1,7 @@
 import {
   WEEK_1_PRACTICE_NOTE,
   generateFall2026Quiz
-} from "./fall-2026-quiz-generator.js?v=20260827a";
+} from "./fall-2026-quiz-generator.js?v=20260913a";
 import {
   ADAPTIVE_MEMORY_KEY,
   buildFall2026AdaptivePayload,
