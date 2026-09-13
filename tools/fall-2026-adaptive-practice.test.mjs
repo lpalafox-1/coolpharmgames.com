@@ -737,34 +737,33 @@ test("shared domain cap applies across the combined 6+4, not per bucket", () => 
   assert.ok(adrCount <= 4, `combined ADR count was ${adrCount}`);
 });
 
-test("a feasible 6+4 is not abandoned when current fill saturates review domains", () => {
-  // 24 current + 16 prior. Greedy current fill takes 3 ADR + 3 FDA; the shared
-  // cap then allows only 1 prior ADR + 1 prior FDA; remainder would add 2
-  // current Brand/Generic → 8+2. A valid 6+4 exists: current 2 ADR + 2 FDA +
-  // 2 B/G, then prior 2 ADR + 2 FDA.
+function makeSaturatedSixFourPool({ extraReviewBg = 0, idPrefix = "sat" } = {}) {
   const currentAdr = Array.from({ length: 8 }, (_, index) => makeAdaptiveItem({
-    id: `sat-cur-adr-${index}`, domain: "topAdverseReactions", drug: `sat-cur-adr-${index}`,
+    id: `${idPrefix}-cur-adr-${index}`, domain: "topAdverseReactions", drug: `${idPrefix}-cur-adr-${index}`,
     week: 6, sourceWeek: 6
   }));
   const currentFda = Array.from({ length: 8 }, (_, index) => makeAdaptiveItem({
-    id: `sat-cur-fda-${index}`, domain: "fdaIndication", drug: `sat-cur-fda-${index}`,
+    id: `${idPrefix}-cur-fda-${index}`, domain: "fdaIndication", drug: `${idPrefix}-cur-fda-${index}`,
     week: 6, sourceWeek: 6
   }));
   const currentBg = Array.from({ length: 8 }, (_, index) => makeAdaptiveItem({
-    id: `sat-cur-bg-${index}`, domain: "brandGeneric", drug: `sat-cur-bg-${index}`,
+    id: `${idPrefix}-cur-bg-${index}`, domain: "brandGeneric", drug: `${idPrefix}-cur-bg-${index}`,
     week: 6, sourceWeek: 6
   }));
   const reviewAdr = Array.from({ length: 8 }, (_, index) => makeAdaptiveItem({
-    id: `sat-rev-adr-${index}`, domain: "topAdverseReactions", drug: `sat-rev-adr-${index}`,
+    id: `${idPrefix}-rev-adr-${index}`, domain: "topAdverseReactions", drug: `${idPrefix}-rev-adr-${index}`,
     week: 6, sourceWeek: 2
   }));
   const reviewFda = Array.from({ length: 8 }, (_, index) => makeAdaptiveItem({
-    id: `sat-rev-fda-${index}`, domain: "fdaIndication", drug: `sat-rev-fda-${index}`,
+    id: `${idPrefix}-rev-fda-${index}`, domain: "fdaIndication", drug: `${idPrefix}-rev-fda-${index}`,
     week: 6, sourceWeek: 3
   }));
+  const extraBg = Array.from({ length: extraReviewBg }, (_, index) => makeAdaptiveItem({
+    id: `${idPrefix}-rev-bg-${index}`, domain: "brandGeneric", drug: `${idPrefix}-rev-bg-${index}`,
+    week: 6, sourceWeek: 4
+  }));
   const currentItems = [...currentAdr, ...currentFda, ...currentBg];
-  const reviewItems = [...reviewAdr, ...reviewFda];
-  const candidates = [...currentItems, ...reviewItems];
+  const reviewItems = [...reviewAdr, ...reviewFda, ...extraBg];
   const signals = adaptive.buildAdaptiveSignals({
     reviewEntries: [
       ...[...currentAdr, ...currentFda, ...reviewAdr, ...reviewFda].map((question) => (
@@ -777,6 +776,20 @@ test("a feasible 6+4 is not abandoned when current fill saturates review domains
     ],
     now: NOW
   });
+  return {
+    currentItems,
+    reviewItems,
+    candidates: [...currentItems, ...reviewItems],
+    signals
+  };
+}
+
+test("a feasible 6+4 is not abandoned when current fill saturates review domains", () => {
+  // 24 current + 16 prior. Greedy current fill takes 3 ADR + 3 FDA; the shared
+  // cap then allows only 1 prior ADR + 1 prior FDA; remainder would add 2
+  // current Brand/Generic → 8+2. A valid 6+4 exists: current 2 ADR + 2 FDA +
+  // 2 B/G, then prior 2 ADR + 2 FDA.
+  const { currentItems, reviewItems, candidates, signals } = makeSaturatedSixFourPool();
   const seed = "f26-19-rebalance-6-4";
 
   const greedyCurrent = adaptive.selectAdaptiveRound({
@@ -826,6 +839,35 @@ test("a feasible 6+4 is not abandoned when current fill saturates review domains
     `rebalanced current must include B/G so review can fill: ${JSON.stringify(currentDomains)}`);
   assert.equal((reviewDomains.topAdverseReactions || 0) + (reviewDomains.fdaIndication || 0), 4);
   assert.ok(adrCount <= 4, `combined ADR count was ${adrCount}`);
+});
+
+test("one extra prior Brand/Generic does not ban current B/G from a feasible 6+4", () => {
+  // Same 24+16 pool plus one prior B/G. B/G has spare combined capacity, so it
+  // must not be treated as blocking. A valid 6+4 exists: current 2 ADR + 3 FDA
+  // + 1 B/G, then prior 2 ADR + 1 FDA + 1 B/G.
+  const { currentItems, reviewItems, candidates, signals } = makeSaturatedSixFourPool({
+    extraReviewBg: 1, idPrefix: "sat-bg"
+  });
+  const seed = "f26-19-rebalance-spare-bg";
+  assert.equal(currentItems.length, 24);
+  assert.equal(reviewItems.length, 17);
+
+  const round = adaptive.composeAdaptiveRound({
+    candidates, signals, seed, targetWeek: 6
+  });
+  const adrCount = round.questions.filter((question) => (
+    question.metadata.knowledgeDomain === "topAdverseReactions"
+  )).length;
+  const fdaCount = round.questions.filter((question) => (
+    question.metadata.knowledgeDomain === "fdaIndication"
+  )).length;
+
+  assert.equal(round.questions.length, 10);
+  assert.equal(round.composition.currentItemCount, 6);
+  assert.equal(round.composition.reviewItemCount, 4);
+  assert.equal(round.composition.fallback, false);
+  assert.ok(adrCount <= 4, `combined ADR count was ${adrCount}`);
+  assert.ok(fdaCount <= 4, `combined FDA count was ${fdaCount}`);
 });
 
 test("a thin current-week pool still yields ten items and records fallback", () => {

@@ -24,9 +24,10 @@
 // Week 1 is ten current-week items; Weeks 2–10 are six current then four prior.
 // Domain counts, fingerprints, and concepts carry from the current fill into
 // the review fill so the combined ten share one F26-17 cap. If the current
-// six saturate domains the review pool still needs, those current items are
-// rebalanced before remainder-current fallback. A short bucket may still
-// complete the ten from the other source-safe bucket when 6+4 is impossible.
+// six saturate domains that actually starve the review fill, those current
+// items are rebalanced before remainder-current fallback. Domains with spare
+// combined capacity may stay in or enter the current six. A short bucket may
+// still complete the ten from the other source-safe bucket when 6+4 is impossible.
 
 import { generateFall2026Quiz } from "./fall-2026-quiz-generator.js?v=20260827a";
 
@@ -637,12 +638,81 @@ function unusedCandidates(candidates, usedFingerprints) {
   });
 }
 
-function lowestBlockingCurrentIndex(questions, selection, reviewDomains) {
+function countDomains(questions) {
+  const counts = new Map();
+  for (const question of questions) {
+    const domain = questionDomain(question);
+    if (!domain) continue;
+    counts.set(domain, (counts.get(domain) || 0) + 1);
+  }
+  return counts;
+}
+
+function incrementDomainCounts(domainCounts, domain) {
+  const next = new Map(domainCounts);
+  next.set(domain, (next.get(domain) || 0) + 1);
+  return next;
+}
+
+// Matches canTakeForDomainBalance: a 5th same-domain pick is blocked while
+// another domain remains eligible. Do not loosen this combined-10 cap.
+const ADAPTIVE_DOMAIN_COMBINED_CAP = 4;
+const ADAPTIVE_DOMAIN_STEEP_COUNT = 3;
+
+function unusedReviewHasOtherDomain(unusedByDomain, exceptDomain) {
+  for (const [domain, count] of unusedByDomain) {
+    if (domain && domain !== exceptDomain && count > 0) return true;
+  }
+  return false;
+}
+
+function reviewFillCapacity(domainCounts, unusedByDomain) {
+  let total = 0;
+  for (const [domain, unused] of unusedByDomain) {
+    if (!domain || unused <= 0) continue;
+    const already = domainCounts.get(domain) || 0;
+    const capped = unusedReviewHasOtherDomain(unusedByDomain, domain);
+    const room = capped ? Math.max(0, ADAPTIVE_DOMAIN_COMBINED_CAP - already) : unused;
+    total += Math.min(unused, room);
+  }
+  return total;
+}
+
+function isBlockingDomain(domain, domainCounts, unusedByDomain) {
+  if (!domain) return false;
+  const already = domainCounts.get(domain) || 0;
+  const unused = unusedByDomain.get(domain) || 0;
+  if (already < ADAPTIVE_DOMAIN_STEEP_COUNT) return false;
+  if (unused <= 0) return false;
+  return reviewFillCapacity(
+    incrementDomainCounts(domainCounts, domain),
+    unusedByDomain
+  ) < ADAPTIVE_REVIEW_ITEM_TARGET;
+}
+
+function domainPreservesReviewCapacity(domain, domainCounts, unusedByDomain) {
+  if (!domain) return false;
+  const before = reviewFillCapacity(domainCounts, unusedByDomain);
+  const after = reviewFillCapacity(incrementDomainCounts(domainCounts, domain), unusedByDomain);
+  return after >= before;
+}
+
+function blockingCurrentDomains(questions, unusedReview) {
+  const domainCounts = countDomains(questions);
+  const unusedByDomain = countDomains(unusedReview);
+  const blocking = new Set();
+  for (const domain of unusedByDomain.keys()) {
+    if (isBlockingDomain(domain, domainCounts, unusedByDomain)) blocking.add(domain);
+  }
+  return blocking;
+}
+
+function lowestBlockingCurrentIndex(questions, selection, blockingDomains) {
   let bestIndex = -1;
   let bestScore = Infinity;
   for (let index = 0; index < questions.length; index += 1) {
     const domain = questionDomain(questions[index]);
-    if (!reviewDomains.has(domain)) continue;
+    if (!blockingDomains.has(domain)) continue;
     const score = Number(selection[index]?.score);
     const comparable = Number.isFinite(score) ? score : Infinity;
     if (comparable < bestScore || (comparable === bestScore && index > bestIndex)) {
@@ -680,10 +750,10 @@ function rebalanceCurrentForReview({
     const unusedReview = unusedCandidates(reviewCandidates, currentState.usedFingerprints);
     if (!unusedReview.length) return null;
 
-    const reviewDomains = new Set(unusedReview.map(questionDomain).filter(Boolean));
-    if (!reviewDomains.size) return null;
+    const blockingDomains = blockingCurrentDomains(questions, unusedReview);
+    if (!blockingDomains.size) return null;
 
-    const dropIndex = lowestBlockingCurrentIndex(questions, selection, reviewDomains);
+    const dropIndex = lowestBlockingCurrentIndex(questions, selection, blockingDomains);
     if (dropIndex < 0) return null;
 
     const remainingQuestions = questions.filter((_, index) => index !== dropIndex);
@@ -691,10 +761,12 @@ function rebalanceCurrentForReview({
     const remainingFingerprints = new Set(
       remainingQuestions.map((question) => getQuestionFingerprint(question))
     );
+    const remainingCounts = countDomains(remainingQuestions);
+    const unusedByDomain = countDomains(unusedReview);
     const backfillPool = unusedCandidates(currentCandidates, remainingFingerprints)
       .filter((candidate) => {
         const domain = questionDomain(candidate);
-        return domain && !reviewDomains.has(domain);
+        return domainPreservesReviewCapacity(domain, remainingCounts, unusedByDomain);
       });
     const backfillRound = selectAdaptiveRound({
       candidates: backfillPool,
