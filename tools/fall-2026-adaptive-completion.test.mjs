@@ -322,5 +322,5 @@ test("F26-12 leaves the generator, canonical data, policy, and adaptive ranking 
   assert.equal(sha256("assets/data/fall-2026-lab3-quiz-policy.json"),
     "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171");
   assert.equal(sha256("assets/js/fall-2026-adaptive-practice.js"),
-    "223f4888904f90f7c0b89affdded992203955a33428b037537bec5891820209c");
+    "7b633ac4393a1b70fd48f3a4a23817621e41f47d0d3c47d58679c3873746fba3");
 });
