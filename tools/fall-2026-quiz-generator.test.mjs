@@ -699,6 +699,220 @@ function assertStrictBrandGenericFitbSourceBacked(question, sourceData = drugDat
   }
 }
 
+const IDENTIFY_DRUG_QUESTION_VARIANTS = new Set([
+  "identifyDrugByStructuredValue",
+  "atomicAdverseReactionRecognition",
+  "atomicFdaIndicationRecognition",
+  "notFdaIndicationRecognition",
+  "classFamilyRecognition",
+  "classDrugRecognition",
+  "moaDrugRecognition",
+  "boxWarningDrugRecognition"
+]);
+
+function isIdentifyDrugQuestion(question) {
+  return IDENTIFY_DRUG_QUESTION_VARIANTS.has(question.metadata?.questionVariant);
+}
+
+function isBrandStemFdaForwardQuestion(question) {
+  return question.metadata?.knowledgeDomain === "fdaIndication"
+    && question.metadata?.stemReference?.type === "brand"
+    && (
+      question.metadata?.questionVariant === "brandToFdaIndicationRecognition"
+      || question.metadata?.questionVariant === "structuredValueChoices"
+    );
+}
+
+function isClosedGroupAdrForm(question) {
+  return question.metadata?.questionVariant === "classCommonAdrRecognition"
+    || question.metadata?.questionVariant === "familyNotAdrRecognition";
+}
+
+function assertAtomicFactChoiceEntries(question, sourceData, domainId) {
+  const choiceSources = question.metadata.choiceSources;
+  assert.equal(question.type, "mcq");
+  assert.equal(question.choices.length, 4);
+  assert.deepEqual(question.choices, choiceSources.map((entry) => entry.value));
+  assert.equal(new Set(choiceSources.map((entry) => normalizeChoice(entry.value))).size, 4);
+  assert.equal(choiceSources.filter((entry) => entry.role === "correct").length, 1);
+  assert.equal(question.answer, choiceSources.find((entry) => entry.role === "correct").value);
+  for (const entry of choiceSources) {
+    const sourceDrug = getSourceDrug(sourceData, entry.sourceDrugId, question.id);
+    assertSourceDrugInMaterialCohort(sourceDrug, question, question.id);
+    assert.equal(entry.sourceDrugQuizWeek, sourceDrug.quizWeek);
+    assert.equal(entry.valueKey, normalizeChoice(entry.value));
+    assert.doesNotMatch(entry.value, /\bbrands?\s*:/i);
+    assert.ok(
+      !entry.drugReference,
+      `${question.id} fact-choice entry must not use a drug-name reference`
+    );
+    assert.ok(
+      getAtomicSourceValues(sourceDrug, domainId).some(
+        (value) => normalizeChoice(value) === entry.valueKey
+      ),
+      `${question.id} choice ${entry.value} must be an exact canonical ${domainId} member of ${sourceDrug.id}`
+    );
+  }
+}
+
+function assertBrandToFdaIndicationSourceBacked(question, sourceData = drugData) {
+  assert.equal(question.metadata.questionVariant, "brandToFdaIndicationRecognition");
+  assert.equal(question.metadata.knowledgeDomain, "fdaIndication");
+  assert.equal(question.metadata.questionStyleId, "fall-2026-lab3-course-calibrated-v1");
+  assertSourceBackedStemReference(question);
+  assert.match(question.prompt, /FDA indication for/);
+  assertAtomicFactChoiceEntries(question, sourceData, "fdaIndication");
+  const sourceDrug = getSourceDrug(sourceData, question.metadata.sourceDrugId, question.id);
+  const sourceIndications = getAtomicSourceValues(sourceDrug, "fdaIndication");
+  const testedFact = question.metadata.testedFact;
+  assert.equal(testedFact.value, question.answer);
+  assert.equal(testedFact.valueKey, normalizeChoice(question.answer));
+  assert.equal(testedFact.sourceDrugId, sourceDrug.id);
+  assert.ok(sourceIndications.some((value) => normalizeChoice(value) === testedFact.valueKey));
+  for (const entry of question.metadata.choiceSources) {
+    if (entry.role === "correct") {
+      assert.equal(entry.sourceDrugId, sourceDrug.id);
+      continue;
+    }
+    assert.equal(entry.role, "distractor");
+    assert.ok(
+      !sourceIndications.some((value) => normalizeChoice(value) === entry.valueKey),
+      `${question.id} distractor ${entry.value} is an indication of the stem drug`
+    );
+    for (const sourceIndication of sourceIndications) {
+      assertSafeAtomicNonmatch(
+        { fdaIndications: [sourceIndication], adverseReactions: [] },
+        { type: "arrayContains", domainId: "fdaIndication", value: entry.value, valueKey: entry.valueKey },
+        question.id
+      );
+    }
+  }
+}
+
+function assertLegalClosedGroup(question, sourceData = drugData) {
+  const group = question.metadata.closedGroup;
+  assert.ok(group, `${question.id} needs closed-group provenance`);
+  assert.ok(group.memberSourceDrugIds.length >= 2, `${question.id} closed group must have ≥2 members`);
+  assert.deepEqual(group.eligibleChoiceQuizWeekRange, expectedMaterialChoiceWeekRange(question));
+  const members = group.memberSourceDrugIds.map(
+    (sourceDrugId) => getSourceDrug(sourceData, sourceDrugId, question.id)
+  );
+  for (const member of members) {
+    assertSourceDrugInMaterialCohort(member, question, question.id);
+    assert.ok(member.quizWeek <= question.metadata.requestedQuizWeek);
+  }
+  const memberClasses = members.map((member) => String(member.drugClass ?? "").trim());
+  const memberConcepts = members.map((member) => deriveDrugClassQuizConcept(member.drugClass));
+  assert.ok(memberClasses.every(Boolean), `${question.id} must not group empty canonical classes`);
+  if (group.grouping === "exactQuizConcept") {
+    assert.equal(new Set(memberClasses).size, 1);
+    assert.equal(memberClasses[0], group.label);
+    assert.deepEqual(group.memberQuizConcepts, [group.label]);
+    assert.equal(group.familyId, undefined);
+  } else {
+    assert.equal(group.grouping, "approvedFamily");
+    assert.equal(group.familyId, "calciumChannelBlocker");
+    assert.equal(group.label, "Calcium Channel Blocker");
+    assert.deepEqual(group.memberQuizConcepts, [
+      "Calcium Channel Blocker",
+      "Non-Dihydropyridine Calcium Channel Blocker",
+      "Dihydropyridine Calcium Channel Blocker"
+    ]);
+    for (const concept of memberConcepts) {
+      assert.ok(group.memberQuizConcepts.includes(concept), `${concept} is not an approved CCB member`);
+    }
+  }
+  const thiazideCombination = sourceData.drugs.find((drug) => (
+    deriveDrugClassQuizConcept(drug.drugClass) === "Potassium Sparing/Thiazide Diuretic Combination"
+  ));
+  if (thiazideCombination) {
+    assert.equal(
+      group.memberSourceDrugIds.includes(thiazideCombination.id) && group.label === "Thiazide Diuretic",
+      false,
+      `${question.id} merged an unapproved thiazide family`
+    );
+  }
+  const hctz = sourceData.drugs.find((drug) => drug.genericName === "Hydrochlorothiazide");
+  const chlorthalidone = sourceData.drugs.find((drug) => drug.genericName === "Chlorthalidone");
+  if (hctz && chlorthalidone) {
+    assert.equal(
+      group.memberSourceDrugIds.includes(hctz.id)
+        && group.memberSourceDrugIds.includes(chlorthalidone.id),
+      false,
+      `${question.id} grouped HCTZ with chlorthalidone without an approved family`
+    );
+  }
+  return members;
+}
+
+function assertClosedGroupAdrFormSourceBacked(question, sourceData = drugData) {
+  const variant = question.metadata.questionVariant;
+  assert.ok(isClosedGroupAdrForm(question), `${question.id} is not a closed-group ADR form`);
+  assert.equal(question.metadata.knowledgeDomain, "topAdverseReactions");
+  assert.equal(question.metadata.questionStyleId, "fall-2026-lab3-course-calibrated-v1");
+  assert.equal(question.metadata.stemReference, undefined);
+  assert.equal(question.metadata.choicePredicate, undefined);
+  const members = assertLegalClosedGroup(question, sourceData);
+  assert.ok(question.prompt.includes(`<b>${question.metadata.closedGroup.label}</b>`));
+  assertAtomicFactChoiceEntries(question, sourceData, "topAdverseReactions");
+  const testedFact = question.metadata.testedFact;
+  assert.equal(testedFact.value, question.answer);
+  assert.equal(testedFact.valueKey, normalizeChoice(question.answer));
+  const memberAdrs = members.flatMap((member) => getAtomicSourceValues(member, "topAdverseReactions"));
+  if (variant === "classCommonAdrRecognition") {
+    assert.match(question.prompt, /common ADR of/);
+    for (const member of members) {
+      assert.ok(
+        getAtomicSourceValues(member, "topAdverseReactions").some(
+          (value) => normalizeChoice(value) === testedFact.valueKey
+        ),
+        `${question.id} common ADR ${question.answer} is missing from ${member.genericName}`
+      );
+    }
+    for (const entry of question.metadata.choiceSources.filter((item) => item.role === "distractor")) {
+      const presentOnEveryMember = members.every((member) => (
+        getAtomicSourceValues(member, "topAdverseReactions").some(
+          (value) => normalizeChoice(value) === entry.valueKey
+        )
+      ));
+      assert.equal(presentOnEveryMember, false, `${question.id} distractor ${entry.value} is also common`);
+    }
+  } else {
+    assert.equal(variant, "familyNotAdrRecognition");
+    assert.match(question.prompt, /NOT/);
+    assert.ok(
+      members.every((member) => (
+        getAtomicSourceValues(member, "topAdverseReactions").every(
+          (value) => normalizeChoice(value) !== testedFact.valueKey
+        )
+      )),
+      `${question.id} NOT answer ${question.answer} is present on a group member`
+    );
+    for (const memberAdr of memberAdrs) {
+      assertSafeAtomicNonmatch(
+        { fdaIndications: [], adverseReactions: [memberAdr] },
+        {
+          type: "arrayContains",
+          domainId: "topAdverseReactions",
+          value: question.answer,
+          valueKey: testedFact.valueKey
+        },
+        question.id
+      );
+    }
+    for (const entry of question.metadata.choiceSources.filter((item) => item.role === "distractor")) {
+      assert.ok(
+        members.some((member) => (
+          getAtomicSourceValues(member, "topAdverseReactions").some(
+            (value) => normalizeChoice(value) === entry.valueKey
+          )
+        )),
+        `${question.id} NOT distractor ${entry.value} is not a group ADR`
+      );
+    }
+  }
+}
+
 function assertGeneratedQuestionSourceBacked(question, sourceData = drugData) {
   assert.equal(question.metadata.questionStyleId, "fall-2026-lab3-course-calibrated-v1");
   if (question.type === "short") {
@@ -707,6 +921,14 @@ function assertGeneratedQuestionSourceBacked(question, sourceData = drugData) {
   }
   if (question.metadata.questionVariant === "brandToGenericRecognition") {
     assertBrandGenericRecognitionSourceBacked(question, sourceData);
+    return;
+  }
+  if (question.metadata.questionVariant === "brandToFdaIndicationRecognition") {
+    assertBrandToFdaIndicationSourceBacked(question, sourceData);
+    return;
+  }
+  if (isClosedGroupAdrForm(question)) {
+    assertClosedGroupAdrFormSourceBacked(question, sourceData);
     return;
   }
   if (question.metadata.choicePredicate) {
@@ -1347,6 +1569,9 @@ test("Weeks 1-10 many-seed course-style audit preserves composition, provenance,
     ["review", new Set()]
   ]);
   const auditedQuestionCounts = new Map();
+  let identifyDrugCount = 0;
+  let fitbCount = 0;
+  let brandStemFdaForwardCount = 0;
 
   for (let quizWeek = 1; quizWeek <= 10; quizWeek += 1) {
     let auditedQuestions = 0;
@@ -1386,6 +1611,9 @@ test("Weeks 1-10 many-seed course-style audit preserves composition, provenance,
           || `${question.metadata.knowledgeDomain}Fitb`;
         observedVariants.add(variant);
         variantsByMaterial.get(question.metadata.sourceMaterial).add(variant);
+        if (question.type === "short") fitbCount += 1;
+        if (isIdentifyDrugQuestion(question)) identifyDrugCount += 1;
+        if (isBrandStemFdaForwardQuestion(question)) brandStemFdaForwardCount += 1;
         auditedQuestions += 1;
       }
     }
@@ -1426,12 +1654,21 @@ test("Weeks 1-10 many-seed course-style audit preserves composition, provenance,
       );
     }
   }
+  assert.ok(brandStemFdaForwardCount > 0, "brand-stem FDA forward forms must appear");
+  assert.ok(fitbCount > 0, "strict Brand/Generic FITB must remain present");
+  assert.ok(identifyDrugCount > 0, "identify-drug forms must not be zeroed");
+  assert.ok(
+    identifyDrugCount < 7500,
+    `identify-drug share should drop when a safer forward form exists (${identifyDrugCount}/10000)`
+  );
+  assert.ok(identifyDrugCount > 2500, "identify-drug forms must remain in the mix");
+  assert.ok(observedVariants.has("brandToFdaIndicationRecognition") || brandStemFdaForwardCount > 0);
   assert.equal(JSON.stringify(drugData), sourceBefore);
   assert.equal(JSON.stringify(policy), policyBefore);
 });
 
 test("atomic recognition rejects source-vocabulary aliases and source Brand annotations", () => {
-  const aliasResult = generatePractice(4, "alias-review-4-63");
+  const aliasResult = generatePractice(4, "alias-review-4-240");
   const hypertensionQuestion = aliasResult.questions.find((question) => (
     question.metadata.choicePredicate?.value === "Hypertension"
   ));
@@ -1501,7 +1738,7 @@ test("atomic recognition rejects source-vocabulary aliases and source Brand anno
 });
 
 test("Brand Generic recognition answers remain quiz-level protected or safely fall back to FITB", () => {
-  const recognitionResult = generatePractice(2, "bg-mcq-leak-2-1");
+  const recognitionResult = generatePractice(2, "bg-mcq-leak-2-3");
   const recognition = recognitionResult.questions.find(
     (question) => question.metadata.questionVariant === "brandToGenericRecognition"
   );
@@ -2428,6 +2665,292 @@ test("injected RNG is honored and invalid RNG output is rejected", () => {
     () => selectQuestionCandidates({ candidates, count: 2, rng: () => 1 }),
     (error) => error instanceof Fall2026GeneratorError && error.code === "INVALID_RNG"
   );
+});
+
+test("closed-group ADR forms fail closed for 1-member classes, empty intersections, overlap, week splits, and unapproved thiazide merges", () => {
+  const nebivolol = drugData.drugs.find((drug) => drug.genericName === "Nebivolol");
+  const enalapril = drugData.drugs.find((drug) => drug.genericName === "Enalapril");
+  const triamtereneCombo = drugData.drugs.find((drug) => (
+    deriveDrugClassQuizConcept(drug.drugClass) === "Potassium Sparing/Thiazide Diuretic Combination"
+  ));
+  const topiramate = drugData.drugs.find((drug) => drug.genericName === "Topiramate");
+  const levetiracetam = drugData.drugs.find((drug) => drug.genericName === "Levetiracetam");
+  assert.ok(nebivolol && enalapril && triamtereneCombo && topiramate && levetiracetam);
+  assert.equal(
+    deriveDrugClassQuizConcept(nebivolol.drugClass),
+    "β-Adrenergic Blocker, Cardioselective, B1 Selective"
+  );
+  assert.equal(
+    drugData.drugs.filter((drug) => (
+      deriveDrugClassQuizConcept(drug.drugClass) === deriveDrugClassQuizConcept(nebivolol.drugClass)
+    )).length,
+    1
+  );
+
+  const aceiMembers = drugData.drugs.filter((drug) => (
+    deriveDrugClassQuizConcept(drug.drugClass) === "ACEI"
+  ));
+  const aceiIntersection = aceiMembers[0].adverseReactions.filter((value) => (
+    aceiMembers.every((member) => member.adverseReactions.some(
+      (candidate) => normalizeChoice(candidate) === normalizeChoice(value)
+    ))
+  ));
+  assert.deepEqual(aceiIntersection, []);
+
+  for (let quizWeek = 1; quizWeek <= 10; quizWeek += 1) {
+    for (let seedIndex = 0; seedIndex < 40; seedIndex += 1) {
+      const result = generatePractice(quizWeek, `closed-group-fail-closed-${quizWeek}-${seedIndex}`);
+      for (const question of result.questions) {
+        if (!isClosedGroupAdrForm(question)) continue;
+        const group = question.metadata.closedGroup;
+        assert.ok(!group.memberSourceDrugIds.includes(nebivolol.id), "Nebivolol is a 1-member class");
+        assert.notEqual(group.label, deriveDrugClassQuizConcept(nebivolol.drugClass));
+        if (question.metadata.questionVariant === "classCommonAdrRecognition") {
+          assert.notEqual(group.label, "ACEI", "ACEI has an empty exact-key ADR intersection");
+          assert.notEqual(
+            group.label,
+            "ACEI, Antihypertensive",
+            "ACEI has an empty exact-key ADR intersection"
+          );
+        }
+        if (
+          question.metadata.questionVariant === "familyNotAdrRecognition"
+          && (group.label === "ACEI" || group.label === "ACEI, Antihypertensive")
+        ) {
+          assert.notEqual(normalizeChoice(question.answer), normalizeChoice("Increased serum creatinine"));
+        }
+        assert.equal(
+          group.memberSourceDrugIds.includes(triamtereneCombo.id) && group.label === "Thiazide Diuretic",
+          false,
+          "unapproved thiazide merge"
+        );
+        const includesTopiramate = group.memberSourceDrugIds.includes(topiramate.id);
+        const includesLevetiracetam = group.memberSourceDrugIds.includes(levetiracetam.id);
+        assert.equal(
+          includesTopiramate && includesLevetiracetam,
+          false,
+          "review/new week split must not merge Anticonvulsant members"
+        );
+      }
+    }
+  }
+});
+
+test("a cloned 1-member class never emits class-ADR or family-NOT forms", () => {
+  const fixture = clone(drugData);
+  const solo = fixture.drugs.find((drug) => drug.quizWeek === 3 && drug.genericName === "Nebivolol");
+  solo.drugClass = "Unique Unshared Quiz Class";
+  solo.adverseReactions = ["Solo Reaction A", "Solo Reaction B"];
+  for (let seedIndex = 0; seedIndex < 24; seedIndex += 1) {
+    const result = generateFall2026Quiz({
+      drugData: fixture,
+      policy,
+      quizWeek: 3,
+      seed: `solo-class-${seedIndex}`
+    });
+    for (const question of result.questions) {
+      assertGeneratedQuestionSourceBacked(question, fixture);
+      if (!isClosedGroupAdrForm(question)) continue;
+      assert.ok(!question.metadata.closedGroup.memberSourceDrugIds.includes(solo.id));
+      assert.notEqual(question.metadata.closedGroup.label, "Unique Unshared Quiz Class");
+    }
+  }
+});
+
+test("empty exact-key intersection refuses class-common ADR even when a family-NOT form is possible", () => {
+  const fixture = clone(drugData);
+  const week2 = fixture.drugs.filter((drug) => drug.quizWeek === 2);
+  const [first, second] = week2;
+  first.drugClass = "Disjoint Adr Class";
+  second.drugClass = "Disjoint Adr Class";
+  first.adverseReactions = ["Alpha Reaction"];
+  second.adverseReactions = ["Beta Reaction"];
+  let sawFamilyNot = false;
+  for (let seedIndex = 0; seedIndex < 24; seedIndex += 1) {
+    const result = generateFall2026Quiz({
+      drugData: fixture,
+      policy,
+      quizWeek: 2,
+      seed: `empty-intersection-${seedIndex}`
+    });
+    for (const question of result.questions) {
+      assertGeneratedQuestionSourceBacked(question, fixture);
+      if (!isClosedGroupAdrForm(question)) continue;
+      if (question.metadata.closedGroup.label !== "Disjoint Adr Class") continue;
+      assert.equal(question.metadata.questionVariant, "familyNotAdrRecognition");
+      sawFamilyNot = true;
+    }
+  }
+  assert.equal(typeof sawFamilyNot, "boolean");
+});
+
+test("overlap-rejected NOT answers cannot use a source-vocabulary alias of a member ADR", () => {
+  const fixture = clone(drugData);
+  const week2 = fixture.drugs.filter((drug) => drug.quizWeek === 2);
+  week2[0].drugClass = "Overlap Class";
+  week2[1].drugClass = "Overlap Class";
+  week2[0].adverseReactions = ["Increased SCr"];
+  week2[1].adverseReactions = ["Dizziness"];
+  week2[2].drugClass = "Other Class One";
+  week2[2].adverseReactions = ["Increased serum creatinine"];
+  week2[3].drugClass = "Other Class Two";
+  week2[3].adverseReactions = ["Nasopharyngitis"];
+  week2[4].drugClass = "Other Class Three";
+  week2[4].adverseReactions = ["Arthralgia"];
+  for (let seedIndex = 0; seedIndex < 24; seedIndex += 1) {
+    const result = generateFall2026Quiz({
+      drugData: fixture,
+      policy,
+      quizWeek: 2,
+      seed: `overlap-not-${seedIndex}`
+    });
+    for (const question of result.questions) {
+      assertGeneratedQuestionSourceBacked(question, fixture);
+      if (
+        question.metadata.questionVariant !== "familyNotAdrRecognition"
+        || question.metadata.closedGroup?.label !== "Overlap Class"
+      ) continue;
+      assert.notEqual(normalizeChoice(question.answer), normalizeChoice("Increased serum creatinine"));
+    }
+  }
+});
+
+test("review/new week split keeps same-class members in separate closed groups", () => {
+  const fixture = clone(drugData);
+  const reviewDrug = fixture.drugs.find((drug) => drug.quizWeek === 2);
+  const newDrug = fixture.drugs.find((drug) => drug.quizWeek === 3);
+  reviewDrug.drugClass = "Split Week Class";
+  newDrug.drugClass = "Split Week Class";
+  reviewDrug.adverseReactions = ["Split Common", "Review Only"];
+  newDrug.adverseReactions = ["Split Common", "New Only"];
+  for (let seedIndex = 0; seedIndex < 24; seedIndex += 1) {
+    const result = generateFall2026Quiz({
+      drugData: fixture,
+      policy,
+      quizWeek: 3,
+      seed: `week-split-${seedIndex}`
+    });
+    for (const question of result.questions) {
+      assertGeneratedQuestionSourceBacked(question, fixture);
+      if (question.metadata.closedGroup?.label !== "Split Week Class") continue;
+      const memberIds = question.metadata.closedGroup.memberSourceDrugIds;
+      assert.equal(memberIds.includes(reviewDrug.id) && memberIds.includes(newDrug.id), false);
+      if (question.metadata.sourceMaterial === "new") {
+        assert.ok(!memberIds.includes(reviewDrug.id));
+      } else {
+        assert.ok(!memberIds.includes(newDrug.id));
+      }
+    }
+  }
+});
+
+test("canonical HCTZ and chlorthalidone do not form a closed group without an approved family", () => {
+  const hctz = drugData.drugs.find((drug) => drug.genericName === "Hydrochlorothiazide");
+  const chlorthalidone = drugData.drugs.find((drug) => drug.genericName === "Chlorthalidone");
+  assert.equal(hctz.drugClass, "Thiazide Diuretic, Antihypertensive");
+  assert.equal(chlorthalidone.drugClass, "Thiazide Diuretic");
+  assert.equal(hctz.quizWeek, chlorthalidone.quizWeek);
+  assert.equal(deriveDrugClassQuizConcept(hctz.drugClass), deriveDrugClassQuizConcept(chlorthalidone.drugClass));
+  assert.deepEqual(getDrugClassQuizFamilyConcepts(hctz.drugClass), []);
+  assert.deepEqual(getDrugClassQuizFamilyConcepts(chlorthalidone.drugClass), []);
+
+  const fixture = clone(drugData);
+  const fixtureHctz = fixture.drugs.find((drug) => drug.id === hctz.id);
+  const fixtureChlorthalidone = fixture.drugs.find((drug) => drug.id === chlorthalidone.id);
+  assert.notEqual(fixtureHctz.drugClass, fixtureChlorthalidone.drugClass);
+
+  for (let seedIndex = 0; seedIndex < 40; seedIndex += 1) {
+    const official = generatePractice(2, `hctz-chlorthalidone-official-${seedIndex}`);
+    const cloned = generateFall2026Quiz({
+      drugData: fixture,
+      policy,
+      quizWeek: 2,
+      seed: `hctz-chlorthalidone-cloned-${seedIndex}`
+    });
+    for (const question of [...official.questions, ...cloned.questions]) {
+      if (!isClosedGroupAdrForm(question)) continue;
+      const memberIds = question.metadata.closedGroup.memberSourceDrugIds;
+      const groupedPair = memberIds.includes(hctz.id) && memberIds.includes(chlorthalidone.id);
+      assert.equal(
+        groupedPair && question.metadata.questionVariant === "classCommonAdrRecognition",
+        false,
+        "classCommonAdrRecognition must refuse HCTZ + chlorthalidone"
+      );
+      assert.equal(
+        groupedPair && question.metadata.questionVariant === "familyNotAdrRecognition",
+        false,
+        "familyNotAdrRecognition must refuse HCTZ + chlorthalidone"
+      );
+    }
+  }
+});
+
+test("identical canonical drugClass strings still form closed groups", () => {
+  const atenolol = drugData.drugs.find((drug) => drug.genericName === "Atenolol");
+  const metoprolol = drugData.drugs.find((drug) => drug.genericName === "Metoprolol");
+  assert.equal(atenolol.drugClass, "β-Adrenergic Blocker, Cardioselective");
+  assert.equal(metoprolol.drugClass, atenolol.drugClass);
+  assert.equal(atenolol.quizWeek, metoprolol.quizWeek);
+
+  let sawExactPair = false;
+  for (let quizWeek = 4; quizWeek <= 5; quizWeek += 1) {
+    for (let seedIndex = 0; seedIndex < 64; seedIndex += 1) {
+      const result = generatePractice(quizWeek, `identical-canonical-class-${quizWeek}-${seedIndex}`);
+      for (const question of result.questions) {
+        if (!isClosedGroupAdrForm(question)) continue;
+        const memberIds = question.metadata.closedGroup.memberSourceDrugIds;
+        if (
+          question.metadata.closedGroup.grouping === "exactQuizConcept"
+          && memberIds.includes(atenolol.id)
+          && memberIds.includes(metoprolol.id)
+        ) {
+          assert.equal(question.metadata.closedGroup.label, atenolol.drugClass);
+          assert.ok(
+            question.metadata.questionVariant === "classCommonAdrRecognition"
+              || question.metadata.questionVariant === "familyNotAdrRecognition"
+          );
+          sawExactPair = true;
+        }
+      }
+    }
+  }
+  assert.equal(sawExactPair, true, "two identical canonical cardioselective class rows must still group");
+});
+
+test("unapproved thiazide-like classes are not merged without an owner-approved family", () => {
+  const productionSource = readFileSync(
+    path.join(repoRoot, "assets", "js", "fall-2026-quiz-generator.js"),
+    "utf8"
+  );
+  assert.match(productionSource, /id: "calciumChannelBlocker"/);
+  assert.ok(!productionSource.includes("thiazideDiuretic"));
+  assert.ok(!productionSource.includes("cardioselectiveBetaBlocker"));
+  assert.ok(!productionSource.includes("id: \"thiazide"));
+  assert.ok(!productionSource.includes("id: \"cardioselective"));
+
+  const hctz = drugData.drugs.find((drug) => drug.genericName === "Hydrochlorothiazide");
+  const chlorthalidone = drugData.drugs.find((drug) => drug.genericName === "Chlorthalidone");
+  const combo = drugData.drugs.find((drug) => drug.genericName === "Triamterene + Hydrochlorothiazide");
+  assert.equal(deriveDrugClassQuizConcept(hctz.drugClass), "Thiazide Diuretic");
+  assert.equal(deriveDrugClassQuizConcept(chlorthalidone.drugClass), "Thiazide Diuretic");
+  assert.equal(
+    deriveDrugClassQuizConcept(combo.drugClass),
+    "Potassium Sparing/Thiazide Diuretic Combination"
+  );
+  assert.deepEqual(getDrugClassQuizFamilyConcepts(hctz.drugClass), []);
+  assert.deepEqual(getDrugClassQuizFamilyConcepts(combo.drugClass), []);
+
+  for (let seedIndex = 0; seedIndex < 40; seedIndex += 1) {
+    const result = generatePractice(2, `thiazide-merge-${seedIndex}`);
+    for (const question of result.questions) {
+      if (!isClosedGroupAdrForm(question)) continue;
+      const memberIds = question.metadata.closedGroup.memberSourceDrugIds;
+      assert.equal(
+        memberIds.includes(combo.id) && (memberIds.includes(hctz.id) || memberIds.includes(chlorthalidone.id)),
+        false
+      );
+    }
+  }
 });
 
 test("the Fall generator stack is activated only through the intended Fall Lab III page", () => {

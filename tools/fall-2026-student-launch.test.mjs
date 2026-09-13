@@ -23,7 +23,7 @@ const FALL_LAB3_WEEKS = Array.from({ length: 10 }, (_, index) => index + 1);
 const FALL_UI_BASELINES = Object.freeze({
   drugData: "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01",
   policy: "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171",
-  generator: "39e123b914f665282f6abce23110bf3e2bd4f0bcc1974b7038e0f9384cf9871a",
+  generator: "a2d57983327ae3bcd8881168bf391ffafbce4ea5ac45d79d8f1ac971844af970",
   launcher: "8d1fa626fd4d9a35b69dcd47f5418d74cff57b36e0087fe6b47f08ff88edfc60"
 });
 

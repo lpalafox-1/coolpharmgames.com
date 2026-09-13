@@ -693,7 +693,7 @@ test("normal Week Practice output is unchanged by F26-10", () => {
 
 test("the generator, engine, canonical data, and policy are untouched", () => {
   assert.equal(sha256("assets/js/fall-2026-quiz-generator.js"),
-    "39e123b914f665282f6abce23110bf3e2bd4f0bcc1974b7038e0f9384cf9871a", "generator must not change");
+    "a2d57983327ae3bcd8881168bf391ffafbce4ea5ac45d79d8f1ac971844af970", "generator must not change");
   assert.equal(sha256("assets/js/quizEngine.js"),
     "be5ce3f4996981fc9dda427b838e1680773135037e8e048dd8255ab8173c0f7d", "engine must not change");
   assert.equal(sha256("assets/data/fall-2026-p2-top-drugs.json"),
