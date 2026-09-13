@@ -30,12 +30,11 @@ function storage(initial = {}) {
   };
 }
 
-// Only the page's real IDs, defaults, and data-launch-week buttons are mounted.
-// The shipped launcher registers and handles events; no launch logic is copied.
+// Only the page's real IDs and defaults are mounted. The shipped launcher
+// registers and handles events; no launch logic is copied.
 function pageDocument(html) {
   const listeners = new Map();
   const elements = new Map();
-  const weekly = [];
 
   function element(tag = "div", attributes = "", content = "") {
     const classes = new Set();
@@ -84,15 +83,12 @@ function pageDocument(html) {
     const node = element(match[1], match[2], content);
     elements.set(node.id, node);
   }
-  for (const match of html.matchAll(/<button\b([^>]*\bdata-launch-week="\d+"[^>]*)>([\s\S]*?)<\/button>/g)) {
-    weekly.push(element("button", match[1], match[2]));
-  }
   return {
-    elements, weekly,
+    elements,
     documentElement: element("html"),
     createElement: element,
     getElementById(id) { return elements.get(id) || null; },
-    querySelectorAll(selector) { return selector === "[data-launch-week]" ? weekly : []; },
+    querySelectorAll() { return []; },
     addEventListener(type, callback) { listeners.set(type, callback); },
     async initialize() {
       await listeners.get("DOMContentLoaded")?.();
@@ -172,7 +168,7 @@ test("homepage and hub initialization leave existing quiz, adaptive memory, hist
   assert.equal(localStorage.snapshot(), before);
   assert.deepEqual(localStorage.writes, []);
 
-  for (const search of ["", "?week=0", "?week=11", "?week=2.5", "?week=garbage", "?adaptive=1"]) {
+  for (const search of ["", "?week=0", "?week=11", "?week=2.5", "?week=garbage", "?adaptive=1", "?week=2"]) {
     await withHub({ initial, search }, ({ localStorage: hubStorage, fetches, navigations }) => {
       assert.equal(hubStorage.snapshot(), before, `loading ${search || "the hub"} must not persist a round`);
       assert.deepEqual(hubStorage.writes, []);
@@ -283,30 +279,48 @@ test("every adaptive target launches through real selection, retains its lineage
   }
 });
 
-test("all standard buttons and bookmarked week links keep weekly composition and standard history identity", async () => {
+test("?week= preselects Standard Weekly and does not auto-launch or touch Adaptive", async () => {
+  for (const quizWeek of [1, 6, 10]) {
+    await withHub({ search: `?week=${quizWeek}` }, async ({ document, localStorage, navigations, fetches }) => {
+      assert.equal(document.getElementById("weekly-week").value, String(quizWeek));
+      assert.equal(document.getElementById("weekly-launch").disabled, false);
+      assert.equal(document.getElementById("adaptive-week").value, "");
+      assert.equal(document.getElementById("week-focus-week").value, "");
+      assert.equal(document.getElementById("adaptive-launch").disabled, true);
+      assert.equal(document.getElementById("week-focus-launch").disabled, true);
+      assert.deepEqual(localStorage.writes, []);
+      assert.deepEqual(fetches, []);
+      assert.deepEqual(navigations, []);
+    });
+  }
+});
+
+test("Standard Weekly Start keeps weekly composition and standard history identity", async () => {
   for (const quizWeek of allWeeks) {
-    for (const route of ["button", "bookmark"]) {
-      const remembered = '{ "version": 1, "rounds": [] }';
-      await withHub({ search: route === "bookmark" ? `?week=${quizWeek}` : "", initial: { [ADAPTIVE_MEMORY_KEY]: remembered } }, async ({ document, localStorage, navigations }) => {
-        if (route === "button") await document.weekly.find((button) => Number(button.dataset.launchWeek) === quizWeek).dispatch("click");
-        const payload = JSON.parse(localStorage.getItem(CUSTOM_KEY));
-        assert.equal(payload.metadata.kind, "fall-2026-lab3-practice");
-        assert.equal(payload.metadata.quizWeek, quizWeek);
-        assert.equal(payload.metadata.adaptiveTargetWeek, undefined);
-        assert.equal(payload.questions.length, 10);
-        assert.deepEqual(payload.metadata.composition, {
-          newMaterialItemTarget: quizWeek === 1 ? 10 : 6,
-          reviewMaterialItemTarget: quizWeek === 1 ? 0 : 4,
-          totalItemTarget: 10
-        });
-        assert.equal(payload.questions.filter((question) => question.metadata.sourceMaterial === "new").length, quizWeek === 1 ? 10 : 6);
-        assert.ok(payload.questions.every((question) => getQuestionSourceWeeks(question).every((week) => week <= quizWeek)));
-        assert.deepEqual(localStorage.writes, [CUSTOM_KEY]);
-        assert.equal(localStorage.getItem(ADAPTIVE_MEMORY_KEY), remembered);
-        assert.deepEqual(navigations, ["quiz.html?id=custom-quiz"]);
-        assertHistoryIdentity(payload, "fall-2026-lab3-practice", "fall-lab3-practice");
+    const remembered = '{ "version": 1, "rounds": [] }';
+    await withHub({ initial: { [ADAPTIVE_MEMORY_KEY]: remembered } }, async ({ document, localStorage, navigations }) => {
+      const select = document.getElementById("weekly-week");
+      select.value = String(quizWeek);
+      await select.dispatch("change");
+      await document.getElementById("weekly-launch").dispatch("click");
+      const payload = JSON.parse(localStorage.getItem(CUSTOM_KEY));
+      assert.equal(payload.metadata.kind, "fall-2026-lab3-practice");
+      assert.equal(payload.metadata.quizWeek, quizWeek);
+      assert.equal(payload.metadata.adaptiveTargetWeek, undefined);
+      assert.equal(payload.questions.length, 10);
+      assert.deepEqual(payload.metadata.composition, {
+        newMaterialItemTarget: quizWeek === 1 ? 10 : 6,
+        reviewMaterialItemTarget: quizWeek === 1 ? 0 : 4,
+        totalItemTarget: 10
       });
-    }
+      assert.equal(payload.questions.filter((question) => question.metadata.sourceMaterial === "new").length, quizWeek === 1 ? 10 : 6);
+      assert.ok(payload.questions.every((question) => getQuestionSourceWeeks(question).every((week) => week <= quizWeek)));
+      assert.deepEqual(localStorage.writes, [CUSTOM_KEY]);
+      assert.equal(localStorage.getItem(ADAPTIVE_MEMORY_KEY), remembered);
+      assert.equal(localStorage.getItem("pharmlet.fall-2026-lab3.adaptive-request"), null);
+      assert.deepEqual(navigations, ["quiz.html?id=custom-quiz"]);
+      assertHistoryIdentity(payload, "fall-2026-lab3-practice", "fall-lab3-practice");
+    });
   }
 });
 
@@ -322,8 +336,11 @@ test("an in-flight adaptive launch blocks competing mode clicks and keeps the se
     try {
       assert.equal(select.disabled, true);
       assert.equal(adaptiveButton.disabled, true);
-      assert.ok(document.weekly.every((button) => button.disabled));
-      await document.weekly[9].dispatch("click");
+      assert.equal(document.getElementById("weekly-week").disabled, true);
+      assert.equal(document.getElementById("weekly-launch").disabled, true);
+      assert.equal(document.getElementById("week-focus-week").disabled, true);
+      assert.equal(document.getElementById("week-focus-launch").disabled, true);
+      await document.getElementById("weekly-launch").dispatch("click");
       await adaptiveButton.dispatch("click");
       assert.deepEqual(localStorage.writes, []);
     } finally {
@@ -348,7 +365,10 @@ test("a failed source load restores both practice controls and a deliberate retr
     assert.match(document.getElementById("adaptive-status").textContent, /Source temporarily unavailable/);
     assert.equal(select.disabled, false);
     assert.equal(button.disabled, false);
-    assert.ok(document.weekly.every((weeklyButton) => !weeklyButton.disabled));
+    assert.equal(document.getElementById("weekly-week").disabled, false);
+    assert.equal(document.getElementById("week-focus-week").disabled, false);
+    assert.equal(document.getElementById("weekly-launch").disabled, true);
+    assert.equal(document.getElementById("week-focus-launch").disabled, true);
     assert.deepEqual(localStorage.writes, []);
     assert.deepEqual(navigations, []);
     fail = false;

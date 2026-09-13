@@ -36,9 +36,11 @@
     .adaptive-card { border-top: 4px solid var(--accent); }
     .practice-eyebrow { color: var(--study-accent); }
     .adaptive-controls { border-radius: 1rem; background: color-mix(in srgb, var(--accent) 6%, var(--card)); }
-    #adaptive-week, #adaptive-launch { min-height: 3rem; }
-    #adaptive-launch:disabled { opacity: .6; cursor: not-allowed; }
-    #adaptive-launch[aria-busy="true"] { cursor: progress; }
+    #adaptive-week, #adaptive-launch, #week-focus-week, #week-focus-launch,
+    #weekly-week, #weekly-launch { min-height: 3rem; }
+    #adaptive-launch:disabled, #week-focus-launch:disabled, #weekly-launch:disabled { opacity: .6; cursor: not-allowed; }
+    #adaptive-launch[aria-busy="true"], #week-focus-launch[aria-busy="true"],
+    #weekly-launch[aria-busy="true"] { cursor: progress; }
     .resource-link { display: inline-flex; align-items: center; font-size: .875rem; }
     .lab3-hero {
       background:
@@ -50,57 +52,8 @@
       border-radius: 1rem;
       background: color-mix(in srgb, var(--accent) 6%, var(--card));
     }
-    .week-card {
-      min-height: 10.75rem;
-      border: 1px solid var(--ring);
-      background: var(--card);
-      box-shadow: 0 10px 24px rgba(15, 23, 42, .055);
-    }
-    .week-number {
-      display: inline-flex;
-      width: 2.25rem;
-      height: 2.25rem;
-      align-items: center;
-      justify-content: center;
-      flex: none;
-      border-radius: .85rem;
-      background: color-mix(in srgb, var(--accent) 12%, var(--card));
-      color: var(--study-accent);
-      font-size: .82rem;
-      font-weight: 900;
-      letter-spacing: .04em;
-    }
-    .week-contract {
-      color: var(--study-accent);
-      font-size: .72rem;
-      font-weight: 900;
-      letter-spacing: .01em;
-      line-height: 1.3;
-    }
-    .week-detail {
-      color: var(--muted);
-      font-size: .76rem;
-      font-weight: 650;
-      line-height: 1.35;
-    }
-    .week-card button {
-      min-height: 2.75rem;
-      padding: .6rem .35rem;
-      font-size: .82rem;
-      line-height: 1.15;
-      white-space: nowrap;
-    }
-    .week-card button[aria-busy="true"] { cursor: progress; }
-    .week-card button:disabled { opacity: .72; }
     .resource-link {
       min-height: 2.75rem;
-    }
-    .dark .week-card { box-shadow: none; }
-    @media (max-width: 420px) {
-      .week-card {
-        min-height: 10.5rem;
-        padding: .75rem;
-      }
     }
   </style>
 </head>
@@ -161,13 +114,34 @@
     </section>
 
     <section id="week-focus" class="max-w-6xl mx-auto px-4 pt-5 sm:pt-6" aria-labelledby="week-focus-heading">
-      <div class="card p-4 sm:p-6">
-        <p class="practice-eyebrow text-xs font-black uppercase tracking-[0.18em]">Selected-week practice</p>
-        <div class="mt-2 flex flex-wrap items-center gap-2">
-          <h2 id="week-focus-heading" class="text-2xl sm:text-3xl font-black">Week Focus</h2>
-          <span class="text-xs font-black uppercase tracking-[0.16em]" style="color:var(--muted)">Coming Soon</span>
+      <div class="card p-4 sm:p-6 grid md:grid-cols-[1.15fr_1fr] gap-5 sm:gap-8">
+        <div>
+          <p class="practice-eyebrow text-xs font-black uppercase tracking-[0.18em]">Selected-week practice</p>
+          <h2 id="week-focus-heading" class="mt-2 text-2xl sm:text-3xl font-black">Week Focus</h2>
+          <p class="mt-3 max-w-3xl text-sm sm:text-base leading-relaxed" style="color:var(--muted)">Practice one selected week only, with no cumulative review. Adaptive Practice through Week X remains the performance-guided path.</p>
         </div>
-        <p class="mt-3 max-w-3xl text-sm sm:text-base leading-relaxed" style="color:var(--muted)">Practice one selected week only, with no cumulative review. Adaptive Practice through Week X remains the performance-guided path.</p>
+        <div class="adaptive-controls p-4 sm:p-5">
+          <label for="week-focus-week" class="block text-sm font-bold">Practice week</label>
+          <select id="week-focus-week" class="mt-2 w-full" required aria-describedby="week-focus-scope-note week-focus-selection-summary">
+            <option value="" selected>Choose a week</option>
+            <option value="1">Week 1</option>
+            <option value="2">Week 2</option>
+            <option value="3">Week 3</option>
+            <option value="4">Week 4</option>
+            <option value="5">Week 5</option>
+            <option value="6">Week 6</option>
+            <option value="7">Week 7</option>
+            <option value="8">Week 8</option>
+            <option value="9">Week 9</option>
+            <option value="10">Week 10</option>
+          </select>
+          <p id="week-focus-scope-note" class="mt-2 text-sm leading-relaxed" style="color:var(--muted)">Week Focus uses only the selected week's drugs. It does not include prior-week review.</p>
+          <p id="week-focus-selection-summary" class="mt-3 text-sm font-semibold" role="status" aria-live="polite" aria-atomic="true">Choose a week to enable Week Focus.</p>
+          <button id="week-focus-launch" type="button" data-idle-label="Start Week Focus" disabled
+            class="btn btn-blue mt-3 w-full" aria-describedby="week-focus-selection-summary">Start Week Focus</button>
+          <div id="week-focus-status" class="hidden mt-3 text-sm leading-relaxed" role="status" aria-live="polite" aria-atomic="true"></div>
+          <noscript><p class="mt-3 text-sm">Enable JavaScript to choose a week and launch Week Focus.</p></noscript>
+        </div>
       </div>
     </section>
 
@@ -178,91 +152,34 @@
     </nav>
 
     <section id="standard-weekly-practice" class="max-w-6xl mx-auto px-4 py-6 sm:py-8" aria-labelledby="semester-practice-heading" tabindex="-1">
-      <div>
-        <p class="practice-eyebrow text-xs font-black uppercase tracking-[0.2em]">Weekly alternative · Weeks 1–10</p>
-        <h2 id="semester-practice-heading" class="mt-1 text-2xl sm:text-3xl font-black">Standard Weekly Practice</h2>
-        <p class="mt-2 max-w-3xl text-sm leading-relaxed" style="color:var(--muted)">Fresh 10-question sets using the weekly composition, without personalized selection. Week 1 uses Week 1 only; Weeks 2–10 use 6 new + 4 cumulative-review questions.</p>
-      </div>
-
-      <div id="launch-status" class="hidden mb-5 rounded-2xl border border-[var(--ring)] bg-[var(--card)] px-4 py-3 text-sm" role="status" aria-live="polite"></div>
-
-      <div class="mt-3 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4" aria-describedby="semester-practice-note">
-        <article id="week-1" data-week-card="1" aria-labelledby="week-1-title" class="week-card card p-3 sm:p-4 flex flex-col">
-          <div class="flex items-center justify-between gap-2">
-            <span class="week-number" aria-hidden="true">01</span>
-            <div class="text-right">
-              <h3 id="week-1-title" class="text-xs font-black uppercase tracking-[0.12em] text-[var(--accent)]">Week 1</h3>
-              <p class="mt-1 text-xs font-bold" style="color:var(--muted)">10 Questions</p>
-            </div>
-          </div>
-          <p class="mt-3 text-base sm:text-lg font-black leading-tight">Week 1 Content</p>
-          <p class="week-contract mt-1">Practice setup</p>
-          <p class="week-detail mt-1">Week 1 only</p>
-          <button type="button" data-launch-week="1" data-idle-label="Start Week 1" aria-describedby="week-1-guidance semester-practice-note" class="btn btn-blue mt-auto w-full">Start Week 1</button>
-          <p id="week-1-guidance" class="sr-only">Week 1 uses only Week 1 content because no prior-week review material exists. This is a practice configuration, not an official composition claim.</p>
-        </article>
-
-        <article id="week-2" data-week-card="2" aria-labelledby="week-2-title" class="week-card card p-3 sm:p-4 flex flex-col">
-          <div class="flex items-center justify-between gap-2">
-            <span class="week-number" aria-hidden="true">02</span>
-            <div class="text-right"><h3 id="week-2-title" class="text-xs font-black uppercase tracking-[0.12em] text-[var(--accent)]">Week 2</h3><p class="mt-1 text-xs font-bold" style="color:var(--muted)">10 Questions</p></div>
-          </div>
-          <p class="mt-3 text-base sm:text-lg font-black leading-tight">6 New • 4 Review</p>
-          <p class="week-detail mt-1">Cumulative practice</p>
-          <button type="button" data-launch-week="2" data-idle-label="Start Week 2" aria-describedby="semester-practice-note" class="btn btn-blue mt-auto w-full">Start Week 2</button>
-        </article>
-
-        <article id="week-3" data-week-card="3" aria-labelledby="week-3-title" class="week-card card p-3 sm:p-4 flex flex-col">
-          <div class="flex items-center justify-between gap-2">
-            <span class="week-number" aria-hidden="true">03</span>
-            <div class="text-right"><h3 id="week-3-title" class="text-xs font-black uppercase tracking-[0.12em] text-[var(--accent)]">Week 3</h3><p class="mt-1 text-xs font-bold" style="color:var(--muted)">10 Questions</p></div>
-          </div>
-          <p class="mt-3 text-base sm:text-lg font-black leading-tight">6 New • 4 Review</p>
-          <p class="week-detail mt-1">Cumulative practice</p>
-          <button type="button" data-launch-week="3" data-idle-label="Start Week 3" aria-describedby="semester-practice-note" class="btn btn-blue mt-auto w-full">Start Week 3</button>
-        </article>
-
-        <article id="week-4" data-week-card="4" aria-labelledby="week-4-title" class="week-card card p-3 sm:p-4 flex flex-col">
-          <div class="flex items-center justify-between gap-2"><span class="week-number" aria-hidden="true">04</span><div class="text-right"><h3 id="week-4-title" class="text-xs font-black uppercase tracking-[0.12em] text-[var(--accent)]">Week 4</h3><p class="mt-1 text-xs font-bold" style="color:var(--muted)">10 Questions</p></div></div>
-          <p class="mt-3 text-base sm:text-lg font-black leading-tight">6 New • 4 Review</p><p class="week-detail mt-1">Cumulative practice</p>
-          <button type="button" data-launch-week="4" data-idle-label="Start Week 4" aria-describedby="semester-practice-note" class="btn btn-blue mt-auto w-full">Start Week 4</button>
-        </article>
-
-        <article id="week-5" data-week-card="5" aria-labelledby="week-5-title" class="week-card card p-3 sm:p-4 flex flex-col">
-          <div class="flex items-center justify-between gap-2"><span class="week-number" aria-hidden="true">05</span><div class="text-right"><h3 id="week-5-title" class="text-xs font-black uppercase tracking-[0.12em] text-[var(--accent)]">Week 5</h3><p class="mt-1 text-xs font-bold" style="color:var(--muted)">10 Questions</p></div></div>
-          <p class="mt-3 text-base sm:text-lg font-black leading-tight">6 New • 4 Review</p><p class="week-detail mt-1">Cumulative practice</p>
-          <button type="button" data-launch-week="5" data-idle-label="Start Week 5" aria-describedby="semester-practice-note" class="btn btn-blue mt-auto w-full">Start Week 5</button>
-        </article>
-
-        <article id="week-6" data-week-card="6" aria-labelledby="week-6-title" class="week-card card p-3 sm:p-4 flex flex-col">
-          <div class="flex items-center justify-between gap-2"><span class="week-number" aria-hidden="true">06</span><div class="text-right"><h3 id="week-6-title" class="text-xs font-black uppercase tracking-[0.12em] text-[var(--accent)]">Week 6</h3><p class="mt-1 text-xs font-bold" style="color:var(--muted)">10 Questions</p></div></div>
-          <p class="mt-3 text-base sm:text-lg font-black leading-tight">6 New • 4 Review</p><p class="week-detail mt-1">Cumulative practice</p>
-          <button type="button" data-launch-week="6" data-idle-label="Start Week 6" aria-describedby="semester-practice-note" class="btn btn-blue mt-auto w-full">Start Week 6</button>
-        </article>
-
-        <article id="week-7" data-week-card="7" aria-labelledby="week-7-title" class="week-card card p-3 sm:p-4 flex flex-col">
-          <div class="flex items-center justify-between gap-2"><span class="week-number" aria-hidden="true">07</span><div class="text-right"><h3 id="week-7-title" class="text-xs font-black uppercase tracking-[0.12em] text-[var(--accent)]">Week 7</h3><p class="mt-1 text-xs font-bold" style="color:var(--muted)">10 Questions</p></div></div>
-          <p class="mt-3 text-base sm:text-lg font-black leading-tight">6 New • 4 Review</p><p class="week-detail mt-1">Cumulative practice</p>
-          <button type="button" data-launch-week="7" data-idle-label="Start Week 7" aria-describedby="semester-practice-note" class="btn btn-blue mt-auto w-full">Start Week 7</button>
-        </article>
-
-        <article id="week-8" data-week-card="8" aria-labelledby="week-8-title" class="week-card card p-3 sm:p-4 flex flex-col">
-          <div class="flex items-center justify-between gap-2"><span class="week-number" aria-hidden="true">08</span><div class="text-right"><h3 id="week-8-title" class="text-xs font-black uppercase tracking-[0.12em] text-[var(--accent)]">Week 8</h3><p class="mt-1 text-xs font-bold" style="color:var(--muted)">10 Questions</p></div></div>
-          <p class="mt-3 text-base sm:text-lg font-black leading-tight">6 New • 4 Review</p><p class="week-detail mt-1">Cumulative practice</p>
-          <button type="button" data-launch-week="8" data-idle-label="Start Week 8" aria-describedby="semester-practice-note" class="btn btn-blue mt-auto w-full">Start Week 8</button>
-        </article>
-
-        <article id="week-9" data-week-card="9" aria-labelledby="week-9-title" class="week-card card p-3 sm:p-4 flex flex-col">
-          <div class="flex items-center justify-between gap-2"><span class="week-number" aria-hidden="true">09</span><div class="text-right"><h3 id="week-9-title" class="text-xs font-black uppercase tracking-[0.12em] text-[var(--accent)]">Week 9</h3><p class="mt-1 text-xs font-bold" style="color:var(--muted)">10 Questions</p></div></div>
-          <p class="mt-3 text-base sm:text-lg font-black leading-tight">6 New • 4 Review</p><p class="week-detail mt-1">Cumulative practice</p>
-          <button type="button" data-launch-week="9" data-idle-label="Start Week 9" aria-describedby="semester-practice-note" class="btn btn-blue mt-auto w-full">Start Week 9</button>
-        </article>
-
-        <article id="week-10" data-week-card="10" aria-labelledby="week-10-title" class="week-card card p-3 sm:p-4 flex flex-col">
-          <div class="flex items-center justify-between gap-2"><span class="week-number" aria-hidden="true">10</span><div class="text-right"><h3 id="week-10-title" class="text-xs font-black uppercase tracking-[0.12em] text-[var(--accent)]">Week 10</h3><p class="mt-1 text-xs font-bold" style="color:var(--muted)">10 Questions</p></div></div>
-          <p class="mt-3 text-base sm:text-lg font-black leading-tight">6 New • 4 Review</p><p class="week-detail mt-1">Cumulative practice</p>
-          <button type="button" data-launch-week="10" data-idle-label="Start Week 10" aria-describedby="semester-practice-note" class="btn btn-blue mt-auto w-full">Start Week 10</button>
-        </article>
+      <div class="card p-4 sm:p-6 grid md:grid-cols-[1.15fr_1fr] gap-5 sm:gap-8">
+        <div>
+          <p class="practice-eyebrow text-xs font-black uppercase tracking-[0.2em]">Weekly alternative · Weeks 1–10</p>
+          <h2 id="semester-practice-heading" class="mt-1 text-2xl sm:text-3xl font-black">Standard Weekly Practice</h2>
+          <p class="mt-2 max-w-3xl text-sm leading-relaxed" style="color:var(--muted)">Fresh 10-question sets using the weekly composition, without personalized selection. Week 1 uses Week 1 only; Weeks 2–10 use 6 new + 4 cumulative-review questions.</p>
+        </div>
+        <div class="adaptive-controls p-4 sm:p-5">
+          <label for="weekly-week" class="block text-sm font-bold">Practice week</label>
+          <select id="weekly-week" class="mt-2 w-full" required aria-describedby="weekly-scope-note weekly-selection-summary semester-practice-note">
+            <option value="" selected>Choose a week</option>
+            <option value="1">Week 1</option>
+            <option value="2">Week 2</option>
+            <option value="3">Week 3</option>
+            <option value="4">Week 4</option>
+            <option value="5">Week 5</option>
+            <option value="6">Week 6</option>
+            <option value="7">Week 7</option>
+            <option value="8">Week 8</option>
+            <option value="9">Week 9</option>
+            <option value="10">Week 10</option>
+          </select>
+          <p id="weekly-scope-note" class="mt-2 text-sm leading-relaxed" style="color:var(--muted)">Week 1 is Week 1 content only. Weeks 2–10 use 6 new and 4 cumulative-review questions.</p>
+          <p id="weekly-selection-summary" class="mt-3 text-sm font-semibold" role="status" aria-live="polite" aria-atomic="true">Choose a week to enable Standard Weekly Practice.</p>
+          <button id="weekly-launch" type="button" data-idle-label="Start Weekly Practice" disabled
+            class="btn btn-blue mt-3 w-full" aria-describedby="weekly-selection-summary semester-practice-note">Start Weekly Practice</button>
+          <div id="launch-status" class="hidden mt-3 text-sm leading-relaxed" role="status" aria-live="polite" aria-atomic="true"></div>
+          <noscript><p class="mt-3 text-sm">Enable JavaScript to choose a week and launch Standard Weekly Practice.</p></noscript>
+        </div>
       </div>
 
       <div id="semester-practice-note" class="semester-note mt-4 px-4 py-3 text-xs sm:text-sm leading-relaxed" style="color:var(--muted)">
@@ -274,6 +191,6 @@
   </main>
 
   <script src="assets/js/review-queue-store.js?v=20260903a"></script>
-  <script type="module" src="assets/js/fall-2026-lab3-launcher.js?v=20260907a"></script>
+  <script type="module" src="assets/js/fall-2026-lab3-launcher.js?v=20260912b"></script>
 </body>
 </html>

@@ -2328,6 +2328,65 @@ test("Week 1 practice override must be explicit and exactly match the authorized
   }
 });
 
+test("Week 6 week-focus is ten current-week items with no prior-week review", () => {
+  const result = generateFall2026Quiz({
+    drugData, policy, quizWeek: 6, mode: "week-focus", questionCount: 10, seed: "f26-20-week-6-focus"
+  });
+  assert.equal(result.status, "generated");
+  assert.equal(result.mode, "week-focus");
+  assert.equal(result.questions.length, 10);
+  assert.deepEqual(result.composition, {
+    newMaterialItemTarget: 10,
+    reviewMaterialItemTarget: 0,
+    totalItemTarget: 10
+  });
+  for (const question of result.questions) {
+    assert.equal(question.metadata.sourceMaterial, "new");
+    assert.equal(question.metadata.sourceDrugQuizWeek, 6);
+    assert.equal(question.metadata.requestedQuizWeek, 6);
+  }
+  assert.ok(!JSON.stringify(result).includes('"sourceMaterial":"review"'));
+});
+
+test("Week 1 week-focus is ten current items and zero review", () => {
+  const result = generateFall2026Quiz({
+    drugData, policy, quizWeek: 1, mode: "week-focus", questionCount: 10, seed: "f26-20-week-1-focus"
+  });
+  assert.equal(result.questions.length, 10);
+  assert.equal(result.composition.reviewMaterialItemTarget, 0);
+  assert.equal(
+    result.questions.filter((question) => question.metadata.sourceMaterial === "review").length,
+    0
+  );
+  assert.ok(result.questions.every((question) => question.metadata.sourceDrugQuizWeek === 1));
+});
+
+test("default Week 6 generation stays 6 new plus 4 review after week-focus", () => {
+  const result = generate(6, "f26-20-week-6-default");
+  assert.equal(result.questions.length, 10);
+  assert.equal(result.mode, undefined);
+  assert.deepEqual(result.composition, {
+    newMaterialItemTarget: 6,
+    reviewMaterialItemTarget: 4,
+    totalItemTarget: 10
+  });
+  assert.equal(result.questions.filter((question) => question.metadata.sourceMaterial === "new").length, 6);
+  assert.equal(result.questions.filter((question) => question.metadata.sourceMaterial === "review").length, 4);
+});
+
+test("week-focus requires mode and exactly ten questions", () => {
+  for (const options of [
+    { quizWeek: 6, mode: "week-focus" },
+    { quizWeek: 6, mode: "week-focus", questionCount: 6 },
+    { quizWeek: 1, mode: "week-focus", questionCount: 8 }
+  ]) {
+    assert.throws(
+      () => generateFall2026Quiz({ drugData, policy, seed: "invalid-week-focus", ...options }),
+      (error) => error instanceof Fall2026GeneratorError && error.code === "INVALID_WEEK_FOCUS_CONFIGURATION"
+    );
+  }
+});
+
 test("invalid quiz weeks fail cleanly", () => {
   for (const quizWeek of [0, 11, 2.5, "2", null]) {
     assert.throws(
