@@ -563,6 +563,83 @@ test("historical wrongCounts magnitude does not control hard selection", () => {
   assert.doesNotMatch(codeOnly, /[.\[]\s*["']?wrongCounts/, "adaptive must not read wrongCounts");
 });
 
+function makeAdaptiveItem({ id, domain, drug, week = 3 }) {
+  return {
+    id: `f26-17-${id}`,
+    type: domain === "brandGeneric" ? "short" : "mcq",
+    prompt: `Adaptive balance prompt ${id}`,
+    answer: `Adaptive balance answer ${id}`,
+    ...(domain === "brandGeneric" ? {} : { choices: ["A", "B", "C", "D"] }),
+    metadata: {
+      knowledgeDomain: domain,
+      sourceDrugId: drug,
+      requestedQuizWeek: week,
+      generatorId: adaptive.ADAPTIVE_GENERATOR_ID,
+      sourceMaterial: "new"
+    }
+  };
+}
+
+test("an ADR-heavy weakness still caps same-domain picks when B/G and FDA remain eligible", () => {
+  const adr = Array.from({ length: 12 }, (_, index) => makeAdaptiveItem({
+    id: `adr-${index}`,
+    domain: "topAdverseReactions",
+    drug: `adr-drug-${index}`
+  }));
+  const fda = Array.from({ length: 8 }, (_, index) => makeAdaptiveItem({
+    id: `fda-${index}`,
+    domain: "fdaIndication",
+    drug: `fda-drug-${index}`
+  }));
+  const brandGeneric = Array.from({ length: 8 }, (_, index) => makeAdaptiveItem({
+    id: `bg-${index}`,
+    domain: "brandGeneric",
+    drug: `bg-drug-${index}`
+  }));
+  const candidates = [...adr, ...fda, ...brandGeneric];
+  const signals = adaptive.buildAdaptiveSignals({
+    reviewEntries: adr.map((question) => missedEntry(question, { missCount: 6, reviewMissCount: 3 })),
+    now: NOW
+  });
+
+  const round = adaptive.selectAdaptiveRound({
+    candidates, signals, seed: "f26-17-adr-cap"
+  });
+  const domainCounts = new Map();
+  for (const question of round.questions) {
+    const domain = question.metadata.knowledgeDomain;
+    domainCounts.set(domain, (domainCounts.get(domain) || 0) + 1);
+  }
+
+  assert.equal(round.questions.length, 10);
+  assert.ok((domainCounts.get("topAdverseReactions") || 0) <= 4,
+    `ADR may overweight but must not exceed 4 when other domains remain eligible: ${JSON.stringify(Object.fromEntries(domainCounts))}`);
+  assert.ok((domainCounts.get("fdaIndication") || 0) > 0, "FDA must remain selectable");
+  assert.ok((domainCounts.get("brandGeneric") || 0) > 0, "Brand/Generic must remain selectable");
+  assert.equal(fingerprints(round.questions).size, 10);
+});
+
+test("an ADR-only pool may still emit an ADR-heavy round", () => {
+  const adr = Array.from({ length: 12 }, (_, index) => makeAdaptiveItem({
+    id: `only-adr-${index}`,
+    domain: "topAdverseReactions",
+    drug: `only-adr-drug-${index}`
+  }));
+  const signals = adaptive.buildAdaptiveSignals({
+    reviewEntries: adr.map((question) => missedEntry(question, { missCount: 5, reviewMissCount: 2 })),
+    now: NOW
+  });
+  const round = adaptive.selectAdaptiveRound({
+    candidates: adr, signals, seed: "f26-17-adr-only"
+  });
+  assert.equal(round.questions.length, 10);
+  assert.equal(
+    round.questions.filter((question) => question.metadata.knowledgeDomain === "topAdverseReactions").length,
+    10,
+    "a source-safe ADR-only pool must not be starved by domain balance"
+  );
+});
+
 test("malformed or empty history falls back to balanced practice", () => {
   const shapes = [
     { reviewEntries: [], historyEntries: [], memory: null },
@@ -620,8 +697,14 @@ test("a strict FITB candidate passes through selection with its contract intact"
     && Array.isArray(q?._acceptedAnswers) && q._acceptedAnswers.length > 0);
   assert.ok(strictWithAccepted, "corpus must supply a strict question with accepted answers");
 
+  const otherDomainFillers = candidates.filter((question) => (
+    adaptive.getQuestionFingerprint(question) !== adaptive.getQuestionFingerprint(strictWithAccepted)
+    && question.metadata?.knowledgeDomain !== "brandGeneric"
+  )).slice(0, 9);
   const round = adaptive.selectAdaptiveRound({
-    candidates: [strictWithAccepted, ...candidates.slice(0, 20)], signals, seed: "fitb-passthrough"
+    candidates: [strictWithAccepted, ...otherDomainFillers],
+    signals,
+    seed: "fitb-passthrough"
   });
   const selected = round.questions.find((q) =>
     adaptive.getQuestionFingerprint(q) === adaptive.getQuestionFingerprint(strictWithAccepted));

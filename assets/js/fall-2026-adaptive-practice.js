@@ -13,6 +13,12 @@
 // (`missCount`, `reviewMissCount`, `clearStreak`, archived/refresh-due state,
 // miss recency, exposure, and recent attempt history) were unaffected by that
 // bug.
+//
+// Round-local domain balance is applied live inside selectAdaptiveRound as
+// the current round fills. Weakness may still overweight one domain (two to
+// four items is allowed). Further same-domain picks pay a rising penalty when
+// other source-safe domains remain eligible in the current pass. This is not
+// a six-domain quota and is not baked into scoreCandidate.
 
 import { generateFall2026Quiz } from "./fall-2026-quiz-generator.js?v=20260827a";
 
@@ -57,6 +63,14 @@ export const ADAPTIVE_WEIGHTS = Object.freeze({
   masteryPenalty: 2.2,    // currently strong material steps aside
   repeatFingerprint: 5.0, // served very recently as the identical item
   repeatConcept: 1.0      // same drug+domain served very recently
+});
+
+// Live same-domain penalties, keyed by how many items of that domain are
+// already in the current round. Applied only during selection.
+export const ADAPTIVE_DOMAIN_REPEAT_PENALTY = Object.freeze({
+  2: 0.4,
+  3: 1.8,
+  atLeast4: 4.0
 });
 
 // --- small deterministic helpers ---------------------------------------------
@@ -555,15 +569,36 @@ export function selectAdaptiveRound({
   const chosen = [];
   const usedFingerprints = new Set();
   const usedConcepts = new Set();
+  const domainCounts = new Map();
   const counts = { weakness: 0, refresh: 0, coverage: 0, balanced: 0 };
 
   const servedLastRound = signals.exposure.lastRoundFingerprints || new Set();
+
+  const domainOf = (entry) => {
+    const metadata = isRecord(entry.candidate?.metadata) ? entry.candidate.metadata : {};
+    return String(metadata.knowledgeDomain || "").trim();
+  };
+
+  const liveDomainPenalty = (alreadyChosen) => {
+    if (alreadyChosen >= 4) return ADAPTIVE_DOMAIN_REPEAT_PENALTY.atLeast4;
+    if (alreadyChosen === 3) return ADAPTIVE_DOMAIN_REPEAT_PENALTY[3];
+    if (alreadyChosen === 2) return ADAPTIVE_DOMAIN_REPEAT_PENALTY[2];
+    return 0;
+  };
+
+  const effectiveScore = (entry) => {
+    const domain = domainOf(entry);
+    const alreadyChosen = domain ? (domainCounts.get(domain) || 0) : 0;
+    return entry.score - liveDomainPenalty(alreadyChosen);
+  };
 
   const take = (entry) => {
     chosen.push(entry);
     usedFingerprints.add(entry.fingerprint);
     if (entry.conceptKey) usedConcepts.add(entry.conceptKey);
     counts[entry.bucket] += 1;
+    const domain = domainOf(entry);
+    if (domain) domainCounts.set(domain, (domainCounts.get(domain) || 0) + 1);
   };
 
   const eligible = (entry, { allowRepeat, allowConceptReuse }) => {
@@ -573,22 +608,60 @@ export function selectAdaptiveRound({
     return true;
   };
 
+  const otherDomainEligible = (options, exceptDomain) => ranked.some((entry) => {
+    if (!eligible(entry, options)) return false;
+    const domain = domainOf(entry);
+    return Boolean(domain) && domain !== exceptDomain;
+  });
+
+  const canTakeForDomainBalance = (entry, options) => {
+    const domain = domainOf(entry);
+    if (!domain) return true;
+    const alreadyChosen = domainCounts.get(domain) || 0;
+    if (alreadyChosen < 4) return true;
+    return !otherDomainEligible(options, domain);
+  };
+
+  const betterEntry = (candidate, currentBest) => {
+    if (!currentBest) return true;
+    const candidateScore = effectiveScore(candidate);
+    const bestScore = effectiveScore(currentBest);
+    return candidateScore > bestScore
+      || (
+        candidateScore === bestScore
+        && (
+          candidate.jitter < currentBest.jitter
+          || (candidate.jitter === currentBest.jitter && candidate.index < currentBest.index)
+        )
+      );
+  };
+
+  const pickBest = (options, bucket) => {
+    let best = null;
+    for (const entry of ranked) {
+      if (bucket && entry.bucket !== bucket) continue;
+      if (!eligible(entry, options)) continue;
+      if (!canTakeForDomainBalance(entry, options)) continue;
+      if (betterEntry(entry, best)) best = entry;
+    }
+    return best;
+  };
+
   const fillBuckets = (options) => {
     for (const bucket of ADAPTIVE_BUCKET_ORDER) {
       const target = Math.max(0, Number(targets[bucket]) || 0);
-      for (const entry of ranked) {
-        if (chosen.length >= size || counts[bucket] >= target) break;
-        if (entry.bucket !== bucket) continue;
-        if (!eligible(entry, options)) continue;
+      while (chosen.length < size && counts[bucket] < target) {
+        const entry = pickBest(options, bucket);
+        if (!entry) break;
         take(entry);
       }
     }
   };
 
   const backfill = (options) => {
-    for (const entry of ranked) {
-      if (chosen.length >= size) break;
-      if (!eligible(entry, options)) continue;
+    while (chosen.length < size) {
+      const entry = pickBest(options, null);
+      if (!entry) break;
       take(entry);
     }
   };
