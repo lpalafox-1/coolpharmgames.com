@@ -32,7 +32,7 @@
       outline: 3px solid var(--study-accent, var(--accent));
       outline-offset: 4px;
     }
-    #adaptive-practice, #standard-weekly-practice { scroll-margin-top: 1rem; }
+    #adaptive-practice, #week-focus, #standard-weekly-practice { scroll-margin-top: 1rem; }
     .adaptive-card { border-top: 4px solid var(--accent); }
     .practice-eyebrow { color: var(--study-accent); }
     .adaptive-controls { border-radius: 1rem; background: color-mix(in srgb, var(--accent) 6%, var(--card)); }
@@ -157,6 +157,17 @@
           <div id="adaptive-status" class="hidden mt-3 text-sm leading-relaxed" role="status" aria-live="polite" aria-atomic="true"></div>
           <noscript><p class="mt-3 text-sm">Enable JavaScript to choose a week and launch practice.</p></noscript>
         </div>
+      </div>
+    </section>
+
+    <section id="week-focus" class="max-w-6xl mx-auto px-4 pt-5 sm:pt-6" aria-labelledby="week-focus-heading">
+      <div class="card p-4 sm:p-6">
+        <p class="practice-eyebrow text-xs font-black uppercase tracking-[0.18em]">Selected-week practice</p>
+        <div class="mt-2 flex flex-wrap items-center gap-2">
+          <h2 id="week-focus-heading" class="text-2xl sm:text-3xl font-black">Week Focus</h2>
+          <span class="text-xs font-black uppercase tracking-[0.16em]" style="color:var(--muted)">Coming Soon</span>
+        </div>
+        <p class="mt-3 max-w-3xl text-sm sm:text-base leading-relaxed" style="color:var(--muted)">Practice one selected week only, with no cumulative review. Adaptive Practice through Week X remains the performance-guided path.</p>
       </div>
     </section>
 

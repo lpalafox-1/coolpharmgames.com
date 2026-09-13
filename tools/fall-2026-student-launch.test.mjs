@@ -328,6 +328,39 @@ test("homepage exposes direct Fall launches while preserving every legacy study 
   assert.ok(homepage.includes("P1 Fall 2025"));
 });
 
+test("the hub shows Week Focus as Coming Soon without a Week Focus launcher", () => {
+  const page = readFileSync(path.join(repoRoot, "lab3-fall-2026.html"), "utf8");
+  const adaptiveIndex = page.indexOf('id="adaptive-practice"');
+  const weekFocusIndex = page.indexOf('id="week-focus"');
+  const resourcesIndex = page.indexOf('aria-label="Study resources"');
+  const weeklyIndex = page.indexOf('id="standard-weekly-practice"');
+  assert.notEqual(adaptiveIndex, -1);
+  assert.notEqual(weekFocusIndex, -1);
+  assert.notEqual(resourcesIndex, -1);
+  assert.notEqual(weeklyIndex, -1);
+  assert.ok(weekFocusIndex > adaptiveIndex, "Week Focus must follow Adaptive Practice");
+  assert.ok(weekFocusIndex < resourcesIndex, "Week Focus must precede the resource nav");
+  assert.ok(weekFocusIndex < weeklyIndex, "Week Focus must precede Standard Weekly Practice");
+
+  const weekFocus = page.slice(weekFocusIndex, resourcesIndex);
+  assert.match(htmlText(weekFocus), /Week Focus/);
+  assert.match(htmlText(weekFocus), /Coming Soon/);
+  assert.match(htmlText(weekFocus), /selected week only/i);
+  assert.match(htmlText(weekFocus), /no cumulative review/i);
+  assert.match(htmlText(weekFocus), /Adaptive Practice through Week X/i);
+  assert.doesNotMatch(weekFocus, /<select\b/i);
+  assert.doesNotMatch(weekFocus, /<button\b/i);
+  assert.doesNotMatch(weekFocus, /\bdata-week-card\b|\bdata-launch-week\b|id="adaptive-week"/);
+  assert.doesNotMatch(weekFocus, /href="quiz\.html/);
+  assert.doesNotMatch(weekFocus, /href="[^"]+"/i);
+
+  const cardTags = [...page.matchAll(/<article\b[^>]*\bdata-week-card="(\d+)"[^>]*>/g)];
+  const launchButtons = [...page.matchAll(/<button\b[^>]*\bdata-launch-week="(\d+)"[^>]*>/g)];
+  assert.deepEqual(cardTags.map((match) => Number(match[1])), FALL_LAB3_WEEKS);
+  assert.deepEqual(launchButtons.map((match) => Number(match[1])), FALL_LAB3_WEEKS);
+  assert.ok(page.includes('src="assets/js/fall-2026-lab3-launcher.js?v=20260907a"'));
+});
+
 test("Fall Lab III hub exposes ten unified visible week cards with ten native launch buttons", () => {
   const page = readFileSync(path.join(repoRoot, "lab3-fall-2026.html"), "utf8");
   const cardTags = [...page.matchAll(/<article\b[^>]*\bdata-week-card="(\d+)"[^>]*>/g)];
@@ -470,6 +503,25 @@ test("homepage separates primary study tools, quiet utilities, and chronological
   assert.ok(spring.includes('id="lab2-series"'));
   assert.ok(fall.includes('href="quiz.html?id=ceutics-practice-1"'));
   assert.ok(fall.includes('href="quiz.html?id=top-drugs-final-mockE"'));
+});
+
+test("homepage current semester shows Lab IV Spring 2027 Coming Soon without a launch", () => {
+  const homepage = readFileSync(path.join(repoRoot, "index.html"), "utf8");
+  const current = sectionBetween(homepage, "current-semester", "study-tools");
+  const planned = sectionBetween(homepage, "upcoming-planned");
+  const lab4Start = current.indexOf('id="lab4-coming-soon"');
+  assert.notEqual(lab4Start, -1, "Lab IV placeholder must live in #current-semester");
+  const lab4 = current.slice(lab4Start);
+  const lab4Text = htmlText(lab4);
+
+  assert.match(lab4Text, /Lab IV/);
+  assert.match(lab4Text, /Spring 2027/);
+  assert.match(lab4Text, /Coming Soon/);
+  assert.equal(hrefsIn(lab4).length, 0, "the Lab IV placeholder must not expose a launch");
+  assert.doesNotMatch(lab4, /href="quiz\.html/);
+  assert.equal(hrefsIn(planned).length, 0, "upcoming-planned still has no hrefs");
+  assert.doesNotMatch(htmlText(planned), /Lab IV/);
+  assert.ok(homepage.includes('src="assets/js/home.js?v=20260429a"'));
 });
 
 test("homepage keeps compact navigation, planned-content, count, touch-target, and dark-mode contracts", () => {
