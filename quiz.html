@@ -60,6 +60,72 @@
       .action-btn { max-width: 250px; padding: 1rem 1.5rem !important; font-size: 0.875rem !important; border-radius: 12px !important; }
       #question-card { padding: 3rem !important; }
     }
+
+    /* Question-screen QoL below the desktop breakpoint - the same 1024px split
+       that already swaps the Mastery aside for the mobile control row. On a
+       375px phone the question used to start 58% of the way down the screen,
+       with Check Answer 1.6 screens below that. */
+    @media (max-width: 1023px) {
+      /* #quiz-title already names the round above the question. #drug-context
+         repeated it verbatim on every route: Fall and Top Drugs use the round
+         title itself, and each Endocrine context label is a subset of its own
+         quiz title. On a phone it only spent height. */
+      #drug-context { display: none; }
+
+      /* One compact line instead of a ~180px card. The engine already toggles
+         .hot at a streak of 3+, so the flavor text still appears when a streak
+         is worth celebrating - inline, so nothing below it shifts. */
+      .streak-panel { padding: .45rem .75rem; margin-top: .5rem; }
+      .streak-panel .streak-head { align-items: center; }
+      .streak-panel .streak-head > div:first-child { display: flex; align-items: baseline; gap: .6rem; }
+      .streak-panel .streak-best { margin-top: 0; }
+      .streak-panel .streak-track { display: none; }
+      .streak-panel:not(.hot) .streak-flavor { display: none; }
+
+      /* Keep Check Answer reachable. Sticky rather than fixed: the bar settles
+         back into its natural place at the end of the page, so it never
+         permanently covers content. Element+class specificity is needed to
+         beat the Tailwind spacing utilities on the same element. */
+      main > .quiz-action-bar {
+        position: sticky;
+        bottom: 0;
+        z-index: 40;
+        margin-top: 1.5rem;
+        padding: .75rem 0 calc(.75rem + env(safe-area-inset-bottom, 0px));
+        gap: .75rem;
+        background: var(--bg);
+        border-top: 1px solid var(--ring);
+        box-shadow: 0 -10px 24px -18px rgba(15, 23, 42, .45);
+      }
+
+      /* styles.css deliberately stacks this row into full-width "big buttons
+         for thumbs". Stacked AND sticky made a ~157px bar that covered half the
+         choices, so the row goes back to one line: the primary action keeps
+         the full remaining width and its large tap target, and Prev sits
+         beside it. The ID selectors are required to outrank the existing
+         #check/#next/#check-all { width: 100% } rule. */
+      main > .quiz-action-bar { flex-direction: row; flex-wrap: nowrap; align-items: stretch; }
+      main > .quiz-action-bar > button { width: auto; min-width: 0; }
+      main > .quiz-action-bar > #prev { flex: 0 0 auto; padding-left: 1.1rem; padding-right: 1.1rem; }
+      main > .quiz-action-bar > #check,
+      main > .quiz-action-bar > #next,
+      main > .quiz-action-bar > #check-all { flex: 1 1 0%; width: auto; }
+
+      /* The one three-button state - last question, everything seen, something
+         unanswered - squeezed three labels into a single row and wrapped them
+         to four lines each, rebuilding a ~160px bar. Only in that state, give
+         "Check All Answers & Finish" its own full-width line so every label
+         stays on one line. The common two-button case stays a single row. */
+      main > .quiz-action-bar:has(> #check-all:not(.hidden)) { flex-wrap: wrap; row-gap: .5rem; }
+      main > .quiz-action-bar:has(> #check-all:not(.hidden)) > #check-all { flex: 1 1 100%; order: 3; }
+
+      /* Completion hides the individual buttons, not this container. Without
+         this an empty bar would float over the results screen. */
+      main > .quiz-action-bar:has(#prev[data-completion-hidden]) { display: none; }
+
+      /* Keyboard focus has to land above the sticky bar, not behind it. */
+      html { scroll-padding-bottom: 6rem; }
+    }
   </style>
 </head>
 
@@ -155,7 +221,7 @@
       <button id="restart-mobile" class="px-4 py-2 bg-red-500/5 text-red-600 border border-red-500/10 rounded-xl text-xs font-bold">🔄 Restart</button>
     </div>
 
-    <footer class="mt-10 flex flex-wrap gap-4 w-full justify-center max-w-2xl mx-auto">
+    <footer class="quiz-action-bar mt-10 flex flex-wrap gap-4 w-full justify-center max-w-2xl mx-auto">
       <button id="prev" class="action-btn flex-1 py-4 rounded-2xl font-bold bg-gray-100 dark:bg-white/5">← Prev</button>
       <button id="check" class="action-btn flex-[2] py-4 rounded-2xl font-black text-white bg-[#8b1e3f]">Check Answer</button>
       <button id="check-all" class="hidden action-btn flex-[3] py-4 rounded-2xl font-black text-white bg-blue-600">Check All Answers &amp; Finish</button>
