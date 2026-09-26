@@ -1088,5 +1088,5 @@ test("the hub offers Adaptive Practice without AI language", () => {
   // Normal Week Practice stays visible as its own dropdown launcher.
   assert.match(hub, /id="weekly-week"/);
   assert.match(hub, /id="weekly-launch"/);
-  assert.match(hub, /assets\/js\/fall-2026-lab3-launcher\.js\?v=20260926c/);
+  assert.match(hub, /assets\/js\/fall-2026-lab3-launcher\.js\?v=20260926d/);
 });

@@ -46,10 +46,11 @@ test("the hub hero names Adaptive, Week Focus, and Standard as three modes", () 
 
 test("Adaptive copy states the F26-19 target, the Week 1 exception, and the ceiling fallback", () => {
   assert.match(adaptive, /Recommended 10-question rounds shaped by your saved performance/);
-  assert.match(adaptive, /Week 1 is 10 Week 1 questions/);
+  assert.match(adaptive, /Week 1: all 10 questions from Week 1/);
   assert.match(adaptive, /Weeks 2–10 target 6 questions from the week you choose and 4 prior-week review questions/);
-  assert.match(adaptive, /Nothing after that week is included/);
-  assert.match(adaptive, /If that target mix cannot be filled safely, the round still stays inside the selected-week ceiling/);
+  assert.match(adaptive, /If there aren't enough eligible questions for that mix, the round adjusts but still never goes past your selected week/);
+  assert.doesNotMatch(adaptive, /Nothing after that week is included/);
+  assert.doesNotMatch(adaptive, /selected-week ceiling/);
   assert.match(adaptive, /never includes material after the week you choose/i);
   assert.doesNotMatch(adaptive, /can use Weeks 1/i);
   assert.doesNotMatch(adaptive, /always (?:uses|includes)?\s*6/i);
@@ -58,9 +59,10 @@ test("Adaptive copy states the F26-19 target, the Week 1 exception, and the ceil
 });
 
 test("the Adaptive live summary is selected-week-specific and no longer a Weeks 1–N pool", () => {
-  assert.match(adaptiveSummary, /This round is 10 Week 1 questions/);
+  assert.match(adaptiveSummary, /all 10 questions from Week 1/);
   assert.match(adaptiveSummary, /targets 6 Week \$\{targetWeek\} questions and 4 review questions from \$\{priorWeeks\}/);
-  assert.match(adaptiveSummary, /chosen from your saved performance/);
+  assert.match(adaptiveSummary, /guided by your saved performance/);
+  assert.doesNotMatch(adaptiveSummary, /chosen from your saved performance/);
   assert.match(adaptiveSummary, /Nothing after Week \$\{targetWeek\} is included/);
   assert.match(adaptiveSummary, /targetWeek === 2 \? "Week 1" : `Weeks 1–\$\{targetWeek - 1\}`/);
   assert.doesNotMatch(adaptiveSummary, /content ceiling/i);
@@ -78,7 +80,7 @@ test("Week Focus, Standard, and Adaptive descriptions stay semantically distinct
   assert.doesNotMatch(standard, /saved performance|selected-week ceiling|no prior-week review/i);
 
   assert.match(adaptive, /saved performance/);
-  assert.match(adaptive, /selected-week ceiling/);
+  assert.match(adaptive, /never goes past your selected week/);
   assert.doesNotMatch(adaptive, /6 new \+ 4 cumulative-review|selected week only/i);
 });
 
@@ -88,5 +90,5 @@ test("mode copy does not collapse the three week selectors", () => {
   assert.match(hub, /id="adaptive-launch"/);
   assert.match(hub, /id="week-focus-launch"/);
   assert.match(hub, /id="weekly-launch"/);
-  assert.match(hub, /assets\/js\/fall-2026-lab3-launcher\.js\?v=20260926c/);
+  assert.match(hub, /assets\/js\/fall-2026-lab3-launcher\.js\?v=20260926d/);
 });

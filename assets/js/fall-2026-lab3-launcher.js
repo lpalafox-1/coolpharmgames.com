@@ -444,10 +444,10 @@ function getSelectedAdaptiveWeek() {
 function describeAdaptiveSelection(targetWeek) {
   if (targetWeek === null) return "Choose a week to enable Adaptive Practice.";
   if (targetWeek === 1) {
-    return "Week 1 selected. This round is 10 Week 1 questions. Nothing after Week 1 is included.";
+    return "Week 1 selected: all 10 questions from Week 1. Nothing after Week 1 is included.";
   }
   const priorWeeks = targetWeek === 2 ? "Week 1" : `Weeks 1–${targetWeek - 1}`;
-  return `Week ${targetWeek} selected. This round targets 6 Week ${targetWeek} questions and 4 review questions from ${priorWeeks}, chosen from your saved performance. Nothing after Week ${targetWeek} is included.`;
+  return `Week ${targetWeek} selected. This round targets 6 Week ${targetWeek} questions and 4 review questions from ${priorWeeks}, guided by your saved performance. Nothing after Week ${targetWeek} is included.`;
 }
 
 function syncAdaptiveAvailability() {

@@ -237,12 +237,13 @@ test("the visible scope summary always describes the week actually selected", as
         `Week ${targetWeek} summary named a later week: ${laterWeeks.join(", ")}`);
 
       if (targetWeek === 1) {
-        assert.match(summary.textContent, /10 Week 1 questions/);
+        assert.match(summary.textContent, /all 10 questions from Week 1/);
         assert.doesNotMatch(summary.textContent, /targets 6/);
       } else {
         assert.match(summary.textContent, new RegExp(`targets 6 Week ${targetWeek} questions`));
         assert.match(summary.textContent, /4 review questions/);
-        assert.match(summary.textContent, /chosen from your saved performance/);
+        assert.match(summary.textContent, /guided by your saved performance/);
+        assert.doesNotMatch(summary.textContent, /chosen from your saved performance/);
         const prior = targetWeek === 2 ? /from Week 1\b/ : new RegExp(`from Weeks 1[–-]${targetWeek - 1}\\b`);
         assert.match(summary.textContent, prior, `Week ${targetWeek} must name only its prior-week review range`);
       }
