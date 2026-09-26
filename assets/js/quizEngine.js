@@ -452,6 +452,7 @@ const FALL_LAB3_PRACTICE_KIND = "fall-2026-lab3-practice";
 const FALL_LAB3_BOSS_REMIX_KIND = "fall-2026-lab3-boss-remix";
 const FALL_LAB3_ADAPTIVE_KIND = "fall-2026-lab3-adaptive";
 const FALL_LAB3_ADAPTIVE_REQUEST_KEY = "pharmlet.fall-2026-lab3.adaptive-request";
+const FALL_LAB3_WEEKLY_REQUEST_KEY = "pharmlet.fall-2026-lab3.weekly-request";
 const FALL_LAB3_MIN_WEEK = 1;
 const FALL_LAB3_MAX_WEEK = 10;
 const FALL_LAB3_BOSS_BASE_SIZE = 5;
@@ -2093,6 +2094,21 @@ function startFallLab3WeekPractice(quizWeek) {
 
     // A plain weekly practice launch must never inherit a stale remix request.
     clearFallLab3BossRemixRequest();
+
+    // Same contract as the adaptive request: a real completion click writes a
+    // single-use, expiring record and the hub launcher consumes it, so the
+    // ?week=N below stays a preselection for bookmarks and shared URLs while
+    // this action completes without a second click. If the write fails, the
+    // preselected hub is the fallback.
+    try {
+        localStorage.setItem(FALL_LAB3_WEEKLY_REQUEST_KEY, JSON.stringify({
+            quizWeek: week,
+            createdAt: Date.now()
+        }));
+    } catch (error) {
+        console.warn("Unable to request a new weekly practice set:", error);
+    }
+
     state.progressCompleted = true;
     location.href = `${FALL_LAB3_HUB_PAGE}?week=${week}`;
     return true;

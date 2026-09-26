@@ -203,6 +203,7 @@ const ADAPTIVE_REQUEST_MAX_AGE_MS = 10 * 60 * 1000;
 // a small { week, createdAt } record that a real completion click writes and
 // that expires, so a bookmarked or shared hub URL can never generate a round.
 const BOSS_REMIX_REQUEST_KEY = "pharmlet.fall-2026-lab3.boss-remix-request";
+const WEEKLY_REQUEST_KEY = "pharmlet.fall-2026-lab3.weekly-request";
 const CONTINUATION_REQUEST_MAX_AGE_MS = 10 * 60 * 1000;
 
 // Strict, not coercive, for the same reason as the adaptive request below:
@@ -218,6 +219,23 @@ function readContinuationWeek(saved, weekField, now) {
   const age = now - createdAt;
   if (age < 0 || age > CONTINUATION_REQUEST_MAX_AGE_MS) return 0;
   return week;
+}
+
+// Read-and-remove, exactly like the adaptive request. "New Week N Practice
+// Set" on the completion screen writes this; the request is spent whether or
+// not it turns out valid, so a stale or malformed one cannot re-fire later.
+export function consumeWeeklyLaunchRequest(now = Date.now()) {
+  let saved = null;
+  try {
+    const raw = localStorage.getItem(WEEKLY_REQUEST_KEY);
+    if (raw === null) return 0;
+    localStorage.removeItem(WEEKLY_REQUEST_KEY);
+    saved = JSON.parse(raw);
+  } catch {
+    try { localStorage.removeItem(WEEKLY_REQUEST_KEY); } catch { /* nothing to clear */ }
+    return 0;
+  }
+  return readContinuationWeek(saved, "quizWeek", now);
 }
 
 // Read-only. The engine owns the Boss Remix request: it writes it from a real
@@ -592,7 +610,10 @@ export function initializePage() {
   // Round". A request is written only by a real completion click, is consumed
   // on read, and expires, so a bookmarked or shared URL can never generate a
   // round - the ?adaptive= query parameter deliberately does nothing.
+  // Both single-use requests are consumed up front so neither can linger past
+  // this page load, whichever one wins. Adaptive keeps precedence.
   const adaptiveRequestWeek = consumeAdaptiveRoundRequest();
+  const weeklyRequestWeek = consumeWeeklyLaunchRequest();
   if (SUPPORTED_WEEKS.has(adaptiveRequestWeek)) {
     const select = document.getElementById("adaptive-week");
     if (select) {
@@ -600,6 +621,15 @@ export function initializePage() {
       syncAdaptiveAvailability();
     }
     return handleAdaptiveLaunch();
+  }
+
+  // "New Week N Practice Set" wrote a weekly request from a real completion
+  // click; the ?week=N in the URL is only its fallback preselection.
+  if (SUPPORTED_WEEKS.has(weeklyRequestWeek)) {
+    return launchStandardContinuation(
+      weeklyRequestWeek,
+      `Building a fresh Week ${weeklyRequestWeek} practice set from the Fall 2026 source data…`
+    );
   }
 
   // "Boss Remix +1" sends the student here with a live remix request. The

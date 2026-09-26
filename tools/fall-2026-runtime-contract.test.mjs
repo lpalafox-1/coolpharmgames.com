@@ -20,8 +20,8 @@ const policy = JSON.parse(
   readFileSync(path.join(repoRoot, "assets", "data", "fall-2026-lab3-quiz-policy.json"), "utf8")
 );
 const APPROVED_ENGINE_BASELINE = Object.freeze({
-  reference: "F26-09 completion & continuation engine change",
-  sha256: "be5ce3f4996981fc9dda427b838e1680773135037e8e048dd8255ab8173c0f7d"
+  reference: "F26-22 weekly continuation request engine change",
+  sha256: "1913b1703f8acddc6bae5070410ee8309cde94e658ea3515a26573858c7ae7bf"
 });
 
 function createStorageStub(initialValues = {}) {
@@ -419,7 +419,7 @@ test(`Fall stays isolated to its launcher, legacy data has no strict marker, and
     "utf8"
   );
   assert.ok(fallPageSource.includes(
-    'src="assets/js/fall-2026-lab3-launcher.js?v=20260926a"'
+    'src="assets/js/fall-2026-lab3-launcher.js?v=20260926b"'
   ));
   assert.ok(launcherSource.includes('from "./fall-2026-quiz-generator.js?v=20260913a"'));
   assert.ok(launcherSource.includes("assets/data/fall-2026-p2-top-drugs.json"));

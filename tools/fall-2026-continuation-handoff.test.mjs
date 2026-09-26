@@ -16,17 +16,23 @@ import { fileURLToPath } from "node:url";
 import { loadBrowserGlobal } from "./browser-global-harness.mjs";
 import {
   buildFall2026Lab3Payload,
+  buildFall2026WeekFocusPayload,
+  consumeWeeklyLaunchRequest,
   initializePage,
+  launchFall2026Lab3WeekFocus,
   peekBossRemixLaunchWeek
 } from "../assets/js/fall-2026-lab3-launcher.js";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relativePath) => readFileSync(path.join(repoRoot, relativePath), "utf8");
 
-const LAUNCHER_TOKEN = "20260926a";
+const LAUNCHER_TOKEN = "20260926b";
+const ENGINE_TOKEN = "20260926a";
 const CUSTOM_QUIZ_KEY = "pharmlet.custom-quiz";
 const REMIX_REQUEST_KEY = "pharmlet.fall-2026-lab3.boss-remix-request";
 const ADAPTIVE_REQUEST_KEY = "pharmlet.fall-2026-lab3.adaptive-request";
+const WEEKLY_REQUEST_KEY = "pharmlet.fall-2026-lab3.weekly-request";
+const ADAPTIVE_MEMORY_KEY = "pharmlet.fall-2026-lab3.adaptive-memory";
 const TEN_MINUTES = 10 * 60 * 1000;
 
 const drugData = JSON.parse(read("assets/data/fall-2026-p2-top-drugs.json"));
@@ -316,6 +322,7 @@ test("the hub ships the repaired launcher and the homepage names the quick links
   const hub = read("lab3-fall-2026.html");
   assert.ok(hub.includes(`src="assets/js/fall-2026-lab3-launcher.js?v=${LAUNCHER_TOKEN}"`), "launcher cache token must move");
   assert.match(hub, /id="standard-weekly-practice"[^>]*tabindex="-1"/, "the Standard section must stay focusable");
+  assert.ok(read("quiz.html").includes(`assets/js/quizEngine.js?v=${ENGINE_TOKEN}`), "engine cache token must move with the engine change");
 
   const homepage = read("index.html");
   assert.doesNotMatch(homepage, /Jump straight to a week/, "the old label promised a launch that no longer happens");
@@ -329,4 +336,191 @@ test("the hub ships the repaired launcher and the homepage names the quick links
   assert.deepEqual([...new Set(writes)].sort(), ["ADAPTIVE_MEMORY_KEY", "CUSTOM_QUIZ_KEY"],
     "the hub reads continuation requests; it never writes one");
   assert.doesNotMatch(launcher, /removeItem\(\s*BOSS_REMIX_REQUEST_KEY/, "the remix request is the engine's to clear");
+});
+
+// --- New Week N Practice Set: completion → single-use request → fresh set ----------
+
+test("consumeWeeklyLaunchRequest is single use, expiring, and strict", () => {
+  const now = Date.now();
+  const previous = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
+  try {
+    for (const quizWeek of [1, 7, 10]) {
+      const storage = createStorage({ [WEEKLY_REQUEST_KEY]: JSON.stringify({ quizWeek, createdAt: now }) });
+      globalThis.localStorage = storage;
+      assert.equal(consumeWeeklyLaunchRequest(now), quizWeek);
+      assert.equal(storage.getItem(WEEKLY_REQUEST_KEY), null, "the request is consumed on read");
+      assert.equal(consumeWeeklyLaunchRequest(now), 0, "a spent request cannot fire twice");
+    }
+
+    for (const [label, value] of [
+      ["expired", JSON.stringify({ quizWeek: 7, createdAt: now - TEN_MINUTES - 1 })],
+      ["future dated", JSON.stringify({ quizWeek: 7, createdAt: now + (5 * 60 * 1000) })],
+      ["no timestamp", JSON.stringify({ quizWeek: 7 })],
+      ["string timestamp", JSON.stringify({ quizWeek: 7, createdAt: String(now) })],
+      ["null timestamp", JSON.stringify({ quizWeek: 7, createdAt: null })],
+      ["week 0", JSON.stringify({ quizWeek: 0, createdAt: now })],
+      ["week 11", JSON.stringify({ quizWeek: 11, createdAt: now })],
+      ["week 2.5", JSON.stringify({ quizWeek: 2.5, createdAt: now })],
+      ["quizWeek true", JSON.stringify({ quizWeek: true, createdAt: now })],
+      ["quizWeek false", JSON.stringify({ quizWeek: false, createdAt: now })],
+      ["quizWeek \"1\"", JSON.stringify({ quizWeek: "1", createdAt: now })],
+      ["quizWeek [1]", JSON.stringify({ quizWeek: [1], createdAt: now })],
+      ["quizWeek null", JSON.stringify({ quizWeek: null, createdAt: now })],
+      ["adaptive-shaped", JSON.stringify({ targetWeek: 7, createdAt: now })],
+      ["not json", "{ broken"],
+      ["not an object", '"7"'],
+      ["an array", "[7]"]
+    ]) {
+      const storage = createStorage({ [WEEKLY_REQUEST_KEY]: value });
+      globalThis.localStorage = storage;
+      assert.equal(consumeWeeklyLaunchRequest(now), 0, `${label} must not launch`);
+      assert.equal(storage.getItem(WEEKLY_REQUEST_KEY), null, `${label} must still be consumed`);
+    }
+
+    const empty = createStorage();
+    globalThis.localStorage = empty;
+    assert.equal(consumeWeeklyLaunchRequest(now), 0);
+    assert.deepEqual(empty.writes, [], "reading with no request writes nothing");
+  } finally {
+    if (previous) Object.defineProperty(globalThis, "localStorage", previous);
+    else delete globalThis.localStorage;
+  }
+});
+
+test("New Week N Practice Set completes as a fresh Standard set without a second click", async () => {
+  const storage = createStorage({
+    [REMIX_REQUEST_KEY]: JSON.stringify({ quizWeek: 9, createdAt: Date.now(), targetSize: 6, remixGeneration: 1 })
+  });
+  const engine = loadEngine({ storage });
+  seedFinishedStandardAttempt(engine, 9, "f26-22-new-week-handoff", [1]);
+  engine.sandbox.showResults();
+
+  assert.equal(engine.sandbox.startFallLab3WeekPractice(9), true);
+  assert.equal(engine.location.href, "lab3-fall-2026.html?week=9", "?week=N stays the fallback preselection URL");
+  const request = JSON.parse(storage.getItem(WEEKLY_REQUEST_KEY));
+  assert.equal(request.quizWeek, 9);
+  assert.ok(Number.isFinite(request.createdAt));
+  assert.equal(storage.getItem(REMIX_REQUEST_KEY), null, "a plain weekly launch still clears a stale remix request");
+  assert.equal(storage.getItem(CUSTOM_QUIZ_KEY), null, "the engine hands off; it never builds the set");
+
+  await onHub({ storage, search: "?week=9" }, async ({ hub, assigned }) => {
+    await initializePage();
+    assert.deepEqual(assigned, ["quiz.html?id=custom-quiz"]);
+    assert.equal(hub.get("weekly-week").value, "9");
+    assert.equal(storage.getItem(WEEKLY_REQUEST_KEY), null, "single use");
+    const practice = JSON.parse(storage.getItem(CUSTOM_QUIZ_KEY));
+    assert.equal(practice.metadata.kind, "fall-2026-lab3-practice");
+    assert.equal(practice.metadata.quizWeek, 9);
+    assert.deepEqual(practice.metadata.composition, {
+      newMaterialItemTarget: 6,
+      reviewMaterialItemTarget: 4,
+      totalItemTarget: 10
+    }, "Standard 6+4 generation is untouched");
+    assert.equal(storage.getItem(ADAPTIVE_MEMORY_KEY), null, "a Standard launch never touches adaptive memory");
+  });
+
+  // Returning to the same URL later is a bare visit again: preselect only.
+  storage.removeItem(CUSTOM_QUIZ_KEY);
+  await onHub({ storage, search: "?week=9" }, async ({ hub, assigned }) => {
+    await initializePage();
+    assert.deepEqual(assigned, [], "the spent request cannot re-fire from the URL");
+    assert.equal(storage.getItem(CUSTOM_QUIZ_KEY), null);
+    assert.equal(hub.get("weekly-week").value, "9");
+    assert.deepEqual(hub.calls.scrollIntoView.map((call) => call.id), ["standard-weekly-practice"]);
+  });
+});
+
+test("startFallLab3WeekPractice refuses bad weeks and writes no request", () => {
+  // `true` is deliberately absent: this pre-existing function coerces with
+  // Number(), unlike toFallLab3WeekNumber, and F26-22 does not change that.
+  const engine = loadEngine();
+  for (const bad of [0, 11, -1, 2.5, NaN, [], "", null, undefined]) {
+    const literal = typeof bad === "string" ? `"${bad}"` : String(bad);
+    assert.equal(run(engine.sandbox, `startFallLab3WeekPractice(${literal})`), false, `${literal} must be refused`);
+  }
+  assert.equal(engine.storage.getItem(WEEKLY_REQUEST_KEY), null);
+  assert.equal(engine.location.href, "");
+});
+
+test("the adaptive request keeps precedence and a stray weekly request is still consumed", async () => {
+  const now = Date.now();
+  const storage = createStorage({
+    [ADAPTIVE_REQUEST_KEY]: JSON.stringify({ targetWeek: 5, createdAt: now }),
+    [WEEKLY_REQUEST_KEY]: JSON.stringify({ quizWeek: 3, createdAt: now })
+  });
+  await onHub({ storage, search: "" }, async ({ hub, assigned }) => {
+    await initializePage();
+    assert.deepEqual(assigned, ["quiz.html?id=custom-quiz"]);
+    const payload = JSON.parse(storage.getItem(CUSTOM_QUIZ_KEY));
+    assert.equal(payload.metadata.kind, "fall-2026-lab3-adaptive", "Adaptive wins");
+    assert.equal(payload.metadata.adaptiveTargetWeek, 5);
+    assert.equal(hub.get("adaptive-week").value, "5");
+    assert.equal(hub.get("weekly-week").value, "", "the weekly request did not touch the Standard select");
+    assert.equal(storage.getItem(ADAPTIVE_REQUEST_KEY), null);
+    assert.equal(storage.getItem(WEEKLY_REQUEST_KEY), null, "the losing request cannot fire on a later visit");
+  });
+});
+
+// --- boundaries: who never writes or consumes the weekly request -------------------
+
+test("Adaptive and Boss Remix continuations never write the weekly request", () => {
+  const adaptiveEngine = loadEngine();
+  assert.equal(run(adaptiveEngine.sandbox, "startFallLab3AdaptiveRound(7)"), true);
+  assert.ok(adaptiveEngine.storage.getItem(ADAPTIVE_REQUEST_KEY));
+  assert.equal(adaptiveEngine.storage.getItem(WEEKLY_REQUEST_KEY), null);
+  assert.equal(adaptiveEngine.location.href, "lab3-fall-2026.html", "adaptive handoff is unchanged");
+
+  const remixEngine = loadEngine();
+  seedFinishedStandardAttempt(remixEngine, 4, "f26-22-remix-writes-no-weekly", [0, 3]);
+  remixEngine.sandbox.showResults();
+  assert.equal(remixEngine.sandbox.launchFallLab3BossRemix(), true);
+  assert.ok(remixEngine.storage.getItem(REMIX_REQUEST_KEY));
+  assert.equal(remixEngine.storage.getItem(WEEKLY_REQUEST_KEY), null);
+  assert.equal(remixEngine.location.href, "lab3-fall-2026.html?week=4", "remix handoff is unchanged");
+
+  const engine = read("assets/js/quizEngine.js");
+  const writes = [...engine.matchAll(/localStorage\.setItem\(\s*FALL_LAB3_WEEKLY_REQUEST_KEY/g)];
+  assert.equal(writes.length, 1, "exactly one engine site writes the weekly request");
+  const site = engine.slice(engine.indexOf("function startFallLab3WeekPractice("), engine.indexOf("function openFallLab3Hub("));
+  assert.match(site, /FALL_LAB3_WEEKLY_REQUEST_KEY/, "and it is New Week N Practice Set");
+  assert.doesNotMatch(engine, /getItem\(\s*FALL_LAB3_WEEKLY_REQUEST_KEY/, "the engine never consumes it");
+});
+
+test("Week Focus neither writes nor consumes the weekly continuation", async () => {
+  const now = Date.now();
+  const pending = JSON.stringify({ quizWeek: 6, createdAt: now });
+  const storage = createStorage({ [WEEKLY_REQUEST_KEY]: pending });
+  const previous = ["localStorage", "window"].map((name) => [name, Object.getOwnPropertyDescriptor(globalThis, name)]);
+  let assigned = "";
+  Object.defineProperty(globalThis, "localStorage", { configurable: true, value: storage });
+  Object.defineProperty(globalThis, "window", { configurable: true, value: { location: { assign(url) { assigned = url; } } } });
+  try {
+    const payload = await launchFall2026Lab3WeekFocus(6, { drugData, policy, seed: "f26-22-week-focus-isolation" });
+    assert.equal(payload.metadata.kind, "fall-2026-lab3-week-focus");
+    assert.equal(assigned, "quiz.html?id=custom-quiz");
+    assert.equal(storage.getItem(WEEKLY_REQUEST_KEY), pending, "a Week Focus launch leaves the request alone");
+    assert.deepEqual(storage.removals, []);
+    assert.deepEqual([...new Set(storage.writes)], [CUSTOM_QUIZ_KEY]);
+  } finally {
+    for (const [name, descriptor] of previous) {
+      if (descriptor) Object.defineProperty(globalThis, name, descriptor);
+      else delete globalThis[name];
+    }
+  }
+
+  // And a Week Focus payload arriving in quiz.html is not a Standard practice
+  // payload, so it can never stand in for the remix's fresh source either.
+  const engine = loadEngine({ storage: createStorage({
+    [REMIX_REQUEST_KEY]: JSON.stringify({ quizWeek: 6, createdAt: now, targetSize: 6, remixGeneration: 1 })
+  }) });
+  const focusPayload = buildFall2026WeekFocusPayload({ drugData, policy, quizWeek: 6, seed: "f26-22-week-focus-not-remix-source" });
+  assert.equal(focusPayload.metadata.kind, "fall-2026-lab3-week-focus");
+  assert.equal(engine.sandbox.consumeFallLab3BossRemixRequest(focusPayload), null);
+  assert.ok(engine.storage.getItem(REMIX_REQUEST_KEY), "the remix request waits for a Standard set");
+  assert.equal(engine.storage.getItem(CUSTOM_QUIZ_KEY), null, "nothing was substituted");
+
+  const launcher = read("assets/js/fall-2026-lab3-launcher.js");
+  const weekFocus = launcher.slice(launcher.indexOf("export function createFall2026WeekFocusSeed("), launcher.indexOf("function readJson("));
+  assert.doesNotMatch(weekFocus, /WEEKLY_REQUEST_KEY|BOSS_REMIX_REQUEST_KEY|ADAPTIVE_REQUEST_KEY/,
+    "the Week Focus path knows nothing about continuation requests");
 });
