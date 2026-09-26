@@ -616,7 +616,7 @@ test("G16 only the Store and Stats baselines move; G17 the engine is untouched",
     fallPolicy: "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171",
     masterPool: "1fb50e96e60252a9839406d53bc929e9569d76c0ddc2522aff43adf9bdf2a87c",
     fallGenerator: "f678d7a766a3f1594b89110019829d93cabfd2df0cefaadf906dba301748946a",
-    fallLauncher: "fbfbcfff55096152f8c5f64f06fedeb898ce995713c18f7d492f729bc4efb1fc",
+    fallLauncher: "32c25261daa9c95921472a4f28d6ca94c3e04b85b31a684d51ddca2129474b63",
     quizEngine: "be5ce3f4996981fc9dda427b838e1680773135037e8e048dd8255ab8173c0f7d",
     favorites: "b6fbd5bbca17ea150e34e9b29c9e6391b5ae7359d7b6afb18fe6c7e7caed781d"
   };

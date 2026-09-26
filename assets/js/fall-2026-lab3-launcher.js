@@ -199,6 +199,45 @@ function readReviewEntries() {
 const ADAPTIVE_REQUEST_KEY = "pharmlet.fall-2026-lab3.adaptive-request";
 const ADAPTIVE_REQUEST_MAX_AGE_MS = 10 * 60 * 1000;
 
+// Continuation requests written by the completion screen in quiz.html. Each is
+// a small { week, createdAt } record that a real completion click writes and
+// that expires, so a bookmarked or shared hub URL can never generate a round.
+const BOSS_REMIX_REQUEST_KEY = "pharmlet.fall-2026-lab3.boss-remix-request";
+const CONTINUATION_REQUEST_MAX_AGE_MS = 10 * 60 * 1000;
+
+// Strict, not coercive, for the same reason as the adaptive request below:
+// Number() would turn true, "1" and [1] into Week 1. A future-dated record
+// would otherwise have negative age and slip past the expiry check.
+function readContinuationWeek(saved, weekField, now) {
+  if (!saved || typeof saved !== "object" || Array.isArray(saved)) return 0;
+  const week = saved[weekField];
+  const { createdAt } = saved;
+  if (typeof week !== "number" || !Number.isInteger(week)) return 0;
+  if (!SUPPORTED_WEEKS.has(week)) return 0;
+  if (typeof createdAt !== "number" || !Number.isFinite(createdAt)) return 0;
+  const age = now - createdAt;
+  if (age < 0 || age > CONTINUATION_REQUEST_MAX_AGE_MS) return 0;
+  return week;
+}
+
+// Read-only. The engine owns the Boss Remix request: it writes it from a real
+// "Boss Remix +1" click, validates the full record, and consumes it when the
+// matching Week N practice payload loads in quiz.html. The hub only needs to
+// know that a Standard launch for that week is wanted right now, so it checks
+// the week and the age and removes nothing - an invalid or expired record is
+// still the engine's to clear.
+export function peekBossRemixLaunchWeek(now = Date.now()) {
+  let saved = null;
+  try {
+    const raw = localStorage.getItem(BOSS_REMIX_REQUEST_KEY);
+    if (raw === null) return 0;
+    saved = JSON.parse(raw);
+  } catch {
+    return 0;
+  }
+  return readContinuationWeek(saved, "quizWeek", now);
+}
+
 // Read-and-remove. The request is spent whether or not it turns out valid, so
 // a stale or malformed one cannot re-fire on the next visit.
 export function consumeAdaptiveRoundRequest(now = Date.now()) {
@@ -328,9 +367,15 @@ async function handleWeeklyLaunch() {
     return;
   }
 
+  await startWeeklyLaunch(quizWeek, `Building a fresh Week ${quizWeek} practice set from the Fall 2026 source data…`);
+}
+
+async function startWeeklyLaunch(quizWeek, busyMessage) {
+  if (launchInFlight) return;
+
   launchInFlight = true;
   syncAllLaunchAvailability();
-  setWeeklyLaunchState(true, `Building a fresh Week ${quizWeek} practice set from the Fall 2026 source data…`);
+  setWeeklyLaunchState(true, busyMessage);
   try {
     await launchFall2026Lab3Practice(quizWeek);
   } catch (error) {
@@ -474,6 +519,27 @@ async function handleAdaptiveLaunch() {
   syncAllLaunchAvailability();
 }
 
+// A completion-screen continuation already chose the week. Mirror it into the
+// Standard select so the visible state matches what is launching, then start.
+function launchStandardContinuation(quizWeek, busyMessage) {
+  const select = document.getElementById("weekly-week");
+  if (select) select.value = String(quizWeek);
+  syncAllLaunchAvailability();
+  return startWeeklyLaunch(quizWeek, busyMessage);
+}
+
+// A bare ?week=N only preselects. Standard Weekly Practice is the last card on
+// the page, so without this the student lands on an empty Adaptive select while
+// their week sits below the fold. Focus goes to the section (tabindex="-1"),
+// never to the select, so phone pickers do not open on load.
+function revealStandardWeeklyPractice() {
+  const section = document.getElementById("standard-weekly-practice");
+  if (!section) return;
+  const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+  section.scrollIntoView?.({ block: "start", behavior: reduceMotion ? "auto" : "smooth" });
+  section.focus?.({ preventScroll: true });
+}
+
 async function handleWeekFocusLaunch() {
   if (launchInFlight) return;
 
@@ -500,7 +566,7 @@ async function handleWeekFocusLaunch() {
   syncAllLaunchAvailability();
 }
 
-function initializePage() {
+export function initializePage() {
   document.getElementById("adaptive-launch")?.addEventListener("click", handleAdaptiveLaunch);
   document.getElementById("adaptive-week")?.addEventListener("change", () => setAdaptiveState(false, ""));
   document.getElementById("week-focus-launch")?.addEventListener("click", handleWeekFocusLaunch);
@@ -533,16 +599,32 @@ function initializePage() {
       select.value = String(adaptiveRequestWeek);
       syncAdaptiveAvailability();
     }
-    handleAdaptiveLaunch();
-    return;
+    return handleAdaptiveLaunch();
   }
 
+  // "Boss Remix +1" sends the student here with a live remix request. The
+  // remix itself is built from a fresh Week N Standard practice set, so the
+  // only thing missing is that launch; a second click used to be required
+  // and nothing on the page said so. The request stays in storage for the
+  // engine to consume when the set loads.
+  const remixWeek = peekBossRemixLaunchWeek();
+  if (SUPPORTED_WEEKS.has(remixWeek)) {
+    return launchStandardContinuation(
+      remixWeek,
+      `Building a fresh Week ${remixWeek} practice set for your Boss Remix…`
+    );
+  }
+
+  // A bare ?week=N (homepage quick links, bookmarks, shared URLs) never
+  // launches. It preselects the Standard week and brings that card into view.
   const requestedWeek = Number(new URLSearchParams(window.location.search).get("week"));
   if (SUPPORTED_WEEKS.has(requestedWeek)) {
     const select = document.getElementById("weekly-week");
     if (select) select.value = String(requestedWeek);
     syncAllLaunchAvailability();
+    revealStandardWeeklyPractice();
   }
+  return undefined;
 }
 
 if (typeof document !== "undefined") {

@@ -36,7 +36,7 @@ const PROTECTED_FALL_BASELINES = Object.freeze({
   drugData: "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01",
   policy: "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171",
   generator: "f678d7a766a3f1594b89110019829d93cabfd2df0cefaadf906dba301748946a",
-  launcher: "fbfbcfff55096152f8c5f64f06fedeb898ce995713c18f7d492f729bc4efb1fc"
+  launcher: "32c25261daa9c95921472a4f28d6ca94c3e04b85b31a684d51ddca2129474b63"
 });
 
 const drugData = JSON.parse(read("assets/data/fall-2026-p2-top-drugs.json"));
@@ -1156,5 +1156,5 @@ test("the engine cache token is refreshed for quiz.html only", () => {
   const quiz = read("quiz.html");
   assert.ok(quiz.includes(`assets/js/quizEngine.js?v=${ENGINE_TOKEN}`), "the engine change needs a fresh cache token");
   assert.ok(read("stats.html").includes("assets/js/stats.js?v=20260903a"), "unrelated bundles keep their tokens");
-  assert.ok(read("lab3-fall-2026.html").includes('src="assets/js/fall-2026-lab3-launcher.js?v=20260912b"'));
+  assert.ok(read("lab3-fall-2026.html").includes('src="assets/js/fall-2026-lab3-launcher.js?v=20260926a"'));
 });
