@@ -223,18 +223,28 @@ test("the visible scope summary always describes the week actually selected", as
 
       assert.match(summary.textContent, new RegExp(`Week ${targetWeek}\\b`),
         `selecting Week ${targetWeek} must name Week ${targetWeek}`);
-      assert.match(summary.textContent, /content ceiling/i,
-        `selecting Week ${targetWeek} must state the ceiling`);
+      assert.match(summary.textContent, new RegExp(`Nothing after Week ${targetWeek} is included`),
+        `selecting Week ${targetWeek} must keep the ceiling on that week`);
+      assert.doesNotMatch(summary.textContent, /can use Weeks 1/i,
+        "the summary must not describe a generic Weeks 1–N pool");
+      assert.doesNotMatch(summary.textContent, new RegExp(`Weeks 1[–-]${targetWeek}\\b`),
+        `Week ${targetWeek} must not treat Weeks 1–${targetWeek} as one open pool`);
 
-      // No other week may be named, so a stale ceiling cannot linger.
       const namedWeeks = [...summary.textContent.matchAll(/Week\s*(\d+)/g)].map((m) => Number(m[1]));
-      const strayWeeks = namedWeeks.filter((week) => week !== targetWeek);
-      assert.deepEqual(strayWeeks, [],
-        `Week ${targetWeek} summary named other weeks: ${strayWeeks.join(", ")}`);
+      assert.ok(namedWeeks.includes(targetWeek), `Week ${targetWeek} summary must name that week`);
+      const laterWeeks = namedWeeks.filter((week) => week > targetWeek);
+      assert.deepEqual(laterWeeks, [],
+        `Week ${targetWeek} summary named a later week: ${laterWeeks.join(", ")}`);
 
-      if (targetWeek > 1) {
-        assert.match(summary.textContent, new RegExp(`Weeks 1[–-]${targetWeek}`),
-          `Week ${targetWeek} must show the inclusive Weeks 1-${targetWeek} range`);
+      if (targetWeek === 1) {
+        assert.match(summary.textContent, /10 Week 1 questions/);
+        assert.doesNotMatch(summary.textContent, /targets 6/);
+      } else {
+        assert.match(summary.textContent, new RegExp(`targets 6 Week ${targetWeek} questions`));
+        assert.match(summary.textContent, /4 review questions/);
+        assert.match(summary.textContent, /chosen from your saved performance/);
+        const prior = targetWeek === 2 ? /from Week 1\b/ : new RegExp(`from Weeks 1[–-]${targetWeek - 1}\\b`);
+        assert.match(summary.textContent, prior, `Week ${targetWeek} must name only its prior-week review range`);
       }
     }
 
