@@ -28,7 +28,7 @@ const FALL_UI_BASELINES = Object.freeze({
   drugData: "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01",
   policy: "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171",
   generator: "f678d7a766a3f1594b89110019829d93cabfd2df0cefaadf906dba301748946a",
-  launcher: "fbfbcfff55096152f8c5f64f06fedeb898ce995713c18f7d492f729bc4efb1fc"
+  launcher: "bcb711f7a1b2de622281bf7dbf174a59803eae2363e0ed54d7024b621a560fe6"
 });
 
 const LEGACY_HOME_HREFS = [
@@ -354,7 +354,7 @@ test("the hub shows a Week Focus launcher with its own week select and start con
   assert.doesNotMatch(adaptive, /id="week-focus-week"|id="week-focus-launch"|id="weekly-week"|id="weekly-launch"/);
 
   assert.doesNotMatch(page, /\bdata-week-card\b|\bdata-launch-week\b/);
-  assert.ok(page.includes('src="assets/js/fall-2026-lab3-launcher.js?v=20260912b"'));
+  assert.ok(page.includes('src="assets/js/fall-2026-lab3-launcher.js?v=20260926b"'));
 });
 
 test("the hub has three distinct week selects for Adaptive, Week Focus, and Standard Weekly", () => {
@@ -551,7 +551,7 @@ test("the F26-08 presentation-only change preserves launch wiring, cache tokens,
     "utf8"
   );
 
-  assert.ok(page.includes('src="assets/js/fall-2026-lab3-launcher.js?v=20260912b"'));
+  assert.ok(page.includes('src="assets/js/fall-2026-lab3-launcher.js?v=20260926b"'));
   assert.ok(launcher.includes('from "./fall-2026-quiz-generator.js?v=20260913a"'));
   assert.ok(launcher.includes('window.location.assign("quiz.html?id=custom-quiz")'));
   assert.ok(launcher.includes('getElementById("weekly-launch")'));

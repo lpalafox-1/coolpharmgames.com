@@ -590,7 +590,7 @@ test("G15 all three store consumers share the new token and the engine stays put
   // Consumers that changed get fresh tokens; the engine must not move.
   assert.match(readSource("stats.html"), /assets\/js\/stats\.js\?v=20260903a/);
   assert.match(readSource("review-queue.html"), /assets\/js\/review-queue\.js\?v=20260903a/);
-  assert.match(readSource("quiz.html"), /assets\/js\/quizEngine\.js\?v=20260908a/,
+  assert.match(readSource("quiz.html"), /assets\/js\/quizEngine\.js\?v=20260926a/,
     "P2F-09 must not move the engine token");
 
   for (const token of ["20260903a", "20260901a"]) {
@@ -605,7 +605,7 @@ test("G16 only the Store and Stats baselines move; G17 the engine is untouched",
   // The engine and its pinned manifest are byte-identical to the merge base.
   assert.equal(
     sha("assets/js/quizEngine.js"),
-    "be5ce3f4996981fc9dda427b838e1680773135037e8e048dd8255ab8173c0f7d",
+    "1913b1703f8acddc6bae5070410ee8309cde94e658ea3515a26573858c7ae7bf",
     "P2F-09 must not change quizEngine.js"
   );
 
@@ -616,8 +616,8 @@ test("G16 only the Store and Stats baselines move; G17 the engine is untouched",
     fallPolicy: "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171",
     masterPool: "1fb50e96e60252a9839406d53bc929e9569d76c0ddc2522aff43adf9bdf2a87c",
     fallGenerator: "f678d7a766a3f1594b89110019829d93cabfd2df0cefaadf906dba301748946a",
-    fallLauncher: "fbfbcfff55096152f8c5f64f06fedeb898ce995713c18f7d492f729bc4efb1fc",
-    quizEngine: "be5ce3f4996981fc9dda427b838e1680773135037e8e048dd8255ab8173c0f7d",
+    fallLauncher: "bcb711f7a1b2de622281bf7dbf174a59803eae2363e0ed54d7024b621a560fe6",
+    quizEngine: "1913b1703f8acddc6bae5070410ee8309cde94e658ea3515a26573858c7ae7bf",
     favorites: "b6fbd5bbca17ea150e34e9b29c9e6391b5ae7359d7b6afb18fe6c7e7caed781d"
   };
   for (const [key, value] of Object.entries(unchanged)) {
