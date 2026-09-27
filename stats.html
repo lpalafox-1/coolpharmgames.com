@@ -21,6 +21,14 @@
   <link rel="stylesheet" href="assets/css/styles.css" />
 
   <style>
+    :root {
+      --stats-good-text: #15803d;
+      --stats-bad-text: #b91c1c;
+    }
+    .dark {
+      --stats-good-text: var(--good);
+      --stats-bad-text: var(--bad);
+    }
     .stat-card { background: var(--card); border: 1px solid var(--ring); border-radius: 12px; padding: 1.5rem; }
     .stat-label { font-size: 0.875rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
     .stat-value { font-size: 2rem; font-weight: 700; color: var(--accent); margin-top: 0.5rem; }
@@ -317,6 +325,6 @@
   <script src="assets/js/top-drugs-data.js?v=20260419a"></script>
   <script src="assets/js/review-queue-store.js?v=20260903a"></script>
   <script src="assets/js/question-reports.js?v=20260831b"></script>
-  <script src="assets/js/stats.js?v=20260927a" defer></script>
+  <script src="assets/js/stats.js?v=20260927b" defer></script>
 </body>
 </html>

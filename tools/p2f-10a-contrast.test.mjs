@@ -77,7 +77,7 @@ test("quiz contrast classes and the drug-context bridge stay in place", () => {
 test("stats dark totals and the two 10px eyebrows use the approved classes", () => {
   const page = read("stats.html");
   assert.match(page, /\.dark \.stat-value \{ color: #fda4af; \}/);
-  assert.match(page, /assets\/js\/stats\.js\?v=20260927a/);
+  assert.match(page, /assets\/js\/stats\.js\?v=20260927b/);
 
   const stats = read("assets/js/stats.js");
   const eyebrows = stats.match(/text-\[10px\] font-black uppercase tracking-\[0\.18em\] opacity-80/g);
