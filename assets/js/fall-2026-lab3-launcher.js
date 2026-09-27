@@ -439,15 +439,15 @@ function getSelectedAdaptiveWeek() {
 // The adaptive button stays unavailable until the student has actually chosen a
 // target, and while any launch is running. There is deliberately no default
 // week: course progress cannot be inferred from the calendar.
-// The visible summary must always describe the CURRENT selection. A static
-// ceiling sentence would keep asserting one week no matter what the student
-// picked, which is worse than saying nothing.
+// The visible summary must describe the CURRENT selection. Weeks 2–10 state
+// the 6+4 target for that week. They do not describe a generic Weeks 1–N pool.
 function describeAdaptiveSelection(targetWeek) {
   if (targetWeek === null) return "Choose a week to enable Adaptive Practice.";
   if (targetWeek === 1) {
-    return "Week 1 selected. Your content ceiling is Week 1: this round uses Week 1 material only.";
+    return "Week 1 selected: all 10 questions from Week 1. Nothing after Week 1 is included.";
   }
-  return `Week ${targetWeek} selected. Your content ceiling is Week ${targetWeek}: this round can use Weeks 1–${targetWeek} and nothing after Week ${targetWeek}.`;
+  const priorWeeks = targetWeek === 2 ? "Week 1" : `Weeks 1–${targetWeek - 1}`;
+  return `Week ${targetWeek} selected. This round targets 6 Week ${targetWeek} questions and 4 review questions from ${priorWeeks}, guided by your saved performance. Nothing after Week ${targetWeek} is included.`;
 }
 
 function syncAdaptiveAvailability() {

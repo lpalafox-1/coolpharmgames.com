@@ -28,7 +28,7 @@ const FALL_UI_BASELINES = Object.freeze({
   drugData: "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01",
   policy: "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171",
   generator: "f678d7a766a3f1594b89110019829d93cabfd2df0cefaadf906dba301748946a",
-  launcher: "bcb711f7a1b2de622281bf7dbf174a59803eae2363e0ed54d7024b621a560fe6"
+  launcher: "7ede6e99b7d35cfc2f99a3deac74b64ea8b2616c24d2d8aeda8bbd5606d7292c"
 });
 
 const LEGACY_HOME_HREFS = [
@@ -338,9 +338,9 @@ test("the hub shows a Week Focus launcher with its own week select and start con
   const adaptive = page.slice(adaptiveIndex, weekFocusIndex);
   assert.match(htmlText(weekFocus), /Week Focus/);
   assert.doesNotMatch(htmlText(weekFocus), /Coming Soon/);
-  assert.match(htmlText(weekFocus), /selected week only/i);
-  assert.match(htmlText(weekFocus), /no cumulative review/i);
-  assert.match(htmlText(weekFocus), /Adaptive Practice through Week X/i);
+  assert.match(htmlText(weekFocus), /10 questions from the selected week only/i);
+  assert.match(htmlText(weekFocus), /no prior-week review/i);
+  assert.doesNotMatch(htmlText(weekFocus), /Week X/);
   assert.match(weekFocus, /id="week-focus-week"/);
   assert.match(weekFocus, /id="week-focus-launch"/);
   assert.match(weekFocus, /<select\b[^>]*\bid="week-focus-week"/i);
@@ -354,7 +354,7 @@ test("the hub shows a Week Focus launcher with its own week select and start con
   assert.doesNotMatch(adaptive, /id="week-focus-week"|id="week-focus-launch"|id="weekly-week"|id="weekly-launch"/);
 
   assert.doesNotMatch(page, /\bdata-week-card\b|\bdata-launch-week\b/);
-  assert.ok(page.includes('src="assets/js/fall-2026-lab3-launcher.js?v=20260926b"'));
+  assert.ok(page.includes('src="assets/js/fall-2026-lab3-launcher.js?v=20260926d"'));
 });
 
 test("the hub has three distinct week selects for Adaptive, Week Focus, and Standard Weekly", () => {
@@ -551,7 +551,7 @@ test("the F26-08 presentation-only change preserves launch wiring, cache tokens,
     "utf8"
   );
 
-  assert.ok(page.includes('src="assets/js/fall-2026-lab3-launcher.js?v=20260926b"'));
+  assert.ok(page.includes('src="assets/js/fall-2026-lab3-launcher.js?v=20260926d"'));
   assert.ok(launcher.includes('from "./fall-2026-quiz-generator.js?v=20260913a"'));
   assert.ok(launcher.includes('window.location.assign("quiz.html?id=custom-quiz")'));
   assert.ok(launcher.includes('getElementById("weekly-launch")'));
