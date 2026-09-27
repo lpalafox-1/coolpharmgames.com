@@ -20,8 +20,8 @@ const policy = JSON.parse(
   readFileSync(path.join(repoRoot, "assets", "data", "fall-2026-lab3-quiz-policy.json"), "utf8")
 );
 const APPROVED_ENGINE_BASELINE = Object.freeze({
-  reference: "F26-22 weekly continuation request engine change",
-  sha256: "1913b1703f8acddc6bae5070410ee8309cde94e658ea3515a26573858c7ae7bf"
+  reference: "F26-24 Week Focus completion identity engine change",
+  sha256: "50920b5bcd43ad422360236031f8c442c568fba761c34ff1698617e804c2a664"
 });
 
 function createStorageStub(initialValues = {}) {
