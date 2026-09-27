@@ -462,9 +462,9 @@ contract.
 
 F26-10 through F26-24 are shipped on `main` through PR #82 (merge
 `ff225e4a8f5b47b460deb2bb3bdaba72cef871bc`). The Fall generator, policy, and
-canonical data remain feature-frozen. No Fall task is `READY`. The recommended
-next candidate is P2F-10a, recorded in the Phase 2 Facelift lane. It is not
-`READY`.
+canonical data remain feature-frozen. No Fall task is `READY`. The active
+accessibility work is P2F-10, whose current authorized slice is
+P2F-10a — Contrast & Small-Text Legibility.
 
 ### F26-10 — Performance-Guided Adaptive Practice
 
@@ -572,7 +572,7 @@ owner reviews and merges its branch; implementation alone never promotes it to
 | P2F-07 | Additive curriculum metadata contract | `DONE` | P2F-06 |
 | P2F-08 | Stats Dashboard v2 | `DONE` | P2F-07 |
 | P2F-09 | Review Queue v2 + `wrongCounts` correction | `DONE` | P2F-08 |
-| P2F-10 | Mobile/accessibility consistency pass | `BLOCKED` | P2F-09 |
+| P2F-10 | Mobile/accessibility consistency pass. Current authorized slice: P2F-10a — Contrast & Small-Text Legibility | `IN PROGRESS` | P2F-09 |
 
 P2F-08 shipped in PR #67 (merge `c7ccf7d`, 2026-09-03), built from `383a1de`,
 `9a0d8d3`, and the review-correction commit `a9a25a9`.
@@ -612,12 +612,11 @@ P2F-09 follow-ups accepted as non-blocking at merge:
   `reviewMissCount`, and mastery fields were never affected by the bug and may
   be considered independently.
 
-**No task is currently `READY`.** P2F-10 remains `BLOCKED`. The P2F-09 merge
-records that its dependency is satisfied, and that does not authorize P2F-10
-implementation. P2F-10 still needs its own owner-approved scope and
-allowed-files contract. The recommended next candidate is **P2F-10a — Contrast
-& Small-Text Legibility**, a slice of P2F-10, not a new F26-25. P2F-10a is not
-`READY` and has no approved scope. Fall work through F26-24 is already shipped.
+**No task is currently `READY`.** P2F-10 is `IN PROGRESS`. Its current
+authorized slice is **P2F-10a — Contrast & Small-Text Legibility**, a slice of
+P2F-10 rather than a second task or a new F26-25. P2F-10 is not `DONE`; it
+becomes `DONE` only after its approved accessibility slices are completed.
+Fall work through F26-24 is already shipped.
 
 P2F-08 is read-side only. It adds a Stats-local normalization and provenance
 layer over `pharmlet.history` and introduces zero new writes: history, Review

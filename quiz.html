@@ -13,7 +13,7 @@
                  connect-src 'self' https:;">
 
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20260428a" />
+  <link rel="stylesheet" href="assets/css/styles.css?v=20260927a" />
   <link rel="stylesheet" href="assets/css/favorites.css?v=20260821a" />
   <script>
     tailwind.config = { darkMode: 'class', theme: { extend: { colors: { maroon: '#8b1e3f' } } } }
@@ -126,6 +126,11 @@
       /* Keyboard focus has to land above the sticky bar, not behind it. */
       html { scroll-padding-bottom: 6rem; }
     }
+
+    /* ID rules so a rebuilt question card keeps Week/drug context readable.
+       The engine recreates #drug-context with its own opacity and maroon utilities. */
+    #drug-context { opacity: 1; }
+    .dark #drug-context { color: #fecdd3; }
   </style>
 </head>
 
@@ -140,7 +145,7 @@
           <button id="font-increase" class="p-1 px-2 hover:bg-black/5 rounded text-xs font-bold border border-[var(--ring)]">A+</button>
         </div>
       </div>
-      <div id="timer-readout" class="bg-[#8b1e3f]/10 text-[#8b1e3f] px-5 py-2 rounded-full border border-[#8b1e3f]/20 font-black text-xl cursor-pointer">00:00</div>
+      <div id="timer-readout" class="bg-[#8b1e3f]/10 text-[#8b1e3f] dark:text-rose-200 px-5 py-2 rounded-full border border-[#8b1e3f]/20 font-black text-xl cursor-pointer">00:00</div>
       <div class="flex-1 flex justify-end gap-2">
         <div id="favorite-quiz-control" hidden></div>
         <button id="theme-toggle" class="p-2 text-xl">🌓</button>
@@ -150,13 +155,13 @@
   </header>
 
   <main class="max-w-7xl mx-auto p-4 sm:p-10">
-    <div class="flex justify-between items-end mb-4 px-2 text-[10px] font-black uppercase opacity-40 tracking-widest">
+    <div class="flex justify-between items-end mb-4 px-2 text-[10px] font-black uppercase opacity-70 tracking-widest">
       <div>Question <span id="qnum">0</span>/<span id="qtotal">0</span></div>
       <div>Score <span id="score">0</span></div>
     </div>
 
     <div id="mode-banner" class="hidden mb-6 rounded-2xl border border-[#8b1e3f]/20 bg-[#8b1e3f]/8 px-4 py-3 text-sm">
-      <div id="mode-banner-title" class="font-black uppercase tracking-[0.18em] text-[#8b1e3f]">True Exam Mode</div>
+      <div id="mode-banner-title" class="font-black uppercase tracking-[0.18em] text-[#8b1e3f] dark:text-rose-200">True Exam Mode</div>
       <div id="mode-banner-copy" class="mt-1 opacity-80">Hints and answer reveals are disabled for this attempt.</div>
     </div>
 
@@ -171,7 +176,7 @@
     </div>
 
     <div class="mb-4 px-2">
-      <div id="quiz-title" class="text-xs font-black uppercase tracking-[0.18em] opacity-60">Loading Quiz...</div>
+      <div id="quiz-title" class="text-xs font-black uppercase tracking-[0.18em] opacity-80">Loading Quiz...</div>
       <div id="quiz-status" class="mt-1 text-sm opacity-70">Seen 0/0 • 0 unanswered • 0 marked</div>
       <div id="streak-panel" class="streak-panel mt-3">
         <div class="streak-head">
@@ -202,12 +207,12 @@
 
       <aside class="hidden lg:flex flex-col gap-6 sticky top-24">
         <div class="card p-6 border border-[var(--ring)] bg-[var(--bg)]/50 rounded-2xl">
-          <h3 class="text-[10px] font-black uppercase opacity-40 mb-5 tracking-widest">Mastery Controls</h3>
+          <h3 class="text-[10px] font-black uppercase opacity-70 mb-5 tracking-widest">Mastery Controls</h3>
           <div class="grid grid-cols-1 gap-3">
             <button id="mark" class="p-4 bg-[var(--card)] border border-[var(--ring)] rounded-2xl text-xs font-bold hover:bg-[#8b1e3f] hover:text-white transition-all">🚩 Mark (M)</button>
             <button id="hint-btn" data-exam-hidden="true" class="p-4 bg-[var(--card)] border border-[var(--ring)] rounded-2xl text-xs font-bold hover:bg-[#8b1e3f] hover:text-white transition-all">💡 Hint</button>
             <button id="reveal-solution" data-exam-hidden="true" class="p-4 bg-[var(--card)] border border-[var(--ring)] rounded-2xl text-xs font-bold hover:bg-[#8b1e3f] hover:text-white transition-all">👁️ Reveal Answer</button>
-            <button id="restart" class="p-4 bg-red-500/5 text-red-600 border border-red-500/10 rounded-2xl text-xs font-bold hover:bg-red-500 hover:text-white transition-all">🔄 Reset</button>
+            <button id="restart" class="p-4 bg-red-500/5 text-red-700 dark:text-red-400 border border-red-500/10 rounded-2xl text-xs font-bold hover:bg-red-500 hover:text-white transition-all">🔄 Reset</button>
           </div>
         </div>
       </aside>
@@ -218,7 +223,7 @@
       <button id="mark-mobile" class="px-4 py-2 bg-[var(--card)] border border-[var(--ring)] rounded-xl text-xs font-bold">🚩 Mark</button>
       <button id="hint-btn-mobile" data-exam-hidden="true" class="px-4 py-2 bg-[var(--card)] border border-[var(--ring)] rounded-xl text-xs font-bold">💡 Hint</button>
       <button id="reveal-solution-mobile" data-exam-hidden="true" class="px-4 py-2 bg-[var(--card)] border border-[var(--ring)] rounded-xl text-xs font-bold">👁️ Reveal</button>
-      <button id="restart-mobile" class="px-4 py-2 bg-red-500/5 text-red-600 border border-red-500/10 rounded-xl text-xs font-bold">🔄 Restart</button>
+      <button id="restart-mobile" class="px-4 py-2 bg-red-500/5 text-red-700 dark:text-red-400 border border-red-500/10 rounded-xl text-xs font-bold">🔄 Restart</button>
     </div>
 
     <footer class="quiz-action-bar mt-10 flex flex-wrap gap-4 w-full justify-center max-w-2xl mx-auto">

@@ -588,7 +588,7 @@ test("G15 all three store consumers share the new token and the engine stays put
   }
 
   // Consumers that changed get fresh tokens; the engine must not move.
-  assert.match(readSource("stats.html"), /assets\/js\/stats\.js\?v=20260903a/);
+  assert.match(readSource("stats.html"), /assets\/js\/stats\.js\?v=20260927a/);
   assert.match(readSource("review-queue.html"), /assets\/js\/review-queue\.js\?v=20260903a/);
   assert.match(readSource("quiz.html"), /assets\/js\/quizEngine\.js\?v=20260926e/,
     "P2F-09 must not move the engine token");
