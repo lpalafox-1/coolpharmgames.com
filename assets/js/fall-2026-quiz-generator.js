@@ -237,6 +237,76 @@ function normalizeGenericIdentity(value) {
     .toLocaleLowerCase("en-US");
 }
 
+// The Fall brand listing is the source of truth. A listing with two or more
+// "Label: brand, brand" groups is a subtype map, not a flat brand list.
+// Groups are used only for Brand/Generic. They are ignored unless their
+// brands are an exact partition of brandNames, so a malformed listing cannot
+// invent brands or pharmacology.
+function getLabeledBrandGroups(drug) {
+  const listing = String(drug?.brandListing || "");
+  const labelPattern = /([A-Za-z][A-Za-z0-9]*)\s*:/g;
+  const labels = [];
+  for (let match = labelPattern.exec(listing); match; match = labelPattern.exec(listing)) {
+    labels.push({
+      label: match[1],
+      nameStart: match.index,
+      nameEnd: labelPattern.lastIndex
+    });
+  }
+  if (labels.length < 2) return null;
+
+  const canonicalBrands = new Map(
+    (Array.isArray(drug.brandNames) ? drug.brandNames : [])
+      .map((brandName) => [normalizeChoiceKey(brandName), brandName])
+  );
+  const groups = [];
+  const seenLabels = new Set();
+  const seenBrands = new Set();
+
+  for (let index = 0; index < labels.length; index += 1) {
+    const labelKey = normalizeChoiceKey(labels[index].label);
+    if (!labelKey || seenLabels.has(labelKey)) return null;
+    seenLabels.add(labelKey);
+    const stop = index + 1 < labels.length ? labels[index + 1].nameStart : listing.length;
+    const brandNames = [];
+    for (const rawBrand of listing.slice(labels[index].nameEnd, stop).split(",")) {
+      const brandName = canonicalBrands.get(normalizeChoiceKey(rawBrand));
+      const brandKey = normalizeChoiceKey(brandName);
+      if (!brandName || seenBrands.has(brandKey)) return null;
+      seenBrands.add(brandKey);
+      brandNames.push(brandName);
+    }
+    if (!brandNames.length) return null;
+    groups.push({ label: labels[index].label, brandNames });
+  }
+
+  if (seenBrands.size !== canonicalBrands.size) return null;
+  return groups;
+}
+
+function resolveBrandGenericScope(sourceDrug, genericResolution, rng, pinnedLabel) {
+  const groups = getLabeledBrandGroups(sourceDrug);
+  if (!groups) {
+    return {
+      label: sourceDrug.genericName,
+      brandNames: genericResolution.brandNames
+    };
+  }
+
+  const group = pinnedLabel
+    ? groups.find((candidate) => normalizeChoiceKey(candidate.label) === normalizeChoiceKey(pinnedLabel))
+    : groups[Math.floor(nextRandom(rng) * groups.length)];
+  if (!group) return null;
+  return {
+    label: group.label,
+    brandNames: group.brandNames
+  };
+}
+
+function brandGenericStemLabel(question, sourceDrug) {
+  return question?.metadata?.brandGroupLabel || sourceDrug.genericName;
+}
+
 function getDomainSourceValue(drug, domainId) {
   const spec = DOMAIN_SPECS[domainId];
   if (!spec) fail("UNSUPPORTED_DOMAIN", `Unsupported MCQ domain: ${domainId}.`);
@@ -1396,19 +1466,32 @@ function baseQuestionMetadata(context, candidate, extra = {}) {
 
 function materializeBrandGenericQuestion(context, candidate, sourceDrug, genericResolution, rng) {
   const policyDomain = context.domainsById.get("brandGeneric");
+  const scope = resolveBrandGenericScope(sourceDrug, genericResolution, rng);
+  if (!scope) {
+    return {
+      status: "unavailable",
+      code: "UNSAFE_BRAND_GROUP",
+      candidateId: candidate.id,
+      domainId: candidate.domainId
+    };
+  }
   const genericToBrand = nextRandom(rng) >= 0.5;
-  const brandNames = genericResolution.brandNames;
+  const brandNames = scope.brandNames;
+  const groupMetadata = getLabeledBrandGroups(sourceDrug)
+    ? { brandGroupLabel: scope.label }
+    : {};
 
   if (genericToBrand) {
     const [answer, ...acceptedAnswers] = brandNames;
     const question = {
       id: `${candidate.id}-generic-to-brand`,
       type: "short",
-      prompt: `Brand name for <b>${sourceDrug.genericName}</b>?`,
+      prompt: `Brand name for <b>${scope.label}</b>?`,
       answer,
       metadata: baseQuestionMetadata(context, candidate, {
         brandGenericDirection: "genericToBrand",
-        answerMatching: { ...policyDomain.answerMatching }
+        answerMatching: { ...policyDomain.answerMatching },
+        ...groupMetadata
       })
     };
     if (acceptedAnswers.length) question._acceptedAnswers = [...acceptedAnswers];
@@ -1423,11 +1506,12 @@ function materializeBrandGenericQuestion(context, candidate, sourceDrug, generic
       id: `${candidate.id}-brand-to-generic-${brandIndex + 1}`,
       type: "short",
       prompt: `Generic name for <b>${brandName}</b>?`,
-      answer: sourceDrug.genericName,
+      answer: scope.label,
       metadata: baseQuestionMetadata(context, candidate, {
         brandGenericDirection: "brandToGeneric",
         sourceBrandName: brandName,
-        answerMatching: { ...policyDomain.answerMatching }
+        answerMatching: { ...policyDomain.answerMatching },
+        ...groupMetadata
       })
     }
   };
@@ -1791,7 +1875,7 @@ function rewriteConciseBaseQuestion(question, sourceDrug) {
     if (styled.metadata.brandGenericDirection === "genericToBrand") {
       return {
         ...styled,
-        prompt: `What is the brand name for <b>${escapePromptHtml(sourceDrug.genericName)}</b>?`
+        prompt: `What is the brand name for <b>${escapePromptHtml(brandGenericStemLabel(styled, sourceDrug))}</b>?`
       };
     }
     return {
@@ -1831,7 +1915,9 @@ function materializeBrandGenericRecognition(
     candidate.requestedQuizWeek
   );
   if (sourceResolution.sourceDrugs.length !== 1) return null;
-  const safeBrands = sourceResolution.brandNames.filter((brandName) => isBrandOnlyReferenceSafe(
+  const scope = resolveBrandGenericScope(sourceDrug, sourceResolution, rng);
+  if (!scope) return null;
+  const safeBrands = scope.brandNames.filter((brandName) => isBrandOnlyReferenceSafe(
     context,
     brandName,
     sourceDrug.genericName,
@@ -1873,7 +1959,7 @@ function materializeBrandGenericRecognition(
     .slice(0, MCQ_CHOICE_COUNT - 1);
   const choiceEntries = shuffleCopy([
     {
-      value: sourceDrug.genericName,
+      value: scope.label,
       sourceDrugId: sourceDrug.id,
       sourceDrugIds: [...sourceResolution.sourceDrugIds],
       sourceDrugQuizWeek: sourceDrug.quizWeek,
@@ -1897,6 +1983,7 @@ function materializeBrandGenericRecognition(
         questionVariant: "brandToGenericRecognition",
         brandGenericDirection: "brandToGeneric",
         sourceBrandName: brandName,
+        ...(getLabeledBrandGroups(sourceDrug) ? { brandGroupLabel: scope.label } : {}),
         choiceSources: choiceEntries.map((entry) => ({ ...entry }))
       })
     }
@@ -2555,15 +2642,23 @@ function materializeBrandGenericDirection(context, question, direction) {
   metadata.answerMatching = {
     ...context.domainsById.get("brandGeneric").answerMatching
   };
+  const scope = resolveBrandGenericScope(
+    sourceDrug,
+    genericResolution,
+    null,
+    question.metadata.brandGroupLabel
+  );
+  if (!scope) return null;
+  const stemLabel = scope.label;
 
   if (direction === "genericToBrand") {
-    const [answer, ...acceptedAnswers] = genericResolution.brandNames;
+    const [answer, ...acceptedAnswers] = scope.brandNames;
     const nextQuestion = {
       ...baseQuestion,
       id: `${baseId}-generic-to-brand`,
       prompt: question.metadata?.questionStyleId === COURSE_STYLE_ID
-        ? `What is the brand name for <b>${escapePromptHtml(sourceDrug.genericName)}</b>?`
-        : `Brand name for <b>${sourceDrug.genericName}</b>?`,
+        ? `What is the brand name for <b>${escapePromptHtml(stemLabel)}</b>?`
+        : `Brand name for <b>${stemLabel}</b>?`,
       answer,
       metadata
     };
@@ -2572,7 +2667,7 @@ function materializeBrandGenericDirection(context, question, direction) {
   }
 
   const preferredBrand = question.metadata.sourceBrandName;
-  const brandNames = [preferredBrand, ...genericResolution.brandNames]
+  const brandNames = [preferredBrand, ...scope.brandNames]
     .filter(Boolean)
     .filter((brandName, index, values) => (
       values.findIndex((value) => normalizeChoiceKey(value) === normalizeChoiceKey(brandName)) === index
@@ -2584,16 +2679,16 @@ function materializeBrandGenericDirection(context, question, direction) {
     question.metadata.requestedQuizWeek
   ));
   if (!brandName) return null;
-  const brandIndex = genericResolution.brandNames.findIndex(
+  const brandIndex = scope.brandNames.findIndex(
     (candidate) => normalizeChoiceKey(candidate) === normalizeChoiceKey(brandName)
   );
   return {
     ...baseQuestion,
-    id: `${baseId}-brand-to-generic-${brandIndex + 1}`,
+    id: `${baseId}-brand-to-generic-${Math.max(brandIndex, 0) + 1}`,
     prompt: question.metadata?.questionStyleId === COURSE_STYLE_ID
       ? `What is the generic for <b>${escapePromptHtml(brandName)}</b>?`
       : `Generic name for <b>${brandName}</b>?`,
-    answer: sourceDrug.genericName,
+    answer: stemLabel,
     metadata: {
       ...metadata,
       sourceBrandName: brandName
@@ -2671,18 +2766,25 @@ function rebuildBrandGenericRecognitionForProtections(context, question, protect
     "brandGeneric",
     quizWeek
   );
+  const scope = resolveBrandGenericScope(
+    sourceDrug,
+    sourceResolution,
+    null,
+    question.metadata.brandGroupLabel
+  );
   if (
-    sourceResolution.status !== "eligible"
+    !scope
+    || sourceResolution.status !== "eligible"
     || sourceResolution.sourceDrugs.length !== 1
     || referenceLeaksProtectedAnswer(
-      { value: sourceResolution.canonicalDrug.genericName },
+      { value: scope.label },
       protectedAnswers
     )
   ) return null;
 
   const sourceBrandCandidates = [
     question.metadata.sourceBrandName,
-    ...sourceResolution.brandNames
+    ...scope.brandNames
   ].filter(Boolean).filter((brandName, index, values) => (
     values.findIndex((value) => normalizeChoiceKey(value) === normalizeChoiceKey(brandName)) === index
   ));
@@ -2735,7 +2837,7 @@ function rebuildBrandGenericRecognitionForProtections(context, question, protect
 
   const rebuiltEntries = [...originalEntries];
   rebuiltEntries[correctIndex] = {
-    value: sourceResolution.canonicalDrug.genericName,
+    value: scope.label,
     sourceDrugId: sourceResolution.canonicalDrug.id,
     sourceDrugIds: [...sourceResolution.sourceDrugIds],
     sourceDrugQuizWeek: sourceResolution.canonicalDrug.quizWeek,

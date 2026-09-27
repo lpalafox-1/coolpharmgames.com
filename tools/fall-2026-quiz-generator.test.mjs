@@ -640,6 +640,31 @@ function assertPredicateQuestionSourceBacked(question, sourceData = drugData) {
   assert.match(question.prompt, expectedVariantContract[3]);
 }
 
+function sourceBrandGroups(drug) {
+  const listing = String(drug?.brandListing || "");
+  const labelPattern = /([A-Za-z][A-Za-z0-9]*)\s*:/g;
+  const labels = [];
+  for (let match = labelPattern.exec(listing); match; match = labelPattern.exec(listing)) {
+    labels.push({ label: match[1], nameStart: match.index, nameEnd: labelPattern.lastIndex });
+  }
+  if (labels.length < 2) return null;
+  return labels.map((label, index) => {
+    const stop = index + 1 < labels.length ? labels[index + 1].nameStart : listing.length;
+    return {
+      label: label.label,
+      brandNames: listing.slice(label.nameEnd, stop).split(",").map((brand) => brand.trim()).filter(Boolean)
+    };
+  });
+}
+
+function brandGroupForQuestion(sourceDrug, question) {
+  const label = question.metadata?.brandGroupLabel;
+  if (!label) return null;
+  const group = sourceBrandGroups(sourceDrug)?.find((candidate) => candidate.label === label);
+  assert.ok(group, `${question.id} names a brand group that is not in the Fall brand listing`);
+  return group;
+}
+
 function assertBrandGenericRecognitionSourceBacked(question, sourceData = drugData) {
   assert.equal(question.type, "mcq");
   assert.equal(question.metadata.knowledgeDomain, "brandGeneric");
@@ -650,9 +675,13 @@ function assertBrandGenericRecognitionSourceBacked(question, sourceData = drugDa
   assert.deepEqual(question.choices, question.metadata.choiceSources.map((entry) => entry.value));
   assert.equal(new Set(question.choices.map(normalizeChoice)).size, 4);
   const sourceDrug = getSourceDrug(sourceData, question.metadata.sourceDrugId, question.id);
+  const brandGroup = brandGroupForQuestion(sourceDrug, question);
   assert.ok(sourceDrug.brandNames.includes(question.metadata.sourceBrandName));
+  if (brandGroup) {
+    assert.ok(brandGroup.brandNames.includes(question.metadata.sourceBrandName));
+  }
   assert.ok(question.prompt.includes(`<b>${question.metadata.sourceBrandName}</b>`));
-  assert.equal(question.answer, sourceDrug.genericName);
+  assert.equal(question.answer, brandGroup ? brandGroup.label : sourceDrug.genericName);
   assert.equal(question.metadata.answerMatching, undefined);
   assert.equal(question._acceptedAnswers, undefined);
 
@@ -664,7 +693,10 @@ function assertBrandGenericRecognitionSourceBacked(question, sourceData = drugDa
     const entryDrug = getSourceDrug(sourceData, entry.sourceDrugId, question.id);
     assertSourceDrugInMaterialCohort(entryDrug, question, question.id);
     assert.equal(entry.sourceDrugQuizWeek, entryDrug.quizWeek);
-    assert.equal(entry.value, entryDrug.genericName);
+    assert.equal(
+      entry.value,
+      entry.role === "correct" && brandGroup ? brandGroup.label : entryDrug.genericName
+    );
     assert.equal(entry.sourceGenericIdentity, normalizeGenericIdentity(entryDrug.genericName));
     assert.deepEqual(entry.sourceDrugIds, [entryDrug.id]);
     assert.equal(entry.role, entry.sourceDrugId === sourceDrug.id ? "correct" : "distractor");
@@ -683,19 +715,24 @@ function assertStrictBrandGenericFitbSourceBacked(question, sourceData = drugDat
   );
   assert.ok(sourceRows.every((drug) => drug.quizWeek <= question.metadata.requestedQuizWeek));
   const sourceDrug = getSourceDrug(sourceData, question.metadata.sourceDrugId, question.id);
+  const brandGroup = brandGroupForQuestion(sourceDrug, question);
   if (question.metadata.brandGenericDirection === "genericToBrand") {
-    assert.ok(question.prompt.includes(`<b>${sourceDrug.genericName}</b>`));
+    const stem = brandGroup ? brandGroup.label : sourceDrug.genericName;
+    assert.ok(question.prompt.includes(`<b>${stem}</b>`));
     assert.deepEqual(
       new Set([question.answer, ...(question._acceptedAnswers || [])].map(normalizeChoice)),
-      new Set(sourceRows.flatMap((drug) => drug.brandNames).map(normalizeChoice))
+      new Set((brandGroup ? brandGroup.brandNames : sourceRows.flatMap((drug) => drug.brandNames)).map(normalizeChoice))
     );
   } else {
     assert.equal(question.metadata.brandGenericDirection, "brandToGeneric");
     assert.ok(sourceRows.some(
       (drug) => drug.brandNames.includes(question.metadata.sourceBrandName)
     ));
+    if (brandGroup) {
+      assert.ok(brandGroup.brandNames.includes(question.metadata.sourceBrandName));
+    }
     assert.ok(question.prompt.includes(`<b>${question.metadata.sourceBrandName}</b>`));
-    assert.equal(question.answer, sourceDrug.genericName);
+    assert.equal(question.answer, brandGroup ? brandGroup.label : sourceDrug.genericName);
   }
 }
 

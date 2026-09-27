@@ -13,7 +13,7 @@ const PROTECTED_BASELINES = Object.freeze({
   fallSource: "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01",
   fallPolicy: "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171",
   masterPool: "1fb50e96e60252a9839406d53bc929e9569d76c0ddc2522aff43adf9bdf2a87c",
-  fallGenerator: "f678d7a766a3f1594b89110019829d93cabfd2df0cefaadf906dba301748946a",
+  fallGenerator: "84c66064d60cc84eee5e6c4306540ff5c1d3722848ba43b35bc2cc0918889654",
   fallLauncher: "7ede6e99b7d35cfc2f99a3deac74b64ea8b2616c24d2d8aeda8bbd5606d7292c",
   quizEngine: "50920b5bcd43ad422360236031f8c442c568fba761c34ff1698617e804c2a664",
   stats: "d97046dcafeb57e26385a094fbf39b6cc8eee68c86088bdbb3980b59c2589fdc",
