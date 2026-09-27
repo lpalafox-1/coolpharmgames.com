@@ -1321,7 +1321,7 @@ function renderMorningWarmups(reviewQueue, history, poolState) {
     card.innerHTML = `
       <div class="flex items-start justify-between gap-3">
         <div>
-          <div class="text-[10px] font-black uppercase tracking-[0.18em] opacity-60">${model.type === "review-queue" ? "Fast Cleanup" : "Adaptive Top Drugs"}</div>
+          <div class="text-[10px] font-black uppercase tracking-[0.18em] opacity-80">${model.type === "review-queue" ? "Fast Cleanup" : "Adaptive Top Drugs"}</div>
           <h3 class="text-lg font-semibold mt-1">${sanitize(model.title)}</h3>
         </div>
         <div class="text-xs font-semibold whitespace-nowrap" style="color:var(--muted)">${sanitize(countLabel)}</div>
@@ -1392,7 +1392,7 @@ async function renderWeakAreaPlaylists(reviewQueue, poolState) {
     card.innerHTML = `
       <div class="flex items-start justify-between gap-3">
         <div>
-          <div class="text-[10px] font-black uppercase tracking-[0.18em] opacity-60">${playlist.type === "review-queue" ? "Review Queue" : "Top Drugs"}</div>
+          <div class="text-[10px] font-black uppercase tracking-[0.18em] opacity-80">${playlist.type === "review-queue" ? "Review Queue" : "Top Drugs"}</div>
           <h3 class="text-lg font-semibold mt-1">${sanitize(playlist.title)}</h3>
         </div>
         <div class="text-xs font-semibold whitespace-nowrap" style="color:var(--muted)">${sanitize(countLabel)}</div>
