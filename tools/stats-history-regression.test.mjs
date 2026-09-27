@@ -1140,7 +1140,7 @@ test("T-14 only the Stats cache token moved for P2F-08", () => {
   assert.notEqual(statsToken, "20260831a", "a changed Stats bundle needs a fresh token");
 
   // Every other bundle keeps the token it already had.
-  assert.match(quizPage, /assets\/js\/quizEngine\.js\?v=20260926a/);
+  assert.match(quizPage, /assets\/js\/quizEngine\.js\?v=20260926e/);
   assert.match(quizPage, /assets\/js\/curriculum-metadata\.js\?v=20260831b/);
   assert.match(statsPage, /assets\/js\/curriculum-metadata\.js\?v=20260831b/);
   assert.match(statsPage, /assets\/js\/quiz-catalog\.js\?v=20260831b/);
@@ -1200,7 +1200,7 @@ test("T-17 every protected hash except the approved Stats baseline is unchanged"
     masterPool: "1fb50e96e60252a9839406d53bc929e9569d76c0ddc2522aff43adf9bdf2a87c",
     fallGenerator: "f678d7a766a3f1594b89110019829d93cabfd2df0cefaadf906dba301748946a",
     fallLauncher: "7ede6e99b7d35cfc2f99a3deac74b64ea8b2616c24d2d8aeda8bbd5606d7292c",
-    quizEngine: "1913b1703f8acddc6bae5070410ee8309cde94e658ea3515a26573858c7ae7bf",
+    quizEngine: "50920b5bcd43ad422360236031f8c442c568fba761c34ff1698617e804c2a664",
     reviewQueueStore: "169c528d77fe0a185b801c7bcc61949adad803eeb839be96fa1354dbe9937ba3",
     favorites: "b6fbd5bbca17ea150e34e9b29c9e6391b5ae7359d7b6afb18fe6c7e7caed781d"
   });

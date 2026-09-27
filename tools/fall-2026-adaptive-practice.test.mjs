@@ -1056,7 +1056,7 @@ test("the generator, engine, canonical data, and policy are untouched", () => {
   assert.equal(sha256("assets/js/fall-2026-quiz-generator.js"),
     "f678d7a766a3f1594b89110019829d93cabfd2df0cefaadf906dba301748946a", "generator must not change");
   assert.equal(sha256("assets/js/quizEngine.js"),
-    "1913b1703f8acddc6bae5070410ee8309cde94e658ea3515a26573858c7ae7bf", "engine must not change");
+    "50920b5bcd43ad422360236031f8c442c568fba761c34ff1698617e804c2a664", "engine must not change");
   assert.equal(sha256("assets/data/fall-2026-p2-top-drugs.json"),
     "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01", "canonical drug data must not change");
   assert.equal(sha256("assets/data/fall-2026-lab3-quiz-policy.json"),

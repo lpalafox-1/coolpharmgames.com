@@ -451,6 +451,7 @@ const FALL_LAB3_HUB_PAGE = "lab3-fall-2026.html";
 const FALL_LAB3_PRACTICE_KIND = "fall-2026-lab3-practice";
 const FALL_LAB3_BOSS_REMIX_KIND = "fall-2026-lab3-boss-remix";
 const FALL_LAB3_ADAPTIVE_KIND = "fall-2026-lab3-adaptive";
+const FALL_LAB3_WEEK_FOCUS_KIND = "fall-2026-lab3-week-focus";
 const FALL_LAB3_ADAPTIVE_REQUEST_KEY = "pharmlet.fall-2026-lab3.adaptive-request";
 const FALL_LAB3_WEEKLY_REQUEST_KEY = "pharmlet.fall-2026-lab3.weekly-request";
 const FALL_LAB3_MIN_WEEK = 1;
@@ -3888,8 +3889,30 @@ function getCompletionContinuationActions({
     remixSize = 0,
     generatedPayload = false,
     fall = { active: false, quizWeek: 0 },
-    adaptive = { active: false, targetWeek: 0 }
+    adaptive = { active: false, targetWeek: 0 },
+    weekFocus = { active: false, quizWeek: 0 }
 } = {}) {
+    // Week Focus stays a selected-week round, including after Review Missed.
+    // Boss Round, Boss Remix, and New Week N Practice Set belong to Standard.
+    if (weekFocus.active && !bossMode) {
+        const focusActions = [];
+        if (missedCount > 0) {
+            focusActions.push({ id: "review-missed", tone: "review", label: `🔄 Review ${missedCount} Missed` });
+        }
+        focusActions.push({
+            id: "new-week-focus",
+            tone: "primary",
+            label: `🆕 New Week ${weekFocus.quizWeek} Focus`
+        });
+        focusActions.push({
+            id: "retry-attempt",
+            tone: "accent",
+            label: getCompletionRetryLabel({ bossMode, reviewMode, generatedPayload })
+        });
+        focusActions.push({ id: "lab3-hub", tone: "ghost", label: "← Return to Lab III Hub" });
+        return focusActions;
+    }
+
     // Adaptive Practice gets its own short fork. The generic Fall menu offers
     // five or six continuations, which buries the one natural next step after
     // an adaptive round. Boss Round, Boss Remix, and New Week X Practice Set
@@ -3959,6 +3982,46 @@ function runCompletionAction(actionId) {
     if (actionId === "retry-attempt") return restartQuiz();
     if (actionId === "boss-remix") return launchFallLab3BossRemix();
     if (actionId === "new-adaptive-round") return startFallLab3AdaptiveRound(getFallLab3AdaptiveContext().targetWeek);
+    if (actionId === "new-week-focus") {
+        const saved = state.attemptMetadata;
+        const metadata = saved && typeof saved === "object" && !Array.isArray(saved) ? saved : {};
+        const week = String(metadata.kind || "") === FALL_LAB3_WEEK_FOCUS_KIND
+            ? toFallLab3WeekNumber(metadata.quizWeek)
+            : 0;
+        if (!week || state.weekFocusLaunchInFlight) return false;
+
+        state.weekFocusLaunchInFlight = true;
+        clearFallLab3BossRemixRequest();
+
+        const reportWeekFocusLaunchFailure = (error) => {
+            state.weekFocusLaunchInFlight = false;
+            console.warn("Unable to start a new Week Focus round:", error);
+            try {
+                alert("This browser could not start a new Week Focus round.");
+            } catch (alertError) {
+                console.warn("Unable to report the Week Focus launch failure:", alertError);
+            }
+        };
+
+        try {
+            // quizEngine.js is a classic script. The launcher is an ES module,
+            // so this action imports it at click time. The hub registers its
+            // own startup on DOMContentLoaded; a click after load does not
+            // run that startup or consume continuation requests.
+            const launcherUrl = new URL("assets/js/fall-2026-lab3-launcher.js", window.location.href).href;
+            import(launcherUrl)
+                .then((launcher) => {
+                    if (typeof launcher.launchFall2026Lab3WeekFocus !== "function") {
+                        throw new Error("Week Focus launch is unavailable.");
+                    }
+                    return launcher.launchFall2026Lab3WeekFocus(week);
+                })
+                .catch(reportWeekFocusLaunchFailure);
+        } catch (error) {
+            reportWeekFocusLaunchFailure(error);
+        }
+        return true;
+    }
     if (actionId === "new-week-practice") return startFallLab3WeekPractice(getFallLab3AttemptContext().quizWeek);
     if (actionId === "start-week-practice") return startFallLab3PreparedWeekPractice();
     if (actionId === "lab3-hub") return openFallLab3Hub(getFallLab3AttemptContext().quizWeek);
@@ -8204,6 +8267,13 @@ function showResults() {
     const bossQuestions = !state.reviewMode && !state.bossMode ? buildBossRoundQuestions(state.questions) : [];
     const fallContext = getFallLab3AttemptContext();
     const adaptiveContext = getFallLab3AdaptiveContext();
+    const weekFocusMetadata = state.attemptMetadata && typeof state.attemptMetadata === "object" && !Array.isArray(state.attemptMetadata)
+        ? state.attemptMetadata
+        : {};
+    const weekFocusWeek = String(weekFocusMetadata.kind || "") === FALL_LAB3_WEEK_FOCUS_KIND
+        ? toFallLab3WeekNumber(weekFocusMetadata.quizWeek)
+        : 0;
+    const weekFocusContext = { active: weekFocusWeek > 0, quizWeek: weekFocusWeek };
     const remixSize = state.reviewMode ? 0 : getFallLab3RemixPreviewSize(state.questions, fallContext);
     const continuationActions = getCompletionContinuationActions({
         reviewMode: state.reviewMode,
@@ -8213,7 +8283,8 @@ function showResults() {
         remixSize,
         generatedPayload: GENERATED_QUIZ_IDS.has(quizId),
         fall: fallContext,
-        adaptive: adaptiveContext
+        adaptive: adaptiveContext,
+        weekFocus: weekFocusContext
     });
     const continuationMarkup = buildCompletionActionsMarkup(continuationActions);
     const savedNote = state.reviewMode
@@ -8221,7 +8292,11 @@ function showResults() {
         : remixAttempt
         ? `<p class="text-sm opacity-70 mt-2">✅ Saved to this browser: this Boss Remix attempt's history and high score. Boss Remix stays a bounded challenge, so it does not feed lifetime weakness, review-queue, or adaptive memory.</p>`
         : `<p class="text-sm opacity-70 mt-2">✅ Saved to this browser: history, high score, and review queue. Nothing else is needed to keep this attempt.</p>`;
-    const continuationNote = adaptiveContext.active && !state.reviewMode && !state.bossMode
+    const continuationNote = weekFocusContext.active && !state.bossMode
+        ? `<p class="mt-4 text-xs opacity-70 max-w-xl mx-auto">${state.reviewMode
+            ? `Restart Full Set reloads this exact Week ${weekFocusContext.quizWeek} Focus set. `
+            : `Retry This Set repeats these exact questions. `}New Week ${weekFocusContext.quizWeek} Focus builds a fresh 10-question set from Week ${weekFocusContext.quizWeek} only, with no prior-week review.</p>`
+        : adaptiveContext.active && !state.reviewMode && !state.bossMode
         ? `<p class="mt-4 text-xs opacity-70 max-w-xl mx-auto">New Adaptive Round builds a fresh 10-question round through Week ${adaptiveContext.targetWeek}, chosen from the performance you just saved, so it can differ from this one. Retry This Set repeats these exact questions.</p>`
         : fallContext.active
         ? `<p class="mt-4 text-xs opacity-70 max-w-xl mx-auto">${state.bossMode ? "Retry Same Boss" : "Retry This Set"} repeats these exact questions. ${remixSize > 0

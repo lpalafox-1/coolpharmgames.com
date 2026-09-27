@@ -22,7 +22,7 @@ import { loadBrowserGlobal } from "./browser-global-harness.mjs";
 import { buildFall2026Lab3Payload } from "../assets/js/fall-2026-lab3-launcher.js";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const ENGINE_TOKEN = "20260926a";
+const ENGINE_TOKEN = "20260926e";
 const REMIX_REQUEST_KEY = "pharmlet.fall-2026-lab3.boss-remix-request";
 const CUSTOM_QUIZ_KEY = "pharmlet.custom-quiz";
 const HISTORY_KEY = "pharmlet.history";
@@ -1123,12 +1123,17 @@ test("the engine still selects no Fall source data, policy, or generator module"
   for (const reference of [
     "fall-2026-p2-top-drugs.json",
     "fall-2026-lab3-quiz-policy.json",
-    "fall-2026-quiz-generator.js",
-    "fall-2026-lab3-launcher.js"
+    "fall-2026-quiz-generator.js"
   ]) {
     assert.equal(engineSource.includes(reference), false, `quizEngine.js must not select ${reference}`);
   }
-  assert.equal(/\bimport\s*\(/.test(engineSource), false, "the engine stays a plain classic script");
+  const dynamicImports = [...engineSource.matchAll(/\bimport\s*\(/g)];
+  assert.equal(dynamicImports.length, 1, "F26-24 adds one dynamic import, the Week Focus completion bridge");
+  assert.equal(
+    [...engineSource.matchAll(/fall-2026-lab3-launcher\.js/g)].length,
+    1,
+    "that import is the existing launcher and nothing else loads it from the engine"
+  );
   assert.ok(engineSource.includes('const FALL_LAB3_HUB_PAGE = "lab3-fall-2026.html";'), "continuation routes through the hub page");
 });
 
