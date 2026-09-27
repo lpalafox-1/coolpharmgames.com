@@ -803,8 +803,8 @@ function setProgressTransferStatus(message, tone = "muted") {
 
   const colors = {
     muted: "var(--muted)",
-    good: "var(--good)",
-    bad: "var(--bad)",
+    good: "var(--stats-good-text)",
+    bad: "var(--stats-bad-text)",
     accent: "var(--accent)"
   };
 
@@ -818,8 +818,8 @@ function setQuestionReportStatus(message, tone = "muted") {
 
   const colors = {
     muted: "var(--muted)",
-    good: "var(--good)",
-    bad: "var(--bad)",
+    good: "var(--stats-good-text)",
+    bad: "var(--stats-bad-text)",
     accent: "var(--accent)"
   };
 
@@ -833,8 +833,8 @@ function setPlaylistStatus(message, tone = "muted") {
 
   const colors = {
     muted: "var(--muted)",
-    good: "var(--good)",
-    bad: "var(--bad)",
+    good: "var(--stats-good-text)",
+    bad: "var(--stats-bad-text)",
     accent: "var(--accent)"
   };
 
@@ -848,8 +848,8 @@ function setWarmupStatus(message, tone = "muted") {
 
   const colors = {
     muted: "var(--muted)",
-    good: "var(--good)",
-    bad: "var(--bad)",
+    good: "var(--stats-good-text)",
+    bad: "var(--stats-bad-text)",
     accent: "var(--accent)"
   };
 
@@ -2317,7 +2317,7 @@ function renderQuestionReports(reports) {
           ${reasonLabel ? `<span class="shrink-0 self-start rounded-full border border-[var(--ring)] px-2.5 py-1 text-xs font-bold">${sanitize(reasonLabel)}</span>` : `<span class="shrink-0 self-start rounded-full border border-[var(--ring)] px-2.5 py-1 text-xs" style="color:var(--muted)">Legacy report</span>`}
         </div>
         <div class="text-sm" style="color:var(--muted)">Expected answer: <span class="font-medium" style="color:var(--text)">${correctAnswer}</span></div>
-        <div class="text-sm" style="color:var(--muted)">Your answer: <span class="font-medium" style="color:var(--bad)">${userAnswer}</span></div>
+        <div class="text-sm" style="color:var(--muted)">Your answer: <span class="font-medium" style="color:var(--stats-bad-text)">${userAnswer}</span></div>
         ${note ? `<div class="text-sm" style="color:var(--muted)">Note: <span class="font-medium" style="color:var(--text)">${note}</span></div>` : ""}
         ${traceMarkup}
         <div class="text-xs" style="color:var(--muted)">${legacyMetaParts.join(" · ")}${legacyMetaParts.length ? " · " : ""}${sanitize(when)}</div>
@@ -2386,7 +2386,7 @@ function renderMostMissedQuestions(reviewQueue) {
             Correct answer: <span class="font-medium" style="color:var(--text)">${sanitize(toPlainText(item.answer))}</span>
           </div>
           <div class="text-sm" style="color:var(--muted)">
-            Tempting wrong answer: <span class="font-medium" style="color:var(--bad)">${sanitize(item.commonWrong || "—")}</span>${item.commonWrongCount ? ` <span class="opacity-70">(${item.commonWrongCount}x)</span>` : ""}
+            Tempting wrong answer: <span class="font-medium" style="color:var(--stats-bad-text)">${sanitize(item.commonWrong || "—")}</span>${item.commonWrongCount ? ` <span class="opacity-70">(${item.commonWrongCount}x)</span>` : ""}
           </div>
         </div>
         <div class="text-sm lg:text-right" style="color:var(--muted)">

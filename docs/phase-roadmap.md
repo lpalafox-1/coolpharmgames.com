@@ -466,7 +466,7 @@ canonical data remain feature-frozen. No Fall task is `READY`. The active
 accessibility work is P2F-10, which remains `IN PROGRESS`. P2F-10a —
 Contrast & Small-Text Legibility is `DONE`, shipped in PR #84 (merge
 `c0c6be60d24f1b6dd16116fc65ff5ba5a9932cca`). It is a completed slice of
-P2F-10, not a separate parent task. No next P2F-10 slice is authorized.
+P2F-10, not a separate parent task. Current authorized slice: Stats Semantic Text Contrast.
 
 ### F26-10 — Performance-Guided Adaptive Practice
 
@@ -574,7 +574,7 @@ owner reviews and merges its branch; implementation alone never promotes it to
 | P2F-07 | Additive curriculum metadata contract | `DONE` | P2F-06 |
 | P2F-08 | Stats Dashboard v2 | `DONE` | P2F-07 |
 | P2F-09 | Review Queue v2 + `wrongCounts` correction | `DONE` | P2F-08 |
-| P2F-10 | Mobile/accessibility consistency pass. Completed slice: P2F-10a — Contrast & Small-Text Legibility, `DONE` in PR #84 (merge `c0c6be60d24f1b6dd16116fc65ff5ba5a9932cca`). No next slice is authorized. | `IN PROGRESS` | P2F-09 |
+| P2F-10 | Mobile/accessibility consistency pass. Completed slice: P2F-10a — Contrast & Small-Text Legibility, `DONE` in PR #84 (merge `c0c6be60d24f1b6dd16116fc65ff5ba5a9932cca`). Current authorized slice: Stats Semantic Text Contrast. | `IN PROGRESS` | P2F-09 |
 
 P2F-08 shipped in PR #67 (merge `c7ccf7d`, 2026-09-03), built from `383a1de`,
 `9a0d8d3`, and the review-correction commit `a9a25a9`.
@@ -618,8 +618,8 @@ P2F-09 follow-ups accepted as non-blocking at merge:
 Mobile/accessibility consistency pass. **P2F-10a — Contrast & Small-Text
 Legibility** is `DONE`, shipped in PR #84 (merge
 `c0c6be60d24f1b6dd16116fc65ff5ba5a9932cca`). P2F-10a is a completed slice of
-P2F-10, not a separate parent task or a new F26-25. No next P2F-10 slice is
-authorized. P2F-10 is not `DONE`; it becomes `DONE` only after its approved
+P2F-10, not a separate parent task or a new F26-25. Current authorized slice:
+Stats Semantic Text Contrast. P2F-10 is not `DONE`; it becomes `DONE` only after its approved
 accessibility slices are completed. Fall work through F26-24 is already shipped.
 
 P2F-08 is read-side only. It adds a Stats-local normalization and provenance
