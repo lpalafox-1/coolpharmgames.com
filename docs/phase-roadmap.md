@@ -23,7 +23,8 @@ Phase 2 Facelift task without explicit owner approval.
 | `npm run test:tools` | Full current suite passes (count grows only with deliberate test additions) |
 | `npm run health:repo` | exit 0 with `Errors: 0`; informational small-quiz warnings remain visible |
 
-Current audited repository facts after F26-08: 1,723 static quiz questions
+Current audited repository facts, still holding after PR #82
+(`ff225e4a8f5b47b460deb2bb3bdaba72cef871bc`): 1,723 static quiz questions
 across 34 JSON files; 169 legacy P1 Top Drugs records; and 100 Fall 2026 P2
 records, ten per week. P1 and P2 remain separate canonical sources.
 
@@ -423,7 +424,7 @@ contract.
   - **No longitudinal writes.** A completed remix saves its own history entry
     and high score, but never feeds the review queue, `wrongCounts`, or adaptive
     memory. P2F-09 has since corrected the review-queue side of those
-    semantics; F26-10 still owns adaptive selection. Normal quiz and Boss
+    semantics. Adaptive selection later shipped as F26-10. Normal quiz and Boss
     Round behavior outside the remix is unchanged.
 - **Delivered (history provenance):** a remix records the distinct history mode
   `bossRemix` through the existing generated-attempt identity machinery, plus one
@@ -457,60 +458,89 @@ contract.
   engine in the same commit. Coverage lives in
   `tools/fall-2026-lab3-completion-continuation.test.mjs`.
 
-### Fall sequencing — next planned work
+### Fall sequencing
 
-The bounded generator-fidelity audit ran as Phase 0 of F26-10 rather than as a
-separate branch. Two of its four checks passed and two failed; the failures are
-deferred to a separate task rather than being fixed inside F26-10 (see F26-11
-below). The Fall generator, policy, and canonical data remain feature-frozen.
+F26-10 through F26-24 are shipped on `main` through PR #82 (merge
+`ff225e4a8f5b47b460deb2bb3bdaba72cef871bc`). The Fall generator, policy, and
+canonical data remain feature-frozen. No Fall task is `READY`. The recommended
+next candidate is P2F-10a, recorded in the Phase 2 Facelift lane. It is not
+`READY`.
 
 ### F26-10 — Performance-Guided Adaptive Practice
 
-- **Status:** `IN PROGRESS` (owner-authorized 2026-09-04; generator-free path)
+- **Status:** `DONE`. PR #71, merge `141c92968403232dcd9beb8f820d049e59e23b67`
+  (2026-09-05). Title: "F26-10: add performance-guided adaptive Lab III practice."
 - **Objective:** an additive Adaptive Practice mode for Fall Lab III Weeks 1–10
   that builds a fresh 10-question round from the student's own longitudinal
   performance. Normal Week Practice, Boss Round, Boss Remix, scoring, weekly
   eligibility, and the shared generator are unchanged.
 - **Phase 0 result (bounded generator-fidelity check):** verified against a
-  2,500-question corpus generated through the real launcher.
+  2,500-question corpus generated through the real launcher. The two failures
+  stayed out of F26-10 and later shipped as the single F26-11 (PR #74).
   - **PASS** — NOT/EXCEPT generation is source-safe. All emitted negatives are
     `notFdaIndicationRecognition`; across 76 distinct items the keyed answer
     genuinely lacks the indication and every distractor genuinely has it, with
     brand and generic choices both resolving to canonical records.
   - **PASS** — no future-week leakage, 0 violations across the corpus.
-  - **FAIL, deferred** — direct brand → FDA-indication stems are never
-    generated (0 brand stem references in the corpus).
-  - **FAIL, deferred** — the cross-drug `What is NOT an ADR for either of the
-    Thiazide Diuretics?` form does not exist.
+  - **FAIL inside F26-10** — direct brand → FDA-indication stems were absent
+    from that corpus. Shipped later as F26-11.
+  - **FAIL inside F26-10** — the cross-drug `What is NOT an ADR for either of the
+    Thiazide Diuretics?` form did not exist. F26-11 shipped closed-group
+    NOT-an-ADR instead. PR #74 says an unapproved thiazide merge fails closed.
 - **Selection trust boundary:** historical `wrongCounts` is deliberately never
   read. Pre-P2F-09 values may carry normalization inflation (see P2F-09-F1 and
   the legacy best-effort note), so answer-frequency magnitude has no influence
   on selection. `missCount`, `reviewMissCount`, `clearStreak`, archived and
   refresh-due state, miss recency, exposure, and recent attempt history are
   used instead; none was affected by that bug.
-- **Boundaries:** `assets/js/fall-2026-quiz-generator.js`, `quizEngine.js`, the
-  engine manifest, canonical Fall data, and the quiz policy are byte-identical.
-  Adaptive writes exactly one additive store,
+- **Boundaries at the F26-10 merge:** `assets/js/fall-2026-quiz-generator.js`,
+  `quizEngine.js`, the engine manifest, canonical Fall data, and the quiz policy
+  were byte-identical. Adaptive writes exactly one additive store,
   `pharmlet.fall-2026-lab3.adaptive-memory`, used only for anti-repetition; it
-  never writes history or the Review Queue.
+  never writes history or the Review Queue. Later Fall tasks changed the
+  generator and the engine under their own merges.
+- **Accepted nonblocking follow-ups (PR #71).** Historical only. This ledger
+  does not close them, except item 5, which PR #72's merged change removed.
+  1. Document launch-time adaptive-memory semantics. Completion-time memory
+     stays a separate engine task.
+  2. Adaptive lineage end-to-end regression.
+  3. Adaptive launcher runtime coverage.
+  4. MCQ/FITB identity-collision regression.
+  5. Replace the hardcoded Week 6 selector default. PR #72's merged change
+     (merge `ea907677c74eb3f8c5d6400d8321796aabe24b80`) removed that hardcoded
+     default and requires explicit Adaptive week selection. Items 1–4 were not
+     re-audited here.
 
-### F26-11 — Bounded official-quiz-fidelity forms (deferred from F26-10)
+### Fall task ledger after F26-10
 
-- **Status:** `DEFERRED` — needs its own owner-approved scope and allowed-files
-  contract; **not** authorized by F26-10.
-- **Scope:** the two Phase 0 failures above. Both require touching the shared
-  Fall generator's question-construction path, which F26-10 was explicitly
-  forbidden to do because that path also feeds normal Week Practice, whose
-  composition must not change.
-  - Direct brand → FDA-indication stems. The machinery exists
-    (`createMcqStemReference("brand")`, `selectMcqStemReference`,
-    `isBrandOnlyReferenceSafe`) but the composition route the launcher uses
-    never produces a stem reference, so brands appear only as choice values.
-  - Cross-drug NOT-an-ADR stems. Needs a drug-group stem concept, an
-    ADR-domain negative, and a guarantee that the keyed answer is provably
-    absent from every canonical drug the stem covers.
+Compact record of merged work through PR #82. Titles and SHAs come from the
+merged PR title, body, or branch. No second F26-11 is recorded. F26-13,
+F26-14, and F26-15 have no verified shipped task. F26-16 appears only in the
+PR #78 body, which says that PR does not start F26-16. No title is assigned
+to F26-16.
 
-### Deferred Fall engine issue
+| Task | Status | Record |
+| --- | --- | --- |
+| PR #72, no F26 ID | `DONE` | Adaptive Practice as the primary Lab III launch path, plus a summary that names the selected week. Merge `ea907677c74eb3f8c5d6400d8321796aabe24b80` (2026-09-08). GitHub title: "Codex/fall lab3 adaptive primary." The PR body is empty. |
+| F26-11 — Bounded official-quiz-fidelity forms | `DONE` | The single shipped F26-11. PR #74, merge `c9dcd97c30499aefe20c2e5ec9d3d21483b7d29c` (2026-09-13). Branch `claude/f26-11-quiz-form-fidelity`. GitHub title: "feat(fall-2026): add source-safe quiz-form fidelity surfaces." PR body heading matches this row. Shipped brand→FDA, closed-group NOT-an-ADR (exact class or the existing CCB family), and class→common ADR. An unapproved thiazide merge fails closed. |
+| F26-12 — Adaptive Practice completion | `DONE` | PR #73, merge `f097417af03ad4b8bd56a8b8bcda796126ae3c83` (2026-09-08). Title: "F26-12: simplify Adaptive Practice completion." PR #73 recorded three nonblocking follow-ups, which were not re-audited here and are not authorized: adaptive `rootAttemptId` provenance; clear pending adaptive requests from additional engine exit paths and surface request-write failure rather than failing silently; Adaptive-derived Review completion may label New Week Practice using the maximum missed-question week rather than the original adaptive target. |
+| F26-13, F26-14, F26-15 | — | No verified shipped task, title, PR, or merge SHA. |
+| F26-16 | — | Not started. PR #78 says it does not start F26-16. No title is on record. |
+| F26-17 — Adaptive Balance Guardrails | `DONE` | PR #75, merge `ed7d7c8d10d74b96058f4d4d1b38203e7f07327d` (2026-09-13). The F26 id and title are the PR body heading. The GitHub title omits the id. |
+| F26-18 — Future Practice + Lab IV Placeholders | `DONE` | PR #76, merge `9112ed44ece363ff36b69b53405c3b024f6d6d18` (2026-09-13). Week Focus and Lab IV were Coming Soon only. F26-20 later replaced the Week Focus placeholder with a real launcher. |
+| F26-19 — Adaptive Weekly Composition | `DONE` | PR #77, merge `97ac4ebe39bf9fd55ce94cbcb2c22e985d7a79eb` (2026-09-13). Faculty 6+4 shape for Adaptive rounds. Week 1 stays 10 current-week items. |
+| F26-20 — Week Focus v1 | `DONE` | PR #78, merge `f1c3f16906612bc2b8b030944d7d693a151c9111` (2026-09-13). Branch `claude/f26-20-week-focus`. Body heading: "F26-20 Week Focus v1." The GitHub title omits the id. Week Focus is 10 selected-week questions and no prior-week review. Standard Weekly uses its own dropdown. `?week=N` preselects Standard and does not launch. |
+| F26-21 — Mobile question-screen QoL | `DONE` | PR #79, merge `faf7e38761e033c21c00ac842eaee3c79c4cc5b9` (2026-09-25). Title: "F26-21: Keep Check Answer reachable on phones (mobile question-screen QoL)." |
+| F26-22 — Lab III continuation handoff | `DONE` | PR #80, merge `2a752bb150bb3459d7964e62b8515d20040fd745` (2026-09-26). Title: "F26-22: Lab III continuation handoff repair (Boss Remix, New Week Practice, ?week=N)." Precedence: Adaptive request, weekly request, peeked Boss Remix, then bare `?week=N`. |
+| F26-23 — Lab III hub mode copy | `DONE` | PR #81, merge `a67cdc5beca3b80afa17c15da153d07347ffddd3` (2026-09-27). Title: "F26-23: Clarify Lab III hub mode copy." |
+| F26-24 — Week Focus completion identity | `DONE` | PR #82, merge `ff225e4a8f5b47b460deb2bb3bdaba72cef871bc` (2026-09-27). Title: "fix(fall-2026): keep Week Focus completion on Week Focus (F26-24)." Week Focus completion stays Week Focus. New Week N Focus calls the existing launcher. |
+
+F26-24 review follow-ups are owner-stated, nonblocking, and not authorized.
+They are not in the PR #82 body or its review comments.
+
+- New Week Focus launch busy/double-action resilience.
+- Explicit failure-path coverage.
+- Subprocess zero-match hardening.
 
 ### Deferred Fall engine issue
 
@@ -582,11 +612,12 @@ P2F-09 follow-ups accepted as non-blocking at merge:
   `reviewMissCount`, and mastery fields were never affected by the bug and may
   be considered independently.
 
-**No Phase 2 Facelift task is currently `READY`.** P2F-10 remains `BLOCKED`:
-the P2F-09 merge records that its dependency is satisfied, but it does not by
-itself authorize P2F-10 implementation, which still needs its own
-owner-approved scope and allowed-files contract. The next planned work is Fall,
-not P2F-10 — see the Fall sequencing note above.
+**No task is currently `READY`.** P2F-10 remains `BLOCKED`. The P2F-09 merge
+records that its dependency is satisfied, and that does not authorize P2F-10
+implementation. P2F-10 still needs its own owner-approved scope and
+allowed-files contract. The recommended next candidate is **P2F-10a — Contrast
+& Small-Text Legibility**, a slice of P2F-10, not a new F26-25. P2F-10a is not
+`READY` and has no approved scope. Fall work through F26-24 is already shipped.
 
 P2F-08 is read-side only. It adds a Stats-local normalization and provenance
 layer over `pharmlet.history` and introduces zero new writes: history, Review
