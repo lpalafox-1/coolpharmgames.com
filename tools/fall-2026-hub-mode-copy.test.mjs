@@ -90,5 +90,5 @@ test("mode copy does not collapse the three week selectors", () => {
   assert.match(hub, /id="adaptive-launch"/);
   assert.match(hub, /id="week-focus-launch"/);
   assert.match(hub, /id="weekly-launch"/);
-  assert.match(hub, /assets\/js\/fall-2026-lab3-launcher\.js\?v=20260926d/);
+  assert.match(hub, /assets\/js\/fall-2026-lab3-launcher\.js\?v=20260927a/);
 });
