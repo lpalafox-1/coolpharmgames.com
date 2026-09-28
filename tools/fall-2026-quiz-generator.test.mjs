@@ -703,6 +703,35 @@ function assertBrandGenericRecognitionSourceBacked(question, sourceData = drugDa
   }
 }
 
+function stripFinalSourceParenthetical(value) {
+  const text = String(value ?? "").normalize("NFKC").trim();
+  const match = /^(.*\S)\s+\(([^()]*)\)\s*$/.exec(text);
+  if (!match) return null;
+  const bare = match[1].trim();
+  if (!bare || !match[2].trim() || /[()]/.test(bare)) return null;
+  return bare;
+}
+
+// Source brands stay required. A generic-to-brand FITB may also accept the
+// same brand with only its final parenthetical removed, and nothing else.
+function expectedGenericToBrandAnswers(canonicalBrands) {
+  const canonicalKeys = new Set(canonicalBrands.map(normalizeChoice).filter(Boolean));
+  const owners = new Map();
+  for (const brandName of canonicalBrands) {
+    const bare = stripFinalSourceParenthetical(brandName);
+    const key = normalizeChoice(bare);
+    if (!bare || !key) continue;
+    const group = owners.get(key) || [];
+    group.push(bare);
+    owners.set(key, group);
+  }
+  const expected = new Set(canonicalKeys);
+  for (const [key, bareForms] of owners) {
+    if (bareForms.length === 1 && !canonicalKeys.has(key)) expected.add(key);
+  }
+  return expected;
+}
+
 function assertStrictBrandGenericFitbSourceBacked(question, sourceData = drugData) {
   assert.equal(question.type, "short");
   assert.equal(question.metadata.knowledgeDomain, "brandGeneric");
@@ -718,10 +747,12 @@ function assertStrictBrandGenericFitbSourceBacked(question, sourceData = drugDat
   const brandGroup = brandGroupForQuestion(sourceDrug, question);
   if (question.metadata.brandGenericDirection === "genericToBrand") {
     const stem = brandGroup ? brandGroup.label : sourceDrug.genericName;
+    const canonicalBrands = brandGroup ? brandGroup.brandNames : sourceRows.flatMap((drug) => drug.brandNames);
     assert.ok(question.prompt.includes(`<b>${stem}</b>`));
+    assert.ok(canonicalBrands.map(normalizeChoice).includes(normalizeChoice(question.answer)));
     assert.deepEqual(
       new Set([question.answer, ...(question._acceptedAnswers || [])].map(normalizeChoice)),
-      new Set((brandGroup ? brandGroup.brandNames : sourceRows.flatMap((drug) => drug.brandNames)).map(normalizeChoice))
+      expectedGenericToBrandAnswers(canonicalBrands)
     );
   } else {
     assert.equal(question.metadata.brandGenericDirection, "brandToGeneric");

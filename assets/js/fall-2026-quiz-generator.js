@@ -307,6 +307,71 @@ function brandGenericStemLabel(question, sourceDrug) {
   return question?.metadata?.brandGroupLabel || sourceDrug.genericName;
 }
 
+// A canonical brand may carry one trailing source qualifier, such as
+// "Lopressor (tartrate)". Brand/Generic FITB keeps that canonical string and
+// may also accept the same string with only that final parenthetical removed.
+// Nothing is added when the remainder is empty, ambiguous, or already a
+// generic or brand identity.
+function stripFinalSourceParenthetical(value) {
+  const text = String(value ?? "").normalize("NFKC").trim();
+  const match = /^(.*\S)\s+\(([^()]*)\)\s*$/.exec(text);
+  if (!match) return null;
+  const bare = match[1].trim();
+  if (!bare || !match[2].trim() || /[()]/.test(bare)) return null;
+  return bare;
+}
+
+function unqualifiedBrandSupplements(canonicalBrands, context, quizWeek) {
+  const canonicalKeys = new Set(
+    canonicalBrands.map((brand) => normalizeChoiceKey(brand)).filter(Boolean)
+  );
+  const owners = new Map();
+  for (const brandName of canonicalBrands) {
+    const bare = stripFinalSourceParenthetical(brandName);
+    const key = normalizeChoiceKey(bare);
+    if (!bare || !key) continue;
+    const group = owners.get(key) || [];
+    group.push(bare);
+    owners.set(key, group);
+  }
+
+  const drugs = getAvailableDrugsThroughWeek(context, quizWeek);
+  const supplements = [];
+  for (const [key, bareForms] of owners) {
+    if (bareForms.length !== 1 || canonicalKeys.has(key)) continue;
+    const bare = bareForms[0];
+    const collides = drugs.some((drug) => (
+      normalizeChoiceKey(drug.genericName) === key
+      || normalizeGenericIdentity(drug.genericName) === normalizeGenericIdentity(bare)
+      || drug.brandNames.some((brandName) => normalizeChoiceKey(brandName) === key)
+    ));
+    if (collides) continue;
+    supplements.push(bare);
+  }
+  return supplements;
+}
+
+function applyUnqualifiedBrandSupplements(context, questions) {
+  return questions.map((question) => {
+    if (question?.type !== "short" || question.metadata?.knowledgeDomain !== "brandGeneric") {
+      return question;
+    }
+    if (question.metadata.brandGenericDirection !== "genericToBrand") return question;
+    const canonical = [question.answer, ...(question._acceptedAnswers || [])]
+      .filter((answer) => typeof answer === "string" && answer.trim());
+    const supplements = unqualifiedBrandSupplements(
+      canonical,
+      context,
+      question.metadata.requestedQuizWeek
+    );
+    if (!supplements.length) return question;
+    return {
+      ...question,
+      _acceptedAnswers: [...(question._acceptedAnswers || []), ...supplements]
+    };
+  });
+}
+
 function getDomainSourceValue(drug, domainId) {
   const spec = DOMAIN_SPECS[domainId];
   if (!spec) fail("UNSUPPORTED_DOMAIN", `Unsupported MCQ domain: ${domainId}.`);
@@ -3288,7 +3353,10 @@ function generateNewMaterialPracticeQuiz({
     randomSource.rng
   );
   const guardedQuestions = applyQuizLevelBrandGenericLeakageGuard(context, materialized);
-  const questions = shuffleCopy(guardedQuestions, randomSource.rng);
+  const questions = shuffleCopy(
+    applyUnqualifiedBrandSupplements(context, guardedQuestions),
+    randomSource.rng
+  );
 
   return {
     status: "generated",
@@ -3422,7 +3490,10 @@ export function generateFall2026Quiz({
     randomSource.rng
   );
   const guardedQuestions = applyQuizLevelBrandGenericLeakageGuard(context, materialized);
-  const questions = shuffleCopy(guardedQuestions, randomSource.rng);
+  const questions = shuffleCopy(
+    applyUnqualifiedBrandSupplements(context, guardedQuestions),
+    randomSource.rng
+  );
 
   if (questions.length !== context.later.totalItemTarget) {
     fail("COMPOSITION_MISMATCH", "Generated quiz does not match the policy total.");
