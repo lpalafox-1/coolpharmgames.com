@@ -27,6 +27,16 @@ const COURSE_STYLE_ID = "fall-2026-lab3-course-calibrated-v1";
 const BRAND_GENERIC_RECOGNITION_RATE = 0.25;
 const FDA_NOT_VARIANT_RATE = 0.25;
 const IDENTIFY_DRUG_SOFT_CAP = 6;
+// Faculty-observed Fall 2026 Lab III form: "Which adverse reaction is listed for
+// both X and Y?" It stays inside the topAdverseReactions knowledge domain; it is
+// a question variant, not a curriculum domain.
+const PAIRWISE_SHARED_ADR_VARIANT = "pairwiseSharedAdrRecognition";
+// Seeded share of ADR candidates that try the pairwise form before the
+// identify-drug form, matching the other 0.25 form rates. It is a chance, not
+// a quota: the roll is only taken when a safe pair actually exists, so
+// candidates without one leave the seeded stream untouched, and the form also
+// remains a fallback after the closed-group forms.
+const PAIRWISE_SHARED_ADR_RATE = 0.25;
 const IDENTIFY_DRUG_QUESTION_VARIANTS = Object.freeze(new Set([
   "identifyDrugByStructuredValue",
   "atomicAdverseReactionRecognition",
@@ -2419,6 +2429,211 @@ function materializeClosedGroupAdrForm(context, candidate, sourceDrug, rng) {
   return null;
 }
 
+// --- Pairwise shared ADR ------------------------------------------------------------
+//
+// Truth is the exact-key intersection of the two canonical adverseReactions
+// arrays under normalizeAtomicFactKey (NFKC, whitespace, trailing ".;",
+// casing). A pair is eligible only when that intersection is exactly one ADR
+// and no other ADR of one drug is a source-vocabulary alias or near-match of an
+// ADR of the other, so the singular stem has exactly one defensible answer.
+// Nothing is inferred: no class effects, no synonyms beyond the reviewed
+// ambiguity groups, no medical knowledge. Both drugs are named by generic only,
+// and the pair is sorted before anything is built, so A+B and B+A produce the
+// same id, prompt, answer, and pair key. The candidate's own drug stays the
+// question's source drug, so per-set drug diversity accounting is unchanged;
+// both participating records are listed in sourceDrugIds.
+
+function normalizedAtomicFactKeys(drug, domainId) {
+  return new Set(getAtomicDomainValues(drug, domainId).map(normalizeAtomicFactKey).filter(Boolean));
+}
+
+function atomicFactDefensiblyListedFor(value, drug, domainId) {
+  const valueKey = normalizeAtomicFactKey(value);
+  return getAtomicDomainValues(drug, domainId).some((listed) => (
+    normalizeAtomicFactKey(listed) === valueKey
+    || atomicFactsPotentiallyOverlap(listed, value)
+  ));
+}
+
+function sortPairwiseDrugs(left, right) {
+  const leftKey = `${normalizeGenericIdentity(left.genericName)}\0${left.id}`;
+  const rightKey = `${normalizeGenericIdentity(right.genericName)}\0${right.id}`;
+  return leftKey <= rightKey ? [left, right] : [right, left];
+}
+
+function getPairwiseSharedAdr(first, second) {
+  const domainId = "topAdverseReactions";
+  const secondKeys = normalizedAtomicFactKeys(second, domainId);
+  const shared = [];
+  const seen = new Set();
+  for (const value of getAtomicDomainValues(first, domainId)) {
+    const key = normalizeAtomicFactKey(value);
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    if (secondKeys.has(key)) shared.push({ value, valueKey: key });
+  }
+  if (shared.length !== 1) return null;
+  const [sharedFact] = shared;
+  if (!atomicFactIsSafeForPrompt(sharedFact.value)) return null;
+
+  const others = (drug) => getAtomicDomainValues(drug, domainId)
+    .filter((value) => normalizeAtomicFactKey(value) !== sharedFact.valueKey);
+  const secondOthers = others(second);
+  if (others(first).some((left) => secondOthers.some((right) => atomicFactsPotentiallyOverlap(left, right)))) {
+    return null;
+  }
+  return sharedFact;
+}
+
+// The quiz-level Brand / Generic leakage guard rewrites single stem references
+// and rebuilds drug-name choices, but it has no rewrite for a two-generic
+// prompt. Any generic identity that owns a Brand / Generic item in this set is
+// therefore kept out of pairwise prompts entirely, including combination
+// generics that contain that identity as a word.
+function genericNameIsProtected(drug, protectedGenericNames) {
+  if (!protectedGenericNames || !protectedGenericNames.size) return false;
+  const visibleText = normalizePreAnswerVisibleText(drug.genericName);
+  for (const genericName of protectedGenericNames) {
+    if (visibleTextContainsAnswer(visibleText, genericName)) return true;
+  }
+  return false;
+}
+
+// Every distractor is a canonical ADR of an eligible drug. It is never the
+// shared ADR or a near-match of it, and it is never listed (exactly or by
+// alias) for both drugs, so it cannot be a second defensible answer. ADRs that
+// belong to exactly one of the two drugs are offered first because they test
+// the relationship itself; the rest of the cohort fills any remaining slots.
+function buildPairwiseSharedAdrDistractorPool(context, candidate, first, second, sharedFact) {
+  const domainId = "topAdverseReactions";
+  const pairIds = new Set([first.id, second.id]);
+  const otherDrugs = getMaterialEligibleDrugs(
+    context,
+    candidate.requestedQuizWeek,
+    candidate.materialType
+  ).filter((drug) => !pairIds.has(drug.id));
+  const pool = collectDistinctSafeAtomicFacts([first, second, ...otherDrugs], domainId).filter((entry) => (
+    entry.valueKey !== sharedFact.valueKey
+    && !atomicFactConflictsWithValues(entry.value, [sharedFact.value])
+    && !(
+      atomicFactDefensiblyListedFor(entry.value, first, domainId)
+      && atomicFactDefensiblyListedFor(entry.value, second, domainId)
+    )
+  ));
+  return {
+    ownEntries: pool.filter((entry) => pairIds.has(entry.sourceDrugId)),
+    cohortEntries: pool.filter((entry) => !pairIds.has(entry.sourceDrugId))
+  };
+}
+
+// Pair evaluation depends only on the two canonical records and the material
+// cohort, so it is cached per week, material, and sorted pair. A null entry
+// means the pair can never produce a safe question in that cohort.
+function getPairwiseSharedAdrOption(context, candidate, sourceDrug, partner) {
+  const [first, second] = sortPairwiseDrugs(sourceDrug, partner);
+  const pairKey = `${first.id}+${second.id}`;
+  const cacheKey = `${candidate.requestedQuizWeek}\0${candidate.materialType}\0${pairKey}`;
+  context.pairwiseSharedAdrCache ??= new Map();
+  if (context.pairwiseSharedAdrCache.has(cacheKey)) {
+    return context.pairwiseSharedAdrCache.get(cacheKey);
+  }
+  let option = null;
+  const sharedFact = getPairwiseSharedAdr(first, second);
+  if (sharedFact) {
+    const pool = buildPairwiseSharedAdrDistractorPool(context, candidate, first, second, sharedFact);
+    if (pool.ownEntries.length + pool.cohortEntries.length >= MCQ_CHOICE_COUNT - 1) {
+      option = { first, second, pairKey, sharedFact, ...pool };
+    }
+  }
+  context.pairwiseSharedAdrCache.set(cacheKey, option);
+  return option;
+}
+
+function getPairwiseSharedAdrPartners(context, candidate, sourceDrug, styleOptions = {}) {
+  const domainId = "topAdverseReactions";
+  const quizWeek = candidate.requestedQuizWeek;
+  const { protectedGenericNames } = styleOptions;
+  if (genericNameIsProtected(sourceDrug, protectedGenericNames)) return [];
+  const sourceIdentity = normalizeGenericIdentity(sourceDrug.genericName);
+  return getMaterialEligibleDrugs(context, quizWeek, candidate.materialType).filter((drug) => (
+    drug.id !== sourceDrug.id
+    && normalizeGenericIdentity(drug.genericName) !== sourceIdentity
+    && getGenericIdentityResolution(context, drug, domainId, quizWeek).status === "eligible"
+    && !genericNameIsProtected(drug, protectedGenericNames)
+  ));
+}
+
+function pairwiseOptionIsAvailable(option, styleOptions = {}) {
+  return Boolean(option) && !styleOptions.usedPairwiseKeys?.has(option.pairKey);
+}
+
+// Capacity is answered without consuming randomness, so a candidate that has
+// no safe pair never changes the seeded stream of the rest of the quiz.
+function hasPairwiseSharedAdrCapacity(context, candidate, sourceDrug, styleOptions = {}) {
+  return getPairwiseSharedAdrPartners(context, candidate, sourceDrug, styleOptions).some((partner) => (
+    pairwiseOptionIsAvailable(getPairwiseSharedAdrOption(context, candidate, sourceDrug, partner), styleOptions)
+  ));
+}
+
+function materializePairwiseSharedAdrForm(context, candidate, sourceDrug, rng, styleOptions = {}) {
+  const domainId = "topAdverseReactions";
+  const quizWeek = candidate.requestedQuizWeek;
+  const partners = shuffleCopy(
+    getPairwiseSharedAdrPartners(context, candidate, sourceDrug, styleOptions),
+    rng
+  );
+
+  for (const partner of partners) {
+    const option = getPairwiseSharedAdrOption(context, candidate, sourceDrug, partner);
+    if (!pairwiseOptionIsAvailable(option, styleOptions)) continue;
+    const { first, second, pairKey, sharedFact } = option;
+    const distractors = [
+      ...shuffleCopy(option.ownEntries, rng),
+      ...shuffleCopy(option.cohortEntries, rng)
+    ];
+
+    const sourceDrugIds = [...new Set([
+      ...getGenericIdentityResolution(context, first, domainId, quizWeek).sourceDrugIds,
+      ...getGenericIdentityResolution(context, second, domainId, quizWeek).sourceDrugIds
+    ])].sort();
+    const pairCandidate = {
+      ...candidate,
+      id: `${GENERATOR_ID}-week-${String(quizWeek).padStart(2, "0")}-${candidate.materialType}-pair-${first.id}--${second.id}-${domainId}`,
+      sourceDrugIds
+    };
+    const result = materializeAtomicFactChoiceQuestion({
+      context,
+      candidate: pairCandidate,
+      prompt: `Which adverse reaction is listed for both <b>${escapePromptHtml(first.genericName)}</b> and <b>${escapePromptHtml(second.genericName)}</b>?`,
+      questionVariant: PAIRWISE_SHARED_ADR_VARIANT,
+      extraMetadata: {
+        testedFact: { value: sharedFact.value, valueKey: sharedFact.valueKey },
+        pairwiseSharedAdr: {
+          pairKey,
+          sourceDrugIds: [first.id, second.id],
+          sourceDrugQuizWeeks: [first.quizWeek, second.quizWeek],
+          genericNames: [first.genericName, second.genericName],
+          stemReferences: [
+            createMcqStemReference(first, "generic").metadata,
+            createMcqStemReference(second, "generic").metadata
+          ],
+          eligibleChoiceQuizWeekRange: getMaterialChoiceWeekRange(candidate.materialType, quizWeek)
+        }
+      },
+      correctEntry: {
+        value: sharedFact.value,
+        valueKey: sharedFact.valueKey,
+        sourceDrugId: sourceDrug.id,
+        sourceDrugQuizWeek: sourceDrug.quizWeek
+      },
+      distractorEntries: distractors,
+      rng
+    });
+    if (result) return result;
+  }
+  return null;
+}
+
 function materializeIdentifyDrugAdrForm(context, candidate, sourceDrug, rng) {
   const predicate = selectSeededItem(
     getSafeAtomicPredicates(
@@ -2581,8 +2796,18 @@ function calibrateCourseQuestionStyle(context, candidate, question, rng, styleOp
   }
 
   if (domainId === "topAdverseReactions") {
+    const pairwiseAttempt = () => materializePairwiseSharedAdrForm(
+      context,
+      candidate,
+      sourceDrug,
+      rng,
+      styleOptions
+    );
+    const pairwiseFirst = hasPairwiseSharedAdrCapacity(context, candidate, sourceDrug, styleOptions)
+      && nextRandom(rng) < PAIRWISE_SHARED_ADR_RATE;
     const forwardAttempts = [
       () => materializeClosedGroupAdrForm(context, candidate, sourceDrug, rng),
+      ...(pairwiseFirst ? [] : [pairwiseAttempt]),
       () => keepForwardStemQuestion(question, sourceDrug)
     ];
     const identifyAttempts = [
@@ -2591,7 +2816,7 @@ function calibrateCourseQuestionStyle(context, candidate, question, rng, styleOp
     const ordered = preferForward
       ? [...forwardAttempts, ...identifyAttempts]
       : [...identifyAttempts, ...forwardAttempts];
-    return firstMaterializedQuestion(ordered)
+    return firstMaterializedQuestion(pairwiseFirst ? [pairwiseAttempt, ...ordered] : ordered)
       || (question ? rewriteConciseBaseQuestion(question, sourceDrug) : null);
   }
 
@@ -3315,6 +3540,16 @@ function resolveRandomSource({ quizWeek, seed, rng }) {
 
 function materializeCalibratedPracticeQuestions(context, selectedCandidates, rng) {
   let identifyDrugCount = 0;
+  // Generic identities with a Brand / Generic item in this set stay out of
+  // pairwise ADR prompts (see genericNameIsProtected), and an unordered drug
+  // pair is used at most once per set.
+  const protectedGenericNames = new Set(
+    selectedCandidates
+      .filter((candidate) => candidate.domainId === "brandGeneric")
+      .map((candidate) => context.drugsById.get(candidate.sourceDrugId)?.genericName)
+      .filter(Boolean)
+  );
+  const usedPairwiseKeys = new Set();
   return selectedCandidates.map((candidate) => {
     const result = materializeFromContext(context, candidate, rng);
     if (result.status !== "materialized") {
@@ -3325,9 +3560,11 @@ function materializeCalibratedPracticeQuestions(context, selectedCandidates, rng
       candidate,
       result.question,
       rng,
-      { identifyDrugCount }
+      { identifyDrugCount, protectedGenericNames, usedPairwiseKeys }
     );
     if (isIdentifyDrugQuestion(question)) identifyDrugCount += 1;
+    const pairKey = question?.metadata?.pairwiseSharedAdr?.pairKey;
+    if (pairKey) usedPairwiseKeys.add(pairKey);
     return question;
   });
 }

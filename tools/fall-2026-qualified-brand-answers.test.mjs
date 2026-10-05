@@ -38,8 +38,8 @@ function scoreQuestion(question, value) {
 }
 
 test("Metoprolol generic-to-brand accepts the source brand with or without its qualifier", () => {
-  const question = metoprololBrandQuestion("premise-22");
-  assert.ok(question, "Week 3 seed premise-22 still selects the Metoprolol brand question");
+  const question = metoprololBrandQuestion("premise-42");
+  assert.ok(question, "Week 3 seed premise-42 still selects the Metoprolol brand question");
   assert.equal(question.id, PRE_FIX.id);
   assert.equal(question.prompt, PRE_FIX.prompt);
   assert.equal(question.answer, PRE_FIX.answer);
@@ -67,6 +67,9 @@ test("drugs without a trailing source qualifier do not gain accepted answers", (
       for (const question of quiz.questions) {
         if (question.metadata?.knowledgeDomain !== "brandGeneric") continue;
         if (question.metadata.brandGenericDirection !== "genericToBrand") continue;
+        // F26-25 group-scoped items (e.g. "Glargine") accept only their own
+        // group's brands; tools/fall-2026-insulin-brand-groups.test.mjs covers them.
+        if (question.metadata.brandGroupLabel) continue;
         const sourceDrugs = (question.metadata.sourceDrugIds || [question.metadata.sourceDrugId])
           .map((id) => drugData.drugs.find((entry) => entry.id === id));
         const brands = [];
@@ -89,15 +92,15 @@ test("drugs without a trailing source qualifier do not gain accepted answers", (
   assert.ok(checked > 20);
 });
 
-test("launcher and adaptive import the same post-F26-25 generator token", () => {
+test("launcher and adaptive import the same post-F26-25 generator token (bumped again for the pairwise shared-ADR form)", () => {
   const launcher = read("assets/js/fall-2026-lab3-launcher.js");
   const adaptive = read("assets/js/fall-2026-adaptive-practice.js");
   const page = read("lab3-fall-2026.html");
   const generatorToken = /fall-2026-quiz-generator\.js\?v=([0-9a-z]+)/;
-  assert.equal(generatorToken.exec(launcher)?.[1], "20260927a");
-  assert.equal(generatorToken.exec(adaptive)?.[1], "20260927a");
+  assert.equal(generatorToken.exec(launcher)?.[1], "20261005a");
+  assert.equal(generatorToken.exec(adaptive)?.[1], "20261005a");
   assert.equal(launcher.includes("fall-2026-quiz-generator.js?v=20260913a"), false);
   assert.equal(adaptive.includes("fall-2026-quiz-generator.js?v=20260913a"), false);
-  assert.match(launcher, /fall-2026-adaptive-practice\.js\?v=20260927a/);
-  assert.match(page, /fall-2026-lab3-launcher\.js\?v=20260927a/);
+  assert.match(launcher, /fall-2026-adaptive-practice\.js\?v=20261005a/);
+  assert.match(page, /fall-2026-lab3-launcher\.js\?v=20261005a/);
 });

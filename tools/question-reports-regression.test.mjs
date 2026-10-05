@@ -15,8 +15,8 @@ const STATS_TOKEN = "20260927b";
 const PROTECTED_BASELINES = Object.freeze({
   fallSource: "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01",
   fallPolicy: "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171",
-  fallGenerator: "bf6434d60813c27b9cb8197a6b7d806f7b46a2ffef6aa83336ba8608278bf839",
-  fallLauncher: "00af91e575275b2c626be2f70fb6ec7b9fbd2be60895dc27f9d649de4e7d34d2",
+  fallGenerator: "54b75499eac96ad07d8cb7f296803f217c72436ea817ec5ede7db50c5c9d86bc",
+  fallLauncher: "a6c945bcf6220ef9cacc3e655d7068a0d83e550f4728b43c11ef47c6d03361ee",
   masterPool: "1fb50e96e60252a9839406d53bc929e9569d76c0ddc2522aff43adf9bdf2a87c"
 });
 
