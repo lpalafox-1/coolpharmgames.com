@@ -891,6 +891,142 @@ test("a thin current-week pool still yields ten items and records fallback", () 
   assert.equal(round.composition.fallback, true);
 });
 
+test("adaptive selects a class-coherent pairwise ADR and keeps the reversed pair one concept", () => {
+  assert.equal(adaptive.ADAPTIVE_CURRENT_ITEM_TARGET, 6);
+  assert.equal(adaptive.ADAPTIVE_REVIEW_ITEM_TARGET, 4);
+  const payload = buildFall2026Lab3Payload({
+    drugData,
+    policy,
+    quizWeek: 6,
+    seed: "pairwise-shared-adr-fixture-week-6-new-3"
+  });
+  const pairwise = payload.questions.find((question) => (
+    question.metadata?.questionVariant === "pairwiseSharedAdrRecognition"
+    && question.metadata.pairwiseSharedAdr?.pairKey === "p2-fall-quiz-06-drug-01+p2-fall-quiz-06-drug-03"
+  ));
+  assert.ok(pairwise, "the fixture seed must produce the Glimepiride and Glyburide question");
+  assert.equal(pairwise.metadata.knowledgeDomain, "topAdverseReactions");
+  assert.equal(pairwise.metadata.pairwiseSharedAdr.classCoherence.rule, "exactCanonicalClass");
+  assert.equal(pairwise.metadata.pairwiseSharedAdr.classCoherence.drugClass, "Second-Generation Sulfonylurea, Antidiabetic");
+  assert.deepEqual(pairwise.metadata.pairwiseSharedAdr.genericNames, ["Glimepiride", "Glyburide"]);
+  assert.equal(pairwise.answer, "Hypoglycemia");
+  for (const id of pairwise.metadata.pairwiseSharedAdr.sourceDrugIds) {
+    assert.ok(drugData.drugs.find((drug) => drug.id === id).quizWeek <= 6);
+  }
+  assert.ok(adaptive.isWithinAdaptiveWeekCeiling(pairwise, 6));
+  assert.ok(adaptive.getQuestionSourceWeeks(pairwise).every((week) => week <= 6));
+
+  const otherOwnerId = pairwise.metadata.pairwiseSharedAdr.sourceDrugIds.find((id) => (
+    id !== pairwise.metadata.sourceDrugId
+  ));
+  const reversedOwner = {
+    ...pairwise,
+    id: `${pairwise.id}-reversed-owner`,
+    metadata: {
+      ...pairwise.metadata,
+      sourceDrugId: otherOwnerId,
+      sourceDrugQuizWeek: 6
+    }
+  };
+  assert.equal(adaptive.getQuestionFingerprint(reversedOwner), adaptive.getQuestionFingerprint(pairwise));
+  assert.equal(
+    adaptive.getQuestionConceptKey(reversedOwner),
+    adaptive.getQuestionConceptKey(pairwise)
+  );
+  assert.equal(
+    adaptive.getQuestionConceptKey(pairwise),
+    `${pairwise.metadata.pairwiseSharedAdr.pairKey}::topAdverseReactions`
+  );
+
+  const currentOthers = [
+    ["fdaIndication", "pair-fda-0"],
+    ["fdaIndication", "pair-fda-1"],
+    ["mechanismOfAction", "pair-moa-0"],
+    ["mechanismOfAction", "pair-moa-1"],
+    ["drugClass", "pair-class-0"]
+  ].map(([domain, id]) => makeAdaptiveItem({
+    id,
+    domain,
+    drug: id,
+    week: 6,
+    sourceWeek: 6
+  }));
+  const review = Array.from({ length: 4 }, (_, index) => makeAdaptiveItem({
+    id: `pair-rev-${index}`,
+    domain: "brandGeneric",
+    drug: `pair-rev-${index}`,
+    week: 6,
+    sourceWeek: 2
+  }));
+  const reworded = {
+    ...pairwise,
+    id: `${pairwise.id}-reworded`,
+    prompt: "Which listed adverse reaction belongs to both sulfonylureas in this pair?",
+    answer: "Hypoglycemia"
+  };
+  assert.notEqual(adaptive.getQuestionFingerprint(reworded), adaptive.getQuestionFingerprint(pairwise));
+  assert.equal(adaptive.getQuestionConceptKey(reworded), adaptive.getQuestionConceptKey(pairwise));
+
+  const signals = adaptive.buildAdaptiveSignals({
+    reviewEntries: [missedEntry(pairwise)],
+    now: NOW
+  });
+  const round = adaptive.composeAdaptiveRound({
+    candidates: [pairwise, reversedOwner, reworded, ...currentOthers, ...review],
+    signals,
+    seed: "pairwise-adaptive-select",
+    targetWeek: 6
+  });
+  assert.equal(round.questions.length, 10);
+  assert.equal(round.composition.currentItemTarget, 6);
+  assert.equal(round.composition.reviewItemTarget, 4);
+  assert.equal(round.composition.currentItemCount, 6);
+  assert.equal(round.composition.reviewItemCount, 4);
+  assert.equal(round.composition.fallback, false);
+  const selectedFingerprints = round.questions.map(adaptive.getQuestionFingerprint);
+  assert.equal(selectedFingerprints.filter((key) => key === adaptive.getQuestionFingerprint(pairwise)).length, 1);
+  assert.equal(round.questions.some((question) => question.id === reworded.id), false);
+  assert.equal(round.questions.filter((question) => (
+    adaptive.getQuestionConceptKey(question) === adaptive.getQuestionConceptKey(pairwise)
+  )).length, 1);
+
+  const freshCurrent = [
+    ["fdaIndication", "pair-fresh-fda-0"],
+    ["fdaIndication", "pair-fresh-fda-1"],
+    ["mechanismOfAction", "pair-fresh-moa-0"],
+    ["mechanismOfAction", "pair-fresh-moa-1"],
+    ["drugClass", "pair-fresh-class-0"],
+    ["boxWarning", "pair-fresh-box-0"]
+  ].map(([domain, id]) => makeAdaptiveItem({
+    id,
+    domain,
+    drug: id,
+    week: 6,
+    sourceWeek: 6
+  }));
+  const memory = adaptive.recordAdaptiveRound({
+    memory: null,
+    questions: round.questions,
+    targetWeek: 6,
+    at: NOW
+  });
+  const suppressed = adaptive.composeAdaptiveRound({
+    candidates: [pairwise, reversedOwner, ...freshCurrent, ...currentOthers, ...review],
+    signals: adaptive.buildAdaptiveSignals({ memory, now: NOW + 1000 }),
+    seed: "pairwise-adaptive-suppress",
+    targetWeek: 6
+  });
+  assert.equal(suppressed.composition.currentItemCount, 6);
+  assert.equal(suppressed.composition.reviewItemCount, 4);
+  assert.equal(suppressed.composition.fallback, false);
+  assert.equal(
+    suppressed.questions.some((question) => (
+      adaptive.getQuestionFingerprint(question) === adaptive.getQuestionFingerprint(pairwise)
+    )),
+    false
+  );
+});
+
 test("items missing sourceDrugQuizWeek are excluded from adaptive composition", () => {
   const current = Array.from({ length: 6 }, (_, index) => makeAdaptiveItem({
     id: `ok-cur-${index}`, domain: "fdaIndication", drug: `ok-cur-${index}`,
@@ -1054,7 +1190,7 @@ test("normal Week Practice output is unchanged by F26-10", () => {
 
 test("the generator, engine, canonical data, and policy are untouched", () => {
   assert.equal(sha256("assets/js/fall-2026-quiz-generator.js"),
-    "54b75499eac96ad07d8cb7f296803f217c72436ea817ec5ede7db50c5c9d86bc", "generator must not change");
+    "1260bd47cd348073c780fd3d2ff9df5b7abd82e50a700052444855e9026d1e8c", "generator must not change");
   assert.equal(sha256("assets/js/quizEngine.js"),
     "50920b5bcd43ad422360236031f8c442c568fba761c34ff1698617e804c2a664", "engine must not change");
   assert.equal(sha256("assets/data/fall-2026-p2-top-drugs.json"),
@@ -1088,5 +1224,5 @@ test("the hub offers Adaptive Practice without AI language", () => {
   // Normal Week Practice stays visible as its own dropdown launcher.
   assert.match(hub, /id="weekly-week"/);
   assert.match(hub, /id="weekly-launch"/);
-  assert.match(hub, /assets\/js\/fall-2026-lab3-launcher\.js\?v=20261005a/);
+  assert.match(hub, /assets\/js\/fall-2026-lab3-launcher\.js\?v=20261006a/);
 });

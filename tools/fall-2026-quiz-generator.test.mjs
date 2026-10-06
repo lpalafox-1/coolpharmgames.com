@@ -26,6 +26,7 @@ import {
   buildAdaptiveCandidatePool,
   getQuestionConceptKey,
   getQuestionFingerprint,
+  getQuestionSourceWeeks,
   isWithinAdaptiveWeekCeiling
 } from "../assets/js/fall-2026-adaptive-practice.js";
 
@@ -1022,6 +1023,27 @@ function pairwiseSortKey(drug) {
   return `${normalizeGenericIdentity(drug.genericName)}\0${drug.id}`;
 }
 
+function expectedPairwiseClassCoherence(left, right) {
+  const leftClass = String(left.drugClass ?? "").trim();
+  const rightClass = String(right.drugClass ?? "").trim();
+  if (leftClass && leftClass === rightClass) {
+    return { rule: "exactCanonicalClass", drugClass: leftClass };
+  }
+  const rightConcept = deriveDrugClassQuizConcept(right.drugClass);
+  const family = rightConcept
+    ? getDrugClassQuizFamilyConcepts(left.drugClass).find((entry) => (
+      entry.memberQuizConcepts.includes(rightConcept)
+    ))
+    : null;
+  if (!family) return null;
+  return {
+    rule: "approvedFamily",
+    familyId: family.id,
+    label: family.label,
+    memberQuizConcepts: [...family.memberQuizConcepts]
+  };
+}
+
 function assertPairwiseSharedAdrSourceBacked(question, sourceData = drugData) {
   assert.equal(question.type, "mcq");
   assert.equal(question.metadata.questionVariant, PAIRWISE_SHARED_ADR_VARIANT);
@@ -1045,6 +1067,9 @@ function assertPairwiseSharedAdrSourceBacked(question, sourceData = drugData) {
   assert.equal(pair.pairKey, `${first.id}+${second.id}`);
   assert.deepEqual(pair.sourceDrugQuizWeeks, [first.quizWeek, second.quizWeek]);
   assert.deepEqual(pair.genericNames, [first.genericName, second.genericName]);
+  const expectedCoherence = expectedPairwiseClassCoherence(first, second);
+  assert.ok(expectedCoherence, `${question.id} pairs drugs with no exact class or approved family`);
+  assert.deepEqual(pair.classCoherence, expectedCoherence);
   assert.deepEqual(pair.stemReferences, [
     { type: "generic", genericName: first.genericName },
     { type: "generic", genericName: second.genericName }
@@ -1929,7 +1954,7 @@ test("atomic recognition rejects source-vocabulary aliases and source Brand anno
 });
 
 test("Brand Generic recognition answers remain quiz-level protected or safely fall back to FITB", () => {
-  const recognitionResult = generatePractice(2, "bg-mcq-leak-2-0");
+  const recognitionResult = generatePractice(2, "bg-mcq-leak-2-5");
   const recognition = recognitionResult.questions.find(
     (question) => question.metadata.questionVariant === "brandToGenericRecognition"
   );
@@ -3257,15 +3282,18 @@ test("pairwise shared-ADR questions are source-backed across Weeks 2-10 in both 
 test("deterministic Fall 2026 seeds produce real pairwise shared-ADR questions with answers derived from the canonical JSON", () => {
   const fixtures = [
     { quizWeek: 6, seed: "pairwise-shared-adr-fixture-week-6-new-3", pair: ["p2-fall-quiz-06-drug-01", "p2-fall-quiz-06-drug-03"], material: "new" },
-    { quizWeek: 6, seed: "pairwise-shared-adr-fixture-week-6-review-0", pair: ["p2-fall-quiz-05-drug-10", "p2-fall-quiz-05-drug-06"], material: "review" },
-    { quizWeek: 2, seed: "pairwise-shared-adr-fixture-week-2-0", pair: ["p2-fall-quiz-02-drug-02", "p2-fall-quiz-02-drug-07"], material: "new" }
+    { quizWeek: 6, seed: "pairwise-shared-adr-fixture-week-6-review-102", pair: ["p2-fall-quiz-05-drug-07", "p2-fall-quiz-05-drug-06"], material: "review" },
+    { quizWeek: 2, seed: "pairwise-shared-adr-fixture-week-2-0", pair: ["p2-fall-quiz-02-drug-02", "p2-fall-quiz-02-drug-05"], material: "new" }
   ];
   for (const fixture of fixtures) {
     const result = generate(fixture.quizWeek, fixture.seed);
     assert.deepEqual(result, generate(fixture.quizWeek, fixture.seed), `${fixture.seed} must stay deterministic`);
     assertGeneratedComposition(result, fixture.quizWeek);
-    const question = result.questions.find(isPairwiseSharedAdrQuestion);
-    assert.ok(question, `${fixture.seed} must produce a pairwise shared-ADR question`);
+    const question = result.questions.find((item) => (
+      isPairwiseSharedAdrQuestion(item)
+      && item.metadata.pairwiseSharedAdr.sourceDrugIds.join("+") === fixture.pair.join("+")
+    ));
+    assert.ok(question, `${fixture.seed} must produce the ${fixture.pair.join("+")} pairwise question`);
     assert.deepEqual(question.metadata.pairwiseSharedAdr.sourceDrugIds, fixture.pair);
     assert.equal(question.metadata.sourceMaterial, fixture.material);
     const [first, second] = fixture.pair.map((id) => getSourceDrug(drugData, id, fixture.seed));
@@ -3284,7 +3312,7 @@ test("reversed drug order is one pairwise concept: sorted pair, one id, one prom
   // produced from the Glyburide candidate and from the Glimepiride candidate.
   const PAIR_KEY = "p2-fall-quiz-06-drug-01+p2-fall-quiz-06-drug-03";
   const cases = [
-    { label: "Standard Week 6", seeds: ["pairwise-owner-standard-6-140", "pairwise-owner-standard-6-197"], extra: {} },
+    { label: "Standard Week 6", seeds: ["pairwise-owner-standard-6-107", "pairwise-owner-standard-6-197"], extra: {} },
     { label: "Week Focus 6", seeds: ["pairwise-owner-week-focus-6-57", "pairwise-owner-week-focus-6-63"], extra: { mode: "week-focus", questionCount: 10 } }
   ];
   for (const { label, seeds, extra } of cases) {
@@ -3307,6 +3335,8 @@ test("reversed drug order is one pairwise concept: sorted pair, one id, one prom
     assert.deepEqual(left.metadata.pairwiseSharedAdr, right.metadata.pairwiseSharedAdr);
     assert.deepEqual(left.metadata.sourceDrugIds, right.metadata.sourceDrugIds);
     assert.equal(getQuestionFingerprint(left), getQuestionFingerprint(right), `${label}: one adaptive fingerprint`);
+    assert.equal(getQuestionConceptKey(left), getQuestionConceptKey(right), `${label}: one adaptive concept`);
+    assert.equal(getQuestionConceptKey(left), `${PAIR_KEY}::topAdverseReactions`);
   }
 
   // And across a wide seed corpus no pair ever renders two ways.
@@ -3327,6 +3357,27 @@ test("reversed drug order is one pairwise concept: sorted pair, one id, one prom
     }
   }
   assert.ok(renders.size > 0, "Week 5 seeds must exercise pairwise questions");
+});
+
+test("approved CCB family pairing is used only for the generator's existing family", () => {
+  const result = generate(6, "pairwise-family-6-5");
+  const question = result.questions.find((item) => (
+    isPairwiseSharedAdrQuestion(item)
+    && item.metadata.pairwiseSharedAdr.classCoherence.rule === "approvedFamily"
+  ));
+  assert.ok(question, "Week 6 review must be able to pair Diltiazem with Nifedipine");
+  assert.equal(question.metadata.pairwiseSharedAdr.classCoherence.familyId, "calciumChannelBlocker");
+  assert.deepEqual(question.metadata.pairwiseSharedAdr.classCoherence.memberQuizConcepts, [
+    "Calcium Channel Blocker",
+    "Non-Dihydropyridine Calcium Channel Blocker",
+    "Dihydropyridine Calcium Channel Blocker"
+  ]);
+  assert.deepEqual(question.metadata.pairwiseSharedAdr.genericNames, ["Diltiazem", "Nifedipine"]);
+  assert.deepEqual(question.metadata.pairwiseSharedAdr.sourceDrugQuizWeeks, [1, 3]);
+  assert.equal(question.metadata.sourceMaterial, "review");
+  assert.equal(question.answer, "Edema");
+  assert.equal(question.metadata.knowledgeDomain, "topAdverseReactions");
+  assertGeneratedQuestionSourceBacked(question);
 });
 
 test("Week Focus inherits the pairwise form through the shared generator path and never repeats a pair", () => {
@@ -3375,6 +3426,7 @@ test("Week 1 practice omits the pairwise form when its cohort has no exactly-one
   for (let left = 0; left < week1.length; left += 1) {
     for (let right = left + 1; right < week1.length; right += 1) {
       if (normalizeGenericIdentity(week1[left].genericName) === normalizeGenericIdentity(week1[right].genericName)) continue;
+      if (!expectedPairwiseClassCoherence(week1[left], week1[right])) continue;
       if (exactSharedAdrKeys(week1[left], week1[right]).length === 1) eligiblePairs += 1;
     }
   }
@@ -3386,6 +3438,36 @@ test("Week 1 practice omits the pairwise form when its cohort has no exactly-one
       assert.equal(pairwise.length, 0, "no safe Week 1 pair exists, so the form must be omitted rather than forced");
     } else {
       pairwise.forEach((question) => assertGeneratedQuestionSourceBacked(question));
+    }
+  }
+});
+
+test("pairwise shared ADR omits drugs that only share an ADR", () => {
+  const forbidden = [
+    ["p2-fall-quiz-02-drug-02", "p2-fall-quiz-02-drug-07"],
+    ["p2-fall-quiz-05-drug-06", "p2-fall-quiz-05-drug-10"]
+  ];
+  for (const ids of forbidden) {
+    const [left, right] = ids.map((id) => getSourceDrug(drugData, id, "class-coherence"));
+    assert.equal(expectedPairwiseClassCoherence(left, right), null);
+    assert.equal(exactSharedAdrKeys(left, right).length, 1, `${left.genericName} and ${right.genericName} should still share one ADR`);
+  }
+  for (let quizWeek = 2; quizWeek <= 10; quizWeek += 1) {
+    for (let seedIndex = 0; seedIndex < 20; seedIndex += 1) {
+      const result = generate(quizWeek, `pairwise-class-coherence-${quizWeek}-${seedIndex}`);
+      for (const question of result.questions.filter(isPairwiseSharedAdrQuestion)) {
+        const ids = question.metadata.pairwiseSharedAdr.sourceDrugIds;
+        assert.equal(
+          forbidden.some((pair) => pair.every((id) => ids.includes(id))),
+          false,
+          `${question.id} paired drugs that are not class-coherent`
+        );
+        assert.ok(question.metadata.pairwiseSharedAdr.classCoherence);
+        assert.ok(
+          question.metadata.pairwiseSharedAdr.classCoherence.rule === "exactCanonicalClass"
+          || question.metadata.pairwiseSharedAdr.classCoherence.rule === "approvedFamily"
+        );
+      }
     }
   }
 });
@@ -3426,8 +3508,17 @@ test("Adaptive Practice inherits pairwise candidates with one fingerprint per pa
     }
     assert.equal(
       getQuestionConceptKey(question),
-      `${question.metadata.sourceDrugId}::topAdverseReactions`,
-      "adaptive concept identity is the owning drug in the Top ADR domain"
+      `${question.metadata.pairwiseSharedAdr.pairKey}::topAdverseReactions`,
+      "reversed pair order must stay one adaptive concept in the Top ADR domain"
+    );
+    assert.deepEqual(
+      [...new Set(getQuestionSourceWeeks(question))].sort((left, right) => left - right),
+      [...new Set([
+        question.metadata.requestedQuizWeek,
+        question.metadata.sourceDrugQuizWeek,
+        ...question.metadata.pairwiseSharedAdr.sourceDrugQuizWeeks,
+        ...question.metadata.choiceSources.map((entry) => entry.sourceDrugQuizWeek)
+      ])].sort((left, right) => left - right)
     );
     assert.ok(question.metadata.pairwiseSharedAdr.sourceDrugIds.includes(question.metadata.sourceDrugId));
     const fingerprint = getQuestionFingerprint(question);

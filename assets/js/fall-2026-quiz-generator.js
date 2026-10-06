@@ -6,7 +6,8 @@
  * source order as the canonical tie-breaker; four choices per MCQ; a
  * source-string-only pharmacologic-class projection plus an explicit quiz-only
  * class-family map while canonical class wording remains untouched; concise
- * source-backed recognition questions whose atomic ADR/FDA and NOT predicates
+ * source-backed recognition questions, including an optional class-coherent
+ * pairwise shared-ADR form, whose atomic ADR/FDA and NOT predicates
  * are checked against complete canonical arrays; brand-stem FDA-indication and
  * closed-group class-ADR fact-choice forms when those surfaces are source-safe;
  * a soft preference against filling a quiz with identify-drug items once six
@@ -2431,12 +2432,16 @@ function materializeClosedGroupAdrForm(context, candidate, sourceDrug, rng) {
 
 // --- Pairwise shared ADR ------------------------------------------------------------
 //
-// Truth is the exact-key intersection of the two canonical adverseReactions
-// arrays under normalizeAtomicFactKey (NFKC, whitespace, trailing ".;",
-// casing). A pair is eligible only when that intersection is exactly one ADR
-// and no other ADR of one drug is a source-vocabulary alias or near-match of an
+// ADR only, inside topAdverseReactions. A partner is eligible only when the
+// two drugs share one exact canonical drugClass string, or one family already
+// listed in DRUG_CLASS_FAMILY_CONCEPTS. Exact-class partners are tried first.
+// If neither relationship holds, the pair is omitted even when the drugs share
+// an ADR. Truth is the exact-key intersection of the two canonical
+// adverseReactions arrays under normalizeAtomicFactKey (NFKC, whitespace,
+// trailing ".;", casing). That intersection must be exactly one ADR, and no
+// other ADR of one drug may be a source-vocabulary alias or near-match of an
 // ADR of the other, so the singular stem has exactly one defensible answer.
-// Nothing is inferred: no class effects, no synonyms beyond the reviewed
+// Nothing is inferred: no new families, no synonyms beyond the reviewed
 // ambiguity groups, no medical knowledge. Both drugs are named by generic only,
 // and the pair is sorted before anything is built, so A+B and B+A produce the
 // same id, prompt, answer, and pair key. The candidate's own drug stays the
@@ -2459,6 +2464,30 @@ function sortPairwiseDrugs(left, right) {
   const leftKey = `${normalizeGenericIdentity(left.genericName)}\0${left.id}`;
   const rightKey = `${normalizeGenericIdentity(right.genericName)}\0${right.id}`;
   return leftKey <= rightKey ? [left, right] : [right, left];
+}
+
+// Exact canonical class is the full drugClass string, not the quiz-concept
+// projection. The only broader grouping is a family the generator already
+// publishes through getDrugClassQuizFamilyConcepts.
+function getPairwiseClassCoherence(left, right) {
+  const leftClass = getCanonicalDrugClass(left.drugClass);
+  const rightClass = getCanonicalDrugClass(right.drugClass);
+  if (leftClass && leftClass === rightClass) {
+    return { rule: "exactCanonicalClass", drugClass: leftClass };
+  }
+  const rightConcept = deriveDrugClassQuizConcept(right.drugClass);
+  const family = rightConcept
+    ? getDrugClassQuizFamilyConcepts(left.drugClass).find((entry) => (
+      entry.memberQuizConcepts.includes(rightConcept)
+    ))
+    : null;
+  if (!family) return null;
+  return {
+    rule: "approvedFamily",
+    familyId: family.id,
+    label: family.label,
+    memberQuizConcepts: [...family.memberQuizConcepts]
+  };
 }
 
 function getPairwiseSharedAdr(first, second) {
@@ -2538,11 +2567,12 @@ function getPairwiseSharedAdrOption(context, candidate, sourceDrug, partner) {
     return context.pairwiseSharedAdrCache.get(cacheKey);
   }
   let option = null;
-  const sharedFact = getPairwiseSharedAdr(first, second);
+  const classCoherence = getPairwiseClassCoherence(first, second);
+  const sharedFact = classCoherence ? getPairwiseSharedAdr(first, second) : null;
   if (sharedFact) {
     const pool = buildPairwiseSharedAdrDistractorPool(context, candidate, first, second, sharedFact);
     if (pool.ownEntries.length + pool.cohortEntries.length >= MCQ_CHOICE_COUNT - 1) {
-      option = { first, second, pairKey, sharedFact, ...pool };
+      option = { first, second, pairKey, sharedFact, classCoherence, ...pool };
     }
   }
   context.pairwiseSharedAdrCache.set(cacheKey, option);
@@ -2558,6 +2588,7 @@ function getPairwiseSharedAdrPartners(context, candidate, sourceDrug, styleOptio
   return getMaterialEligibleDrugs(context, quizWeek, candidate.materialType).filter((drug) => (
     drug.id !== sourceDrug.id
     && normalizeGenericIdentity(drug.genericName) !== sourceIdentity
+    && getPairwiseClassCoherence(sourceDrug, drug)
     && getGenericIdentityResolution(context, drug, domainId, quizWeek).status === "eligible"
     && !genericNameIsProtected(drug, protectedGenericNames)
   ));
@@ -2578,12 +2609,16 @@ function hasPairwiseSharedAdrCapacity(context, candidate, sourceDrug, styleOptio
 function materializePairwiseSharedAdrForm(context, candidate, sourceDrug, rng, styleOptions = {}) {
   const domainId = "topAdverseReactions";
   const quizWeek = candidate.requestedQuizWeek;
-  const partners = shuffleCopy(
-    getPairwiseSharedAdrPartners(context, candidate, sourceDrug, styleOptions),
-    rng
-  );
-
+  const partners = getPairwiseSharedAdrPartners(context, candidate, sourceDrug, styleOptions);
+  const exactPartners = [];
+  const familyPartners = [];
   for (const partner of partners) {
+    const coherence = getPairwiseClassCoherence(sourceDrug, partner);
+    if (coherence?.rule === "exactCanonicalClass") exactPartners.push(partner);
+    else if (coherence?.rule === "approvedFamily") familyPartners.push(partner);
+  }
+
+  for (const partner of [...shuffleCopy(exactPartners, rng), ...shuffleCopy(familyPartners, rng)]) {
     const option = getPairwiseSharedAdrOption(context, candidate, sourceDrug, partner);
     if (!pairwiseOptionIsAvailable(option, styleOptions)) continue;
     const { first, second, pairKey, sharedFact } = option;
@@ -2613,6 +2648,19 @@ function materializePairwiseSharedAdrForm(context, candidate, sourceDrug, rng, s
           sourceDrugIds: [first.id, second.id],
           sourceDrugQuizWeeks: [first.quizWeek, second.quizWeek],
           genericNames: [first.genericName, second.genericName],
+          classCoherence: {
+            rule: option.classCoherence.rule,
+            ...(option.classCoherence.drugClass
+              ? { drugClass: option.classCoherence.drugClass }
+              : {}),
+            ...(option.classCoherence.familyId
+              ? {
+                familyId: option.classCoherence.familyId,
+                label: option.classCoherence.label,
+                memberQuizConcepts: [...option.classCoherence.memberQuizConcepts]
+              }
+              : {})
+          },
           stemReferences: [
             createMcqStemReference(first, "generic").metadata,
             createMcqStemReference(second, "generic").metadata
