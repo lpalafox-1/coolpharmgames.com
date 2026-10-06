@@ -29,7 +29,7 @@
 // combined capacity may stay in or enter the current six. A short bucket may
 // still complete the ten from the other source-safe bucket when 6+4 is impossible.
 
-import { generateFall2026Quiz } from "./fall-2026-quiz-generator.js?v=20260927a";
+import { generateFall2026Quiz } from "./fall-2026-quiz-generator.js?v=20261006a";
 
 export const ADAPTIVE_KIND = "fall-2026-lab3-adaptive";
 export const ADAPTIVE_MEMORY_KEY = "pharmlet.fall-2026-lab3.adaptive-memory";
@@ -177,12 +177,16 @@ export function getQuestionFingerprint(question) {
   return buildContentKey(question);
 }
 
-// Coarser identity: the drug/knowledge-domain pairing being tested. Used to
-// keep a round from circling one concept even when the wording differs.
+// Coarser identity: the drug/knowledge-domain pairing being tested. A pairwise
+// shared-ADR item uses the sorted pair key, so Drug A + Drug B and Drug B +
+// Drug A are one concept. Used to keep a round from circling one concept even
+// when the wording differs.
 export function getQuestionConceptKey(question) {
   const metadata = isRecord(question?.metadata) ? question.metadata : {};
-  const drug = String(metadata.sourceDrugId || "").trim();
   const domain = String(metadata.knowledgeDomain || "").trim();
+  const pairKey = String(metadata.pairwiseSharedAdr?.pairKey || "").trim();
+  if (pairKey && domain) return `${pairKey}::${domain}`;
+  const drug = String(metadata.sourceDrugId || "").trim();
   if (!drug && !domain) return "";
   return `${drug}::${domain}`;
 }
@@ -205,6 +209,9 @@ export function getQuestionSourceWeeks(question) {
     metadata.requestedQuizWeek,
     metadata.sourceDrugQuizWeek,
     metadata.testedFact?.sourceDrugQuizWeek,
+    ...(Array.isArray(metadata.pairwiseSharedAdr?.sourceDrugQuizWeeks)
+      ? metadata.pairwiseSharedAdr.sourceDrugQuizWeeks
+      : []),
     ...(Array.isArray(metadata.choiceSources)
       ? metadata.choiceSources.map((choice) => choice?.sourceDrugQuizWeek)
       : [])
