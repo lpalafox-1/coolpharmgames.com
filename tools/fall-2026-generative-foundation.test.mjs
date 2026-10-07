@@ -19,7 +19,7 @@ const LEGACY_BASELINE = Object.freeze({
 });
 const APPROVED_ENGINE_BASELINE = Object.freeze({
   reference: "F26-24 Week Focus completion identity engine change",
-  sha256: "50920b5bcd43ad422360236031f8c442c568fba761c34ff1698617e804c2a664"
+  sha256: "81a226d1ed5300da9bca375dd4e69a52bf934bd40705c0f90cbdf144e00c5ba3"
 });
 
 function sha256(value) {

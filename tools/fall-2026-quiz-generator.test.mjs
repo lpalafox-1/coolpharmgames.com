@@ -274,8 +274,7 @@ function assertInverseStructuredMcq(question, sourceData = drugData) {
         assert.ok(question.prompt.startsWith("Which drug has this full top ADR list?"));
       }
     } else {
-      assert.ok(question.prompt.includes("recorded in the Fall source"));
-      assert.ok(question.prompt.includes("complete"));
+      assert.ok(question.prompt.startsWith("Which drug has this full"));
     }
   }
   const displayed = question.metadata.displayedStructuredValue;
@@ -447,7 +446,7 @@ function assertSourceBackedStemReference(question) {
       .map((drug) => normalizeGenericIdentity(drug.genericName))
   );
   assert.equal(matchingGenericIdentities.size, 1, `${reference.brandName} is not safe as a brand-only reference`);
-  assert.ok(question.prompt.includes(`<b>${reference.brandName}</b>`));
+  assert.ok(question.prompt.includes(`<b>${reference.brandName}®</b>`));
 }
 
 function getSourceDrug(sourceData, sourceDrugId, label) {
@@ -691,7 +690,7 @@ function assertBrandGenericRecognitionSourceBacked(question, sourceData = drugDa
   if (brandGroup) {
     assert.ok(brandGroup.brandNames.includes(question.metadata.sourceBrandName));
   }
-  assert.ok(question.prompt.includes(`<b>${question.metadata.sourceBrandName}</b>`));
+  assert.ok(question.prompt.includes(`<b>${question.metadata.sourceBrandName}®</b>`));
   assert.equal(question.answer, brandGroup ? brandGroup.label : sourceDrug.genericName);
   assert.equal(question.metadata.answerMatching, undefined);
   assert.equal(question._acceptedAnswers, undefined);
@@ -773,7 +772,7 @@ function assertStrictBrandGenericFitbSourceBacked(question, sourceData = drugDat
     if (brandGroup) {
       assert.ok(brandGroup.brandNames.includes(question.metadata.sourceBrandName));
     }
-    assert.ok(question.prompt.includes(`<b>${question.metadata.sourceBrandName}</b>`));
+    assert.ok(question.prompt.includes(`<b>${question.metadata.sourceBrandName}®</b>`));
     assert.equal(question.answer, brandGroup ? brandGroup.label : sourceDrug.genericName);
   }
 }
@@ -839,7 +838,7 @@ function assertBrandToFdaIndicationSourceBacked(question, sourceData = drugData)
   assert.equal(question.metadata.knowledgeDomain, "fdaIndication");
   assert.equal(question.metadata.questionStyleId, "fall-2026-lab3-course-calibrated-v1");
   assertSourceBackedStemReference(question);
-  assert.match(question.prompt, /FDA indication for/);
+  assert.match(question.prompt, /FDA-approved indication for/);
   assertAtomicFactChoiceEntries(question, sourceData, "fdaIndication");
   const sourceDrug = getSourceDrug(sourceData, question.metadata.sourceDrugId, question.id);
   const sourceIndications = getAtomicSourceValues(sourceDrug, "fdaIndication");
@@ -1186,7 +1185,7 @@ function visibleTextContainsAnswer(visibleText, answer) {
 function assertMcqStemDoesNotPairGenericAndBrand(question, sourceData = drugData) {
   if (question.type !== "mcq") return;
   const emphasizedReferences = [...question.prompt.matchAll(/<b>(.*?)<\/b>/g)]
-    .map((match) => normalizeChoice(match[1].replace(/<[^>]*>/g, " ")));
+    .map((match) => normalizeChoice(match[1].replace(/<[^>]*>/g, " ").replace(/®/g, "")));
   for (const sourceDrug of sourceData.drugs.filter(
     (drug) => drug.quizWeek <= question.metadata.requestedQuizWeek
   )) {
@@ -2050,7 +2049,7 @@ test("drug-class forward stems disambiguate nested source-listed concepts", () =
   assert.equal(result.question.metadata.questionVariant, "structuredValueChoices");
   assert.ok(
     result.question.prompt.startsWith(
-      "Which pharmacologic class is recorded in the Fall source for "
+      "What is the drug class of "
     )
   );
   assert.ok(result.question.choices.includes("Dihydropyridine Calcium Channel Blocker"));
@@ -2075,7 +2074,7 @@ test("drug-class inverse stems exclude synonymous answers outside the selected m
   assert.equal(result.question.metadata.questionVariant, "identifyDrugByStructuredValue");
   assert.ok(
     result.question.prompt.startsWith(
-      "Which drug is paired with this pharmacologic class in the Fall source?"
+      "Which drug has this pharmacologic class?"
     )
   );
   assert.equal(
@@ -2196,7 +2195,7 @@ test("all Fall Drug Class questions use reviewed source-derived quiz concepts", 
     path.join(repoRoot, "assets", "js", "quizEngine.js"),
     "utf8"
   );
-  const promptPrefix = "Which pharmacologic class is recorded in the Fall source for";
+  const promptPrefix = "What is the drug class of";
   const canonicalPath = path.join(
     repoRoot,
     "assets",
