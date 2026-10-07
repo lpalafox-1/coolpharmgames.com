@@ -171,26 +171,26 @@ export const WEEK_1_PRACTICE_NOTE = "Practice configuration: Week 1 has no prior
 const DOMAIN_SPECS = Object.freeze({
   drugClass: Object.freeze({
     field: "drugClass",
-    prompt: (reference) => `What is the drug class of ${reference}?`,
-    inversePrompt: (value) => `Which drug has this pharmacologic class?<br><b>${value}</b>`
+    prompt: (reference) => `Which pharmacologic class is recorded in the Fall source for ${reference}?`,
+    inversePrompt: (value) => `Which drug is paired with this pharmacologic class in the Fall source?<br><b>${value}</b>`
   }),
   fdaIndication: Object.freeze({
     field: "fdaIndications",
-    prompt: (reference) => `Which full list of FDA-approved indications is associated with ${reference}?`,
-    inversePrompt: (value) => `Which drug has this full FDA indication list?<br><b>${value}</b>`
+    prompt: (reference) => `Which complete FDA indication list is recorded for ${reference}?`,
+    inversePrompt: (value) => `Which drug is recorded in the Fall source with this complete FDA indication list?<br><b>${value}</b>`
   }),
   mechanismOfAction: Object.freeze({
     field: "mechanismOfAction",
-    prompt: (reference) => `What is the mechanism of action of ${reference}?`
+    prompt: (reference) => `Which mechanism of action belongs to ${reference}?`
   }),
   topAdverseReactions: Object.freeze({
     field: "adverseReactions",
-    prompt: (reference) => `Which full list of top adverse reactions is associated with ${reference}?`,
-    inversePrompt: (value) => `Which drug has this full top ADR list?<br><b>${value}</b>`
+    prompt: (reference) => `Which complete top adverse-reaction list is recorded for ${reference}?`,
+    inversePrompt: (value) => `Which drug is recorded in the Fall source with this complete top adverse-reaction list?<br><b>${value}</b>`
   }),
   boxWarning: Object.freeze({
     field: "boxWarning",
-    prompt: (reference) => `What boxed warning is associated with ${reference}?`
+    prompt: (reference) => `Which boxed-warning value belongs to ${reference}?`
   })
 });
 
@@ -1186,11 +1186,6 @@ function hasCourseStyleCandidateCapacity(
   return false;
 }
 
-// Display only: canonical brands, answers, choices, and metadata stay plain.
-function renderBrandReferenceHtml(brandName) {
-  return `<b>${escapePromptHtml(brandName)}®</b>`;
-}
-
 function createMcqStemReference(sourceDrug, type, brandName) {
   if (type === "generic") {
     return {
@@ -1204,7 +1199,7 @@ function createMcqStemReference(sourceDrug, type, brandName) {
 
   if (type === "brand") {
     return {
-      html: renderBrandReferenceHtml(brandName),
+      html: `<b>${brandName}</b>`,
       metadata: {
         type,
         genericName: sourceDrug.genericName,
@@ -1586,7 +1581,7 @@ function materializeBrandGenericQuestion(context, candidate, sourceDrug, generic
     question: {
       id: `${candidate.id}-brand-to-generic-${brandIndex + 1}`,
       type: "short",
-      prompt: `What is the generic name of ${renderBrandReferenceHtml(brandName)}?`,
+      prompt: `Generic name for <b>${brandName}</b>?`,
       answer: scope.label,
       metadata: baseQuestionMetadata(context, candidate, {
         brandGenericDirection: "brandToGeneric",
@@ -1940,11 +1935,11 @@ function withCourseStyleMetadata(question) {
 
 function getCourseStyleForwardPrompt(domainId, referenceHtml) {
   const promptByDomain = {
-    drugClass: `What is the drug class of ${referenceHtml}?`,
-    fdaIndication: `Which full list of FDA-approved indications is associated with ${referenceHtml}?`,
-    mechanismOfAction: `What is the mechanism of action of ${referenceHtml}?`,
-    topAdverseReactions: `Which full list of top adverse reactions is associated with ${referenceHtml}?`,
-    boxWarning: `What boxed warning is associated with ${referenceHtml}?`
+    drugClass: `What class does the Fall source list for ${referenceHtml}?`,
+    fdaIndication: `Which full FDA indication list is recorded for ${referenceHtml}?`,
+    mechanismOfAction: `What is the MOA of ${referenceHtml}?`,
+    topAdverseReactions: `Which full top ADR list is recorded for ${referenceHtml}?`,
+    boxWarning: `Which boxed warning is listed for ${referenceHtml}?`
   };
   return promptByDomain[domainId] || DOMAIN_SPECS[domainId]?.prompt(referenceHtml);
 }
@@ -1961,14 +1956,14 @@ function rewriteConciseBaseQuestion(question, sourceDrug) {
     }
     return {
       ...styled,
-      prompt: `What is the generic name of ${renderBrandReferenceHtml(styled.metadata.sourceBrandName)}?`
+      prompt: `What is the generic for <b>${escapePromptHtml(styled.metadata.sourceBrandName)}</b>?`
     };
   }
 
   if (isInverseStructuredQuestion(styled)) {
     const value = escapePromptHtml(styled.metadata.displayedStructuredValue.value);
     const promptByDomain = {
-      drugClass: `Which drug has this pharmacologic class?<br><b>${value}</b>`,
+      drugClass: `Which drug has this class in the Fall source?<br><b>${value}</b>`,
       fdaIndication: `Which drug has this full FDA indication list?<br><b>${value}</b>`,
       topAdverseReactions: `Which drug has this full top ADR list?<br><b>${value}</b>`
     };
@@ -2056,7 +2051,7 @@ function materializeBrandGenericRecognition(
     question: {
       id: `${candidate.id}-brand-to-generic-recognition`,
       type: "mcq",
-      prompt: `What is the generic name of ${renderBrandReferenceHtml(brandName)}?`,
+      prompt: `What is the generic for <b>${escapePromptHtml(brandName)}</b>?`,
       choices: choiceEntries.map((entry) => entry.value),
       answer: correctEntry.value,
       metadata: baseQuestionMetadata(context, candidate, {
@@ -2305,7 +2300,7 @@ function materializeBrandToFdaIndicationRecognition(
   return materializeAtomicFactChoiceQuestion({
     context,
     candidate,
-    prompt: `Which is an FDA-approved indication for ${brandReference.html}?`,
+    prompt: `Which of the following is an FDA indication for ${brandReference.html}?`,
     questionVariant: "brandToFdaIndicationRecognition",
     extraMetadata: {
       stemReference: brandReference.metadata,
@@ -2923,7 +2918,7 @@ function calibrateCourseQuestionStyle(context, candidate, question, rng, styleOp
 function applyMcqStemReference(question, sourceDrug, stemReference) {
   const variant = question.metadata?.questionVariant;
   const prompt = variant === "brandToFdaIndicationRecognition"
-    ? `Which is an FDA-approved indication for ${stemReference.html}?`
+    ? `Which of the following is an FDA indication for ${stemReference.html}?`
     : question.metadata?.questionStyleId === COURSE_STYLE_ID
       ? getCourseStyleForwardPrompt(question.metadata.knowledgeDomain, stemReference.html)
       : DOMAIN_SPECS[question.metadata.knowledgeDomain].prompt(stemReference.html);
@@ -3029,8 +3024,8 @@ function materializeBrandGenericDirection(context, question, direction) {
     ...baseQuestion,
     id: `${baseId}-brand-to-generic-${Math.max(brandIndex, 0) + 1}`,
     prompt: question.metadata?.questionStyleId === COURSE_STYLE_ID
-      ? `What is the generic name of ${renderBrandReferenceHtml(brandName)}?`
-      : `What is the generic name of ${renderBrandReferenceHtml(brandName)}?`,
+      ? `What is the generic for <b>${escapePromptHtml(brandName)}</b>?`
+      : `Generic name for <b>${brandName}</b>?`,
     answer: stemLabel,
     metadata: {
       ...metadata,
@@ -3200,7 +3195,7 @@ function rebuildBrandGenericRecognitionForProtections(context, question, protect
 
   return {
     ...question,
-    prompt: `What is the generic name of ${renderBrandReferenceHtml(brandName)}?`,
+    prompt: `What is the generic for <b>${escapePromptHtml(brandName)}</b>?`,
     choices: rebuiltEntries.map((entry) => entry.value),
     answer: rebuiltEntries[correctIndex].value,
     metadata: {

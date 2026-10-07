@@ -1,13 +1,13 @@
 import {
   WEEK_1_PRACTICE_NOTE,
   generateFall2026Quiz
-} from "./fall-2026-quiz-generator.js?v=20261006c";
+} from "./fall-2026-quiz-generator.js?v=20261006a";
 import {
   ADAPTIVE_MEMORY_KEY,
   buildFall2026AdaptivePayload,
   normalizeAdaptiveMemory,
   recordAdaptiveRound
-} from "./fall-2026-adaptive-practice.js?v=20261006c";
+} from "./fall-2026-adaptive-practice.js?v=20261006a";
 
 const CUSTOM_QUIZ_KEY = "pharmlet.custom-quiz";
 const HISTORY_KEY = "pharmlet.history";

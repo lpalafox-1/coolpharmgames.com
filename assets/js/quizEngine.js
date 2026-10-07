@@ -1441,6 +1441,80 @@ function isFallLab3Question(question) {
     return getFallLab3QuestionMetadata(question)?.generatorId === FALL_LAB3_GENERATOR_ID;
 }
 
+// Presentation only. Identity, saved attempts, reports, and Review Queue keep
+// the original generated prompt. Queue playlists retain sourceQuizId but omit
+// generator metadata, so their ambiguous references use a read-only catalog.
+let fallLab3DisplayBrands = new Set();
+let fallLab3DisplayBrandsPromise = null;
+
+function isFallLab3DisplayQuestion(question) {
+    return isFallLab3Question(question)
+        || /^fall-2026-lab3-week-(?:[1-9]|10)-(?:practice|adaptive|week-focus|boss-remix)$/.test(String(question?.sourceQuizId || ""));
+}
+
+function loadFallLab3DisplayBrands() {
+    if (!fallLab3DisplayBrandsPromise) {
+        fallLab3DisplayBrandsPromise = fetch("assets/data/fall-2026-p2-top-drugs.json")
+            .then((response) => {
+                if (!response.ok) throw new Error("Fall display catalog unavailable");
+                return response.json();
+            })
+            .then((data) => {
+                const drugs = Array.isArray(data?.drugs) ? data.drugs : [];
+                const generics = new Set(drugs.map((drug) => normalizeQuizValue(drug.genericName)));
+                fallLab3DisplayBrands = new Set(drugs.flatMap((drug) => drug.brandNames || [])
+                    .map(normalizeQuizValue).filter((brand) => brand && !generics.has(brand)));
+            })
+            .catch(() => {}); // Missing display context must never block a saved review.
+    }
+    return fallLab3DisplayBrandsPromise;
+}
+
+function getFallLab3StudentFacingPromptHtml(question) {
+    const prompt = question?.prompt || "";
+    if (!isFallLab3DisplayQuestion(question)) return prompt;
+    const metadata = getFallLab3QuestionMetadata(question);
+    const reference = (html, knownBrand = false) => {
+        if (metadata?.stemReference?.type === "generic") return html;
+        const brand = metadata?.stemReference?.type === "brand"
+            ? metadata.stemReference.brandName
+            : metadata?.brandGenericDirection === "brandToGeneric" ? metadata.sourceBrandName : null;
+        if (brand && (html === `<b>${brand}</b>` || html === `<b>${escapeHtml(brand)}</b>`)) {
+            return `<b>${escapeHtml(brand)}®</b>`;
+        }
+        const text = toPlainText(html);
+        if (knownBrand || (!isFallLab3Question(question) && fallLab3DisplayBrands.has(normalizeQuizValue(text)))) {
+            return `<b>${escapeHtml(text)}®</b>`;
+        }
+        return html;
+    };
+    // Anchored main templates only: atomic, pairwise, NOT/EXCEPT, and other
+    // questions pass through unchanged. Structured inverse values are facts.
+    const forward = [
+        [/^(?:Which pharmacologic class is recorded in the Fall source for|What class does the Fall source list for) (<b>.*<\/b>)\?$/, "What is the drug class of"],
+        [/^Which (?:complete FDA indication list|full FDA indication list) is recorded for (<b>.*<\/b>)\?$/, "Which full list of FDA-approved indications is associated with"],
+        [/^(?:Which mechanism of action belongs to|What is the MOA of) (<b>.*<\/b>)\?$/, "What is the mechanism of action of"],
+        [/^Which (?:complete top adverse-reaction list|full top ADR list) is recorded for (<b>.*<\/b>)\?$/, "Which full list of top adverse reactions is associated with"],
+        [/^(?:Which boxed-warning value belongs to|Which boxed warning is listed for) (<b>.*<\/b>)\?$/, "What boxed warning is associated with"],
+        [/^(?:Generic name for|What is the generic for) (<b>.*<\/b>)\?$/, "What is the generic name of", true],
+        [/^Which of the following is an FDA indication for (<b>.*<\/b>)\?$/, "Which is an FDA-approved indication for", true]
+    ];
+    for (const [pattern, wording, knownBrand] of forward) {
+        const match = prompt.match(pattern);
+        if (match) return `${wording} ${reference(match[1], knownBrand)}?`;
+    }
+    const inverse = [
+        [/^Which drug (?:is paired with this pharmacologic class in the Fall source|has this class in the Fall source)\?(<br><b>.*<\/b>)$/, "Which drug has this pharmacologic class?"],
+        [/^Which drug is recorded in the Fall source with this complete FDA indication list\?(<br><b>.*<\/b>)$/, "Which drug has this full FDA indication list?"],
+        [/^Which drug is recorded in the Fall source with this complete top adverse-reaction list\?(<br><b>.*<\/b>)$/, "Which drug has this full top ADR list?"]
+    ];
+    for (const [pattern, wording] of inverse) {
+        const match = prompt.match(pattern);
+        if (match) return `${wording}${match[1]}`;
+    }
+    return prompt;
+}
+
 function getFallLab3QuestionWeek(question) {
     const week = Number(getFallLab3QuestionMetadata(question)?.requestedQuizWeek);
     return Number.isInteger(week) && week >= FALL_LAB3_MIN_WEEK && week <= FALL_LAB3_MAX_WEEK ? week : 0;
@@ -4008,7 +4082,7 @@ function runCompletionAction(actionId) {
             // so this action imports it at click time. The hub registers its
             // own startup on DOMContentLoaded; a click after load does not
             // run that startup or consume continuation requests.
-            const launcherUrl = new URL("assets/js/fall-2026-lab3-launcher.js?v=20261006c", window.location.href).href;
+            const launcherUrl = new URL("assets/js/fall-2026-lab3-launcher.js?v=20261006a", window.location.href).href;
             import(launcherUrl)
                 .then((launcher) => {
                     if (typeof launcher.launchFall2026Lab3WeekFocus !== "function") {
@@ -7516,7 +7590,14 @@ function render() {
     markCurrentQuestionSeen();
     if (getEl("drug-context")) getEl("drug-context").textContent = getQuestionContextLabel(q);
     if (getEl("qnum")) getEl("qnum").textContent = state.index + 1;
-    if (getEl("prompt")) getEl("prompt").innerHTML = q.prompt;
+    if (getEl("prompt")) getEl("prompt").innerHTML = getFallLab3StudentFacingPromptHtml(q);
+    if (isFallLab3DisplayQuestion(q) && !isFallLab3Question(q)) {
+        loadFallLab3DisplayBrands().then(() => {
+            if (state.questions[state.index] === q && getEl("prompt")) {
+                getEl("prompt").innerHTML = getFallLab3StudentFacingPromptHtml(q);
+            }
+        });
+    }
     renderQuizStatus();
     renderStreakMeter();
     renderAdaptiveFinalBanner();

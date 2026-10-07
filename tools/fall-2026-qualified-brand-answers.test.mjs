@@ -97,10 +97,10 @@ test("launcher and adaptive import the same post-F26-25 generator token (bumped 
   const adaptive = read("assets/js/fall-2026-adaptive-practice.js");
   const page = read("lab3-fall-2026.html");
   const generatorToken = /fall-2026-quiz-generator\.js\?v=([0-9a-z]+)/;
-  assert.equal(generatorToken.exec(launcher)?.[1], "20261006c");
-  assert.equal(generatorToken.exec(adaptive)?.[1], "20261006c");
+  assert.equal(generatorToken.exec(launcher)?.[1], "20261006a");
+  assert.equal(generatorToken.exec(adaptive)?.[1], "20261006a");
   assert.equal(launcher.includes("fall-2026-quiz-generator.js?v=20260913a"), false);
   assert.equal(adaptive.includes("fall-2026-quiz-generator.js?v=20260913a"), false);
-  assert.match(launcher, /fall-2026-adaptive-practice\.js\?v=20261006c/);
-  assert.match(page, /fall-2026-lab3-launcher\.js\?v=20261006c/);
+  assert.match(launcher, /fall-2026-adaptive-practice\.js\?v=20261006a/);
+  assert.match(page, /fall-2026-lab3-launcher\.js\?v=20261006a/);
 });

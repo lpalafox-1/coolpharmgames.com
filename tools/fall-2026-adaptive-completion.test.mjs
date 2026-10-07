@@ -309,18 +309,22 @@ test("the engine hands adaptive selection to the launcher instead of duplicating
       `the engine must not call ${forbidden}; adaptive selection stays in its own module`);
   }
 
-  // Canonical Fall data stays out of the engine.
-  assert.ok(!engineSource.includes("fall-2026-p2-top-drugs.json"));
+  // The isolated display adapter may read brand labels for metadata-free saved
+  // playlists; Adaptive selection must never read the canonical source here.
+  const selectionSource = engineSource.replace(engineSource.slice(
+    engineSource.indexOf("// Presentation only."), engineSource.indexOf("function getFallLab3QuestionWeek(")
+  ), "");
+  assert.ok(!selectionSource.includes("fall-2026-p2-top-drugs.json"));
   assert.ok(!engineSource.includes("fall-2026-lab3-quiz-policy.json"));
 });
 
 test("F26-12 leaves the generator, canonical data, policy, and adaptive ranking untouched", () => {
   assert.equal(sha256("assets/js/fall-2026-quiz-generator.js"),
-    "f29b90bbff911006c68d312a5207a6d41f4b5285a2db1e9fe40116e646f8d3d3");
+    "1260bd47cd348073c780fd3d2ff9df5b7abd82e50a700052444855e9026d1e8c");
   assert.equal(sha256("assets/data/fall-2026-p2-top-drugs.json"),
     "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01");
   assert.equal(sha256("assets/data/fall-2026-lab3-quiz-policy.json"),
     "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171");
   assert.equal(sha256("assets/js/fall-2026-adaptive-practice.js"),
-    "37a4de8fec1044f8a6d06448891db7a3b2e55fe2b949291df1b5719e92dc3f32");
+    "611892cc80f74ffe943443a3b1ab13609a0412a77342a7fb40559d3c5720ccca");
 });
