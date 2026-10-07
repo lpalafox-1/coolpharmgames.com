@@ -22,7 +22,7 @@ import { loadBrowserGlobal } from "./browser-global-harness.mjs";
 import { buildFall2026Lab3Payload } from "../assets/js/fall-2026-lab3-launcher.js";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const ENGINE_TOKEN = "20260926e";
+const ENGINE_TOKEN = "20261006d";
 const REMIX_REQUEST_KEY = "pharmlet.fall-2026-lab3.boss-remix-request";
 const CUSTOM_QUIZ_KEY = "pharmlet.custom-quiz";
 const HISTORY_KEY = "pharmlet.history";
@@ -1119,13 +1119,16 @@ test("remix eligibility needs real attempt evidence and a Fall attempt", () => {
 // Protected boundaries
 // ---------------------------------------------------------------------------
 
-test("the engine still selects no Fall source data, policy, or generator module", () => {
+test("outside the isolated display adapter, the engine still selects no Fall source data, policy, or generator module", () => {
+  const selectionSource = engineSource.replace(engineSource.slice(
+    engineSource.indexOf("// Presentation only."), engineSource.indexOf("function getFallLab3QuestionWeek(")
+  ), "");
   for (const reference of [
     "fall-2026-p2-top-drugs.json",
     "fall-2026-lab3-quiz-policy.json",
     "fall-2026-quiz-generator.js"
   ]) {
-    assert.equal(engineSource.includes(reference), false, `quizEngine.js must not select ${reference}`);
+    assert.equal(selectionSource.includes(reference), false, `quizEngine.js must not select ${reference}`);
   }
   const dynamicImports = [...engineSource.matchAll(/\bimport\s*\(/g)];
   assert.equal(dynamicImports.length, 1, "F26-24 adds one dynamic import, the Week Focus completion bridge");

@@ -18,8 +18,8 @@ const LEGACY_BASELINE = Object.freeze({
   masterPoolSha256: "1fb50e96e60252a9839406d53bc929e9569d76c0ddc2522aff43adf9bdf2a87c"
 });
 const APPROVED_ENGINE_BASELINE = Object.freeze({
-  reference: "F26-24 Week Focus completion identity engine change",
-  sha256: "50920b5bcd43ad422360236031f8c442c568fba761c34ff1698617e804c2a664"
+  reference: "F26-24 Week Focus completion plus PR #90 display-only renderer",
+  sha256: "571f70c7555c09f49aefba14675010ac6d945f82675514ba69d04e4ff79e9c01"
 });
 
 function sha256(value) {
@@ -189,7 +189,7 @@ test("Fall 2026 policy separates eligibility, question types, and Week 1 uncerta
   assertNoForbiddenQuestionBankKeys(policy);
 });
 
-test("Fall 2026 source data is selected only by the launcher and approved reference adapter", () => {
+test("Fall question selection stays in the launcher; only the isolated display adapter also reads brand labels", () => {
   const htmlFiles = listFilesRecursively(
     repoRoot,
     (file) => file.endsWith(".html"),
@@ -210,8 +210,13 @@ test("Fall 2026 source data is selected only by the launcher and approved refere
   };
 
   for (const file of runtimeFiles) {
-    const source = readFileSync(file, "utf8");
+    let source = readFileSync(file, "utf8");
     const relativePath = path.relative(repoRoot, file);
+    if (relativePath === "assets/js/quizEngine.js") {
+      const displayOnly = source.slice(source.indexOf("// Presentation only."), source.indexOf("function getFallLab3QuestionWeek("));
+      assert.equal((displayOnly.match(/fall-2026-p2-top-drugs\.json/g) || []).length, 1);
+      source = source.replace(displayOnly, "");
+    }
     for (const [reference, allowedFiles] of Object.entries(allowedSelectors)) {
       assert.equal(
         source.includes(reference),

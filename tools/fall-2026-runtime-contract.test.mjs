@@ -20,8 +20,8 @@ const policy = JSON.parse(
   readFileSync(path.join(repoRoot, "assets", "data", "fall-2026-lab3-quiz-policy.json"), "utf8")
 );
 const APPROVED_ENGINE_BASELINE = Object.freeze({
-  reference: "F26-24 Week Focus completion identity engine change",
-  sha256: "50920b5bcd43ad422360236031f8c442c568fba761c34ff1698617e804c2a664"
+  reference: "F26-24 Week Focus completion plus PR #90 display-only renderer",
+  sha256: "571f70c7555c09f49aefba14675010ac6d945f82675514ba69d04e4ff79e9c01"
 });
 
 function createStorageStub(initialValues = {}) {
@@ -383,7 +383,10 @@ test("malformed answerMatching markers remain fail closed by staying out of pers
 test(`Fall stays isolated to its launcher, legacy data has no strict marker, and the engine matches the ${APPROVED_ENGINE_BASELINE.reference}`, () => {
   const digest = createHash("sha256").update(engineSource).digest("hex");
   assert.equal(digest, APPROVED_ENGINE_BASELINE.sha256);
-  assert.ok(!engineSource.includes("stemReference"), "Fall stem provenance must not be rendered by the legacy engine");
+  const selectionSource = engineSource.replace(engineSource.slice(
+    engineSource.indexOf("// Presentation only."), engineSource.indexOf("function getFallLab3QuestionWeek(")
+  ), "");
+  assert.ok(!selectionSource.includes("stemReference"), "only the display adapter may inspect Fall stem references");
 
   const htmlFiles = listFilesRecursively(
     repoRoot,

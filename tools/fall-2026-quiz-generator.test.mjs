@@ -2205,7 +2205,10 @@ test("all Fall Drug Class questions use reviewed source-derived quiz concepts", 
   );
 
   assert.ok(!productionSource.includes("Benazepril"));
-  assert.ok(!legacyEngineSource.includes(promptPrefix));
+  const selectionSource = legacyEngineSource.replace(legacyEngineSource.slice(
+    legacyEngineSource.indexOf("// Presentation only."), legacyEngineSource.indexOf("function getFallLab3QuestionWeek(")
+  ), "");
+  assert.ok(!selectionSource.includes(promptPrefix), "only the display adapter may recognize the canonical Fall class stem");
   assert.equal(
     createHash("sha256").update(readFileSync(canonicalPath)).digest("hex"),
     "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01"

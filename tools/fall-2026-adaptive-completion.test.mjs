@@ -309,8 +309,12 @@ test("the engine hands adaptive selection to the launcher instead of duplicating
       `the engine must not call ${forbidden}; adaptive selection stays in its own module`);
   }
 
-  // Canonical Fall data stays out of the engine.
-  assert.ok(!engineSource.includes("fall-2026-p2-top-drugs.json"));
+  // The isolated display adapter may read brand labels for metadata-free saved
+  // playlists; Adaptive selection must never read the canonical source here.
+  const selectionSource = engineSource.replace(engineSource.slice(
+    engineSource.indexOf("// Presentation only."), engineSource.indexOf("function getFallLab3QuestionWeek(")
+  ), "");
+  assert.ok(!selectionSource.includes("fall-2026-p2-top-drugs.json"));
   assert.ok(!engineSource.includes("fall-2026-lab3-quiz-policy.json"));
 });
 

@@ -590,7 +590,7 @@ test("G15 all three store consumers share the new token and the engine stays put
   // Consumers that changed get fresh tokens; the engine must not move.
   assert.match(readSource("stats.html"), /assets\/js\/stats\.js\?v=20260927b/);
   assert.match(readSource("review-queue.html"), /assets\/js\/review-queue\.js\?v=20260903a/);
-  assert.match(readSource("quiz.html"), /assets\/js\/quizEngine\.js\?v=20260926e/,
+  assert.match(readSource("quiz.html"), /assets\/js\/quizEngine\.js\?v=20261006d/,
     "P2F-09 must not move the engine token");
 
   for (const token of ["20260903a", "20260901a"]) {
@@ -599,17 +599,17 @@ test("G15 all three store consumers share the new token and the engine stays put
 });
 
 // G16/G17 Protected hashes and the engine boundary.
-test("G16 only the Store and Stats baselines move; G17 the engine is untouched", () => {
+test("Store and Stats retain their baselines; engine matches the isolated display rework", () => {
   const sha = (relativePath) => createHash("sha256").update(readFileSync(path.join(repoRoot, relativePath))).digest("hex");
 
-  // The engine and its pinned manifest are byte-identical to the merge base.
+  // The engine baseline includes PR #90 display-only rendering.
   assert.equal(
     sha("assets/js/quizEngine.js"),
-    "50920b5bcd43ad422360236031f8c442c568fba761c34ff1698617e804c2a664",
-    "P2F-09 must not change quizEngine.js"
+    "571f70c7555c09f49aefba14675010ac6d945f82675514ba69d04e4ff79e9c01",
+    "engine must match the isolated display baseline"
   );
 
-  // Every protected baseline other than Store and Stats keeps its value.
+  // Source and persistence baselines retain their values; only the engine baseline includes display rendering.
   const contract = readSource("tools/curriculum-metadata-contract.test.mjs");
   const unchanged = {
     fallSource: "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01",
@@ -617,7 +617,7 @@ test("G16 only the Store and Stats baselines move; G17 the engine is untouched",
     masterPool: "1fb50e96e60252a9839406d53bc929e9569d76c0ddc2522aff43adf9bdf2a87c",
     fallGenerator: "1260bd47cd348073c780fd3d2ff9df5b7abd82e50a700052444855e9026d1e8c",
     fallLauncher: "db3bdf2a5532fa8af9892d3c1fd7e0aa3e0c29d38835230f139a78e5a2cf407d",
-    quizEngine: "50920b5bcd43ad422360236031f8c442c568fba761c34ff1698617e804c2a664",
+    quizEngine: "571f70c7555c09f49aefba14675010ac6d945f82675514ba69d04e4ff79e9c01",
     favorites: "b6fbd5bbca17ea150e34e9b29c9e6391b5ae7359d7b6afb18fe6c7e7caed781d"
   };
   for (const [key, value] of Object.entries(unchanged)) {
