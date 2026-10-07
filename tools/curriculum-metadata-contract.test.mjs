@@ -13,9 +13,9 @@ const PROTECTED_BASELINES = Object.freeze({
   fallSource: "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01",
   fallPolicy: "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171",
   masterPool: "1fb50e96e60252a9839406d53bc929e9569d76c0ddc2522aff43adf9bdf2a87c",
-  fallGenerator: "2ea0c062a8d0c11cd22c70c3b247de1d4bd10502eaf328538f371b90f8dd6be7",
-  fallLauncher: "ffea5a1e2c5b25dd27515b58bc18d24b47cba163f9e5cffb22638922ecdbe6d2",
-  quizEngine: "81a226d1ed5300da9bca375dd4e69a52bf934bd40705c0f90cbdf144e00c5ba3",
+  fallGenerator: "f29b90bbff911006c68d312a5207a6d41f4b5285a2db1e9fe40116e646f8d3d3",
+  fallLauncher: "b0ba8464375aed88194f5d3d510884446e378ba4f691f61292b3da10ee3a85b1",
+  quizEngine: "60c10bbbdea427cbf9c20026213a223bcbdfb1e14ee75172e8c63624f9fe4d45",
   stats: "d97046dcafeb57e26385a094fbf39b6cc8eee68c86088bdbb3980b59c2589fdc",
   reviewQueueStore: "169c528d77fe0a185b801c7bcc61949adad803eeb839be96fa1354dbe9937ba3",
   favorites: "b6fbd5bbca17ea150e34e9b29c9e6391b5ae7359d7b6afb18fe6c7e7caed781d"

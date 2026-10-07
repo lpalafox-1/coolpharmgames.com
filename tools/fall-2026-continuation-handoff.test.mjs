@@ -26,8 +26,8 @@ import {
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relativePath) => readFileSync(path.join(repoRoot, relativePath), "utf8");
 
-const LAUNCHER_TOKEN = "20261006b";
-const ENGINE_TOKEN = "20261006b";
+const LAUNCHER_TOKEN = "20261006c";
+const ENGINE_TOKEN = "20261006c";
 const CUSTOM_QUIZ_KEY = "pharmlet.custom-quiz";
 const REMIX_REQUEST_KEY = "pharmlet.fall-2026-lab3.boss-remix-request";
 const ADAPTIVE_REQUEST_KEY = "pharmlet.fall-2026-lab3.adaptive-request";

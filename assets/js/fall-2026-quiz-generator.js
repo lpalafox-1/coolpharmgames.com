@@ -185,7 +185,7 @@ const DOMAIN_SPECS = Object.freeze({
   }),
   topAdverseReactions: Object.freeze({
     field: "adverseReactions",
-    prompt: (reference) => `Which full list of adverse reactions is associated with ${reference}?`,
+    prompt: (reference) => `Which full list of top adverse reactions is associated with ${reference}?`,
     inversePrompt: (value) => `Which drug has this full top ADR list?<br><b>${value}</b>`
   }),
   boxWarning: Object.freeze({
@@ -1943,7 +1943,7 @@ function getCourseStyleForwardPrompt(domainId, referenceHtml) {
     drugClass: `What is the drug class of ${referenceHtml}?`,
     fdaIndication: `Which full list of FDA-approved indications is associated with ${referenceHtml}?`,
     mechanismOfAction: `What is the mechanism of action of ${referenceHtml}?`,
-    topAdverseReactions: `Which full list of adverse reactions is associated with ${referenceHtml}?`,
+    topAdverseReactions: `Which full list of top adverse reactions is associated with ${referenceHtml}?`,
     boxWarning: `What boxed warning is associated with ${referenceHtml}?`
   };
   return promptByDomain[domainId] || DOMAIN_SPECS[domainId]?.prompt(referenceHtml);

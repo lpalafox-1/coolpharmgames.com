@@ -28,8 +28,8 @@ const APPROVED_BASELINES = Object.freeze({
   p1: "1fb50e96e60252a9839406d53bc929e9569d76c0ddc2522aff43adf9bdf2a87c",
   p2: "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01",
   policy: "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171",
-  generator: "2ea0c062a8d0c11cd22c70c3b247de1d4bd10502eaf328538f371b90f8dd6be7",
-  engine: "81a226d1ed5300da9bca375dd4e69a52bf934bd40705c0f90cbdf144e00c5ba3"
+  generator: "f29b90bbff911006c68d312a5207a6d41f4b5285a2db1e9fe40116e646f8d3d3",
+  engine: "60c10bbbdea427cbf9c20026213a223bcbdfb1e14ee75172e8c63624f9fe4d45"
 });
 
 function sha256(value) {

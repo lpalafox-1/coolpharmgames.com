@@ -134,11 +134,11 @@ test("Boss Remix preserves decorated prompts from its fresh shared-generator pra
 test("all generator entry points and the Week Focus continuation use the refreshed cache chain", () => {
   const launcher = read("assets/js/fall-2026-lab3-launcher.js");
   const adaptive = read("assets/js/fall-2026-adaptive-practice.js");
-  for (const parent of [launcher, adaptive]) assert.match(parent, /fall-2026-quiz-generator\.js\?v=20261006b/);
-  assert.match(launcher, /fall-2026-adaptive-practice\.js\?v=20261006b/);
-  assert.match(read("lab3-fall-2026.html"), /fall-2026-lab3-launcher\.js\?v=20261006b/);
-  assert.match(read("assets/js/quizEngine.js"), /new URL\("assets\/js\/fall-2026-lab3-launcher\.js\?v=20261006b"/);
-  assert.match(read("quiz.html"), /quizEngine\.js\?v=20261006b/);
+  for (const parent of [launcher, adaptive]) assert.match(parent, /fall-2026-quiz-generator\.js\?v=20261006c/);
+  assert.match(launcher, /fall-2026-adaptive-practice\.js\?v=20261006c/);
+  assert.match(read("lab3-fall-2026.html"), /fall-2026-lab3-launcher\.js\?v=20261006c/);
+  assert.match(read("assets/js/quizEngine.js"), /new URL\("assets\/js\/fall-2026-lab3-launcher\.js\?v=20261006c"/);
+  assert.match(read("quiz.html"), /quizEngine\.js\?v=20261006c/);
 });
 
 test("student stems use natural wording without visible source-audit language", () => {
@@ -146,7 +146,7 @@ test("student stems use natural wording without visible source-audit language", 
     drugClass: "What is the drug class of ",
     fdaIndication: "Which full list of FDA-approved indications is associated with ",
     mechanismOfAction: "What is the mechanism of action of ",
-    topAdverseReactions: "Which full list of adverse reactions is associated with ",
+    topAdverseReactions: "Which full list of top adverse reactions is associated with ",
     boxWarning: "What boxed warning is associated with "
   };
   const seenDomains = new Set();
@@ -178,5 +178,11 @@ test("student stems use natural wording without visible source-audit language", 
   assert.equal(inverse.question.metadata.questionVariant, "identifyDrugByStructuredValue");
   assert.ok(inverse.question.prompt.startsWith("Which drug has this pharmacologic class?"));
   assert.doesNotMatch(inverse.question.prompt, /Fall source|recorded/i);
+  const rawAdrCandidate = buildQuestionCandidates({ drugData, policy, quizWeek: 3, materialType: "new" })
+    .find((entry) => entry.sourceDrugId === "p2-fall-quiz-03-drug-02" && entry.domainId === "topAdverseReactions");
+  const rawAdr = materializeQuestionCandidate({ candidate: rawAdrCandidate, drugData, policy, rng: createSeededRng("adr-top-boundary") });
+  assert.equal(rawAdr.status, "materialized");
+  assert.equal(rawAdr.question.prompt, "Which full list of top adverse reactions is associated with <b>Atenolol</b>?");
+  assert.equal(rawAdr.question.metadata.knowledgeDomain, "topAdverseReactions");
   assert.ok(singleIndicationCount > 0);
 });
