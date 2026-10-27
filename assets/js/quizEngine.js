@@ -324,8 +324,20 @@ function renderFooterActions(q) {
     const unseenCount = Math.max(0, state.questions.length - getSeenCount());
     const canCheckAllHere = isLastQuestion && hasSeenAllQuestions() && unansweredCount > 0;
     const reviewRoundComplete = isReviewRoundComplete();
-    const perfectReviewRound = isPerfectReviewRoundComplete();
+    const perfectReviewRound = isPerfectReviewRoundComplete() && !getFallLab3FinalContext().active;
 
+    if (getFallLab3FinalContext().active && isTrueExamMode() && !state.reviewMode) {
+        if (checkBtn) checkBtn.classList.add("hidden");
+        if (nextBtn) {
+            nextBtn.classList.toggle("hidden", canCheckAllHere);
+            nextBtn.textContent = isLastQuestion ? "Review Unseen Questions" : "Next →";
+        }
+        if (checkAllBtn) {
+            checkAllBtn.classList.toggle("hidden", !canCheckAllHere);
+            checkAllBtn.textContent = "Submit 100 Answers & Finish";
+        }
+        return;
+    }
     if (checkBtn) {
         checkBtn.classList.toggle("hidden", !!q._answered);
         checkBtn.textContent = canCheckAllHere ? "Check This Answer" : "Check Answer";
@@ -1432,6 +1444,33 @@ function launchWeakAreaRetake() {
 // counters, review-queue history, and adaptive memory are never consulted here,
 // and a completed remix never writes them back (P2F-09 and F26-10 own those).
 
+function getFallLab3FinalContext(metadata = state.attemptMetadata) {
+    const kind = String(metadata?.kind || "");
+    const mode = kind === "fall-2026-lab3-final-balanced" ? "balanced"
+        : kind === "fall-2026-lab3-final-adaptive" ? "adaptive" : "";
+    return { active: Boolean(mode), mode, kind };
+}
+
+function buildFallLab3FinalBreakdown(questions = state.questions) {
+    if (!getFallLab3FinalContext().active) return null;
+    const weeks = {}, domains = {};
+    for (const q of questions) {
+        for (const [group, key] of [[weeks, q.metadata?.sourceDrugQuizWeek], [domains, q.metadata?.knowledgeDomain]]) {
+            const row = group[key] || (group[key] = { correct: 0, total: 0 });
+            row.total += 1;
+            if (q._correct) row.correct += 1;
+        }
+    }
+    return { weeks, domains };
+}
+
+function buildFallLab3FinalBreakdownMarkup(summary) {
+    if (!summary) return "";
+    const labels = { brandGeneric: "Brand / Generic", drugClass: "Drug Class", fdaIndication: "FDA Indication", mechanismOfAction: "MOA", topAdverseReactions: "Top ADRs", boxWarning: "BBW" };
+    const rows = (values, week) => Object.entries(values).map(([key, row]) => `<li>${week ? `Week ${escapeHtml(key)}` : escapeHtml(labels[key] || key)}: ${row.correct} / ${row.total}</li>`).join("");
+    return `<div class="mt-6 text-left max-w-xl mx-auto"><h3 class="font-bold">Final Practice breakdown</h3><p class="text-sm mt-2">Primary source week; practice composition, not an official final blueprint.</p><div class="grid sm:grid-cols-2 gap-4 mt-3"><ul>${rows(summary.weeks, true)}</ul><ul>${rows(summary.domains, false)}</ul></div></div>`;
+}
+
 function getFallLab3QuestionMetadata(question) {
     const metadata = question?.metadata;
     return metadata && typeof metadata === "object" && !Array.isArray(metadata) ? metadata : null;
@@ -2036,6 +2075,11 @@ function buildFallLab3HistoryLineage() {
     }
     if (!lineage.curriculumId) lineage.curriculumId = FALL_LAB3_CURRICULUM_ID;
 
+    if (getFallLab3FinalContext().active) {
+        lineage.finalMode = getFallLab3FinalContext().mode;
+        lineage.composerVersion = state.attemptMetadata?.finalPractice?.version || "";
+        lineage.eligibleWeeks = [1,2,3,4,5,6,7,8,9,10];
+    }
     return lineage;
 }
 
@@ -3458,7 +3502,10 @@ function buildGeneratedAttemptIdentity(data) {
     if (parts.length <= 2 && titleSegment !== "na") parts.push(titleSegment);
 
     const identity = `generated-${parts.join("-")}`;
-    const modeLabel = kindSegment === FALL_LAB3_BOSS_REMIX_KIND
+    const finalContext = getFallLab3FinalContext(metadata);
+    const modeLabel = finalContext.active
+        ? `final-${finalContext.mode}${isTrueExamMode() ? "-exam" : ""}`
+        : kindSegment === FALL_LAB3_BOSS_REMIX_KIND
         ? "bossRemix"
         : state.bossMode
         ? "boss"
@@ -3638,7 +3685,8 @@ function serializeQuizProgress() {
         quizConfigId: state.quizConfig?.id || null,
         configuredModeKey: state.configuredModeKey || "",
         placeholderQuiz: !!state.placeholderQuiz,
-        modeNotice: state.modeNotice || ""
+        modeNotice: state.modeNotice || "",
+        ...(getFallLab3FinalContext().active ? { finalPracticePayload: state.finalPracticePayload } : {})
     };
 }
 
@@ -3661,6 +3709,10 @@ function persistQuizProgress(force = false) {
         renderQuizStatus();
     } catch (error) {
         console.warn("Unable to save quiz progress:", error);
+        if (getFallLab3FinalContext().active) {
+            showQuizSessionNote("Progress could not be saved in this browser. Keep this tab open or free browser storage before leaving.", "accent");
+            if (getEl("quiz-session-note-title")) getEl("quiz-session-note-title").textContent = "Progress not saved";
+        }
     }
 }
 
@@ -3757,6 +3809,7 @@ function restoreSavedQuizProgress(snapshot) {
     state.marked = new Set(Array.isArray(snapshot.marked) ? snapshot.marked : []);
     state.seen = new Set(Array.isArray(snapshot.seen) ? snapshot.seen : []);
     state.title = String(snapshot.title || state.title || "Quiz");
+    if (getFallLab3FinalContext().active && snapshot.finalPracticePayload?.metadata?.kind === state.attemptMetadata?.kind) state.finalPracticePayload = snapshot.finalPracticePayload;
     state.resultsRecorded = false;
     state.signalsRecorded = false;
     state.finalBreakdown = null;
@@ -3820,6 +3873,7 @@ function saveQuizHistory() {
             hintsUsed: state.hintsUsed,
             letterGrade: letterGradeInfo?.letter || null,
             finalSummary,
+            ...(getFallLab3FinalContext().active ? { fallFinalSummary: buildFallLab3FinalBreakdown() } : {}),
             ...(attemptLineage ? { attemptLineage } : {})
         });
 
@@ -3964,8 +4018,17 @@ function getCompletionContinuationActions({
     generatedPayload = false,
     fall = { active: false, quizWeek: 0 },
     adaptive = { active: false, targetWeek: 0 },
-    weekFocus = { active: false, quizWeek: 0 }
+    weekFocus = { active: false, quizWeek: 0 },
+    finalPractice = { active: false, mode: "" }
 } = {}) {
+    if (finalPractice.active && !bossMode) {
+        const actions = [];
+        if (missedCount > 0) actions.push({ id: "review-missed", tone: "review", label: `🎯 Review ${missedCount} Missed` });
+        actions.push({ id: "new-final-practice", tone: "primary", label: `New ${finalPractice.mode === "balanced" ? "Balanced" : "Adaptive"} Final — 100 Questions` });
+        actions.push({ id: "retry-attempt", tone: "accent", label: "Retry Same Final — 100 Questions" });
+        actions.push({ id: "lab3-hub", tone: "ghost", label: "← Return to Lab III Hub" });
+        return actions;
+    }
     // Week Focus stays a selected-week round, including after Review Missed.
     // Boss Round, Boss Remix, and New Week N Practice Set belong to Standard.
     if (weekFocus.active && !bossMode) {
@@ -4051,6 +4114,16 @@ function buildCompletionActionsMarkup(actions) {
 }
 
 function runCompletionAction(actionId) {
+    if (actionId === "new-final-practice") {
+        const context = getFallLab3FinalContext();
+        if (!context.active || state.finalLaunchInFlight) return false;
+        state.finalLaunchInFlight = true;
+        const launcherUrl = new URL("assets/js/fall-2026-lab3-launcher.js?v=20261027b", window.location.href).href;
+        import(launcherUrl).then(launcher => launcher.launchFall2026Lab3Final(context.mode, { exam: isTrueExamMode() }))
+            .catch(error => { console.warn("Final Practice launch failed:", error); alert("Unable to build a safe Final Practice set. Try again from the Lab III hub."); })
+            .finally(() => { state.finalLaunchInFlight = false; });
+        return true;
+    }
     if (actionId === "review-missed") return reviewMissed();
     if (actionId === "boss-round") return launchBossRound();
     if (actionId === "retry-attempt") return restartQuiz();
@@ -4082,7 +4155,7 @@ function runCompletionAction(actionId) {
             // so this action imports it at click time. The hub registers its
             // own startup on DOMContentLoaded; a click after load does not
             // run that startup or consume continuation requests.
-            const launcherUrl = new URL("assets/js/fall-2026-lab3-launcher.js?v=20261027a", window.location.href).href;
+            const launcherUrl = new URL("assets/js/fall-2026-lab3-launcher.js?v=20261027b", window.location.href).href;
             import(launcherUrl)
                 .then((launcher) => {
                     if (typeof launcher.launchFall2026Lab3WeekFocus !== "function") {
@@ -4117,6 +4190,10 @@ function restartQuiz() {
     // warning would be false there. Unfinished runs keep the accurate warning.
     if (!state.attemptCompleted && !confirm("🔄 Restart this quiz? Your progress will be lost.")) return;
 
+    if (getFallLab3FinalContext().active && state.finalPracticePayload) {
+        try { localStorage.setItem(CUSTOM_QUIZ_KEY, JSON.stringify(state.finalPracticePayload)); }
+        catch (error) { alert("Unable to save this exact Final for retry. Free browser storage and try again."); return; }
+    }
     state.progressCompleted = true;
     clearQuizProgress();
     location.reload();
@@ -4223,7 +4300,7 @@ function finishQuizDueToTimeout() {
 }
 
 function handleNextAction() {
-    if (isPerfectReviewRoundComplete()) {
+    if (isPerfectReviewRoundComplete() && !getFallLab3FinalContext().active) {
         replayCurrentReviewRound();
         return;
     }
@@ -7756,6 +7833,7 @@ function renderNavMap() {
             colorClass = "bg-slate-200 text-slate-800 border border-slate-400";
         }
         btn.className = `w-8 h-8 rounded-lg text-xs font-bold transition-all ${i === state.index ? 'ring-2 ring-blue-500 scale-110' : ''} ${colorClass}`;
+        if (getFallLab3FinalContext().active && i === state.index) btn.dataset.finalCurrent = "true";
         btn.textContent = i + 1;
         btn.title = isMarked ? `Question ${i + 1} marked for review` : `Question ${i + 1}`;
         btn.style.outline = isMarked ? "2px solid #facc15" : "";
@@ -7763,6 +7841,10 @@ function renderNavMap() {
         btn.onclick = () => { jumpToQuestion(i); };
         nav.appendChild(btn);
     });
+    if (getFallLab3FinalContext().active && nav.scrollHeight > nav.clientHeight) {
+        const current = nav.querySelector?.('[data-final-current="true"]');
+        if (current) nav.scrollTop = current.offsetTop - nav.clientHeight / 2 + 16;
+    }
 }
 
 // --- 4. SYSTEM WIRING ---
@@ -7778,6 +7860,7 @@ function wireEvents() {
         "next": handleNextAction,
         "prev": () => { if (state.index > 0) jumpToQuestion(state.index - 1); },
         "check": () => {
+            if (getFallLab3FinalContext().active && isTrueExamMode() && !state.reviewMode) return handleNextAction();
             const q = state.questions[state.index];
             if (!q) return;
             let val = null;
@@ -7927,6 +8010,7 @@ function startSmartTimer() {
         ? 600
         : (isFinalExam ? FINAL_EXAM_TIMER_SECONDS : (weekParam ? 600 : (count <= 20 ? 900 : (count <= 50 ? 2700 : 7200))));
     state.timerPaused = false;
+    if (getFallLab3FinalContext().active && getEl("timer-readout")) getEl("timer-readout").textContent = `${Math.floor(state.timerSeconds / 60)}:${String(state.timerSeconds % 60).padStart(2, "0")}`;
     state.timerHandle = setInterval(timerTick, 1000);
 }
 
@@ -8365,7 +8449,8 @@ function showResults() {
         generatedPayload: GENERATED_QUIZ_IDS.has(quizId),
         fall: fallContext,
         adaptive: adaptiveContext,
-        weekFocus: weekFocusContext
+        weekFocus: weekFocusContext,
+        finalPractice: getFallLab3FinalContext()
     });
     const continuationMarkup = buildCompletionActionsMarkup(continuationActions);
     const savedNote = state.reviewMode
@@ -8373,7 +8458,9 @@ function showResults() {
         : remixAttempt
         ? `<p class="text-sm opacity-70 mt-2">✅ Saved to this browser: this Boss Remix attempt's history and high score. Boss Remix stays a bounded challenge, so it does not feed lifetime weakness, review-queue, or adaptive memory.</p>`
         : `<p class="text-sm opacity-70 mt-2">✅ Saved to this browser: history, high score, and review queue. Nothing else is needed to keep this attempt.</p>`;
-    const continuationNote = weekFocusContext.active && !state.bossMode
+    const continuationNote = getFallLab3FinalContext().active
+        ? `<p class="mt-4 text-xs opacity-70 max-w-xl mx-auto">Retry Same Final reloads the original ordered 100-question set. New Final builds a fresh set with ten questions per week. Review Missed keeps this Final’s mode and does not overwrite its score.</p>`
+        : weekFocusContext.active && !state.bossMode
         ? `<p class="mt-4 text-xs opacity-70 max-w-xl mx-auto">${state.reviewMode
             ? `Restart Full Set reloads this exact Week ${weekFocusContext.quizWeek} Focus set. `
             : `Retry This Set repeats these exact questions. `}New Week ${weekFocusContext.quizWeek} Focus builds a fresh 10-question set from Week ${weekFocusContext.quizWeek} only, with no prior-week review.</p>`
@@ -8390,7 +8477,9 @@ function showResults() {
     const weightedSummary = usesWeightedPointScoring()
         ? `${state.pointScore} / ${state.totalPoints} points • ${state.score} / ${state.questions.length} correct`
         : `${state.score} / ${state.questions.length}`;
-    const resultsHeading = state.bossMode
+    const resultsHeading = getFallLab3FinalContext().active && !state.reviewMode
+        ? `${getFallLab3FinalContext().mode === "balanced" ? "Balanced" : "Adaptive"} Final Practice Complete!`
+        : state.bossMode
         ? (missed.length === 0 ? "Boss Cleared!" : "Boss Round Complete!")
         : state.reviewMode
         ? "Review Round Complete!"
@@ -8427,7 +8516,9 @@ function showResults() {
     const examModeMarkup = isTrueExamMode()
         ? `<p class="text-sm opacity-70 mt-2">True Exam Mode was active for this attempt.</p>`
         : "";
-    const breakdownMarkup = buildFinalBreakdownMarkup(finalBreakdown);
+    const breakdownMarkup = getFallLab3FinalContext().active
+        ? buildFallLab3FinalBreakdownMarkup(buildFallLab3FinalBreakdown())
+        : buildFinalBreakdownMarkup(finalBreakdown);
     
     if (card) card.innerHTML = `<div class="text-center py-10">
         <h2 class="text-4xl font-black mb-4">${resultsHeading}</h2>
@@ -8682,6 +8773,8 @@ async function main() {
             state.questionReportContext = data?.metadata && typeof data.metadata === "object" && !Array.isArray(data.metadata)
                 ? { ...data.metadata }
                 : {};
+            state.finalPracticePayload = getFallLab3FinalContext(data?.metadata).active ? JSON.parse(JSON.stringify(data)) : null;
+            if (getFallLab3FinalContext(data?.metadata).active) document.body?.setAttribute?.("data-fall-final", "true");
             state.attemptMetadata = data?.metadata && typeof data.metadata === "object" && !Array.isArray(data.metadata)
                 ? { ...data.metadata }
                 : null;
@@ -8689,7 +8782,9 @@ async function main() {
             state.activeModeConfig = getEffectiveQuizModeConfig(data);
             state.configuredModeKey = state.activeModeConfig?._modeKey || "";
             state.placeholderQuiz = data?.meta?.placeholder === true;
-            state.modeNotice = takeFallLab3RemixNotice();
+            state.modeNotice = getFallLab3FinalContext(data.metadata).active
+                ? ""
+                : takeFallLab3RemixNotice();
             state.generatedTimerSeconds = Math.max(0, Number(state.activeModeConfig?.timerSeconds ?? data?.metadata?.timerSeconds) || 0);
             state.generatedQuestionLimit = Math.max(0, Number(state.activeModeConfig?.questionLimit ?? data?.metadata?.questionLimit) || 0);
             state.generatedAttemptIdentity = GENERATED_QUIZ_IDS.has(quizId)
@@ -8743,7 +8838,11 @@ async function main() {
                 storageKey = state.generatedAttemptIdentity?.scoreStorageKey || `pharmlet.${quizId}.${modeParam}`;
             } else {
                 state.title = data.title || "Quiz";
-                state.questions = shuffled(applyQuestionLimit(pool)).map((q, i) => ({ ...q, _id: i }));
+                if (getFallLab3FinalContext().active && (pool.length !== 100 || !data.metadata?.finalPractice || data.metadata.finalPractice.version !== "fall-final100-v1")) {
+                    throw new Error("Final Practice requires a complete validated 100-question payload.");
+                }
+                const orderedPool = getFallLab3FinalContext().active ? pool : shuffled(applyQuestionLimit(pool));
+                state.questions = orderedPool.map((q, i) => ({ ...q, _id: i }));
                 storageKey = state.generatedAttemptIdentity?.scoreStorageKey || `pharmlet.${quizId}.${modeParam}`;
 
                 // Skip to render for legacy quizzes
