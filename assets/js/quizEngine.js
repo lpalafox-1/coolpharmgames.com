@@ -4082,7 +4082,7 @@ function runCompletionAction(actionId) {
             // so this action imports it at click time. The hub registers its
             // own startup on DOMContentLoaded; a click after load does not
             // run that startup or consume continuation requests.
-            const launcherUrl = new URL("assets/js/fall-2026-lab3-launcher.js?v=20261006a", window.location.href).href;
+            const launcherUrl = new URL("assets/js/fall-2026-lab3-launcher.js?v=20261027a", window.location.href).href;
             import(launcherUrl)
                 .then((launcher) => {
                     if (typeof launcher.launchFall2026Lab3WeekFocus !== "function") {
