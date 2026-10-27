@@ -41,6 +41,7 @@
     #adaptive-launch:disabled, #week-focus-launch:disabled, #weekly-launch:disabled { opacity: .6; cursor: not-allowed; }
     #adaptive-launch[aria-busy="true"], #week-focus-launch[aria-busy="true"],
     #weekly-launch[aria-busy="true"] { cursor: progress; }
+    #final-practice button:disabled { opacity: .6; cursor: progress; }
     .resource-link { display: inline-flex; align-items: center; font-size: .875rem; }
     .lab3-hero {
       background:
@@ -188,9 +189,23 @@
       </div>
     </section>
 
+    <section id="final-practice" class="card mt-6 p-5 sm:p-6" aria-labelledby="final-heading">
+      <p class="text-xs font-bold uppercase tracking-widest" style="color:var(--muted)">Cumulative prototype · Weeks 1–10</p>
+      <h2 id="final-heading" class="text-xl sm:text-2xl font-black mt-2">Fall 2026 Lab III Final Practice</h2>
+      <p class="mt-3 text-sm leading-relaxed">100 questions, ten from each week, covering all six domains. This is a Pharm-let practice blueprint; it is not the professor’s official final blueprint.</p>
+      <p class="mt-2 text-sm leading-relaxed" style="color:var(--muted)">Balanced is the default and ignores past performance. Adaptive uses saved weakness signals inside the same cumulative balance. Both use the Fall Lab III source.</p>
+      <label class="flex items-center gap-3 mt-4 text-sm"><input id="final-exam-mode" type="checkbox"> True Exam Mode — hold feedback until completion</label>
+      <p class="mt-2 text-xs" style="color:var(--muted)">100-minute practice timer. Tap the timer to pause. Answers and progress save in this browser; use Resume for an unfinished set.</p>
+      <div class="flex flex-col gap-3 mt-4">
+        <button id="final-balanced-launch" type="button" class="btn btn-blue w-full">Balanced Final Practice — 100 Questions</button>
+        <button id="final-adaptive-launch" type="button" class="btn btn-ghost w-full">Adaptive Final Practice — 100 Questions</button>
+      </div>
+      <p id="final-launch-status" class="mt-3 text-sm" role="status" aria-live="polite"></p>
+    </section>
+
   </main>
 
   <script src="assets/js/review-queue-store.js?v=20260903a"></script>
-  <script type="module" src="assets/js/fall-2026-lab3-launcher.js?v=20261027a"></script>
+  <script type="module" src="assets/js/fall-2026-lab3-launcher.js?v=20261027b"></script>
 </body>
 </html>

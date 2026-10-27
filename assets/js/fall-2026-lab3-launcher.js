@@ -1,13 +1,14 @@
+import { buildFall2026FinalPayload, FINAL_KINDS } from './fall-2026-final-practice.js?v=20261027b';
 import {
   WEEK_1_PRACTICE_NOTE,
   generateFall2026Quiz
-} from "./fall-2026-quiz-generator.js?v=20261027a";
+} from "./fall-2026-quiz-generator.js?v=20261027b";
 import {
   ADAPTIVE_MEMORY_KEY,
   buildFall2026AdaptivePayload,
   normalizeAdaptiveMemory,
   recordAdaptiveRound
-} from "./fall-2026-adaptive-practice.js?v=20261027a";
+} from "./fall-2026-adaptive-practice.js?v=20261027b";
 
 const CUSTOM_QUIZ_KEY = "pharmlet.custom-quiz";
 const HISTORY_KEY = "pharmlet.history";
@@ -332,6 +333,38 @@ export async function launchFall2026Lab3Adaptive(targetWeek, options = {}) {
   return payload;
 }
 
+// Full cumulative practice uses its own composer, never weekly 6+4 rules.
+export async function launchFall2026Lab3Final(mode = "balanced", options = {}) {
+  if (!FINAL_KINDS[mode]) throw new Error("Unknown Final mode.");
+  const { drugData, policy } = options.drugData && options.policy ? options : await loadSources();
+  const seed = options.seed || createFall2026PracticeSeed(10).replace("week-10", "final");
+  const evidence = mode === "adaptive" ? {
+    reviewEntries: readJson(REVIEW_KEY, []), historyEntries: readJson(HISTORY_KEY, []),
+    memory: normalizeAdaptiveMemory(readJson(ADAPTIVE_MEMORY_KEY, null)), now: options.now ?? Date.now()
+  } : {};
+  const payload = buildFall2026FinalPayload({ drugData, policy, seed, mode, ...evidence });
+  // Build and validate before writing; quota/source/capacity failures keep the
+  // previous custom payload intact and never navigate to a shortened exam.
+  localStorage.setItem(CUSTOM_QUIZ_KEY, JSON.stringify(payload));
+  window.location.assign(`quiz.html?id=custom-quiz${options.exam ? "&exam=1" : ""}`);
+  return payload;
+}
+
+async function handleFinalLaunch(mode) {
+  if (launchInFlight) return;
+  launchInFlight = true; syncAllLaunchAvailability();
+  const status = document.getElementById("final-launch-status");
+  if (status) status.textContent = "Building 100 cumulative questions…";
+  try {
+    // Yield once to let the loading state paint before bounded composition.
+    await new Promise(resolve => setTimeout(resolve, 0));
+    await launchFall2026Lab3Final(mode, { exam: Boolean(document.getElementById("final-exam-mode")?.checked) });
+  } catch (error) {
+    console.error("Final Practice launch failed:", error);
+    if (status) status.textContent = `Unable to start Final Practice: ${error.message} Try again.`;
+  } finally { launchInFlight = false; syncAllLaunchAvailability(); }
+}
+
 function getSelectedWeeklyWeek() {
   const select = document.getElementById("weekly-week");
   const week = Number(select?.value);
@@ -374,6 +407,10 @@ function setWeeklyLaunchState(busy, message = "") {
   }
 
   syncWeeklyAvailability();
+  for (const mode of ["balanced", "adaptive"]) {
+    const button = document.getElementById(`final-${mode}-launch`);
+    if (button) button.disabled = launchInFlight;
+  }
 }
 
 async function handleWeeklyLaunch() {
@@ -507,6 +544,10 @@ function syncAllLaunchAvailability() {
   syncAdaptiveAvailability();
   syncWeekFocusAvailability();
   syncWeeklyAvailability();
+  for (const mode of ["balanced", "adaptive"]) {
+    const button = document.getElementById(`final-${mode}-launch`);
+    if (button) button.disabled = launchInFlight;
+  }
 }
 
 async function handleAdaptiveLaunch() {
@@ -585,6 +626,7 @@ async function handleWeekFocusLaunch() {
 }
 
 export function initializePage() {
+  for (const mode of ["balanced", "adaptive"]) document.getElementById(`final-${mode}-launch`)?.addEventListener("click", () => handleFinalLaunch(mode));
   document.getElementById("adaptive-launch")?.addEventListener("click", handleAdaptiveLaunch);
   document.getElementById("adaptive-week")?.addEventListener("change", () => setAdaptiveState(false, ""));
   document.getElementById("week-focus-launch")?.addEventListener("click", handleWeekFocusLaunch);

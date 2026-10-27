@@ -22,7 +22,7 @@ import { loadBrowserGlobal } from "./browser-global-harness.mjs";
 import { buildFall2026Lab3Payload } from "../assets/js/fall-2026-lab3-launcher.js";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const ENGINE_TOKEN = "20261027a";
+const ENGINE_TOKEN = "20261027b";
 const REMIX_REQUEST_KEY = "pharmlet.fall-2026-lab3.boss-remix-request";
 const CUSTOM_QUIZ_KEY = "pharmlet.custom-quiz";
 const HISTORY_KEY = "pharmlet.history";
@@ -35,8 +35,8 @@ const LIFETIME_MEMORY_KEYS = [
 const PROTECTED_FALL_BASELINES = Object.freeze({
   drugData: "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01",
   policy: "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171",
-  generator: "adde462c93e39b3cb94134169ae5cc990e2930590c06bc074b34b28ddeec4b79",
-  launcher: "f127400896b40f1b3e5736d355ec317627cf8aa6b441aa4d068060a527496f38"
+  generator: "126b3b7aa070bf3e7ebc9daf8018c27e378c61ea68e5281412b674936c8a1493",
+  launcher: "0fa65e5120302a295b84a3b236e80ed5f86f01d60248f42b637afd4626dfc317"
 });
 
 const drugData = JSON.parse(read("assets/data/fall-2026-p2-top-drugs.json"));
@@ -1131,10 +1131,10 @@ test("outside the isolated display adapter, the engine still selects no Fall sou
     assert.equal(selectionSource.includes(reference), false, `quizEngine.js must not select ${reference}`);
   }
   const dynamicImports = [...engineSource.matchAll(/\bimport\s*\(/g)];
-  assert.equal(dynamicImports.length, 1, "F26-24 adds one dynamic import, the Week Focus completion bridge");
+  assert.equal(dynamicImports.length, 2, "Week Focus and Final completion each delegate launches to the shared launcher");
   assert.equal(
     [...engineSource.matchAll(/fall-2026-lab3-launcher\.js/g)].length,
-    1,
+    2,
     "that import is the existing launcher and nothing else loads it from the engine"
   );
   assert.ok(engineSource.includes('const FALL_LAB3_HUB_PAGE = "lab3-fall-2026.html";'), "continuation routes through the hub page");
@@ -1168,6 +1168,6 @@ test("normal Fall generation semantics are untouched by the continuation work", 
 test("the engine cache token is refreshed for quiz.html only", () => {
   const quiz = read("quiz.html");
   assert.ok(quiz.includes(`assets/js/quizEngine.js?v=${ENGINE_TOKEN}`), "the engine change needs a fresh cache token");
-  assert.ok(read("stats.html").includes("assets/js/stats.js?v=20260927b"), "unrelated bundles keep their tokens");
-  assert.ok(read("lab3-fall-2026.html").includes('src="assets/js/fall-2026-lab3-launcher.js?v=20261027a"'));
+  assert.ok(read("stats.html").includes("assets/js/stats.js?v=20261027b"), "unrelated bundles keep their tokens");
+  assert.ok(read("lab3-fall-2026.html").includes('src="assets/js/fall-2026-lab3-launcher.js?v=20261027b"'));
 });

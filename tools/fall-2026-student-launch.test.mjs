@@ -27,8 +27,8 @@ const FALL_LAB3_WEEKS = Array.from({ length: 10 }, (_, index) => index + 1);
 const FALL_UI_BASELINES = Object.freeze({
   drugData: "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01",
   policy: "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171",
-  generator: "adde462c93e39b3cb94134169ae5cc990e2930590c06bc074b34b28ddeec4b79",
-  launcher: "f127400896b40f1b3e5736d355ec317627cf8aa6b441aa4d068060a527496f38"
+  generator: "126b3b7aa070bf3e7ebc9daf8018c27e378c61ea68e5281412b674936c8a1493",
+  launcher: "0fa65e5120302a295b84a3b236e80ed5f86f01d60248f42b637afd4626dfc317"
 });
 
 const LEGACY_HOME_HREFS = [
@@ -354,7 +354,7 @@ test("the hub shows a Week Focus launcher with its own week select and start con
   assert.doesNotMatch(adaptive, /id="week-focus-week"|id="week-focus-launch"|id="weekly-week"|id="weekly-launch"/);
 
   assert.doesNotMatch(page, /\bdata-week-card\b|\bdata-launch-week\b/);
-  assert.ok(page.includes('src="assets/js/fall-2026-lab3-launcher.js?v=20261027a"'));
+  assert.ok(page.includes('src="assets/js/fall-2026-lab3-launcher.js?v=20261027b"'));
 });
 
 test("the hub has three distinct week selects for Adaptive, Week Focus, and Standard Weekly", () => {
@@ -551,8 +551,8 @@ test("the F26-08 presentation-only change preserves launch wiring, cache tokens,
     "utf8"
   );
 
-  assert.ok(page.includes('src="assets/js/fall-2026-lab3-launcher.js?v=20261027a"'));
-  assert.ok(launcher.includes('from "./fall-2026-quiz-generator.js?v=20261027a"'));
+  assert.ok(page.includes('src="assets/js/fall-2026-lab3-launcher.js?v=20261027b"'));
+  assert.ok(launcher.includes('from "./fall-2026-quiz-generator.js?v=20261027b"'));
   assert.ok(launcher.includes('window.location.assign("quiz.html?id=custom-quiz")'));
   assert.ok(launcher.includes('getElementById("weekly-launch")'));
   assert.doesNotMatch(launcher, /data-launch-week/);

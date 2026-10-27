@@ -19,7 +19,7 @@ const LEGACY_BASELINE = Object.freeze({
 });
 const APPROVED_ENGINE_BASELINE = Object.freeze({
   reference: "F26-24 Week Focus completion plus PR #90 display-only renderer",
-  sha256: "e19ebb5e8a6af9beea71120e3b299f0eb18082ff356d7be03e5109072d6b18ab"
+  sha256: "aa3977811dc2451249012abb5f651fd7f2ffb8e0f24379cb1237320b9344c56d"
 });
 
 function sha256(value) {
