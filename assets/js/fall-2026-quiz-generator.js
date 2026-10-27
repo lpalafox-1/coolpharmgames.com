@@ -185,8 +185,7 @@ const DOMAIN_SPECS = Object.freeze({
   }),
   topAdverseReactions: Object.freeze({
     field: "adverseReactions",
-    prompt: (reference) => `Which complete top adverse-reaction list is recorded for ${reference}?`,
-    inversePrompt: (value) => `Which drug is recorded in the Fall source with this complete top adverse-reaction list?<br><b>${value}</b>`
+    prompt: (reference) => `Which complete top adverse-reaction list is recorded for ${reference}?`
   }),
   boxWarning: Object.freeze({
     field: "boxWarning",
@@ -1171,6 +1170,7 @@ function hasCourseStyleCandidateCapacity(
     );
   }
   if (domainId === "mechanismOfAction" || domainId === "boxWarning") {
+    if (domainId === "boxWarning" && normalizeChoiceKey(sourceDrug.boxWarning) === "none") return false;
     return hasSingleAnswerPredicateCapacity(
       context,
       sourceDrug,
@@ -1348,6 +1348,9 @@ function getInverseStructuredChoicePool(
   quizWeek,
   materialType
 ) {
+  // Luis faculty-verbal report, 2026-10-27: never identify a drug by its
+  // complete ADR list, including the low-distractor inverse fallback.
+  if (domainId === "topAdverseReactions") return null;
   if (getDomainStructuralCardinality(sourceDrug, domainId) === null) return null;
   const correctDomainValueKey = getDomainValueKey(sourceDrug, domainId);
   const correctEntry = createInverseChoiceEntry(
@@ -1964,8 +1967,7 @@ function rewriteConciseBaseQuestion(question, sourceDrug) {
     const value = escapePromptHtml(styled.metadata.displayedStructuredValue.value);
     const promptByDomain = {
       drugClass: `Which drug has this class in the Fall source?<br><b>${value}</b>`,
-      fdaIndication: `Which drug has this full FDA indication list?<br><b>${value}</b>`,
-      topAdverseReactions: `Which drug has this full top ADR list?<br><b>${value}</b>`
+      fdaIndication: `Which drug has this full FDA indication list?<br><b>${value}</b>`
     };
     return { ...styled, prompt: promptByDomain[domainId] || styled.prompt };
   }
@@ -2791,6 +2793,8 @@ function materializeIdentifyDrugClassForms(context, candidate, sourceDrug, rng) 
 }
 
 function materializeIdentifyDrugValueForm(context, candidate, sourceDrug, rng) {
+  // Keep drug -> BBW available, but never reverse-identify absence of BBW.
+  if (candidate.domainId === "boxWarning" && normalizeChoiceKey(sourceDrug.boxWarning) === "none") return null;
   const predicate = withMaterialChoiceWeekRange(
     createDomainValuePredicate(candidate.domainId, sourceDrug),
     candidate.materialType,
@@ -2798,9 +2802,7 @@ function materializeIdentifyDrugValueForm(context, candidate, sourceDrug, rng) {
   );
   const prompt = candidate.domainId === "mechanismOfAction"
     ? `Which drug has the following MOA?<br><b>${escapePromptHtml(predicate.value)}</b>`
-    : normalizeChoiceKey(predicate.value) === "none"
-      ? "Which drug has no boxed warning listed?"
-      : `Which drug has the following boxed warning?<br><b>${escapePromptHtml(predicate.value)}</b>`;
+    : `Which drug has the following boxed warning?<br><b>${escapePromptHtml(predicate.value)}</b>`;
   return materializePredicateDrugQuestion({
     context,
     candidate,

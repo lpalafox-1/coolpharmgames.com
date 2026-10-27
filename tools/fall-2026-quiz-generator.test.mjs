@@ -1884,7 +1884,7 @@ test("Weeks 1-10 many-seed course-style audit preserves composition, provenance,
 });
 
 test("atomic recognition rejects source-vocabulary aliases and source Brand annotations", () => {
-  const aliasResult = generatePractice(4, "alias-review-4-267");
+  const aliasResult = generatePractice(4, "policy-fixture-4-standard-550");
   const hypertensionQuestion = aliasResult.questions.find((question) => (
     question.metadata.choicePredicate?.value === "Hypertension"
   ));
@@ -1954,7 +1954,7 @@ test("atomic recognition rejects source-vocabulary aliases and source Brand anno
 });
 
 test("Brand Generic recognition answers remain quiz-level protected or safely fall back to FITB", () => {
-  const recognitionResult = generatePractice(2, "bg-mcq-leak-2-5");
+  const recognitionResult = generatePractice(2, "policy-fixture-2-standard-0");
   const recognition = recognitionResult.questions.find(
     (question) => question.metadata.questionVariant === "brandToGenericRecognition"
   );
@@ -2169,6 +2169,9 @@ test("normal same-cardinality structured MCQs remain preferred whenever their po
       assert.equal(result.status, "materialized");
       if (normalDistractorCount >= 3) {
         assertStructuredMcqCardinality(result.question);
+      } else if (candidate.domainId === "topAdverseReactions") {
+        assert.notEqual(result.question.metadata.questionVariant, "identifyDrugByStructuredValue");
+        assertGeneratedQuestionSourceBacked(result.question);
       } else {
         assertInverseStructuredMcq(result.question);
       }
@@ -3286,7 +3289,7 @@ test("deterministic Fall 2026 seeds produce real pairwise shared-ADR questions w
   const fixtures = [
     { quizWeek: 6, seed: "pairwise-shared-adr-fixture-week-6-new-3", pair: ["p2-fall-quiz-06-drug-01", "p2-fall-quiz-06-drug-03"], material: "new" },
     { quizWeek: 6, seed: "pairwise-shared-adr-fixture-week-6-review-102", pair: ["p2-fall-quiz-05-drug-07", "p2-fall-quiz-05-drug-06"], material: "review" },
-    { quizWeek: 2, seed: "pairwise-shared-adr-fixture-week-2-0", pair: ["p2-fall-quiz-02-drug-02", "p2-fall-quiz-02-drug-05"], material: "new" }
+    { quizWeek: 2, seed: "policy-fixture-2-standard-26", pair: ["p2-fall-quiz-02-drug-02", "p2-fall-quiz-02-drug-05"], material: "new" }
   ];
   for (const fixture of fixtures) {
     const result = generate(fixture.quizWeek, fixture.seed);
@@ -3315,8 +3318,8 @@ test("reversed drug order is one pairwise concept: sorted pair, one id, one prom
   // produced from the Glyburide candidate and from the Glimepiride candidate.
   const PAIR_KEY = "p2-fall-quiz-06-drug-01+p2-fall-quiz-06-drug-03";
   const cases = [
-    { label: "Standard Week 6", seeds: ["pairwise-owner-standard-6-107", "pairwise-owner-standard-6-197"], extra: {} },
-    { label: "Week Focus 6", seeds: ["pairwise-owner-week-focus-6-57", "pairwise-owner-week-focus-6-63"], extra: { mode: "week-focus", questionCount: 10 } }
+    { label: "Standard Week 6", seeds: ["policy-fixture-6-standard-55", "policy-fixture-6-standard-102"], extra: {} },
+    { label: "Week Focus 6", seeds: ["policy-fixture-6-week-focus-25", "policy-fixture-6-week-focus-8"], extra: { mode: "week-focus", questionCount: 10 } }
   ];
   for (const { label, seeds, extra } of cases) {
     const questions = seeds.map((seed) => {

@@ -221,11 +221,10 @@ test("brand rendering escapes HTML without mutating the canonical source referen
   assert.equal(result.question.answer, drug.genericName);
 });
 
-test("raw structured inverse class, full FDA, and full top ADR templates render naturally without decorating facts", () => {
+test("allowed raw structured inverse class and full FDA templates render naturally without decorating facts", () => {
   for (const [domain, wording] of [
     ["drugClass", "Which drug has this pharmacologic class?"],
-    ["fdaIndication", "Which drug has this full FDA indication list?"],
-    ["topAdverseReactions", "Which drug has this full top ADR list?"]
+    ["fdaIndication", "Which drug has this full FDA indication list?"]
   ]) {
     let inverse;
     for (let week = 1; week <= 10 && !inverse; week += 1) {
@@ -245,9 +244,9 @@ test("raw structured inverse class, full FDA, and full top ADR templates render 
   }
 });
 
-test("400 seeded payloads match main in every field, including canonical question prompts", () => {
-  // Captured from main 3c047c83 before this change, with the same corpus.
-  assert.equal(createHash("sha256").update(JSON.stringify(generated)).digest("hex"), "9bf06660644531e6825a40f415342a6ef9f635084a6dee7278e573fc7efbbccf");
+test("400 seeded payloads reproduce the faculty-form policy revision deterministically", () => {
+  // Repinned for the faculty-verbal form suppression; renderer remains presentation-only.
+  assert.equal(createHash("sha256").update(JSON.stringify(generated)).digest("hex"), "97758b151b6a79bbd215c6a0496f423f12d0d72b0145563d1f1d1b75d4025199");
 });
 
 test("Adaptive Week 8, Standard Weekly, and Week Focus render the display convention from canonical payloads", () => {
@@ -296,19 +295,19 @@ test("Boss Remix preserves canonical prompts and renders its brand references on
   assert.ok(counts.brand > 0, "remix must exercise a brand prompt");
 });
 
-test("unchanged generator parents retain main tokens; only the engine cache and known Week Focus import catch-up change", () => {
+test("policy revision refreshes generator parents and engine cache together", () => {
   for (const [file, mainHash] of [
-    ["fall-2026-quiz-generator.js", "1260bd47cd348073c780fd3d2ff9df5b7abd82e50a700052444855e9026d1e8c"],
-    ["fall-2026-adaptive-practice.js", "611892cc80f74ffe943443a3b1ab13609a0412a77342a7fb40559d3c5720ccca"],
-    ["fall-2026-lab3-launcher.js", "db3bdf2a5532fa8af9892d3c1fd7e0aa3e0c29d38835230f139a78e5a2cf407d"]
-  ]) assert.equal(createHash("sha256").update(read(`assets/js/${file}`)).digest("hex"), mainHash, `${file}: byte-identical to main`);
+    ["fall-2026-quiz-generator.js", "adde462c93e39b3cb94134169ae5cc990e2930590c06bc074b34b28ddeec4b79"],
+    ["fall-2026-adaptive-practice.js", "5cd28f8074c1542defeb421faa8fafa77cd575e1fbe8607d0b4078204e4903cb"],
+    ["fall-2026-lab3-launcher.js", "f127400896b40f1b3e5736d355ec317627cf8aa6b441aa4d068060a527496f38"]
+  ]) assert.equal(createHash("sha256").update(read(`assets/js/${file}`)).digest("hex"), mainHash, `${file}: approved policy baseline`);
   const launcher = read("assets/js/fall-2026-lab3-launcher.js");
   const adaptive = read("assets/js/fall-2026-adaptive-practice.js");
-  for (const parent of [launcher, adaptive]) assert.match(parent, /fall-2026-quiz-generator\.js\?v=20261006a/);
-  assert.match(launcher, /fall-2026-adaptive-practice\.js\?v=20261006a/);
-  assert.match(read("lab3-fall-2026.html"), /fall-2026-lab3-launcher\.js\?v=20261006a/);
-  assert.match(read("assets/js/quizEngine.js"), /new URL\("assets\/js\/fall-2026-lab3-launcher\.js\?v=20261006a"/);
-  assert.match(read("quiz.html"), /quizEngine\.js\?v=20261006d/);
+  for (const parent of [launcher, adaptive]) assert.match(parent, /fall-2026-quiz-generator\.js\?v=20261027a/);
+  assert.match(launcher, /fall-2026-adaptive-practice\.js\?v=20261027a/);
+  assert.match(read("lab3-fall-2026.html"), /fall-2026-lab3-launcher\.js\?v=20261027a/);
+  assert.match(read("assets/js/quizEngine.js"), /new URL\("assets\/js\/fall-2026-lab3-launcher\.js\?v=20261027a"/);
+  assert.match(read("quiz.html"), /quizEngine\.js\?v=20261027a/);
 });
 
 test("student stems use natural wording without visible source-audit language", () => {
