@@ -15,6 +15,9 @@ function safe(q){
  if(!field[domain])return;
  if(m.choicePredicate?.type==='arrayContains')for(const c of m.choiceSources.filter(c=>c.role==='distractor')){
   assert.notEqual(byId.get(c.sourceDrugId).drugClass,source.drugClass,`${q.id}: unsafe exact-class inverse distractor`);
+  const proposed=byId.get(c.sourceDrugId);
+  const ownClass=drugData.drugs.filter(d=>d.quizWeek<=m.requestedQuizWeek&&d.drugClass===proposed.drugClass);
+  assert.ok(ownClass.every(d=>!d[field[domain]].map(key).includes(key(m.choicePredicate.value))),`${q.id}: distractor's own class supplies the tested fact`);
  }
  if(m.stemReference){
   const forbidden=drugData.drugs.filter(d=>d.quizWeek<=m.requestedQuizWeek&&d.drugClass===source.drugClass).flatMap(d=>d[field[domain]]).map(key);

@@ -71,6 +71,15 @@ forward fact choices cannot use facts listed for the target or its eligible
 exact-class siblings. Predicate caches and leakage rebuilds share the rule.
 No class projection, family-map expansion or new clinical inference is used.
 
+The final P1 correction makes inverse safety symmetric: a proposed distractor
+is also excluded when its own exact-class siblings list the tested fact (or
+an existing ambiguity-guard overlap). This check is independent of a predicate
+source ID and uses every source drug available through the requested quiz
+week, even outside the material choice cohort. Existing predicate cache,
+capacity and leakage rebuild paths all call the same rule. Targeted regressions
+exercise hypercholesterolemia, hyperlipidemia and hypotension with real omitted
+facts, missing source IDs, known/future week boundaries and fail-closed capacity.
+
 Unchanged positive inverse FDA/ADR facts and class-group facts retain their
 pre-#91 canonical prompts and answers, so existing fingerprints/performance
 keys match without aliases or storage rewrites. The display adapter alone adds
@@ -83,7 +92,7 @@ saved attempts and Review Queue identities are preserved. This change governs
 new generation, including fresh Standard Weekly, Week Focus, Adaptive, Boss
 Remix material and future Final pools. Old saved payloads are not migrated.
 Generator, both importing parents, hub, engine dynamic launcher import and
-engine HTML token advance together to `20261101c`; #92 advances its dependent
+engine HTML token advance together to `20261102a`; #92 advances its dependent
 chain after reconciliation. Brand ® remains render-only and never graded.
 
 ## Remaining evidence
