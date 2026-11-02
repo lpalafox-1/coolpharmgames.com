@@ -2,7 +2,7 @@
 
 Owner-requested October 27, 2026. Luis alone controls product decisions and
 merges. This prototype depends on the separate faculty-form policy change
-(46ef4d763199bb90b03123757048168651e4558c, PR #91). It is not a professor-authored
+(6cff37810160e68c5a5641f037f3cab616718fd4, PR #91). It is not a professor-authored
 final blueprint or a deployment claim.
 
 ## Source and faculty boundary
@@ -144,4 +144,4 @@ deadline/legacy-snapshot restoration, study pause and expired-resume ordering.
 
 Canonical Fall source, written policy, P1 source and Queue store remain unchanged.
 The generator/Adaptive/Final/launcher/hub/engine cache chain and Stats importer
-all use `20261101d`. Live production activation awaits Luis's merge decision.
+all use `20261102b`. Live production activation awaits Luis's merge decision.

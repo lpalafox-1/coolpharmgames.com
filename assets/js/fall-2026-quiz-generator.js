@@ -881,7 +881,7 @@ function drugMatchesChoicePredicate(drug, predicate) {
   fail("UNSUPPORTED_CHOICE_PREDICATE", `Unsupported choice predicate: ${predicate.type}.`);
 }
 
-function drugIsSafePredicateNonmatch(drug, predicate, context) {
+function drugIsSafePredicateNonmatch(drug, predicate, context, quizWeek) {
   if (drugMatchesChoicePredicate(drug, predicate)) return false;
   if (predicate.type === "domainValueEquals" && predicate.domainId === "mechanismOfAction") {
     return !moaValuesPotentiallyOverlap(getDomainQuizValue(drug, predicate.domainId), predicate.value);
@@ -901,9 +901,15 @@ function drugIsSafePredicateNonmatch(drug, predicate, context) {
   // Exact source membership decides correctness. Symmetric whole-phrase
   // containment is used only to reject potentially confusing negatives; it
   // never promotes an unlisted fact into a correct answer.
-  return getAtomicDomainValues(drug, predicate.domainId).every((value) => {
-    return !atomicFactsPotentiallyOverlap(value, predicate.value);
-  });
+  // Symmetrically inspect this proposed distractor's own exact class. Its
+  // source list may omit a fact recorded for a classmate. This check does not
+  // depend on predicate.sourceDrugId, and uses all source records available
+  // through the requested week (including classmates outside the choice cohort).
+  const canonicalClass = getCanonicalDrugClass(drug.drugClass);
+  return getAvailableDrugsThroughWeek(context, quizWeek)
+    .filter((member) => member.id === drug.id || (canonicalClass && getCanonicalDrugClass(member.drugClass) === canonicalClass))
+    .every((member) => getAtomicDomainValues(member, predicate.domainId)
+      .every((value) => !atomicFactsPotentiallyOverlap(value, predicate.value)));
 }
 
 function getPredicateChoicePools(context, predicate, quizWeek, excludedDrugId = null) {
@@ -927,7 +933,7 @@ function getPredicateChoicePools(context, predicate, quizWeek, excludedDrugId = 
       }
       if (!getSourceRecordChoiceReferences(context, drug, quizWeek).length) continue;
       if (drugMatchesChoicePredicate(drug, predicate)) matching.push(drug);
-      else if (drugIsSafePredicateNonmatch(drug, predicate, context)) nonmatching.push(drug);
+      else if (drugIsSafePredicateNonmatch(drug, predicate, context, quizWeek)) nonmatching.push(drug);
     }
     pools = { matching, nonmatching };
     context.predicateChoicePoolsCache.set(predicateKey, pools);
@@ -949,7 +955,7 @@ function hasSingleAnswerPredicateCapacity(
   if (!getSourceRecordChoiceReferences(context, sourceDrug, quizWeek).length) return false;
   const sourceMatches = drugMatchesChoicePredicate(sourceDrug, predicate);
   if (sourceMatches !== answerWhenMatches) return false;
-  if (!sourceMatches && !drugIsSafePredicateNonmatch(sourceDrug, predicate, context)) return false;
+  if (!sourceMatches && !drugIsSafePredicateNonmatch(sourceDrug, predicate, context, quizWeek)) return false;
   const pools = getPredicateChoicePools(context, predicate, quizWeek, sourceDrug.id);
   const distractors = answerWhenMatches ? pools.nonmatching : pools.matching;
   return distractors.length >= MCQ_CHOICE_COUNT - 1;
@@ -3137,7 +3143,7 @@ function rebuildPredicateChoicesForProtections(context, question, protections) {
         !drug
         || drug.quizWeek > quizWeek
         || drugMatchesChoicePredicate(drug, predicate) !== expectedMatches
-        || (!expectedMatches && !drugIsSafePredicateNonmatch(drug, predicate, context))
+        || (!expectedMatches && !drugIsSafePredicateNonmatch(drug, predicate, context, quizWeek))
       ) continue;
       const reference = getSourceRecordChoiceReferences(context, drug, quizWeek)
         .find((candidateReference) => (
