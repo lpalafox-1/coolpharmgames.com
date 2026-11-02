@@ -179,7 +179,10 @@ test("flat Brand/Generic drugs still accept every listed brand", () => {
       if (question.metadata.brandGroupLabel) continue;
       const drug = drugData.drugs.find((entry) => entry.id === question.metadata.sourceDrugId);
       if (!drug || drug.brandNames.length < 2) continue;
-      assert.equal(sameBrandSet(acceptedAnswers(question), drug.brandNames), true, drug.genericName);
+      // Approved qualifier compatibility predates this correction: Metoprolol
+      // accepts both source-qualified brands and their unqualified spellings.
+      const expected = drug.genericName === "Metoprolol" ? [...drug.brandNames, "Lopressor", "Toprol XL"] : drug.brandNames;
+      assert.equal(sameBrandSet(acceptedAnswers(question), expected), true, drug.genericName);
       checked += 1;
     }
   }

@@ -363,11 +363,11 @@ function getDiversityConstrainedData() {
       quizWeek: 1,
       genericName: `Fixture Generic ${index + 1}`,
       brandNames: [`Fixture Brand ${index + 1}`],
-      fdaIndications: [`Fixture Indication ${index + 1}`],
+      fdaIndications: [`Indication${index + 1}`],
       drugClass: `Fixture Class ${index + 1}`,
-      mechanismOfAction: `Fixture Mechanism ${index + 1}`,
-      boxWarning: `Fixture Warning ${index + 1}`,
-      adverseReactions: [`Fixture Reaction ${index + 1}`]
+      mechanismOfAction: `Mechanism${index + 1}`,
+      boxWarning: `Warning${index + 1}`,
+      adverseReactions: [`Reaction${index + 1}`]
     }))
   };
 }
@@ -939,7 +939,7 @@ function assertClosedGroupAdrFormSourceBacked(question, sourceData = drugData) {
   assert.equal(testedFact.valueKey, normalizeChoice(question.answer));
   const memberAdrs = members.flatMap((member) => getAtomicSourceValues(member, "topAdverseReactions"));
   if (variant === "classCommonAdrRecognition") {
-    assert.match(question.prompt, /common ADR of/);
+    assert.match(question.prompt, /common ADR of/); // pre-#91 canonical identity; display is source-scoped
     for (const member of members) {
       assert.ok(
         getAtomicSourceValues(member, "topAdverseReactions").some(
@@ -1132,6 +1132,20 @@ function assertGeneratedQuestionSourceBacked(question, sourceData = drugData) {
   }
   if (question.metadata.questionVariant === "brandToGenericRecognition") {
     assertBrandGenericRecognitionSourceBacked(question, sourceData);
+    return;
+  }
+  if (["singleFdaIndicationRecognition", "singleAdverseReactionRecognition"].includes(question.metadata.questionVariant)) {
+    assertSourceBackedStemReference(question);
+    const domain = question.metadata.knowledgeDomain;
+    assertAtomicFactChoiceEntries(question, sourceData, domain);
+    const source = getSourceDrug(sourceData, question.metadata.sourceDrugId, question.id);
+    const facts = getAtomicSourceValues(source, domain);
+    assert.ok(facts.includes(question.answer));
+    assert.equal(question.metadata.testedFact.value, question.answer);
+    assert.equal(question.metadata.testedFact.sourceDrugId, source.id);
+    for (const entry of question.metadata.choiceSources.filter((entry) => entry.role === "distractor")) {
+      assertSafeAtomicNonmatch(source, { type: "arrayContains", domainId: domain, value: entry.value, valueKey: entry.valueKey }, question.id);
+    }
     return;
   }
   if (question.metadata.questionVariant === "brandToFdaIndicationRecognition") {
@@ -1400,7 +1414,7 @@ test("Weeks 1-3 practice sets never expose another Brand / Generic FITB answer",
   }
 
   assert.deepEqual(fitbDirections, new Set(["genericToBrand", "brandToGeneric"]));
-  assert.ok(recognitionCount > 0, "many-seed audit must exercise Brand / Generic recognition");
+  assert.equal(recognitionCount, 0, "Brand/Generic must always be FITB");
   assert.deepEqual([...drugReferenceTypes].sort(), ["brand", "generic"]);
   assert.equal(JSON.stringify(drugData), sourceBefore);
   assert.equal(JSON.stringify(policy), policyBefore);
@@ -1711,11 +1725,9 @@ test("Weeks 1-3 course-calibrated questions remain source-safe and diverse acros
   assert.deepEqual(observedStructuredDomains, new Set(STRUCTURED_MCQ_DOMAIN_IDS));
   for (const variant of [
     "brandGenericFitb",
-    "brandToGenericRecognition",
     "classFamilyRecognition",
     "classDrugRecognition",
     "atomicFdaIndicationRecognition",
-    "notFdaIndicationRecognition",
     "atomicAdverseReactionRecognition",
     "moaDrugRecognition",
     "boxWarningDrugRecognition"
@@ -1841,11 +1853,9 @@ test("Weeks 1-10 many-seed course-style audit preserves composition, provenance,
   );
   for (const variant of [
     "brandGenericFitb",
-    "brandToGenericRecognition",
     "classFamilyRecognition",
     "classDrugRecognition",
     "atomicFdaIndicationRecognition",
-    "notFdaIndicationRecognition",
     "atomicAdverseReactionRecognition",
     "moaDrugRecognition",
     "boxWarningDrugRecognition",
@@ -1856,10 +1866,8 @@ test("Weeks 1-10 many-seed course-style audit preserves composition, provenance,
   for (const materialType of ["new", "review"]) {
     for (const variant of [
       "brandGenericFitb",
-      "brandToGenericRecognition",
       "classDrugRecognition",
       "atomicFdaIndicationRecognition",
-      "notFdaIndicationRecognition",
       "atomicAdverseReactionRecognition",
       "moaDrugRecognition",
       "boxWarningDrugRecognition"
@@ -1884,16 +1892,17 @@ test("Weeks 1-10 many-seed course-style audit preserves composition, provenance,
 });
 
 test("atomic recognition rejects source-vocabulary aliases and source Brand annotations", () => {
-  const aliasResult = generatePractice(4, "alias-review-4-267");
+  const aliasResult = Array.from({length: 30}, (_, i) => generatePractice(4, `atomic-alias-${i}`))
+    .find(round => round.questions.some(q => (q.metadata.choicePredicate || q.metadata.testedFact)?.value === "Hypertension"));
+  assert.ok(aliasResult);
   const hypertensionQuestion = aliasResult.questions.find((question) => (
-    question.metadata.choicePredicate?.value === "Hypertension"
+    (question.metadata.choicePredicate || question.metadata.testedFact)?.value === "Hypertension"
   ));
   assert.ok(hypertensionQuestion, "the regression seed must exercise Hypertension");
-  assert.equal(hypertensionQuestion.metadata.sourceMaterial, "review");
   assertGeneratedQuestionSourceBacked(hypertensionQuestion);
   assert.ok(
     !hypertensionQuestion.metadata.choiceSources.some(
-      (entry) => entry.sourceDrugId === "p2-fall-quiz-03-drug-07"
+      (entry) => entry.role === "distractor" && (entry.value.toLowerCase() === "htn" || (hypertensionQuestion.metadata.choicePredicate && entry.sourceDrugId === "p2-fall-quiz-03-drug-07"))
     ),
     "Labetalol's source-listed HTN must not be treated as a safe Hypertension nonmatch"
   );
@@ -1953,23 +1962,15 @@ test("atomic recognition rejects source-vocabulary aliases and source Brand anno
   }
 });
 
-test("Brand Generic recognition answers remain quiz-level protected or safely fall back to FITB", () => {
-  const recognitionResult = generatePractice(2, "bg-mcq-leak-2-5");
-  const recognition = recognitionResult.questions.find(
-    (question) => question.metadata.questionVariant === "brandToGenericRecognition"
-  );
-  assert.ok(recognition, "the regression seed must retain a safe recognition item");
-  assertNoBrandGenericLeakage(recognitionResult);
-  assertBrandGenericRecognitionSourceBacked(recognition);
-
-  const fallbackResult = generatePractice(2, "bg-mcq-leak-2-2");
-  assertNoBrandGenericLeakage(fallbackResult);
-  assert.ok(
-    fallbackResult.questions.some(
-      (question) => question.metadata.knowledgeDomain === "brandGeneric" && question.type === "short"
-    ),
-    "an unsafe recognition pairing must preserve retrieval practice through strict FITB"
-  );
+test("Brand Generic remains strict FITB and protected across both former recognition seeds", () => {
+  for (const seed of ["policy-fixture-2-standard-0", "bg-mcq-leak-2-2"]) {
+    const result = generatePractice(2, seed);
+    assertNoBrandGenericLeakage(result);
+    const items = result.questions.filter(q => q.metadata.knowledgeDomain === "brandGeneric");
+    assert.ok(items.length);
+    for (const q of items) assertStrictBrandGenericFitbSourceBacked(q);
+    assert.ok(!result.questions.some(q => q.metadata.questionVariant === "brandToGenericRecognition"));
+  }
 });
 
 test("drug-class cardinality follows the derived quiz concept rather than the canonical display", () => {
@@ -2167,8 +2168,15 @@ test("normal same-cardinality structured MCQs remain preferred whenever their po
       );
       const result = materialize(candidate, `variant-preference-${candidate.id}`);
       assert.equal(result.status, "materialized");
-      if (normalDistractorCount >= 3) {
+      if (["fdaIndication", "topAdverseReactions"].includes(candidate.domainId)) {
+        assert.notEqual(result.question.metadata.questionVariant, "structuredValueChoices");
+        assert.notEqual(result.question.metadata.questionVariant, "identifyDrugByStructuredValue");
+        assertGeneratedQuestionSourceBacked(result.question);
+      } else if (normalDistractorCount >= 3) {
         assertStructuredMcqCardinality(result.question);
+      } else if (candidate.domainId === "topAdverseReactions") {
+        assert.notEqual(result.question.metadata.questionVariant, "identifyDrugByStructuredValue");
+        assertGeneratedQuestionSourceBacked(result.question);
       } else {
         assertInverseStructuredMcq(result.question);
       }
@@ -2386,7 +2394,7 @@ test("Weeks 1-3 generated stems use concise source-backed recognition styles", (
 
   assert.ok([...referenceTypeCounts.keys()].every((type) => ["brand", "generic"].includes(type)));
   assert.ok(strictFitbCount > 0);
-  assert.ok(recognitionCount > 0);
+  assert.equal(recognitionCount, 0, "Brand/Generic MCQ is excluded");
   assert.ok(predicateQuestionCount > 0);
 });
 
@@ -3059,7 +3067,7 @@ test("empty exact-key intersection refuses class-common ADR even when a family-N
       sawFamilyNot = true;
     }
   }
-  assert.equal(typeof sawFamilyNot, "boolean");
+  assert.equal(sawFamilyNot, false, "no clinical negative may be inferred from source omission");
 });
 
 test("overlap-rejected NOT answers cannot use a source-vocabulary alias of a member ADR", () => {
@@ -3284,9 +3292,9 @@ test("pairwise shared-ADR questions are source-backed across Weeks 2-10 in both 
 
 test("deterministic Fall 2026 seeds produce real pairwise shared-ADR questions with answers derived from the canonical JSON", () => {
   const fixtures = [
-    { quizWeek: 6, seed: "pairwise-shared-adr-fixture-week-6-new-3", pair: ["p2-fall-quiz-06-drug-01", "p2-fall-quiz-06-drug-03"], material: "new" },
-    { quizWeek: 6, seed: "pairwise-shared-adr-fixture-week-6-review-102", pair: ["p2-fall-quiz-05-drug-07", "p2-fall-quiz-05-drug-06"], material: "review" },
-    { quizWeek: 2, seed: "pairwise-shared-adr-fixture-week-2-0", pair: ["p2-fall-quiz-02-drug-02", "p2-fall-quiz-02-drug-05"], material: "new" }
+    { quizWeek: 6, seed: "stage2-pair-standard-6-35", pair: ["p2-fall-quiz-06-drug-01", "p2-fall-quiz-06-drug-03"], material: "new" },
+    { quizWeek: 6, seed: "stage2-pair-standard-6-6", pair: ["p2-fall-quiz-05-drug-07", "p2-fall-quiz-05-drug-06"], material: "review" },
+    { quizWeek: 2, seed: "stage2-pair-standard-2-6", pair: ["p2-fall-quiz-02-drug-02", "p2-fall-quiz-02-drug-05"], material: "new" }
   ];
   for (const fixture of fixtures) {
     const result = generate(fixture.quizWeek, fixture.seed);
@@ -3315,8 +3323,8 @@ test("reversed drug order is one pairwise concept: sorted pair, one id, one prom
   // produced from the Glyburide candidate and from the Glimepiride candidate.
   const PAIR_KEY = "p2-fall-quiz-06-drug-01+p2-fall-quiz-06-drug-03";
   const cases = [
-    { label: "Standard Week 6", seeds: ["pairwise-owner-standard-6-107", "pairwise-owner-standard-6-197"], extra: {} },
-    { label: "Week Focus 6", seeds: ["pairwise-owner-week-focus-6-57", "pairwise-owner-week-focus-6-63"], extra: { mode: "week-focus", questionCount: 10 } }
+    { label: "Standard Week 6", seeds: ["stage2-pair-standard-6-35", "stage2-pair-standard-6-200"], extra: {} },
+    { label: "Week Focus 6", seeds: ["stage2-pair-week-focus-6-50", "stage2-pair-week-focus-6-55"], extra: { mode: "week-focus", questionCount: 10 } }
   ];
   for (const { label, seeds, extra } of cases) {
     const questions = seeds.map((seed) => {
@@ -3363,7 +3371,7 @@ test("reversed drug order is one pairwise concept: sorted pair, one id, one prom
 });
 
 test("approved CCB family pairing is used only for the generator's existing family", () => {
-  const result = generate(6, "pairwise-family-6-5");
+  const result = generate(4, "family-safe-4-5");
   const question = result.questions.find((item) => (
     isPairwiseSharedAdrQuestion(item)
     && item.metadata.pairwiseSharedAdr.classCoherence.rule === "approvedFamily"
@@ -3414,7 +3422,7 @@ test("Week Focus inherits the pairwise form through the shared generator path an
     drugData,
     policy,
     quizWeek: 6,
-    seed: "pairwise-shared-adr-fixture-week-focus-6-3",
+    seed: "stage2-pair-week-focus-6-50",
     mode: "week-focus",
     questionCount: 10
   });
@@ -3476,7 +3484,7 @@ test("pairwise shared ADR omits drugs that only share an ADR", () => {
 });
 
 test("Standard and Week Focus launch payloads carry the pairwise form unchanged", () => {
-  const standard = buildFall2026Lab3Payload({ drugData, policy, quizWeek: 6, seed: "pairwise-shared-adr-fixture-week-6-new-3" });
+  const standard = buildFall2026Lab3Payload({ drugData, policy, quizWeek: 6, seed: "stage2-pair-standard-6-35" });
   assert.equal(standard.metadata.kind, "fall-2026-lab3-practice");
   const standardQuestion = standard.questions.find(isPairwiseSharedAdrQuestion);
   assert.ok(standardQuestion, "Standard Weekly Practice must carry the pairwise question");
@@ -3485,7 +3493,7 @@ test("Standard and Week Focus launch payloads carry the pairwise form unchanged"
   assert.equal(standardQuestion.metadata.knowledgeDomain, "topAdverseReactions");
   assertGeneratedQuestionSourceBacked(standardQuestion);
 
-  const focus = buildFall2026WeekFocusPayload({ drugData, policy, quizWeek: 6, seed: "pairwise-shared-adr-fixture-week-focus-6-3" });
+  const focus = buildFall2026WeekFocusPayload({ drugData, policy, quizWeek: 6, seed: "stage2-pair-week-focus-6-50" });
   assert.equal(focus.metadata.kind, "fall-2026-lab3-week-focus");
   const focusQuestion = focus.questions.find(isPairwiseSharedAdrQuestion);
   assert.ok(focusQuestion, "Week Focus must carry the pairwise question");

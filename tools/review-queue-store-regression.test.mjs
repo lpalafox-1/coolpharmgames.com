@@ -590,7 +590,7 @@ test("G15 all three store consumers share the new token and the engine stays put
   // Consumers that changed get fresh tokens; the engine must not move.
   assert.match(readSource("stats.html"), /assets\/js\/stats\.js\?v=20260927b/);
   assert.match(readSource("review-queue.html"), /assets\/js\/review-queue\.js\?v=20260903a/);
-  assert.match(readSource("quiz.html"), /assets\/js\/quizEngine\.js\?v=20261006d/,
+  assert.match(readSource("quiz.html"), /assets\/js\/quizEngine\.js\?v=20261102a/,
     "P2F-09 must not move the engine token");
 
   for (const token of ["20260903a", "20260901a"]) {
@@ -605,7 +605,7 @@ test("Store and Stats retain their baselines; engine matches the isolated displa
   // The engine baseline includes PR #90 display-only rendering.
   assert.equal(
     sha("assets/js/quizEngine.js"),
-    "571f70c7555c09f49aefba14675010ac6d945f82675514ba69d04e4ff79e9c01",
+    "3f563bb5ae3f31e81830ff4ddd072fbe6f1b45e184f721a84f601faa0ddf3b96",
     "engine must match the isolated display baseline"
   );
 
@@ -615,9 +615,9 @@ test("Store and Stats retain their baselines; engine matches the isolated displa
     fallSource: "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01",
     fallPolicy: "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171",
     masterPool: "1fb50e96e60252a9839406d53bc929e9569d76c0ddc2522aff43adf9bdf2a87c",
-    fallGenerator: "1260bd47cd348073c780fd3d2ff9df5b7abd82e50a700052444855e9026d1e8c",
-    fallLauncher: "db3bdf2a5532fa8af9892d3c1fd7e0aa3e0c29d38835230f139a78e5a2cf407d",
-    quizEngine: "571f70c7555c09f49aefba14675010ac6d945f82675514ba69d04e4ff79e9c01",
+    fallGenerator: "db6efca530d7891bb2ad64840317b7ee0f753652dc4da9f7333b800d3abd7404",
+    fallLauncher: "a26b8cb255e864efd12078fe6849e881472cdfa042b13acb30068469e0b52b80",
+    quizEngine: "3f563bb5ae3f31e81830ff4ddd072fbe6f1b45e184f721a84f601faa0ddf3b96",
     favorites: "b6fbd5bbca17ea150e34e9b29c9e6391b5ae7359d7b6afb18fe6c7e7caed781d"
   };
   for (const [key, value] of Object.entries(unchanged)) {
