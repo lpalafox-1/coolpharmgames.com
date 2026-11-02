@@ -3291,7 +3291,7 @@ function rebuildInverseChoicesForProtections(context, question, protections) {
   };
 }
 
-function selectSafeBrandGenericDirections(context, questions) {
+function selectSafeBrandGenericDirections(context, questions, maxCombinations = Infinity) {
   const brandGenericIndexes = questions
     .map((question, index) => ({ question, index }))
     .filter(({ question }) => (
@@ -3321,7 +3321,7 @@ function selectSafeBrandGenericDirections(context, questions) {
       .map((variant) => ({ index, variant }));
     combinations = combinations.flatMap((combination) => (
       variants.map((variant) => [...combination, variant])
-    ));
+    )).slice(0, maxCombinations);
   }
 
   for (const combination of combinations) {
@@ -3396,8 +3396,8 @@ function stemReferenceCandidates(context, question, sourceDrug, protection) {
   });
 }
 
-function applyQuizLevelBrandGenericLeakageGuard(context, questions) {
-  const directionSafeQuestions = selectSafeBrandGenericDirections(context, questions);
+function applyQuizLevelBrandGenericLeakageGuard(context, questions, maxCombinations = Infinity) {
+  const directionSafeQuestions = selectSafeBrandGenericDirections(context, questions, maxCombinations);
   const protectedByIdentity = buildBrandGenericProtections(context, directionSafeQuestions);
   const allProtections = [...protectedByIdentity.values()];
 
@@ -3455,6 +3455,18 @@ function applyQuizLevelBrandGenericLeakageGuard(context, questions) {
   }
 
   return guardedQuestions;
+}
+
+// The cumulative composer uses the SAME complete-set source/answer guard.
+// Bound direction search for 100 items; exhaustion fails closed, never skips
+// the guard. Weekly callers keep their existing search and output.
+export function finalizeFall2026QuestionSet({ drugData, policy, questions }) {
+  const context = createContext(drugData, policy);
+  if (!Array.isArray(questions) || questions.length !== 100) {
+    fail("INVALID_FINAL_SIZE", "A cumulative Final must contain exactly 100 questions.");
+  }
+  const guarded = applyQuizLevelBrandGenericLeakageGuard(context, questions, 256);
+  return applyUnqualifiedBrandSupplements(context, guarded);
 }
 
 export function materializeQuestionCandidate({ candidate, drugData, policy, rng }) {

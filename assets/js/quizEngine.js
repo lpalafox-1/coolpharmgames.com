@@ -18,6 +18,9 @@ const THEME_KEY = "pharmlet.theme";
 const QUIZ_PROGRESS_PREFIX = "pharmlet.quiz-progress.";
 const MAX_QUESTION_REPORTS = 200;
 const QUIZ_PROGRESS_MAX_AGE_MS = 1000 * 60 * 60 * 12;
+const FINAL_TAB_PROGRESS_KEY = "pharmlet.final-progress-tab";
+const FINAL_PROGRESS_LEASE_PREFIX = "pharmlet.final-progress-lease.";
+const FINAL_INACTIVE_PROGRESS_LIMIT = 2;
 const TIMER_AUTOSAVE_INTERVAL_SECONDS = 15;
 const quizCatalog = window.PharmletQuizCatalog || null;
 const CEUTICS2_FINAL_ID = "ceutics2-final";
@@ -324,8 +327,20 @@ function renderFooterActions(q) {
     const unseenCount = Math.max(0, state.questions.length - getSeenCount());
     const canCheckAllHere = isLastQuestion && hasSeenAllQuestions() && unansweredCount > 0;
     const reviewRoundComplete = isReviewRoundComplete();
-    const perfectReviewRound = isPerfectReviewRoundComplete();
+    const perfectReviewRound = isPerfectReviewRoundComplete() && !getFallLab3FinalContext().active;
 
+    if (getFallLab3FinalContext().active && isTrueExamMode() && !state.reviewMode) {
+        if (checkBtn) checkBtn.classList.add("hidden");
+        if (nextBtn) {
+            nextBtn.classList.toggle("hidden", canCheckAllHere);
+            nextBtn.textContent = isLastQuestion ? "Review Unseen Questions" : "Next →";
+        }
+        if (checkAllBtn) {
+            checkAllBtn.classList.toggle("hidden", !canCheckAllHere);
+            checkAllBtn.textContent = "Submit 100 Answers & Finish";
+        }
+        return;
+    }
     if (checkBtn) {
         checkBtn.classList.toggle("hidden", !!q._answered);
         checkBtn.textContent = canCheckAllHere ? "Check This Answer" : "Check Answer";
@@ -1432,6 +1447,33 @@ function launchWeakAreaRetake() {
 // counters, review-queue history, and adaptive memory are never consulted here,
 // and a completed remix never writes them back (P2F-09 and F26-10 own those).
 
+function getFallLab3FinalContext(metadata = state.attemptMetadata) {
+    const kind = String(metadata?.kind || "");
+    const mode = kind === "fall-2026-lab3-final-balanced" ? "balanced"
+        : kind === "fall-2026-lab3-final-adaptive" ? "adaptive" : "";
+    return { active: Boolean(mode), mode, kind };
+}
+
+function buildFallLab3FinalBreakdown(questions = state.questions) {
+    if (!getFallLab3FinalContext().active) return null;
+    const weeks = {}, domains = {};
+    for (const q of questions) {
+        for (const [group, key] of [[weeks, q.metadata?.sourceDrugQuizWeek], [domains, q.metadata?.knowledgeDomain]]) {
+            const row = group[key] || (group[key] = { correct: 0, total: 0 });
+            row.total += 1;
+            if (q._correct) row.correct += 1;
+        }
+    }
+    return { weeks, domains };
+}
+
+function buildFallLab3FinalBreakdownMarkup(summary) {
+    if (!summary) return "";
+    const labels = { brandGeneric: "Brand / Generic", drugClass: "Drug Class", fdaIndication: "FDA Indication", mechanismOfAction: "MOA", topAdverseReactions: "Top ADRs", boxWarning: "BBW" };
+    const rows = (values, week) => Object.entries(values).map(([key, row]) => `<li>${week ? `Week ${escapeHtml(key)}` : escapeHtml(labels[key] || key)}: ${row.correct} / ${row.total}</li>`).join("");
+    return `<div class="mt-6 text-left max-w-xl mx-auto"><h3 class="font-bold">Final Practice breakdown</h3><p class="text-sm mt-2">Primary source week; practice composition, not an official final blueprint.</p><div class="grid sm:grid-cols-2 gap-4 mt-3"><ul>${rows(summary.weeks, true)}</ul><ul>${rows(summary.domains, false)}</ul></div></div>`;
+}
+
 function getFallLab3QuestionMetadata(question) {
     const metadata = question?.metadata;
     return metadata && typeof metadata === "object" && !Array.isArray(metadata) ? metadata : null;
@@ -1449,6 +1491,7 @@ let fallLab3DisplayBrandsPromise = null;
 
 function isFallLab3DisplayQuestion(question) {
     return isFallLab3Question(question)
+        || /^fall-2026-lab3-final-(?:balanced|adaptive)$/.test(String(question?.sourceQuizId || ""))
         || /^fall-2026-lab3-week-(?:[1-9]|10)-(?:practice|adaptive|week-focus|boss-remix)$/.test(String(question?.sourceQuizId || ""));
 }
 
@@ -2053,6 +2096,11 @@ function buildFallLab3HistoryLineage() {
     }
     if (!lineage.curriculumId) lineage.curriculumId = FALL_LAB3_CURRICULUM_ID;
 
+    if (getFallLab3FinalContext().active) {
+        lineage.finalMode = getFallLab3FinalContext().mode;
+        lineage.composerVersion = state.attemptMetadata?.finalPractice?.version || "";
+        lineage.eligibleWeeks = [1,2,3,4,5,6,7,8,9,10];
+    }
     return lineage;
 }
 
@@ -3475,7 +3523,10 @@ function buildGeneratedAttemptIdentity(data) {
     if (parts.length <= 2 && titleSegment !== "na") parts.push(titleSegment);
 
     const identity = `generated-${parts.join("-")}`;
-    const modeLabel = kindSegment === FALL_LAB3_BOSS_REMIX_KIND
+    const finalContext = getFallLab3FinalContext(metadata);
+    const modeLabel = finalContext.active
+        ? `final-${finalContext.mode}${isTrueExamMode() ? "-exam" : ""}`
+        : kindSegment === FALL_LAB3_BOSS_REMIX_KIND
         ? "bossRemix"
         : state.bossMode
         ? "boss"
@@ -3627,7 +3678,7 @@ function serializeQuizProgress() {
 
     syncCurrentDraftFromDom();
 
-    return {
+    const snapshot = {
         version: 1,
         routeId: getQuizProgressRouteId(),
         savedAt: Date.now(),
@@ -3655,12 +3706,125 @@ function serializeQuizProgress() {
         quizConfigId: state.quizConfig?.id || null,
         configuredModeKey: state.configuredModeKey || "",
         placeholderQuiz: !!state.placeholderQuiz,
-        modeNotice: state.modeNotice || ""
+        modeNotice: state.modeNotice || "",
+        ...(getFallLab3FinalContext().active ? {
+            finalPracticePayload: state.finalPracticePayload, finalExamDeadline: state.finalExamDeadline || null,
+            finalSaveId: state.finalSaveId, finalArtifactsRecorded: !!state.finalArtifactsRecorded,
+            completedFinal: !!(state.progressCompleted && state.historySaveFailed)
+        } : {})
     };
+    return compactFinalProgress(snapshot);
+}
+
+// Keep one immutable copy of the Final, plus small per-question deltas. The
+// original set is still available after resume/review even if another tab
+// replaces custom-quiz. Older full snapshots remain readable.
+function compactFinalProgress(snapshot) {
+    const payload = snapshot?.finalPracticePayload;
+    if (!payload?.metadata || !getFallLab3FinalContext(payload.metadata).active || !Array.isArray(payload.questions) || payload.questions.length !== 100) return snapshot;
+    const indexes = new Map(payload.questions.map((q, i) => [q.id, i]));
+    const pack = (questions) => questions.map((q) => {
+        const sourceIndex = indexes.get(q.id);
+        if (!Number.isInteger(sourceIndex)) throw new Error("Final progress does not belong to its retry payload.");
+        const original = payload.questions[sourceIndex];
+        return { sourceIndex, changes: Object.fromEntries(Object.entries(q).filter(([key, value]) => JSON.stringify(value) !== JSON.stringify(original[key]))) };
+    });
+    try {
+        return { ...snapshot, finalProgressFormat: 2, questions: pack(snapshot.questions), originalQuestions: pack(snapshot.originalQuestions || []) };
+    } catch (_) { return snapshot; } // Preserve unfamiliar legacy shapes intact.
+}
+
+function expandFinalProgress(snapshot) {
+    if (snapshot?.finalProgressFormat !== 2) return snapshot;
+    const payload = snapshot.finalPracticePayload;
+    if (!payload?.metadata || !getFallLab3FinalContext(payload.metadata).active || !Array.isArray(payload.questions) || payload.questions.length !== 100) return null;
+    const unpack = (questions) => questions.map((item) => {
+        if (!Number.isInteger(item?.sourceIndex) || item.sourceIndex < 0 || item.sourceIndex >= 100
+            || !item.changes || typeof item.changes !== "object" || Array.isArray(item.changes)) throw new Error("Invalid compact Final progress.");
+        const original = payload.questions[item.sourceIndex];
+        if (item.changes.id && item.changes.id !== original.id) throw new Error("Final question identity changed.");
+        return JSON.parse(JSON.stringify({ ...original, ...item.changes }));
+    });
+    try { return { ...snapshot, finalProgressFormat: undefined, questions: unpack(snapshot.questions), originalQuestions: unpack(snapshot.originalQuestions || []) }; }
+    catch (_) { return null; }
+}
+
+function cleanupAbandonedFinalProgress(now = Date.now()) {
+    let removed = 0;
+    try {
+        const keys = Array.from({ length: localStorage.length }, (_, i) => localStorage.key(i)).filter(Boolean);
+        const liveKeys = () => {
+            const live = new Set([state.progressKey]);
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (!key?.startsWith(FINAL_PROGRESS_LEASE_PREFIX)) continue;
+                const lease = safeReadStorageJson(key, null);
+                if (lease?.expiresAt > now) live.add(lease.progressKey);
+            }
+            return live;
+        };
+        const live = liveKeys(), candidates = [];
+        const remove = ({ key, raw }) => {
+            // Recheck both ownership and bytes so an intervening save or tab
+            // activation does not get removed by an older cleanup decision.
+            if (!liveKeys().has(key) && localStorage.getItem(key) === raw) { localStorage.removeItem(key); removed++; }
+        };
+        for (const key of keys) {
+            if (key.startsWith(FINAL_PROGRESS_LEASE_PREFIX)) {
+                const raw = localStorage.getItem(key), lease = safeReadStorageJson(key, null);
+                if (lease?.expiresAt <= now && localStorage.getItem(key) === raw) localStorage.removeItem(key);
+                continue;
+            }
+            if (!key.startsWith(QUIZ_PROGRESS_PREFIX) || live.has(key)) continue;
+            const raw = localStorage.getItem(key);
+            let saved; try { saved = JSON.parse(raw); } catch (_) { continue; }
+            if (!saved?.finalPracticePayload?.metadata || !getFallLab3FinalContext(saved.finalPracticePayload.metadata).active || !Number.isFinite(saved.savedAt)) continue;
+            if (now - saved.savedAt > QUIZ_PROGRESS_MAX_AGE_MS) remove({ key, raw });
+            else if (saved.finalProgressFormat === 2) candidates.push({ key, raw, savedAt: saved.savedAt });
+            // Recent legacy snapshots may belong to an older open player
+            // without leases. Keep them for the existing 12-hour resume window.
+        }
+        candidates.sort((a, b) => b.savedAt - a.savedAt || a.key.localeCompare(b.key));
+        candidates.slice(FINAL_INACTIVE_PROGRESS_LIMIT).forEach(remove);
+    } catch (error) { console.warn("Unable to reclaim abandoned Final progress:", error); }
+    return removed;
+}
+
+function maintainFinalProgressLease(active = true) {
+    if (!getFallLab3FinalContext().active) return;
+    try {
+        if (!active) {
+            if (state.finalLeaseHandle) clearInterval(state.finalLeaseHandle);
+            state.finalLeaseHandle = null;
+            if (state.finalLeaseKey) localStorage.removeItem(state.finalLeaseKey);
+            if (state.resultsRecorded) sessionStorage.removeItem(FINAL_TAB_PROGRESS_KEY);
+            return;
+        }
+        if (state.attemptCompleted && !state.historySaveFailed) return;
+        state.finalLeaseKey ||= `${FINAL_PROGRESS_LEASE_PREFIX}${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        sessionStorage.setItem(FINAL_TAB_PROGRESS_KEY, JSON.stringify({ progressKey: state.progressKey, exam: isTrueExamMode() }));
+        localStorage.setItem(state.finalLeaseKey, JSON.stringify({ progressKey: state.progressKey, expiresAt: Date.now() + QUIZ_PROGRESS_MAX_AGE_MS }));
+        if (!state.finalLeaseHandle) state.finalLeaseHandle = setInterval(() => maintainFinalProgressLease(), 60000);
+    } catch (error) { console.warn("Unable to protect this tab's Final progress:", error); }
+}
+
+function loadTabFinalResumePayload(fallback) {
+    if (!resumeRequestedParam && window.performance?.getEntriesByType?.("navigation")?.[0]?.type !== "reload") return fallback;
+    try {
+        const tab = JSON.parse(sessionStorage.getItem(FINAL_TAB_PROGRESS_KEY) || "null");
+        if (!tab?.progressKey?.startsWith(QUIZ_PROGRESS_PREFIX) || tab.exam !== isTrueExamMode()) return fallback;
+        const saved = safeReadStorageJson(tab.progressKey, null), payload = saved?.finalPracticePayload;
+        if (payload?.metadata && getFallLab3FinalContext(payload.metadata).active && Array.isArray(payload.questions) && payload.questions.length === 100
+            && Number.isFinite(saved.savedAt) && Date.now() - saved.savedAt <= QUIZ_PROGRESS_MAX_AGE_MS) {
+            state.finalResumeProgressKey = tab.progressKey;
+            return payload;
+        }
+    } catch (_) {}
+    return fallback;
 }
 
 function persistQuizProgress(force = false) {
-    if (!state.progressKey || !state.questions.length || state.progressCompleted) return;
+    if (!state.progressKey || !state.questions.length || (state.progressCompleted && !(getFallLab3FinalContext().active && state.historySaveFailed))) return;
     if (force) clearQueuedQuizProgressSave();
 
     const now = Date.now();
@@ -3670,6 +3834,7 @@ function persistQuizProgress(force = false) {
     if (!snapshot) return;
 
     try {
+        if (getFallLab3FinalContext().active) { maintainFinalProgressLease(); cleanupAbandonedFinalProgress(now); }
         localStorage.setItem(state.progressKey, JSON.stringify(snapshot));
         state.lastAutosaveAt = now;
         const saveLabel = force ? "Saved" : "Autosaved";
@@ -3678,6 +3843,10 @@ function persistQuizProgress(force = false) {
         renderQuizStatus();
     } catch (error) {
         console.warn("Unable to save quiz progress:", error);
+        if (getFallLab3FinalContext().active) {
+            showQuizSessionNote("Progress could not be saved in this browser. Keep this tab open or free browser storage before leaving.", "accent");
+            if (getEl("quiz-session-note-title")) getEl("quiz-session-note-title").textContent = "Progress not saved";
+        }
     }
 }
 
@@ -3706,9 +3875,13 @@ function clearQuizProgress() {
 function loadSavedQuizProgress() {
     if (!state.progressKey) return null;
 
-    const saved = safeReadStorageJson(state.progressKey, null);
+    const saved = expandFinalProgress(safeReadStorageJson(state.progressKey, null));
     if (!saved || typeof saved !== "object") return null;
-    if (saved.routeId !== getQuizProgressRouteId()) return null;
+    const ownFinalResume = getFallLab3FinalContext().active && state.finalResumeProgressKey === state.progressKey
+        && saved.finalPracticePayload?.metadata?.kind === state.attemptMetadata?.kind
+        && saved.finalPracticePayload?.metadata?.seed === state.attemptMetadata?.seed
+        && state.progressKey === `${QUIZ_PROGRESS_PREFIX}${saved.routeId}`;
+    if (saved.routeId !== getQuizProgressRouteId() && !ownFinalResume) return null;
 
     const savedAt = Number(saved.savedAt) || 0;
     if (!savedAt || (Date.now() - savedAt) > QUIZ_PROGRESS_MAX_AGE_MS) {
@@ -3726,7 +3899,7 @@ function loadSavedQuizProgress() {
     const currentTimerSeconds = Math.max(0, Number(state.generatedTimerSeconds) || 0);
     const currentQuestionLimit = Math.max(0, Number(state.generatedQuestionLimit) || 0);
 
-    if (savedTimerSeconds !== currentTimerSeconds || savedQuestionLimit !== currentQuestionLimit) {
+    if (!(ownFinalResume && saved.reviewMode) && (savedTimerSeconds !== currentTimerSeconds || savedQuestionLimit !== currentQuestionLimit)) {
         clearQuizProgress();
         return null;
     }
@@ -3742,6 +3915,8 @@ function loadSavedQuizProgress() {
 }
 
 function restoreSavedQuizProgress(snapshot) {
+    if (!snapshot) return false;
+    snapshot = expandFinalProgress(snapshot);
     if (!snapshot) return false;
 
     state.questions = snapshot.questions.map((question, index) => ({
@@ -3761,6 +3936,13 @@ function restoreSavedQuizProgress(snapshot) {
     state.timedOut = !!snapshot.timedOut;
     state.reviewMode = !!snapshot.reviewMode;
     state.bossMode = !!snapshot.bossMode;
+    if (getFallLab3FinalContext().active && isTrueExamMode() && !state.reviewMode) {
+        state.finalExamDeadline = Number.isFinite(snapshot.finalExamDeadline) && snapshot.finalExamDeadline > 0
+            ? snapshot.finalExamDeadline
+            : (Number(snapshot.savedAt) || Date.now()) + state.timerSeconds * 1000;
+        state.timerSeconds = Math.max(0, Math.ceil((state.finalExamDeadline - Date.now()) / 1000));
+        state.timerPaused = false;
+    }
     state.generatedTimerSeconds = Math.max(0, Number(snapshot.generatedTimerSeconds) || 0);
     state.generatedQuestionLimit = Math.max(0, Number(snapshot.generatedQuestionLimit) || 0);
     state.adaptiveSummary = snapshot.adaptiveSummary && typeof snapshot.adaptiveSummary === "object"
@@ -3774,7 +3956,13 @@ function restoreSavedQuizProgress(snapshot) {
     state.marked = new Set(Array.isArray(snapshot.marked) ? snapshot.marked : []);
     state.seen = new Set(Array.isArray(snapshot.seen) ? snapshot.seen : []);
     state.title = String(snapshot.title || state.title || "Quiz");
+    if (getFallLab3FinalContext().active && snapshot.finalPracticePayload?.metadata?.kind === state.attemptMetadata?.kind) state.finalPracticePayload = snapshot.finalPracticePayload;
     state.resultsRecorded = false;
+    if (getFallLab3FinalContext().active) {
+        state.finalSaveId = snapshot.finalSaveId || state.finalSaveId;
+        state.finalArtifactsRecorded = !!snapshot.finalArtifactsRecorded;
+        state.restoredCompletedFinal = !!snapshot.completedFinal;
+    }
     state.signalsRecorded = false;
     state.finalBreakdown = null;
     syncPointTotalsFromQuestions();
@@ -3791,7 +3979,9 @@ function restoreSavedQuizProgress(snapshot) {
     const when = formatSavedSessionAge(savedAt);
     state.saveStatusMessage = `Restored ${when}`;
     renderQuizStatus();
-    showQuizSessionNote(`Saved progress restored from ${when}. Answers, marks, and timer are back where you left them.`);
+    showQuizSessionNote(getFallLab3FinalContext().active && isTrueExamMode() && !state.reviewMode
+        ? `Saved progress restored from ${when}. Answers and marks are restored; the exam countdown includes time away.`
+        : `Saved progress restored from ${when}. Answers, marks, and timer are back where you left them.`);
     return true;
 }
 
@@ -3819,6 +4009,12 @@ function saveQuizHistory() {
     try {
         const raw = localStorage.getItem(HISTORY_KEY);
         const history = raw ? JSON.parse(raw) : [];
+        if (getFallLab3FinalContext().active) {
+            cleanupAbandonedFinalProgress();
+            state.historySaveFailed = false;
+            state.finalSaveId ||= `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+            if (history.some((entry) => entry.finalSaveId === state.finalSaveId)) { state.resultsRecorded = true; return; }
+        }
         const letterGradeInfo = getLetterGradeInfoForQuiz(state.score, state.questions.length);
         const finalSummary = buildStoredFinalAttemptSummary(state.questions);
         const attemptLineage = buildFallLab3HistoryLineage();
@@ -3837,12 +4033,15 @@ function saveQuizHistory() {
             hintsUsed: state.hintsUsed,
             letterGrade: letterGradeInfo?.letter || null,
             finalSummary,
+            ...(getFallLab3FinalContext().active ? { fallFinalSummary: buildFallLab3FinalBreakdown() } : {}),
+            ...(getFallLab3FinalContext().active ? { finalSaveId: state.finalSaveId } : {}),
             ...(attemptLineage ? { attemptLineage } : {})
         });
 
         localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(-200)));
         state.resultsRecorded = true;
     } catch (e) {
+        if (getFallLab3FinalContext().active) state.historySaveFailed = true;
         console.warn("Failed to save quiz history:", e);
     }
 }
@@ -3943,6 +4142,15 @@ function freezeCompletedAttemptTimer() {
 function restoreAttemptTimerAffordance() {
     const readout = getEl("timer-readout");
     if (!readout) return;
+    readout.hidden = false;
+    readout.style.display = "";
+
+    if (getFallLab3FinalContext().active && isTrueExamMode() && !state.reviewMode) {
+        readout.title = "True Exam Mode: the 100-minute countdown cannot be paused and continues across reloads.";
+        readout.onclick = null;
+        readout.classList.remove("cursor-pointer", "opacity-40", "cursor-default");
+        return;
+    }
 
     if (readout.dataset?.completed) delete readout.dataset.completed;
     readout.title = "";
@@ -3953,10 +4161,17 @@ function restoreAttemptTimerAffordance() {
 
 function applyCompletedAttemptUi() {
     state.attemptCompleted = true;
-    state.saveStatusMessage = state.reviewMode ? "Review round saved" : "Attempt saved to history";
+    state.saveStatusMessage = state.reviewMode ? "Review round saved" : state.historySaveFailed ? "History not saved" : "Attempt saved to history";
     freezeCompletedAttemptTimer();
     setCompletedAttemptControlsHidden(true);
     renderQuizStatus();
+    if (getFallLab3FinalContext().active) {
+        if (getEl("score")) getEl("score").textContent = state.score;
+        hideQuizSessionNote();
+        getEl("mode-banner")?.classList.add("hidden");
+        const timer = getEl("timer-readout");
+        if (timer) { timer.hidden = true; timer.style.display = "none"; }
+    }
 }
 
 function exitCompletedAttemptUi() {
@@ -3981,8 +4196,17 @@ function getCompletionContinuationActions({
     generatedPayload = false,
     fall = { active: false, quizWeek: 0 },
     adaptive = { active: false, targetWeek: 0 },
-    weekFocus = { active: false, quizWeek: 0 }
+    weekFocus = { active: false, quizWeek: 0 },
+    finalPractice = { active: false, mode: "" }
 } = {}) {
+    if (finalPractice.active && !bossMode) {
+        const actions = [];
+        if (missedCount > 0) actions.push({ id: "review-missed", tone: "review", label: `🎯 Review ${missedCount} Missed` });
+        actions.push({ id: "new-final-practice", tone: "primary", label: `New ${finalPractice.mode === "balanced" ? "Balanced" : "Adaptive"} Final — 100 Questions` });
+        actions.push({ id: "retry-attempt", tone: "accent", label: "Retry Same Final — 100 Questions" });
+        actions.push({ id: "lab3-hub", tone: "ghost", label: "← Return to Lab III Hub" });
+        return actions;
+    }
     // Week Focus stays a selected-week round, including after Review Missed.
     // Boss Round, Boss Remix, and New Week N Practice Set belong to Standard.
     if (weekFocus.active && !bossMode) {
@@ -4068,6 +4292,16 @@ function buildCompletionActionsMarkup(actions) {
 }
 
 function runCompletionAction(actionId) {
+    if (actionId === "new-final-practice") {
+        const context = getFallLab3FinalContext();
+        if (!context.active || state.finalLaunchInFlight) return false;
+        state.finalLaunchInFlight = true;
+        const launcherUrl = new URL("assets/js/fall-2026-lab3-launcher.js?v=20261101d", window.location.href).href;
+        import(launcherUrl).then(launcher => launcher.launchFall2026Lab3Final(context.mode, { exam: isTrueExamMode() }))
+            .catch(error => { console.warn("Final Practice launch failed:", error); alert("Unable to build a safe Final Practice set. Try again from the Lab III hub."); })
+            .finally(() => { state.finalLaunchInFlight = false; });
+        return true;
+    }
     if (actionId === "review-missed") return reviewMissed();
     if (actionId === "boss-round") return launchBossRound();
     if (actionId === "retry-attempt") return restartQuiz();
@@ -4099,7 +4333,7 @@ function runCompletionAction(actionId) {
             // so this action imports it at click time. The hub registers its
             // own startup on DOMContentLoaded; a click after load does not
             // run that startup or consume continuation requests.
-            const launcherUrl = new URL("assets/js/fall-2026-lab3-launcher.js?v=20261101c", window.location.href).href;
+            const launcherUrl = new URL("assets/js/fall-2026-lab3-launcher.js?v=20261101d", window.location.href).href;
             import(launcherUrl)
                 .then((launcher) => {
                     if (typeof launcher.launchFall2026Lab3WeekFocus !== "function") {
@@ -4134,6 +4368,10 @@ function restartQuiz() {
     // warning would be false there. Unfinished runs keep the accurate warning.
     if (!state.attemptCompleted && !confirm("🔄 Restart this quiz? Your progress will be lost.")) return;
 
+    if (getFallLab3FinalContext().active && state.finalPracticePayload) {
+        try { localStorage.setItem(CUSTOM_QUIZ_KEY, JSON.stringify(state.finalPracticePayload)); }
+        catch (error) { alert("Unable to save this exact Final for retry. Free browser storage and try again."); return; }
+    }
     state.progressCompleted = true;
     clearQuizProgress();
     location.reload();
@@ -4240,7 +4478,7 @@ function finishQuizDueToTimeout() {
 }
 
 function handleNextAction() {
-    if (isPerfectReviewRoundComplete()) {
+    if (isPerfectReviewRoundComplete() && !getFallLab3FinalContext().active) {
         replayCurrentReviewRound();
         return;
     }
@@ -7773,6 +8011,7 @@ function renderNavMap() {
             colorClass = "bg-slate-200 text-slate-800 border border-slate-400";
         }
         btn.className = `w-8 h-8 rounded-lg text-xs font-bold transition-all ${i === state.index ? 'ring-2 ring-blue-500 scale-110' : ''} ${colorClass}`;
+        if (getFallLab3FinalContext().active && i === state.index) btn.dataset.finalCurrent = "true";
         btn.textContent = i + 1;
         btn.title = isMarked ? `Question ${i + 1} marked for review` : `Question ${i + 1}`;
         btn.style.outline = isMarked ? "2px solid #facc15" : "";
@@ -7780,6 +8019,10 @@ function renderNavMap() {
         btn.onclick = () => { jumpToQuestion(i); };
         nav.appendChild(btn);
     });
+    if (getFallLab3FinalContext().active && nav.scrollHeight > nav.clientHeight) {
+        const current = nav.querySelector?.('[data-final-current="true"]');
+        if (current) nav.scrollTop = current.offsetTop - nav.clientHeight / 2 + 16;
+    }
 }
 
 // --- 4. SYSTEM WIRING ---
@@ -7795,6 +8038,7 @@ function wireEvents() {
         "next": handleNextAction,
         "prev": () => { if (state.index > 0) jumpToQuestion(state.index - 1); },
         "check": () => {
+            if (getFallLab3FinalContext().active && isTrueExamMode() && !state.reviewMode) return handleNextAction();
             const q = state.questions[state.index];
             if (!q) return;
             let val = null;
@@ -7886,6 +8130,7 @@ function wireEvents() {
 }
 
 function toggleTimer() {
+    if (getFallLab3FinalContext().active && isTrueExamMode() && !state.reviewMode) return;
     if (state.attemptCompleted) return;
     if (!state.timerHandle && state.timerSeconds <= 0) return;
 
@@ -7917,7 +8162,9 @@ function timerTick() {
         return;
     }
 
-    state.timerSeconds--;
+    if (getFallLab3FinalContext().active && isTrueExamMode() && !state.reviewMode && state.finalExamDeadline) {
+        state.timerSeconds = Math.max(0, Math.ceil((state.finalExamDeadline - Date.now()) / 1000));
+    } else state.timerSeconds--;
     const mins = Math.floor(state.timerSeconds / 60);
     const secs = state.timerSeconds % 60;
     const readout = getEl("timer-readout");
@@ -7944,6 +8191,9 @@ function startSmartTimer() {
         ? 600
         : (isFinalExam ? FINAL_EXAM_TIMER_SECONDS : (weekParam ? 600 : (count <= 20 ? 900 : (count <= 50 ? 2700 : 7200))));
     state.timerPaused = false;
+    state.finalExamDeadline = getFallLab3FinalContext().active && isTrueExamMode() && !state.reviewMode
+        ? Date.now() + 100 * 60 * 1000 : null;
+    if (getFallLab3FinalContext().active && getEl("timer-readout")) getEl("timer-readout").textContent = `${Math.floor(state.timerSeconds / 60)}:${String(state.timerSeconds % 60).padStart(2, "0")}`;
     state.timerHandle = setInterval(timerTick, 1000);
 }
 
@@ -8304,9 +8554,10 @@ function showResults() {
     // A Boss Remix saves its own score and history, but never amplifies
     // longitudinal weakness memory (P2F-09 and F26-10 own those semantics).
     const remixAttempt = isFallLab3BossRemixAttempt();
-    const shouldRecordLongitudinalSignals = shouldPersistResults && !remixAttempt;
+    const finalAlreadyRecorded = getFallLab3FinalContext().active && state.finalArtifactsRecorded;
+    const shouldRecordLongitudinalSignals = shouldPersistResults && !remixAttempt && !finalAlreadyRecorded;
     const shouldRecordAttemptArtifacts = shouldPersistResults && !state.resultsRecorded;
-    clearQuizProgress();
+    if (!getFallLab3FinalContext().active) clearQuizProgress();
 
     if (state.reviewMode) {
         saveReviewRoundResultsToReviewQueue(state.questions);
@@ -8356,6 +8607,11 @@ function showResults() {
         }
     }
     
+    if (getFallLab3FinalContext().active) {
+        state.finalArtifactsRecorded = true;
+        if (state.historySaveFailed) persistQuizProgress(true);
+        else { clearQuizProgress(); maintainFinalProgressLease(false); }
+    }
     const card = getEl("question-card");
     const missed = state.questions.filter(q => q._answered && !q._correct);
     const hintsNote = state.hintsUsed > 0 ? `<p class="text-sm opacity-60 mt-2">💡 Hints used: ${state.hintsUsed}</p>` : '';
@@ -8382,15 +8638,22 @@ function showResults() {
         generatedPayload: GENERATED_QUIZ_IDS.has(quizId),
         fall: fallContext,
         adaptive: adaptiveContext,
-        weekFocus: weekFocusContext
+        weekFocus: weekFocusContext,
+        finalPractice: getFallLab3FinalContext()
     });
     const continuationMarkup = buildCompletionActionsMarkup(continuationActions);
     const savedNote = state.reviewMode
         ? `<p class="text-sm opacity-70 mt-2">Review mastery is saved to your review queue for this round.</p>`
+        : getFallLab3FinalContext().active
+        ? state.historySaveFailed
+            ? `<div id="final-history-status" role="alert" class="mt-3 text-sm font-bold">History could not be saved. This score is not yet in Stats. Keep this tab open.<br><button id="retry-final-history" class="mt-2 rounded-lg border px-4 py-2">Retry Saving History</button></div>`
+            : `<p class="text-sm opacity-70 mt-2">✅ This attempt is saved to this browser's history.</p>`
         : remixAttempt
         ? `<p class="text-sm opacity-70 mt-2">✅ Saved to this browser: this Boss Remix attempt's history and high score. Boss Remix stays a bounded challenge, so it does not feed lifetime weakness, review-queue, or adaptive memory.</p>`
         : `<p class="text-sm opacity-70 mt-2">✅ Saved to this browser: history, high score, and review queue. Nothing else is needed to keep this attempt.</p>`;
-    const continuationNote = weekFocusContext.active && !state.bossMode
+    const continuationNote = getFallLab3FinalContext().active
+        ? `<p class="mt-4 text-xs opacity-70 max-w-xl mx-auto">Retry Same Final reloads the original ordered 100-question set. New Final builds a fresh set with ten questions per week. Review Missed keeps this Final’s mode and does not overwrite its score.</p>`
+        : weekFocusContext.active && !state.bossMode
         ? `<p class="mt-4 text-xs opacity-70 max-w-xl mx-auto">${state.reviewMode
             ? `Restart Full Set reloads this exact Week ${weekFocusContext.quizWeek} Focus set. `
             : `Retry This Set repeats these exact questions. `}New Week ${weekFocusContext.quizWeek} Focus builds a fresh 10-question set from Week ${weekFocusContext.quizWeek} only, with no prior-week review.</p>`
@@ -8407,7 +8670,9 @@ function showResults() {
     const weightedSummary = usesWeightedPointScoring()
         ? `${state.pointScore} / ${state.totalPoints} points • ${state.score} / ${state.questions.length} correct`
         : `${state.score} / ${state.questions.length}`;
-    const resultsHeading = state.bossMode
+    const resultsHeading = getFallLab3FinalContext().active && !state.reviewMode
+        ? `${getFallLab3FinalContext().mode === "balanced" ? "Balanced" : "Adaptive"} Final Practice Complete!`
+        : state.bossMode
         ? (missed.length === 0 ? "Boss Cleared!" : "Boss Round Complete!")
         : state.reviewMode
         ? "Review Round Complete!"
@@ -8444,7 +8709,9 @@ function showResults() {
     const examModeMarkup = isTrueExamMode()
         ? `<p class="text-sm opacity-70 mt-2">True Exam Mode was active for this attempt.</p>`
         : "";
-    const breakdownMarkup = buildFinalBreakdownMarkup(finalBreakdown);
+    const breakdownMarkup = getFallLab3FinalContext().active
+        ? buildFallLab3FinalBreakdownMarkup(buildFallLab3FinalBreakdown())
+        : buildFinalBreakdownMarkup(finalBreakdown);
     
     if (card) card.innerHTML = `<div class="text-center py-10">
         <h2 class="text-4xl font-black mb-4">${resultsHeading}</h2>
@@ -8468,6 +8735,19 @@ function showResults() {
 
     wireCompletionActions(card);
     applyCompletedAttemptUi();
+    const retryHistory = getEl("retry-final-history");
+    if (getFallLab3FinalContext().active && state.historySaveFailed) {
+        card.querySelectorAll?.("[data-completion-action]").forEach((button) => { button.disabled = true; });
+    }
+    if (getFallLab3FinalContext().active && state.historySaveFailed && retryHistory) retryHistory.onclick = () => {
+        saveQuizHistory();
+        if (state.resultsRecorded) {
+            clearQuizProgress(); maintainFinalProgressLease(false);
+            getEl("final-history-status").textContent = "✅ This attempt is saved to this browser's history.";
+            state.saveStatusMessage = "Attempt saved to history"; renderQuizStatus();
+            card.querySelectorAll?.("[data-completion-action]").forEach((button) => { button.disabled = false; });
+        }
+    };
 }
 
 function shuffled(a) { return [...a].sort(() => 0.5 - Math.random()); }
@@ -8483,6 +8763,7 @@ async function main() {
         state.adaptiveSummary = null;
         state.questionReportContext = {};
         state.attemptMetadata = null;
+        state.finalResumeProgressKey = null;
         let filteredPool = [];
         let fullPool = [];
         let storageKey = null;
@@ -8680,6 +8961,7 @@ async function main() {
             let data = GENERATED_QUIZ_IDS.has(quizId)
                 ? loadGeneratedQuizFromStorage(quizId)
                 : await loadQuizDataForId(quizId);
+            if (quizId === "custom-quiz") data = loadTabFinalResumePayload(data);
             if (!data) {
                 throw new Error(`Quiz "${quizId}" is not available. Try recreating it from the source page.`);
             }
@@ -8699,6 +8981,8 @@ async function main() {
             state.questionReportContext = data?.metadata && typeof data.metadata === "object" && !Array.isArray(data.metadata)
                 ? { ...data.metadata }
                 : {};
+            state.finalPracticePayload = getFallLab3FinalContext(data?.metadata).active ? JSON.parse(JSON.stringify(data)) : null;
+            if (getFallLab3FinalContext(data?.metadata).active) document.body?.setAttribute?.("data-fall-final", "true");
             state.attemptMetadata = data?.metadata && typeof data.metadata === "object" && !Array.isArray(data.metadata)
                 ? { ...data.metadata }
                 : null;
@@ -8706,7 +8990,9 @@ async function main() {
             state.activeModeConfig = getEffectiveQuizModeConfig(data);
             state.configuredModeKey = state.activeModeConfig?._modeKey || "";
             state.placeholderQuiz = data?.meta?.placeholder === true;
-            state.modeNotice = takeFallLab3RemixNotice();
+            state.modeNotice = getFallLab3FinalContext(data.metadata).active
+                ? ""
+                : takeFallLab3RemixNotice();
             state.generatedTimerSeconds = Math.max(0, Number(state.activeModeConfig?.timerSeconds ?? data?.metadata?.timerSeconds) || 0);
             state.generatedQuestionLimit = Math.max(0, Number(state.activeModeConfig?.questionLimit ?? data?.metadata?.questionLimit) || 0);
             state.generatedAttemptIdentity = GENERATED_QUIZ_IDS.has(quizId)
@@ -8760,7 +9046,11 @@ async function main() {
                 storageKey = state.generatedAttemptIdentity?.scoreStorageKey || `pharmlet.${quizId}.${modeParam}`;
             } else {
                 state.title = data.title || "Quiz";
-                state.questions = shuffled(applyQuestionLimit(pool)).map((q, i) => ({ ...q, _id: i }));
+                if (getFallLab3FinalContext().active && (pool.length !== 100 || !data.metadata?.finalPractice || !["fall-final100-v1", "fall-final100-v2"].includes(data.metadata.finalPractice.version))) {
+                    throw new Error("Final Practice requires a complete validated 100-question payload.");
+                }
+                const orderedPool = getFallLab3FinalContext().active ? pool : shuffled(applyQuestionLimit(pool));
+                state.questions = orderedPool.map((q, i) => ({ ...q, _id: i }));
                 storageKey = state.generatedAttemptIdentity?.scoreStorageKey || `pharmlet.${quizId}.${modeParam}`;
 
                 // Skip to render for legacy quizzes
@@ -8862,7 +9152,11 @@ async function main() {
 
 // Helper function to complete quiz setup
 function finishSetup(storageKey) {
-    state.progressKey = getQuizProgressKey();
+    if (getFallLab3FinalContext().active) {
+        state.historySaveFailed = false; state.finalSaveId = null;
+        state.finalArtifactsRecorded = false; state.restoredCompletedFinal = false;
+    }
+    state.progressKey = state.finalResumeProgressKey || getQuizProgressKey();
     hideQuizSessionNote();
 
     if (getEl("quiz-title")) getEl("quiz-title").textContent = state.title;
@@ -8909,13 +9203,18 @@ function finishSetup(storageKey) {
     } else if (savedSnapshot) {
         const ageLabel = formatSavedSessionAge(savedSnapshot.savedAt);
         const promptLabel = getSavedSessionPromptLabel(savedSnapshot);
-        const resumeSaved = confirm(`Resume ${promptLabel} from ${ageLabel}?\n\nChoose OK to resume it, or Cancel to start a fresh run and clear the saved session.`);
+        const strictFinal = getFallLab3FinalContext().active && isTrueExamMode() && !savedSnapshot.reviewMode;
+        const resumeSaved = confirm(strictFinal
+            ? `Resume saved True Exam ${promptLabel} from ${ageLabel}? Its 100-minute clock has continued running.\n\nOK resumes the same attempt and deadline. Cancel abandons that saved progress and starts a new attempt with a new 100-minute clock.`
+            : `Resume ${promptLabel} from ${ageLabel}?\n\nChoose OK to resume it, or Cancel to start a fresh run and clear the saved session.`);
 
         if (resumeSaved) {
             restored = restoreSavedQuizProgress(savedSnapshot);
         } else {
             clearQuizProgress();
-            showQuizSessionNote(`Starting fresh. The older saved session from ${ageLabel} was cleared for this new run.`, "accent");
+            showQuizSessionNote(strictFinal
+                ? "Saved exam abandoned. This is a new attempt with a new 100-minute clock."
+                : `Starting fresh. The older saved session from ${ageLabel} was cleared for this new run.`, "accent");
         }
     }
 
@@ -8934,11 +9233,13 @@ function finishSetup(storageKey) {
 
     wireEvents();
     applyAttemptModeUI();
+    if (getFallLab3FinalContext().active && isTrueExamMode() && !state.reviewMode) restoreAttemptTimerAffordance();
 
     if (!state.progressLifecycleBound) {
-        const persistNow = () => persistQuizProgress(true);
+        const persistNow = () => { persistQuizProgress(true); maintainFinalProgressLease(false); };
         window.addEventListener("pagehide", persistNow);
         window.addEventListener("beforeunload", persistNow);
+        window.addEventListener("pageshow", () => { if (getFallLab3FinalContext().active) { maintainFinalProgressLease(); persistQuizProgress(true); } });
         state.progressLifecycleBound = true;
     }
     
@@ -8957,6 +9258,12 @@ function finishSetup(storageKey) {
     localStorage.setItem("pharmlet.last-quiz", lastQuizParam);
     
     render();
+    // Render/setup first so an expired resume cannot overwrite its results.
+    if (getFallLab3FinalContext().active && state.restoredCompletedFinal) showResults();
+    else if (getFallLab3FinalContext().active && isTrueExamMode() && !state.reviewMode && state.timerSeconds <= 0) {
+        finishQuizDueToTimeout();
+    }
+    if (getFallLab3FinalContext().active && !state.attemptCompleted) { maintainFinalProgressLease(); cleanupAbandonedFinalProgress(); }
 }
 
 document.addEventListener('DOMContentLoaded', main);

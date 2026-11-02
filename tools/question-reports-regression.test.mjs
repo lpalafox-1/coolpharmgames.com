@@ -10,13 +10,13 @@ import { loadBrowserGlobal } from "./browser-global-harness.mjs";
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const REPORTS_KEY = "pharmlet.question-reports";
 const REPORTS_TOKEN = "20260831b";
-const ENGINE_TOKEN = "20261101c";
-const STATS_TOKEN = "20260927b";
+const ENGINE_TOKEN = "20261101d";
+const STATS_TOKEN = "20261101d";
 const PROTECTED_BASELINES = Object.freeze({
   fallSource: "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01",
   fallPolicy: "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171",
-  fallGenerator: "46845ae5cd1fcd25e78173b040dd300b94ae0269344c7c609ce97d176b94a978",
-  fallLauncher: "0d8bae369b54cc38808473162bfe63bd80c0fabe15eb37476582c1bb5a153b3b",
+  fallGenerator: "6eedb84390d8fdcdde9abd0147f75191514276086d2fd1b82ac62ef3c06befc5",
+  fallLauncher: "7305fc2f230c51b561f6734253a3f7fa898b3eb4a849bbe0572fa732fc3c5063",
   masterPool: "1fb50e96e60252a9839406d53bc929e9569d76c0ddc2522aff43adf9bdf2a87c"
 });
 

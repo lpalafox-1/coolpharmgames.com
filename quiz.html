@@ -66,6 +66,7 @@
        375px phone the question used to start 58% of the way down the screen,
        with Check Answer 1.6 screens below that. */
     @media (max-width: 1023px) {
+      body[data-fall-final="true"] #nav-map { position: relative; max-height: 6.5rem; overflow-y: auto; padding: .25rem; }
       /* #quiz-title already names the round above the question. #drug-context
          repeated it verbatim on every route: Fall and Top Drugs use the round
          title itself, and each Endocrine context label is a subset of its own
@@ -299,6 +300,6 @@
   <script src="assets/js/top-drugs-data.js?v=20260419a"></script>
   <script src="assets/js/review-queue-store.js?v=20260903a"></script>
   <script src="assets/js/question-reports.js?v=20260831b"></script>
-  <script src="assets/js/quizEngine.js?v=20261101c"></script>
+  <script src="assets/js/quizEngine.js?v=20261101d"></script>
 </body>
 </html>
