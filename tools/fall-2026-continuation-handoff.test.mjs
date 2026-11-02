@@ -326,7 +326,8 @@ test("the hub ships the repaired launcher and the homepage names the quick links
 
   const homepage = read("index.html");
   assert.doesNotMatch(homepage, /Jump straight to a week/, "the old label promised a launch that no longer happens");
-  assert.match(homepage, /Standard Weekly Practice · opens the Hub with your week selected/);
+  assert.match(homepage, /aria-label="Standard Weekly Practice shortcuts"/);
+  assert.match(homepage, /Week links open practice setup/);
   for (const quizWeek of [1, 2, 3]) {
     assert.ok(homepage.includes(`href="lab3-fall-2026.html?week=${quizWeek}"`), "quick-link hrefs are unchanged");
   }
