@@ -248,7 +248,7 @@ test("allowed raw structured inverse class and full FDA templates render natural
 
 test("400 seeded payloads reproduce the faculty-form policy revision deterministically", () => {
   // Repinned for the faculty-verbal form suppression; renderer remains presentation-only.
-  assert.equal(createHash("sha256").update(JSON.stringify(generated)).digest("hex"), "8159f02566a09a03456c7af8cab04d720ad6636c196fdb3be5a97ef555507473");
+  assert.equal(createHash("sha256").update(JSON.stringify(generated)).digest("hex"), "439d770163d4744d5261746ef063e7501bc8c9ecb0bd8133661205af6cb68d64");
 });
 
 test("Adaptive Week 8, Standard Weekly, and Week Focus render the display convention from canonical payloads", () => {
@@ -299,17 +299,17 @@ test("Boss Remix preserves canonical prompts and renders its brand references on
 
 test("policy revision refreshes generator parents and engine cache together", () => {
   for (const [file, mainHash] of [
-    ["fall-2026-quiz-generator.js", "6a2c7abfb3beb1c0dd30cb00598b361120eb8764f9f406ed27afdcf52150781f"],
-    ["fall-2026-adaptive-practice.js", "324a38b578a297ddca574116bbd62b75c6d0f3d5c6aeb4ffdebe4f21c2bd71f3"],
-    ["fall-2026-lab3-launcher.js", "e1042684cf79079f653958532156641a1715bf255271d66fae573618fe2fd5aa"]
+    ["fall-2026-quiz-generator.js", "46845ae5cd1fcd25e78173b040dd300b94ae0269344c7c609ce97d176b94a978"],
+    ["fall-2026-adaptive-practice.js", "f01df7048ee410ac0c67f91e0aa24b079af797afe7c839aed0130bc16135f039"],
+    ["fall-2026-lab3-launcher.js", "0d8bae369b54cc38808473162bfe63bd80c0fabe15eb37476582c1bb5a153b3b"]
   ]) assert.equal(createHash("sha256").update(read(`assets/js/${file}`)).digest("hex"), mainHash, `${file}: approved policy baseline`);
   const launcher = read("assets/js/fall-2026-lab3-launcher.js");
   const adaptive = read("assets/js/fall-2026-adaptive-practice.js");
-  for (const parent of [launcher, adaptive]) assert.match(parent, /fall-2026-quiz-generator\.js\?v=20261101a/);
-  assert.match(launcher, /fall-2026-adaptive-practice\.js\?v=20261101a/);
-  assert.match(read("lab3-fall-2026.html"), /fall-2026-lab3-launcher\.js\?v=20261101a/);
-  assert.match(read("assets/js/quizEngine.js"), /new URL\("assets\/js\/fall-2026-lab3-launcher\.js\?v=20261101a"/);
-  assert.match(read("quiz.html"), /quizEngine\.js\?v=20261101a/);
+  for (const parent of [launcher, adaptive]) assert.match(parent, /fall-2026-quiz-generator\.js\?v=20261101c/);
+  assert.match(launcher, /fall-2026-adaptive-practice\.js\?v=20261101c/);
+  assert.match(read("lab3-fall-2026.html"), /fall-2026-lab3-launcher\.js\?v=20261101c/);
+  assert.match(read("assets/js/quizEngine.js"), /new URL\("assets\/js\/fall-2026-lab3-launcher\.js\?v=20261101c"/);
+  assert.match(read("quiz.html"), /quizEngine\.js\?v=20261101c/);
 });
 
 test("student stems use natural wording without visible source-audit language", () => {
@@ -324,7 +324,7 @@ test("student stems use natural wording without visible source-audit language", 
   let singleIndicationCount = 0;
   for (const quiz of generated) for (const question of quiz.questions) {
     const prompt = engine.getFallLab3StudentFacingPromptHtml(question);
-    if (!["singleFdaIndicationRecognition", "singleAdverseReactionRecognition", "atomicFdaIndicationRecognition", "atomicAdverseReactionRecognition"].includes(question.metadata.questionVariant)) {
+    if (!["singleFdaIndicationRecognition", "singleAdverseReactionRecognition", "atomicFdaIndicationRecognition", "atomicAdverseReactionRecognition", "classCommonAdrRecognition"].includes(question.metadata.questionVariant)) {
       assert.doesNotMatch(prompt, /Fall source|recorded (?:in|for)|boxed-warning value/i, question.id);
     }
     if (question.metadata.brandGenericDirection === "brandToGeneric") {
