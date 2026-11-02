@@ -248,7 +248,7 @@ test("allowed raw structured inverse class and full FDA templates render natural
 
 test("400 seeded payloads reproduce the faculty-form policy revision deterministically", () => {
   // Repinned for the faculty-verbal form suppression; renderer remains presentation-only.
-  assert.equal(createHash("sha256").update(JSON.stringify(generated)).digest("hex"), "30d37ad96eab1501094834f8956e1bf548f82b3fad16870752c8e7b2734275c5");
+  assert.equal(createHash("sha256").update(JSON.stringify(generated)).digest("hex"), "8159f02566a09a03456c7af8cab04d720ad6636c196fdb3be5a97ef555507473");
 });
 
 test("Adaptive Week 8, Standard Weekly, and Week Focus render the display convention from canonical payloads", () => {
@@ -299,7 +299,7 @@ test("Boss Remix preserves canonical prompts and renders its brand references on
 
 test("policy revision refreshes generator parents and engine cache together", () => {
   for (const [file, mainHash] of [
-    ["fall-2026-quiz-generator.js", "9a806c13e57e74cef2aa64e25624293dd13a01b4ba4ac92a7d062a4576a55608"],
+    ["fall-2026-quiz-generator.js", "1303cc7e469f8de3795f6e45b62b3c107229bfd399b647dfa8abed3dbc6e3b95"],
     ["fall-2026-adaptive-practice.js", "d758774e8faa40d88c37e950374dde409576d683407485c69db5bf10be1cc548"],
     ["fall-2026-lab3-launcher.js", "1c4280293a80db17a2fd55ffb4510976d03b21e6a747df6cc7e1ca38a61904e3"]
   ]) assert.equal(createHash("sha256").update(read(`assets/js/${file}`)).digest("hex"), mainHash, `${file}: approved policy baseline`);

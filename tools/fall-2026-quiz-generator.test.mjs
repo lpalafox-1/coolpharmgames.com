@@ -939,7 +939,8 @@ function assertClosedGroupAdrFormSourceBacked(question, sourceData = drugData) {
   assert.equal(testedFact.valueKey, normalizeChoice(question.answer));
   const memberAdrs = members.flatMap((member) => getAtomicSourceValues(member, "topAdverseReactions"));
   if (variant === "classCommonAdrRecognition") {
-    assert.match(question.prompt, /common ADR of/);
+    assert.match(question.prompt, /listed for every member of/);
+    assert.ok(question.prompt.includes(`source group in Weeks ${question.metadata.closedGroup.eligibleChoiceQuizWeekRange.join("–")}`));
     for (const member of members) {
       assert.ok(
         getAtomicSourceValues(member, "topAdverseReactions").some(
@@ -3294,7 +3295,7 @@ test("deterministic Fall 2026 seeds produce real pairwise shared-ADR questions w
   const fixtures = [
     { quizWeek: 6, seed: "faculty-pair-standard-6-3", pair: ["p2-fall-quiz-06-drug-01", "p2-fall-quiz-06-drug-03"], material: "new" },
     { quizWeek: 6, seed: "faculty-pair-standard-6-69", pair: ["p2-fall-quiz-05-drug-07", "p2-fall-quiz-05-drug-06"], material: "review" },
-    { quizWeek: 2, seed: "faculty-pair-standard-2-45", pair: ["p2-fall-quiz-02-drug-02", "p2-fall-quiz-02-drug-05"], material: "new" }
+    { quizWeek: 2, seed: "faculty-pair-standard-2-54", pair: ["p2-fall-quiz-02-drug-02", "p2-fall-quiz-02-drug-05"], material: "new" }
   ];
   for (const fixture of fixtures) {
     const result = generate(fixture.quizWeek, fixture.seed);

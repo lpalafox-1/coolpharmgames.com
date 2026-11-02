@@ -41,7 +41,8 @@ export function isFall2026QuestionFormAllowed(question) {
   if (domain === "fdaIndication") return ["singleFdaIndicationRecognition", "brandToFdaIndicationRecognition", "atomicFdaIndicationRecognition"].includes(variant);
   if (domain === "topAdverseReactions") return ["singleAdverseReactionRecognition", "atomicAdverseReactionRecognition", "classCommonAdrRecognition", "pairwiseSharedAdrRecognition"].includes(variant);
   if (domain === "boxWarning") return (!variant || variant === "boxWarningDrugRecognition")
-    && normalizeChoiceKey(question.answer) !== "none" && normalizeChoiceKey(m.choicePredicate?.value) !== "none";
+    && normalizeChoiceKey(question.answer) !== "none" && normalizeChoiceKey(m.choicePredicate?.value) !== "none"
+    && !(question.choices || []).some((choice) => normalizeChoiceKey(choice) === "none");
   if (domain === "mechanismOfAction") return !variant || variant === "moaDrugRecognition";
   return domain === "drugClass" && [undefined, "structuredValueChoices", "identifyDrugByStructuredValue", "classFamilyRecognition", "classDrugRecognition"].includes(variant);
 }
@@ -1285,6 +1286,7 @@ function getDistinctDistractorEntries(
     const key = getDomainValueKey(drug, domainId);
     if (
       (domainId === "drugClass" && !key)
+      || (domainId === "boxWarning" && key === "none")
       || key === correctKey
       || (domainId === "mechanismOfAction" && moaValuesPotentiallyOverlap(value, getDomainQuizValue(sourceDrug, domainId)))
       || (domainId === "boxWarning" && atomicFactsPotentiallyOverlap(value, getDomainQuizValue(sourceDrug, domainId)))
@@ -2297,7 +2299,7 @@ function materializeClassCommonAdrRecognition(
   return materializeAtomicFactChoiceQuestion({
     context,
     candidate,
-    prompt: `Which of the following is a common ADR of <b>${escapePromptHtml(group.label)}</b>?`,
+    prompt: `Which ADR is listed for every member of the <b>${escapePromptHtml(group.label)}</b> source group in Weeks ${group.eligibleChoiceQuizWeekRange.join("–")}?`,
     questionVariant: "classCommonAdrRecognition",
     extraMetadata: {
       closedGroup: closedGroupMetadata(group),

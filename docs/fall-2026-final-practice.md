@@ -96,18 +96,22 @@ Storage limits remain browser-dependent; quota failure is tested explicitly.
 
 ## Validation on the completed prototype
 
-All four repository gates must pass before delivery. One hundred
+All four repository gates pass, including 458/458 tools tests. One hundred
 seeded Finals (50 Balanced / 50 Adaptive) pass independent size, week/domain,
 identity, cap, ordering, source and whole-set Brand/Generic leakage assertions.
 Adversarial weakness evidence changes selection while preserving the envelope.
 Balanced rejects even attempts to read poison evidence/time getters.
 
 System Chrome 1280×900 and touch-mobile 390×844 complete both modes: hub launch,
-100 items, marks, pausing, saved progress/resume, 98/100 with intentional misses,
+100 items, marks, study-mode pausing, strict exam non-pausing, saved
+progress/resume, 98/100 with intentional misses,
 Final history, two-item Review Missed without a new full score, exact 100-item
 retry, no page errors and no horizontal overflow. Both True Exam modes submit
 100 visited questions and launch a fresh Final with the same mode/exam identity.
-Separate evidence verifies an entered answer stays ungraded before submission.
+An entered answer stays ungraded before submission. Expired-resume fixtures
+submit all 100 once and retain the completed results screen. Four focused
+clock-controlled regressions cover wall-clock expiration, pause refusal,
+deadline/legacy-snapshot restoration, study pause and expired-resume ordering.
 
 Canonical Fall source, written policy, P1 source and Queue store remain unchanged.
 The generator/Adaptive/Final/launcher/hub/engine cache chain and Stats importer

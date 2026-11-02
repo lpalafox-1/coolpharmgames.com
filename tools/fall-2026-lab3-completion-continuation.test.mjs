@@ -35,7 +35,7 @@ const LIFETIME_MEMORY_KEYS = [
 const PROTECTED_FALL_BASELINES = Object.freeze({
   drugData: "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01",
   policy: "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171",
-  generator: "9a806c13e57e74cef2aa64e25624293dd13a01b4ba4ac92a7d062a4576a55608",
+  generator: "1303cc7e469f8de3795f6e45b62b3c107229bfd399b647dfa8abed3dbc6e3b95",
   launcher: "1c4280293a80db17a2fd55ffb4510976d03b21e6a747df6cc7e1ca38a61904e3"
 });
 
