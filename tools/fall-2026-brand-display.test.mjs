@@ -299,17 +299,17 @@ test("Boss Remix preserves canonical prompts and renders its brand references on
 
 test("policy revision refreshes generator parents and engine cache together", () => {
   for (const [file, mainHash] of [
-    ["fall-2026-quiz-generator.js", "db6efca530d7891bb2ad64840317b7ee0f753652dc4da9f7333b800d3abd7404"],
-    ["fall-2026-adaptive-practice.js", "6bb77ed3334e004df0797106bf253438eab1bdea556d35ff42bcdd50f552796c"],
-    ["fall-2026-lab3-launcher.js", "a26b8cb255e864efd12078fe6849e881472cdfa042b13acb30068469e0b52b80"]
+    ["fall-2026-quiz-generator.js", "ba917e7cfcfd602777cebdfd4766b64a5fad6b33874c3e61067114046698e2f2"],
+    ["fall-2026-adaptive-practice.js", "28f807f71b1fb5fcb1ded1ac1cda8be173aaeedbe91b7064d897b6e0211de817"],
+    ["fall-2026-lab3-launcher.js", "631c7a93420a69dca0023b01adae438610aac086e59feeb55796004503b8324f"]
   ]) assert.equal(createHash("sha256").update(read(`assets/js/${file}`)).digest("hex"), mainHash, `${file}: approved policy baseline`);
   const launcher = read("assets/js/fall-2026-lab3-launcher.js");
   const adaptive = read("assets/js/fall-2026-adaptive-practice.js");
-  for (const parent of [launcher, adaptive]) assert.match(parent, /fall-2026-quiz-generator\.js\?v=20261102a/);
-  assert.match(launcher, /fall-2026-adaptive-practice\.js\?v=20261102a/);
-  assert.match(read("lab3-fall-2026.html"), /fall-2026-lab3-launcher\.js\?v=20261102a/);
-  assert.match(read("assets/js/quizEngine.js"), /new URL\("assets\/js\/fall-2026-lab3-launcher\.js\?v=20261102a"/);
-  assert.match(read("quiz.html"), /quizEngine\.js\?v=20261102a/);
+  for (const parent of [launcher, adaptive]) assert.match(parent, /fall-2026-quiz-generator\.js\?v=20261102b/);
+  assert.match(launcher, /fall-2026-adaptive-practice\.js\?v=20261102b/);
+  assert.match(read("lab3-fall-2026.html"), /fall-2026-lab3-launcher\.js\?v=20261102b/);
+  assert.match(read("assets/js/quizEngine.js"), /new URL\("assets\/js\/fall-2026-lab3-launcher\.js\?v=20261102b"/);
+  assert.match(read("quiz.html"), /quizEngine\.js\?v=20261102b/);
 });
 
 test("student stems use natural wording without visible source-audit language", () => {

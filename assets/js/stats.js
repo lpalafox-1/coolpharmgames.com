@@ -40,6 +40,8 @@ const FALL_LAB3_BOSS_REMIX_KIND = "fall-2026-lab3-boss-remix";
 const FALL_LAB3_ADAPTIVE_KIND = "fall-2026-lab3-adaptive";
 
 const ATTEMPT_TYPES = Object.freeze([
+  Object.freeze({ id: "fall-lab3-final-balanced", label: "Balanced Final Practice" }),
+  Object.freeze({ id: "fall-lab3-final-adaptive", label: "Adaptive Final Practice" }),
   Object.freeze({ id: "fall-lab3-practice", label: "Fall Lab III Practice" }),
   Object.freeze({ id: "boss-rounds", label: "Boss Rounds" }),
   Object.freeze({ id: "boss-remixes", label: "Boss Remixes" }),
@@ -57,6 +59,8 @@ const ATTEMPT_TYPE_LABELS = Object.freeze(
 // Attempt kind to display category, expressed as data. An unknown future kind
 // resolves to nothing here and falls through to mode, then to the catalog.
 const ATTEMPT_KIND_TYPE_IDS = Object.freeze({
+  "fall-2026-lab3-final-balanced": "fall-lab3-final-balanced",
+  "fall-2026-lab3-final-adaptive": "fall-lab3-final-adaptive",
   [FALL_LAB3_PRACTICE_KIND]: "fall-lab3-practice",
   [FALL_LAB3_BOSS_ROUND_KIND]: "boss-rounds",
   [FALL_LAB3_BOSS_REMIX_KIND]: "boss-remixes",
@@ -67,6 +71,10 @@ const ATTEMPT_KIND_TYPE_IDS = Object.freeze({
 // modes that genuinely assert an attempt type are listed; "easy" and friends
 // describe difficulty, not provenance, so they never classify an attempt.
 const MODE_TYPE_IDS = Object.freeze({
+  "final-balanced": "fall-lab3-final-balanced",
+  "final-balanced-exam": "fall-lab3-final-balanced",
+  "final-adaptive": "fall-lab3-final-adaptive",
+  "final-adaptive-exam": "fall-lab3-final-adaptive",
   bossRemix: "boss-remixes",
   boss: "boss-rounds",
   playlist: "adaptive-playlists"
