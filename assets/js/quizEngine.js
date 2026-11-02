@@ -18,6 +18,9 @@ const THEME_KEY = "pharmlet.theme";
 const QUIZ_PROGRESS_PREFIX = "pharmlet.quiz-progress.";
 const MAX_QUESTION_REPORTS = 200;
 const QUIZ_PROGRESS_MAX_AGE_MS = 1000 * 60 * 60 * 12;
+const FINAL_TAB_PROGRESS_KEY = "pharmlet.final-progress-tab";
+const FINAL_PROGRESS_LEASE_PREFIX = "pharmlet.final-progress-lease.";
+const FINAL_INACTIVE_PROGRESS_LIMIT = 2;
 const TIMER_AUTOSAVE_INTERVAL_SECONDS = 15;
 const quizCatalog = window.PharmletQuizCatalog || null;
 const CEUTICS2_FINAL_ID = "ceutics2-final";
@@ -1488,6 +1491,7 @@ let fallLab3DisplayBrandsPromise = null;
 
 function isFallLab3DisplayQuestion(question) {
     return isFallLab3Question(question)
+        || /^fall-2026-lab3-final-(?:balanced|adaptive)$/.test(String(question?.sourceQuizId || ""))
         || /^fall-2026-lab3-week-(?:[1-9]|10)-(?:practice|adaptive|week-focus|boss-remix)$/.test(String(question?.sourceQuizId || ""));
 }
 
@@ -1513,6 +1517,21 @@ function getFallLab3StudentFacingPromptHtml(question) {
     const prompt = question?.prompt || "";
     if (!isFallLab3DisplayQuestion(question)) return prompt;
     const metadata = getFallLab3QuestionMetadata(question);
+    // Preserve historical canonical prompt+answer identity. Source-scope
+    // clarification belongs only in presentation, including Queue replays.
+    const adr = prompt.match(/^Which drug has an ADR of (<b>.*<\/b>)\?$/);
+    if (adr) return `Which drug has an ADR of ${adr[1]} recorded in the Fall source?`;
+    const indication = prompt.match(/^Which drug is indicated for (<b>.*<\/b>)\?$/);
+    if (indication) return `Which drug has ${indication[1]} recorded as an FDA indication in the Fall source?`;
+    const group = prompt.match(/^Which of the following is a common ADR of (<b>.*<\/b>)\?$/);
+    if (group) {
+        const range = metadata?.closedGroup?.eligibleChoiceQuizWeekRange;
+        const weeks = Array.isArray(range) && range.length === 2
+            ? range[0] === range[1] ? ` in Week ${range[0]}` : ` in Weeks ${range.join("–")}` : "";
+        return `Which ADR is listed for every member of the ${group[1]} source group${weeks}?`;
+    }
+    const repeatedWeek = prompt.match(/^(Which ADR is listed for every member of .* source group) in Weeks (\d+)–\2\?$/);
+    if (repeatedWeek) return `${repeatedWeek[1]} in Week ${repeatedWeek[2]}?`;
     const reference = (html, knownBrand = false) => {
         if (metadata?.stemReference?.type === "generic") return html;
         const brand = metadata?.stemReference?.type === "brand"
@@ -3659,7 +3678,7 @@ function serializeQuizProgress() {
 
     syncCurrentDraftFromDom();
 
-    return {
+    const snapshot = {
         version: 1,
         routeId: getQuizProgressRouteId(),
         savedAt: Date.now(),
@@ -3688,12 +3707,124 @@ function serializeQuizProgress() {
         configuredModeKey: state.configuredModeKey || "",
         placeholderQuiz: !!state.placeholderQuiz,
         modeNotice: state.modeNotice || "",
-        ...(getFallLab3FinalContext().active ? { finalPracticePayload: state.finalPracticePayload, finalExamDeadline: state.finalExamDeadline || null } : {})
+        ...(getFallLab3FinalContext().active ? {
+            finalPracticePayload: state.finalPracticePayload, finalExamDeadline: state.finalExamDeadline || null,
+            finalSaveId: state.finalSaveId, finalArtifactsRecorded: !!state.finalArtifactsRecorded,
+            completedFinal: !!(state.progressCompleted && state.historySaveFailed)
+        } : {})
     };
+    return compactFinalProgress(snapshot);
+}
+
+// Keep one immutable copy of the Final, plus small per-question deltas. The
+// original set is still available after resume/review even if another tab
+// replaces custom-quiz. Older full snapshots remain readable.
+function compactFinalProgress(snapshot) {
+    const payload = snapshot?.finalPracticePayload;
+    if (!payload?.metadata || !getFallLab3FinalContext(payload.metadata).active || !Array.isArray(payload.questions) || payload.questions.length !== 100) return snapshot;
+    const indexes = new Map(payload.questions.map((q, i) => [q.id, i]));
+    const pack = (questions) => questions.map((q) => {
+        const sourceIndex = indexes.get(q.id);
+        if (!Number.isInteger(sourceIndex)) throw new Error("Final progress does not belong to its retry payload.");
+        const original = payload.questions[sourceIndex];
+        return { sourceIndex, changes: Object.fromEntries(Object.entries(q).filter(([key, value]) => JSON.stringify(value) !== JSON.stringify(original[key]))) };
+    });
+    try {
+        return { ...snapshot, finalProgressFormat: 2, questions: pack(snapshot.questions), originalQuestions: pack(snapshot.originalQuestions || []) };
+    } catch (_) { return snapshot; } // Preserve unfamiliar legacy shapes intact.
+}
+
+function expandFinalProgress(snapshot) {
+    if (snapshot?.finalProgressFormat !== 2) return snapshot;
+    const payload = snapshot.finalPracticePayload;
+    if (!payload?.metadata || !getFallLab3FinalContext(payload.metadata).active || !Array.isArray(payload.questions) || payload.questions.length !== 100) return null;
+    const unpack = (questions) => questions.map((item) => {
+        if (!Number.isInteger(item?.sourceIndex) || item.sourceIndex < 0 || item.sourceIndex >= 100
+            || !item.changes || typeof item.changes !== "object" || Array.isArray(item.changes)) throw new Error("Invalid compact Final progress.");
+        const original = payload.questions[item.sourceIndex];
+        if (item.changes.id && item.changes.id !== original.id) throw new Error("Final question identity changed.");
+        return JSON.parse(JSON.stringify({ ...original, ...item.changes }));
+    });
+    try { return { ...snapshot, finalProgressFormat: undefined, questions: unpack(snapshot.questions), originalQuestions: unpack(snapshot.originalQuestions || []) }; }
+    catch (_) { return null; }
+}
+
+function cleanupAbandonedFinalProgress(now = Date.now()) {
+    let removed = 0;
+    try {
+        const keys = Array.from({ length: localStorage.length }, (_, i) => localStorage.key(i)).filter(Boolean);
+        const liveKeys = () => {
+            const live = new Set([state.progressKey]);
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (!key?.startsWith(FINAL_PROGRESS_LEASE_PREFIX)) continue;
+                const lease = safeReadStorageJson(key, null);
+                if (lease?.expiresAt > now) live.add(lease.progressKey);
+            }
+            return live;
+        };
+        const live = liveKeys(), candidates = [];
+        const remove = ({ key, raw }) => {
+            // Recheck both ownership and bytes so an intervening save or tab
+            // activation does not get removed by an older cleanup decision.
+            if (!liveKeys().has(key) && localStorage.getItem(key) === raw) { localStorage.removeItem(key); removed++; }
+        };
+        for (const key of keys) {
+            if (key.startsWith(FINAL_PROGRESS_LEASE_PREFIX)) {
+                const raw = localStorage.getItem(key), lease = safeReadStorageJson(key, null);
+                if (lease?.expiresAt <= now && localStorage.getItem(key) === raw) localStorage.removeItem(key);
+                continue;
+            }
+            if (!key.startsWith(QUIZ_PROGRESS_PREFIX) || live.has(key)) continue;
+            const raw = localStorage.getItem(key);
+            let saved; try { saved = JSON.parse(raw); } catch (_) { continue; }
+            if (!saved?.finalPracticePayload?.metadata || !getFallLab3FinalContext(saved.finalPracticePayload.metadata).active || !Number.isFinite(saved.savedAt)) continue;
+            if (now - saved.savedAt > QUIZ_PROGRESS_MAX_AGE_MS) remove({ key, raw });
+            else if (saved.finalProgressFormat === 2) candidates.push({ key, raw, savedAt: saved.savedAt });
+            // Recent legacy snapshots may belong to an older open player
+            // without leases. Keep them for the existing 12-hour resume window.
+        }
+        candidates.sort((a, b) => b.savedAt - a.savedAt || a.key.localeCompare(b.key));
+        candidates.slice(FINAL_INACTIVE_PROGRESS_LIMIT).forEach(remove);
+    } catch (error) { console.warn("Unable to reclaim abandoned Final progress:", error); }
+    return removed;
+}
+
+function maintainFinalProgressLease(active = true) {
+    if (!getFallLab3FinalContext().active) return;
+    try {
+        if (!active) {
+            if (state.finalLeaseHandle) clearInterval(state.finalLeaseHandle);
+            state.finalLeaseHandle = null;
+            if (state.finalLeaseKey) localStorage.removeItem(state.finalLeaseKey);
+            if (state.resultsRecorded) sessionStorage.removeItem(FINAL_TAB_PROGRESS_KEY);
+            return;
+        }
+        if (state.attemptCompleted && !state.historySaveFailed) return;
+        state.finalLeaseKey ||= `${FINAL_PROGRESS_LEASE_PREFIX}${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        sessionStorage.setItem(FINAL_TAB_PROGRESS_KEY, JSON.stringify({ progressKey: state.progressKey, exam: isTrueExamMode() }));
+        localStorage.setItem(state.finalLeaseKey, JSON.stringify({ progressKey: state.progressKey, expiresAt: Date.now() + QUIZ_PROGRESS_MAX_AGE_MS }));
+        if (!state.finalLeaseHandle) state.finalLeaseHandle = setInterval(() => maintainFinalProgressLease(), 60000);
+    } catch (error) { console.warn("Unable to protect this tab's Final progress:", error); }
+}
+
+function loadTabFinalResumePayload(fallback) {
+    if (!resumeRequestedParam && window.performance?.getEntriesByType?.("navigation")?.[0]?.type !== "reload") return fallback;
+    try {
+        const tab = JSON.parse(sessionStorage.getItem(FINAL_TAB_PROGRESS_KEY) || "null");
+        if (!tab?.progressKey?.startsWith(QUIZ_PROGRESS_PREFIX) || tab.exam !== isTrueExamMode()) return fallback;
+        const saved = safeReadStorageJson(tab.progressKey, null), payload = saved?.finalPracticePayload;
+        if (payload?.metadata && getFallLab3FinalContext(payload.metadata).active && Array.isArray(payload.questions) && payload.questions.length === 100
+            && Number.isFinite(saved.savedAt) && Date.now() - saved.savedAt <= QUIZ_PROGRESS_MAX_AGE_MS) {
+            state.finalResumeProgressKey = tab.progressKey;
+            return payload;
+        }
+    } catch (_) {}
+    return fallback;
 }
 
 function persistQuizProgress(force = false) {
-    if (!state.progressKey || !state.questions.length || state.progressCompleted) return;
+    if (!state.progressKey || !state.questions.length || (state.progressCompleted && !(getFallLab3FinalContext().active && state.historySaveFailed))) return;
     if (force) clearQueuedQuizProgressSave();
 
     const now = Date.now();
@@ -3703,6 +3834,7 @@ function persistQuizProgress(force = false) {
     if (!snapshot) return;
 
     try {
+        if (getFallLab3FinalContext().active) { maintainFinalProgressLease(); cleanupAbandonedFinalProgress(now); }
         localStorage.setItem(state.progressKey, JSON.stringify(snapshot));
         state.lastAutosaveAt = now;
         const saveLabel = force ? "Saved" : "Autosaved";
@@ -3743,9 +3875,13 @@ function clearQuizProgress() {
 function loadSavedQuizProgress() {
     if (!state.progressKey) return null;
 
-    const saved = safeReadStorageJson(state.progressKey, null);
+    const saved = expandFinalProgress(safeReadStorageJson(state.progressKey, null));
     if (!saved || typeof saved !== "object") return null;
-    if (saved.routeId !== getQuizProgressRouteId()) return null;
+    const ownFinalResume = getFallLab3FinalContext().active && state.finalResumeProgressKey === state.progressKey
+        && saved.finalPracticePayload?.metadata?.kind === state.attemptMetadata?.kind
+        && saved.finalPracticePayload?.metadata?.seed === state.attemptMetadata?.seed
+        && state.progressKey === `${QUIZ_PROGRESS_PREFIX}${saved.routeId}`;
+    if (saved.routeId !== getQuizProgressRouteId() && !ownFinalResume) return null;
 
     const savedAt = Number(saved.savedAt) || 0;
     if (!savedAt || (Date.now() - savedAt) > QUIZ_PROGRESS_MAX_AGE_MS) {
@@ -3763,7 +3899,7 @@ function loadSavedQuizProgress() {
     const currentTimerSeconds = Math.max(0, Number(state.generatedTimerSeconds) || 0);
     const currentQuestionLimit = Math.max(0, Number(state.generatedQuestionLimit) || 0);
 
-    if (savedTimerSeconds !== currentTimerSeconds || savedQuestionLimit !== currentQuestionLimit) {
+    if (!(ownFinalResume && saved.reviewMode) && (savedTimerSeconds !== currentTimerSeconds || savedQuestionLimit !== currentQuestionLimit)) {
         clearQuizProgress();
         return null;
     }
@@ -3779,6 +3915,8 @@ function loadSavedQuizProgress() {
 }
 
 function restoreSavedQuizProgress(snapshot) {
+    if (!snapshot) return false;
+    snapshot = expandFinalProgress(snapshot);
     if (!snapshot) return false;
 
     state.questions = snapshot.questions.map((question, index) => ({
@@ -3820,6 +3958,11 @@ function restoreSavedQuizProgress(snapshot) {
     state.title = String(snapshot.title || state.title || "Quiz");
     if (getFallLab3FinalContext().active && snapshot.finalPracticePayload?.metadata?.kind === state.attemptMetadata?.kind) state.finalPracticePayload = snapshot.finalPracticePayload;
     state.resultsRecorded = false;
+    if (getFallLab3FinalContext().active) {
+        state.finalSaveId = snapshot.finalSaveId || state.finalSaveId;
+        state.finalArtifactsRecorded = !!snapshot.finalArtifactsRecorded;
+        state.restoredCompletedFinal = !!snapshot.completedFinal;
+    }
     state.signalsRecorded = false;
     state.finalBreakdown = null;
     syncPointTotalsFromQuestions();
@@ -3866,6 +4009,12 @@ function saveQuizHistory() {
     try {
         const raw = localStorage.getItem(HISTORY_KEY);
         const history = raw ? JSON.parse(raw) : [];
+        if (getFallLab3FinalContext().active) {
+            cleanupAbandonedFinalProgress();
+            state.historySaveFailed = false;
+            state.finalSaveId ||= `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+            if (history.some((entry) => entry.finalSaveId === state.finalSaveId)) { state.resultsRecorded = true; return; }
+        }
         const letterGradeInfo = getLetterGradeInfoForQuiz(state.score, state.questions.length);
         const finalSummary = buildStoredFinalAttemptSummary(state.questions);
         const attemptLineage = buildFallLab3HistoryLineage();
@@ -3885,12 +4034,14 @@ function saveQuizHistory() {
             letterGrade: letterGradeInfo?.letter || null,
             finalSummary,
             ...(getFallLab3FinalContext().active ? { fallFinalSummary: buildFallLab3FinalBreakdown() } : {}),
+            ...(getFallLab3FinalContext().active ? { finalSaveId: state.finalSaveId } : {}),
             ...(attemptLineage ? { attemptLineage } : {})
         });
 
         localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(-200)));
         state.resultsRecorded = true;
     } catch (e) {
+        if (getFallLab3FinalContext().active) state.historySaveFailed = true;
         console.warn("Failed to save quiz history:", e);
     }
 }
@@ -3991,6 +4142,8 @@ function freezeCompletedAttemptTimer() {
 function restoreAttemptTimerAffordance() {
     const readout = getEl("timer-readout");
     if (!readout) return;
+    readout.hidden = false;
+    readout.style.display = "";
 
     if (getFallLab3FinalContext().active && isTrueExamMode() && !state.reviewMode) {
         readout.title = "True Exam Mode: the 100-minute countdown cannot be paused and continues across reloads.";
@@ -4008,10 +4161,17 @@ function restoreAttemptTimerAffordance() {
 
 function applyCompletedAttemptUi() {
     state.attemptCompleted = true;
-    state.saveStatusMessage = state.reviewMode ? "Review round saved" : "Attempt saved to history";
+    state.saveStatusMessage = state.reviewMode ? "Review round saved" : state.historySaveFailed ? "History not saved" : "Attempt saved to history";
     freezeCompletedAttemptTimer();
     setCompletedAttemptControlsHidden(true);
     renderQuizStatus();
+    if (getFallLab3FinalContext().active) {
+        if (getEl("score")) getEl("score").textContent = state.score;
+        hideQuizSessionNote();
+        getEl("mode-banner")?.classList.add("hidden");
+        const timer = getEl("timer-readout");
+        if (timer) { timer.hidden = true; timer.style.display = "none"; }
+    }
 }
 
 function exitCompletedAttemptUi() {
@@ -4136,7 +4296,7 @@ function runCompletionAction(actionId) {
         const context = getFallLab3FinalContext();
         if (!context.active || state.finalLaunchInFlight) return false;
         state.finalLaunchInFlight = true;
-        const launcherUrl = new URL("assets/js/fall-2026-lab3-launcher.js?v=20261101b", window.location.href).href;
+        const launcherUrl = new URL("assets/js/fall-2026-lab3-launcher.js?v=20261101d", window.location.href).href;
         import(launcherUrl).then(launcher => launcher.launchFall2026Lab3Final(context.mode, { exam: isTrueExamMode() }))
             .catch(error => { console.warn("Final Practice launch failed:", error); alert("Unable to build a safe Final Practice set. Try again from the Lab III hub."); })
             .finally(() => { state.finalLaunchInFlight = false; });
@@ -4173,7 +4333,7 @@ function runCompletionAction(actionId) {
             // so this action imports it at click time. The hub registers its
             // own startup on DOMContentLoaded; a click after load does not
             // run that startup or consume continuation requests.
-            const launcherUrl = new URL("assets/js/fall-2026-lab3-launcher.js?v=20261101b", window.location.href).href;
+            const launcherUrl = new URL("assets/js/fall-2026-lab3-launcher.js?v=20261101d", window.location.href).href;
             import(launcherUrl)
                 .then((launcher) => {
                     if (typeof launcher.launchFall2026Lab3WeekFocus !== "function") {
@@ -8394,9 +8554,10 @@ function showResults() {
     // A Boss Remix saves its own score and history, but never amplifies
     // longitudinal weakness memory (P2F-09 and F26-10 own those semantics).
     const remixAttempt = isFallLab3BossRemixAttempt();
-    const shouldRecordLongitudinalSignals = shouldPersistResults && !remixAttempt;
+    const finalAlreadyRecorded = getFallLab3FinalContext().active && state.finalArtifactsRecorded;
+    const shouldRecordLongitudinalSignals = shouldPersistResults && !remixAttempt && !finalAlreadyRecorded;
     const shouldRecordAttemptArtifacts = shouldPersistResults && !state.resultsRecorded;
-    clearQuizProgress();
+    if (!getFallLab3FinalContext().active) clearQuizProgress();
 
     if (state.reviewMode) {
         saveReviewRoundResultsToReviewQueue(state.questions);
@@ -8446,6 +8607,11 @@ function showResults() {
         }
     }
     
+    if (getFallLab3FinalContext().active) {
+        state.finalArtifactsRecorded = true;
+        if (state.historySaveFailed) persistQuizProgress(true);
+        else { clearQuizProgress(); maintainFinalProgressLease(false); }
+    }
     const card = getEl("question-card");
     const missed = state.questions.filter(q => q._answered && !q._correct);
     const hintsNote = state.hintsUsed > 0 ? `<p class="text-sm opacity-60 mt-2">💡 Hints used: ${state.hintsUsed}</p>` : '';
@@ -8478,6 +8644,10 @@ function showResults() {
     const continuationMarkup = buildCompletionActionsMarkup(continuationActions);
     const savedNote = state.reviewMode
         ? `<p class="text-sm opacity-70 mt-2">Review mastery is saved to your review queue for this round.</p>`
+        : getFallLab3FinalContext().active
+        ? state.historySaveFailed
+            ? `<div id="final-history-status" role="alert" class="mt-3 text-sm font-bold">History could not be saved. This score is not yet in Stats. Keep this tab open.<br><button id="retry-final-history" class="mt-2 rounded-lg border px-4 py-2">Retry Saving History</button></div>`
+            : `<p class="text-sm opacity-70 mt-2">✅ This attempt is saved to this browser's history.</p>`
         : remixAttempt
         ? `<p class="text-sm opacity-70 mt-2">✅ Saved to this browser: this Boss Remix attempt's history and high score. Boss Remix stays a bounded challenge, so it does not feed lifetime weakness, review-queue, or adaptive memory.</p>`
         : `<p class="text-sm opacity-70 mt-2">✅ Saved to this browser: history, high score, and review queue. Nothing else is needed to keep this attempt.</p>`;
@@ -8565,6 +8735,19 @@ function showResults() {
 
     wireCompletionActions(card);
     applyCompletedAttemptUi();
+    const retryHistory = getEl("retry-final-history");
+    if (getFallLab3FinalContext().active && state.historySaveFailed) {
+        card.querySelectorAll?.("[data-completion-action]").forEach((button) => { button.disabled = true; });
+    }
+    if (getFallLab3FinalContext().active && state.historySaveFailed && retryHistory) retryHistory.onclick = () => {
+        saveQuizHistory();
+        if (state.resultsRecorded) {
+            clearQuizProgress(); maintainFinalProgressLease(false);
+            getEl("final-history-status").textContent = "✅ This attempt is saved to this browser's history.";
+            state.saveStatusMessage = "Attempt saved to history"; renderQuizStatus();
+            card.querySelectorAll?.("[data-completion-action]").forEach((button) => { button.disabled = false; });
+        }
+    };
 }
 
 function shuffled(a) { return [...a].sort(() => 0.5 - Math.random()); }
@@ -8580,6 +8763,7 @@ async function main() {
         state.adaptiveSummary = null;
         state.questionReportContext = {};
         state.attemptMetadata = null;
+        state.finalResumeProgressKey = null;
         let filteredPool = [];
         let fullPool = [];
         let storageKey = null;
@@ -8777,6 +8961,7 @@ async function main() {
             let data = GENERATED_QUIZ_IDS.has(quizId)
                 ? loadGeneratedQuizFromStorage(quizId)
                 : await loadQuizDataForId(quizId);
+            if (quizId === "custom-quiz") data = loadTabFinalResumePayload(data);
             if (!data) {
                 throw new Error(`Quiz "${quizId}" is not available. Try recreating it from the source page.`);
             }
@@ -8967,7 +9152,11 @@ async function main() {
 
 // Helper function to complete quiz setup
 function finishSetup(storageKey) {
-    state.progressKey = getQuizProgressKey();
+    if (getFallLab3FinalContext().active) {
+        state.historySaveFailed = false; state.finalSaveId = null;
+        state.finalArtifactsRecorded = false; state.restoredCompletedFinal = false;
+    }
+    state.progressKey = state.finalResumeProgressKey || getQuizProgressKey();
     hideQuizSessionNote();
 
     if (getEl("quiz-title")) getEl("quiz-title").textContent = state.title;
@@ -9014,13 +9203,18 @@ function finishSetup(storageKey) {
     } else if (savedSnapshot) {
         const ageLabel = formatSavedSessionAge(savedSnapshot.savedAt);
         const promptLabel = getSavedSessionPromptLabel(savedSnapshot);
-        const resumeSaved = confirm(`Resume ${promptLabel} from ${ageLabel}?\n\nChoose OK to resume it, or Cancel to start a fresh run and clear the saved session.`);
+        const strictFinal = getFallLab3FinalContext().active && isTrueExamMode() && !savedSnapshot.reviewMode;
+        const resumeSaved = confirm(strictFinal
+            ? `Resume saved True Exam ${promptLabel} from ${ageLabel}? Its 100-minute clock has continued running.\n\nOK resumes the same attempt and deadline. Cancel abandons that saved progress and starts a new attempt with a new 100-minute clock.`
+            : `Resume ${promptLabel} from ${ageLabel}?\n\nChoose OK to resume it, or Cancel to start a fresh run and clear the saved session.`);
 
         if (resumeSaved) {
             restored = restoreSavedQuizProgress(savedSnapshot);
         } else {
             clearQuizProgress();
-            showQuizSessionNote(`Starting fresh. The older saved session from ${ageLabel} was cleared for this new run.`, "accent");
+            showQuizSessionNote(strictFinal
+                ? "Saved exam abandoned. This is a new attempt with a new 100-minute clock."
+                : `Starting fresh. The older saved session from ${ageLabel} was cleared for this new run.`, "accent");
         }
     }
 
@@ -9042,9 +9236,10 @@ function finishSetup(storageKey) {
     if (getFallLab3FinalContext().active && isTrueExamMode() && !state.reviewMode) restoreAttemptTimerAffordance();
 
     if (!state.progressLifecycleBound) {
-        const persistNow = () => persistQuizProgress(true);
+        const persistNow = () => { persistQuizProgress(true); maintainFinalProgressLease(false); };
         window.addEventListener("pagehide", persistNow);
         window.addEventListener("beforeunload", persistNow);
+        window.addEventListener("pageshow", () => { if (getFallLab3FinalContext().active) { maintainFinalProgressLease(); persistQuizProgress(true); } });
         state.progressLifecycleBound = true;
     }
     
@@ -9064,9 +9259,11 @@ function finishSetup(storageKey) {
     
     render();
     // Render/setup first so an expired resume cannot overwrite its results.
-    if (getFallLab3FinalContext().active && isTrueExamMode() && !state.reviewMode && state.timerSeconds <= 0) {
+    if (getFallLab3FinalContext().active && state.restoredCompletedFinal) showResults();
+    else if (getFallLab3FinalContext().active && isTrueExamMode() && !state.reviewMode && state.timerSeconds <= 0) {
         finishQuizDueToTimeout();
     }
+    if (getFallLab3FinalContext().active && !state.attemptCompleted) { maintainFinalProgressLease(); cleanupAbandonedFinalProgress(); }
 }
 
 document.addEventListener('DOMContentLoaded', main);
