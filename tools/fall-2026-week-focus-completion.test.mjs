@@ -46,6 +46,7 @@ function createDocument() {
       appendChild(child) { node.children.push(child); return child; },
       addEventListener() {}, removeEventListener() {},
       setAttribute(name, value) { node.attributes[name] = String(value); },
+      removeAttribute(name) { delete node.attributes[name]; },
       getAttribute(name) { return Object.prototype.hasOwnProperty.call(node.attributes, name) ? node.attributes[name] : null; },
       querySelector() { return null; },
       querySelectorAll() { return []; },
