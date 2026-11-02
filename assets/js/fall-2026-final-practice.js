@@ -1,9 +1,9 @@
 // Pharm-let practice composition, not a faculty-authored final blueprint.
 // No curriculum facts live here: all questions come from the shared Fall pool.
-import { generateFall2026Quiz, createSeededRng, finalizeFall2026QuestionSet } from './fall-2026-quiz-generator.js?v=20261027b';
-import { buildAdaptiveSignals, buildConceptWeakness, scoreCandidate, getQuestionFingerprint, getQuestionConceptKey, getQuestionSourceWeeks } from './fall-2026-adaptive-practice.js?v=20261027b';
+import { generateFall2026Quiz, createSeededRng, finalizeFall2026QuestionSet, isFall2026QuestionFormAllowed } from './fall-2026-quiz-generator.js?v=20261101b';
+import { buildAdaptiveSignals, buildConceptWeakness, scoreCandidate, getQuestionFingerprint, getQuestionConceptKey, getQuestionSourceWeeks } from './fall-2026-adaptive-practice.js?v=20261101b';
 export const FINAL_KINDS = Object.freeze({ balanced: 'fall-2026-lab3-final-balanced', adaptive: 'fall-2026-lab3-final-adaptive' });
-export const FINAL_VERSION = 'fall-final100-v1';
+export const FINAL_VERSION = 'fall-final100-v2';
 export const FINAL_DOMAINS = Object.freeze(['brandGeneric', 'drugClass', 'fdaIndication', 'mechanismOfAction', 'topAdverseReactions', 'boxWarning']);
 const WEEKS = Object.freeze(Array.from({ length: 10 }, (_, i) => i + 1));
 const normalize = value => String(value ?? '').replace(/<[^>]*>/g, ' ').replace(/[^\p{L}\p{N}]+/gu, '').toLowerCase();
@@ -14,12 +14,9 @@ const concepts = q => [getQuestionConceptKey(q), ...testedDrugs(q).map(id => `${
 const negative = q => /\b(?:NOT|EXCEPT)\b/.test(q.prompt);
 const pairwise = q => Boolean(q.metadata.pairwiseSharedAdr);
 export function isRejectedFinalForm(q) {
-  const m = q?.metadata || {};
-  return (m.knowledgeDomain === 'topAdverseReactions' && m.questionVariant === 'identifyDrugByStructuredValue')
-    || (m.knowledgeDomain === 'boxWarning' && m.choicePredicate && normalize(m.choicePredicate.value) === 'none')
-    || /which drug.*(?:full|complete).*?(?:ADR|adverse.reaction).*list|which drug has no boxed|\bNOT\b.*boxed/i.test(q?.prompt || '');
+  return !isFall2026QuestionFormAllowed(q);
 }
-export function buildFinalCandidatePool({ drugData, policy, seed, roundsPerWeek = 12 }) {
+export function buildFinalCandidatePool({ drugData, policy, seed, roundsPerWeek = 24 }) {
   if (!Number.isInteger(roundsPerWeek) || roundsPerWeek < 1 || roundsPerWeek > 32) throw new Error('Invalid Final sampling bound.');
   const pool = new Map();
   for (const week of WEEKS) for (let round = 0; round < roundsPerWeek; round++) {
@@ -81,7 +78,7 @@ export function assertFinalInvariants(questions, envelope) {
   }
 }
 export function buildFall2026FinalPayload(options = {}) {
-  const { drugData, policy, seed, mode = 'balanced', roundsPerWeek = 12 } = options;
+  const { drugData, policy, seed, mode = 'balanced', roundsPerWeek = 24 } = options;
   if (!FINAL_KINDS[mode] || typeof seed !== 'string' || !seed) throw new Error('Invalid Final mode or seed.');
   const pool = buildFinalCandidatePool({ drugData, policy, seed, roundsPerWeek });
   const envelope = buildFinalEnvelope(pool);

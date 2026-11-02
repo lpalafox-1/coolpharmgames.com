@@ -1530,6 +1530,8 @@ function getFallLab3StudentFacingPromptHtml(question) {
     // Anchored main templates only: atomic, pairwise, NOT/EXCEPT, and other
     // questions pass through unchanged. Structured inverse values are facts.
     const forward = [
+        [/^Which FDA indication is recorded in the Fall source for (<b>.*<\/b>)\?$/, "Which FDA indication is recorded in the Fall source for"],
+        [/^Which Top ADR is recorded in the Fall source for (<b>.*<\/b>)\?$/, "Which Top ADR is recorded in the Fall source for"],
         [/^(?:Which pharmacologic class is recorded in the Fall source for|What class does the Fall source list for) (<b>.*<\/b>)\?$/, "What is the drug class of"],
         [/^Which (?:complete FDA indication list|full FDA indication list) is recorded for (<b>.*<\/b>)\?$/, "Which full list of FDA-approved indications is associated with"],
         [/^(?:Which mechanism of action belongs to|What is the MOA of) (<b>.*<\/b>)\?$/, "What is the mechanism of action of"],
@@ -3686,7 +3688,7 @@ function serializeQuizProgress() {
         configuredModeKey: state.configuredModeKey || "",
         placeholderQuiz: !!state.placeholderQuiz,
         modeNotice: state.modeNotice || "",
-        ...(getFallLab3FinalContext().active ? { finalPracticePayload: state.finalPracticePayload } : {})
+        ...(getFallLab3FinalContext().active ? { finalPracticePayload: state.finalPracticePayload, finalExamDeadline: state.finalExamDeadline || null } : {})
     };
 }
 
@@ -3796,6 +3798,13 @@ function restoreSavedQuizProgress(snapshot) {
     state.timedOut = !!snapshot.timedOut;
     state.reviewMode = !!snapshot.reviewMode;
     state.bossMode = !!snapshot.bossMode;
+    if (getFallLab3FinalContext().active && isTrueExamMode() && !state.reviewMode) {
+        state.finalExamDeadline = Number.isFinite(snapshot.finalExamDeadline) && snapshot.finalExamDeadline > 0
+            ? snapshot.finalExamDeadline
+            : (Number(snapshot.savedAt) || Date.now()) + state.timerSeconds * 1000;
+        state.timerSeconds = Math.max(0, Math.ceil((state.finalExamDeadline - Date.now()) / 1000));
+        state.timerPaused = false;
+    }
     state.generatedTimerSeconds = Math.max(0, Number(snapshot.generatedTimerSeconds) || 0);
     state.generatedQuestionLimit = Math.max(0, Number(snapshot.generatedQuestionLimit) || 0);
     state.adaptiveSummary = snapshot.adaptiveSummary && typeof snapshot.adaptiveSummary === "object"
@@ -3827,7 +3836,9 @@ function restoreSavedQuizProgress(snapshot) {
     const when = formatSavedSessionAge(savedAt);
     state.saveStatusMessage = `Restored ${when}`;
     renderQuizStatus();
-    showQuizSessionNote(`Saved progress restored from ${when}. Answers, marks, and timer are back where you left them.`);
+    showQuizSessionNote(getFallLab3FinalContext().active && isTrueExamMode() && !state.reviewMode
+        ? `Saved progress restored from ${when}. Answers and marks are restored; the exam countdown includes time away.`
+        : `Saved progress restored from ${when}. Answers, marks, and timer are back where you left them.`);
     return true;
 }
 
@@ -3981,6 +3992,13 @@ function restoreAttemptTimerAffordance() {
     const readout = getEl("timer-readout");
     if (!readout) return;
 
+    if (getFallLab3FinalContext().active && isTrueExamMode() && !state.reviewMode) {
+        readout.title = "True Exam Mode: the 100-minute countdown cannot be paused and continues across reloads.";
+        readout.onclick = null;
+        readout.classList.remove("cursor-pointer", "opacity-40", "cursor-default");
+        return;
+    }
+
     if (readout.dataset?.completed) delete readout.dataset.completed;
     readout.title = "";
     readout.classList.remove("opacity-40", "cursor-default");
@@ -4118,7 +4136,7 @@ function runCompletionAction(actionId) {
         const context = getFallLab3FinalContext();
         if (!context.active || state.finalLaunchInFlight) return false;
         state.finalLaunchInFlight = true;
-        const launcherUrl = new URL("assets/js/fall-2026-lab3-launcher.js?v=20261027b", window.location.href).href;
+        const launcherUrl = new URL("assets/js/fall-2026-lab3-launcher.js?v=20261101b", window.location.href).href;
         import(launcherUrl).then(launcher => launcher.launchFall2026Lab3Final(context.mode, { exam: isTrueExamMode() }))
             .catch(error => { console.warn("Final Practice launch failed:", error); alert("Unable to build a safe Final Practice set. Try again from the Lab III hub."); })
             .finally(() => { state.finalLaunchInFlight = false; });
@@ -4155,7 +4173,7 @@ function runCompletionAction(actionId) {
             // so this action imports it at click time. The hub registers its
             // own startup on DOMContentLoaded; a click after load does not
             // run that startup or consume continuation requests.
-            const launcherUrl = new URL("assets/js/fall-2026-lab3-launcher.js?v=20261027b", window.location.href).href;
+            const launcherUrl = new URL("assets/js/fall-2026-lab3-launcher.js?v=20261101b", window.location.href).href;
             import(launcherUrl)
                 .then((launcher) => {
                     if (typeof launcher.launchFall2026Lab3WeekFocus !== "function") {
@@ -7952,6 +7970,7 @@ function wireEvents() {
 }
 
 function toggleTimer() {
+    if (getFallLab3FinalContext().active && isTrueExamMode() && !state.reviewMode) return;
     if (state.attemptCompleted) return;
     if (!state.timerHandle && state.timerSeconds <= 0) return;
 
@@ -7983,7 +8002,9 @@ function timerTick() {
         return;
     }
 
-    state.timerSeconds--;
+    if (getFallLab3FinalContext().active && isTrueExamMode() && !state.reviewMode && state.finalExamDeadline) {
+        state.timerSeconds = Math.max(0, Math.ceil((state.finalExamDeadline - Date.now()) / 1000));
+    } else state.timerSeconds--;
     const mins = Math.floor(state.timerSeconds / 60);
     const secs = state.timerSeconds % 60;
     const readout = getEl("timer-readout");
@@ -8010,6 +8031,8 @@ function startSmartTimer() {
         ? 600
         : (isFinalExam ? FINAL_EXAM_TIMER_SECONDS : (weekParam ? 600 : (count <= 20 ? 900 : (count <= 50 ? 2700 : 7200))));
     state.timerPaused = false;
+    state.finalExamDeadline = getFallLab3FinalContext().active && isTrueExamMode() && !state.reviewMode
+        ? Date.now() + 100 * 60 * 1000 : null;
     if (getFallLab3FinalContext().active && getEl("timer-readout")) getEl("timer-readout").textContent = `${Math.floor(state.timerSeconds / 60)}:${String(state.timerSeconds % 60).padStart(2, "0")}`;
     state.timerHandle = setInterval(timerTick, 1000);
 }
@@ -8838,7 +8861,7 @@ async function main() {
                 storageKey = state.generatedAttemptIdentity?.scoreStorageKey || `pharmlet.${quizId}.${modeParam}`;
             } else {
                 state.title = data.title || "Quiz";
-                if (getFallLab3FinalContext().active && (pool.length !== 100 || !data.metadata?.finalPractice || data.metadata.finalPractice.version !== "fall-final100-v1")) {
+                if (getFallLab3FinalContext().active && (pool.length !== 100 || !data.metadata?.finalPractice || !["fall-final100-v1", "fall-final100-v2"].includes(data.metadata.finalPractice.version))) {
                     throw new Error("Final Practice requires a complete validated 100-question payload.");
                 }
                 const orderedPool = getFallLab3FinalContext().active ? pool : shuffled(applyQuestionLimit(pool));
@@ -9016,6 +9039,7 @@ function finishSetup(storageKey) {
 
     wireEvents();
     applyAttemptModeUI();
+    if (getFallLab3FinalContext().active && isTrueExamMode() && !state.reviewMode) restoreAttemptTimerAffordance();
 
     if (!state.progressLifecycleBound) {
         const persistNow = () => persistQuizProgress(true);
@@ -9039,6 +9063,10 @@ function finishSetup(storageKey) {
     localStorage.setItem("pharmlet.last-quiz", lastQuizParam);
     
     render();
+    // Render/setup first so an expired resume cannot overwrite its results.
+    if (getFallLab3FinalContext().active && isTrueExamMode() && !state.reviewMode && state.timerSeconds <= 0) {
+        finishQuizDueToTimeout();
+    }
 }
 
 document.addEventListener('DOMContentLoaded', main);

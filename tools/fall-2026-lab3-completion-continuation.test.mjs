@@ -22,7 +22,7 @@ import { loadBrowserGlobal } from "./browser-global-harness.mjs";
 import { buildFall2026Lab3Payload } from "../assets/js/fall-2026-lab3-launcher.js";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const ENGINE_TOKEN = "20261027b";
+const ENGINE_TOKEN = "20261101b";
 const REMIX_REQUEST_KEY = "pharmlet.fall-2026-lab3.boss-remix-request";
 const CUSTOM_QUIZ_KEY = "pharmlet.custom-quiz";
 const HISTORY_KEY = "pharmlet.history";
@@ -35,8 +35,8 @@ const LIFETIME_MEMORY_KEYS = [
 const PROTECTED_FALL_BASELINES = Object.freeze({
   drugData: "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01",
   policy: "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171",
-  generator: "126b3b7aa070bf3e7ebc9daf8018c27e378c61ea68e5281412b674936c8a1493",
-  launcher: "0fa65e5120302a295b84a3b236e80ed5f86f01d60248f42b637afd4626dfc317"
+  generator: "9a806c13e57e74cef2aa64e25624293dd13a01b4ba4ac92a7d062a4576a55608",
+  launcher: "1c4280293a80db17a2fd55ffb4510976d03b21e6a747df6cc7e1ca38a61904e3"
 });
 
 const drugData = JSON.parse(read("assets/data/fall-2026-p2-top-drugs.json"));
@@ -653,13 +653,13 @@ test("a weak drug can return through a different safe question identity", () => 
   const { questions } = buildFinishedAttempt(9, "f26-11-remix-same-drug-0", [1, 2]);
   const engine = loadEngine();
   const request = requestFor(engine, questions, { createdAt: 4_000 });
-  const payload = plain(engine.sandbox.buildFallLab3BossRemixPayload({
-    request,
-    practicePayload: buildPracticePayload(9, "f26-11-remix-same-drug-0-fresh"),
-    createdAt: 4_100
-  }));
-
   const focusDrugIds = new Set(request.focusDrugIds);
+  const payload = Array.from({length: 20}, (_, index) => plain(engine.sandbox.buildFallLab3BossRemixPayload({
+    request,
+    practicePayload: buildPracticePayload(9, `faculty-remix-same-drug-${index}`),
+    createdAt: 4_100
+  }))).find(payload => payload?.questions.some(q => (q.metadata.sourceDrugIds || []).some(id => focusDrugIds.has(id))));
+  assert.ok(payload, "bounded fresh pools contain another safe fact for a missed drug");
   const repeatedDrugs = payload.questions.filter((question) => (
     (question.metadata.sourceDrugIds || []).some((drugId) => focusDrugIds.has(drugId))
   ));
@@ -1165,9 +1165,9 @@ test("normal Fall generation semantics are untouched by the continuation work", 
   }
 });
 
-test("the engine cache token is refreshed for quiz.html only", () => {
+test("the Final engine, Stats and launcher cache tokens advance together", () => {
   const quiz = read("quiz.html");
   assert.ok(quiz.includes(`assets/js/quizEngine.js?v=${ENGINE_TOKEN}`), "the engine change needs a fresh cache token");
-  assert.ok(read("stats.html").includes("assets/js/stats.js?v=20261027b"), "unrelated bundles keep their tokens");
-  assert.ok(read("lab3-fall-2026.html").includes('src="assets/js/fall-2026-lab3-launcher.js?v=20261027b"'));
+  assert.ok(read("stats.html").includes("assets/js/stats.js?v=20261101b"), "Final Stats ships with the new player");
+  assert.ok(read("lab3-fall-2026.html").includes('src="assets/js/fall-2026-lab3-launcher.js?v=20261101b"'));
 });

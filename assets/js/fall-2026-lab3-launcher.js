@@ -1,14 +1,14 @@
-import { buildFall2026FinalPayload, FINAL_KINDS } from './fall-2026-final-practice.js?v=20261027b';
+import { buildFall2026FinalPayload, FINAL_KINDS } from './fall-2026-final-practice.js?v=20261101b';
 import {
   WEEK_1_PRACTICE_NOTE,
   generateFall2026Quiz
-} from "./fall-2026-quiz-generator.js?v=20261027b";
+} from "./fall-2026-quiz-generator.js?v=20261101b";
 import {
   ADAPTIVE_MEMORY_KEY,
   buildFall2026AdaptivePayload,
   normalizeAdaptiveMemory,
   recordAdaptiveRound
-} from "./fall-2026-adaptive-practice.js?v=20261027b";
+} from "./fall-2026-adaptive-practice.js?v=20261101b";
 
 const CUSTOM_QUIZ_KEY = "pharmlet.custom-quiz";
 const HISTORY_KEY = "pharmlet.history";

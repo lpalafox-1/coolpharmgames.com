@@ -94,9 +94,9 @@ test('Final history, completion, review identity and score remain distinct from 
  vm.runInContext('state.reviewMode=true;state.resultsRecorded=false;',e);e.saveQuizHistory();assert.equal(JSON.parse(map.get('pharmlet.history')).length,1);
 });
 test('cache chain includes the Final composer, both source parents, engine and Stats',()=>{
- assert.match(read('assets/js/fall-2026-lab3-launcher.js'),/fall-2026-final-practice\.js\?v=20261027b/);
- for(const p of ['assets/js/fall-2026-final-practice.js','assets/js/fall-2026-adaptive-practice.js','assets/js/fall-2026-lab3-launcher.js'])assert.match(read(p),/fall-2026-quiz-generator\.js\?v=20261027b/);
- assert.match(read('quiz.html'),/quizEngine\.js\?v=20261027b/);assert.match(read('stats.html'),/stats\.js\?v=20261027b/);
+ assert.match(read('assets/js/fall-2026-lab3-launcher.js'),/fall-2026-final-practice\.js\?v=20261101b/);
+ for(const p of ['assets/js/fall-2026-final-practice.js','assets/js/fall-2026-adaptive-practice.js','assets/js/fall-2026-lab3-launcher.js'])assert.match(read(p),/fall-2026-quiz-generator\.js\?v=20261101b/);
+ assert.match(read('quiz.html'),/quizEngine\.js\?v=20261101b/);assert.match(read('stats.html'),/stats\.js\?v=20261101b/);
 });
 
 test('Stats distinguishes Balanced and Adaptive Finals through lineage and exam/practice mode IDs',()=>{

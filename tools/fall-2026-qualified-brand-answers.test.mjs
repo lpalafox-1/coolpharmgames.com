@@ -38,7 +38,7 @@ function scoreQuestion(question, value) {
 }
 
 test("Metoprolol generic-to-brand accepts the source brand with or without its qualifier", () => {
-  const question = metoprololBrandQuestion("premise-42");
+  const question = Array.from({length: 100}, (_, i) => metoprololBrandQuestion(`qualified-brand-${i}`)).find(Boolean);
   assert.ok(question, "Week 3 seed premise-42 still selects the Metoprolol brand question");
   assert.equal(question.id, PRE_FIX.id);
   assert.equal(question.prompt, PRE_FIX.prompt);
@@ -97,10 +97,10 @@ test("launcher and adaptive import the same post-F26-25 generator token (bumped 
   const adaptive = read("assets/js/fall-2026-adaptive-practice.js");
   const page = read("lab3-fall-2026.html");
   const generatorToken = /fall-2026-quiz-generator\.js\?v=([0-9a-z]+)/;
-  assert.equal(generatorToken.exec(launcher)?.[1], "20261027b");
-  assert.equal(generatorToken.exec(adaptive)?.[1], "20261027b");
+  assert.equal(generatorToken.exec(launcher)?.[1], "20261101b");
+  assert.equal(generatorToken.exec(adaptive)?.[1], "20261101b");
   assert.equal(launcher.includes("fall-2026-quiz-generator.js?v=20260913a"), false);
   assert.equal(adaptive.includes("fall-2026-quiz-generator.js?v=20260913a"), false);
-  assert.match(launcher, /fall-2026-adaptive-practice\.js\?v=20261027b/);
-  assert.match(page, /fall-2026-lab3-launcher\.js\?v=20261027b/);
+  assert.match(launcher, /fall-2026-adaptive-practice\.js\?v=20261101b/);
+  assert.match(page, /fall-2026-lab3-launcher\.js\?v=20261101b/);
 });

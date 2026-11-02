@@ -21,7 +21,7 @@ const policy = JSON.parse(
 );
 const APPROVED_ENGINE_BASELINE = Object.freeze({
   reference: "F26-24 Week Focus completion plus PR #90 display-only renderer",
-  sha256: "aa3977811dc2451249012abb5f651fd7f2ffb8e0f24379cb1237320b9344c56d"
+  sha256: "f66d74f69920477564410b12de22bd94ec2dc1e32d72d79b17cce1a62014e046"
 });
 
 function createStorageStub(initialValues = {}) {
@@ -422,9 +422,9 @@ test(`Fall stays isolated to its launcher, legacy data has no strict marker, and
     "utf8"
   );
   assert.ok(fallPageSource.includes(
-    'src="assets/js/fall-2026-lab3-launcher.js?v=20261027b"'
+    'src="assets/js/fall-2026-lab3-launcher.js?v=20261101b"'
   ));
-  assert.ok(launcherSource.includes('from "./fall-2026-quiz-generator.js?v=20261027b"'));
+  assert.ok(launcherSource.includes('from "./fall-2026-quiz-generator.js?v=20261101b"'));
   assert.ok(launcherSource.includes("assets/data/fall-2026-p2-top-drugs.json"));
   assert.ok(launcherSource.includes("assets/data/fall-2026-lab3-quiz-policy.json"));
   assert.ok(!launcherSource.includes("master_pool.json"));

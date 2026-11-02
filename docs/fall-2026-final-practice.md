@@ -2,7 +2,7 @@
 
 Owner-requested October 27, 2026. Luis alone controls product decisions and
 merges. This prototype depends on the separate faculty-form policy change
-(d1ca04ec28725565afcae545162a78f6b2f5ba19, PR #91). It is not a professor-authored
+(5fab17c4c692fe7e62c6f972f3ed309983a3334a, PR #91). It is not a professor-authored
 final blueprint or a deployment claim.
 
 ## Source and faculty boundary
@@ -13,22 +13,28 @@ No P1 pool, outside clinical facts, new drug records, policy edits, MTC, or new
 pair-recognition question forms are used. The six written domains remain
 Brand/Generic, Drug Class, FDA Indication, MOA, Top ADRs and BBW.
 
-Luis's faculty-verbal evidence rejects reverse no-BBW identification and
-whole-ADR-list-to-drug identification. Those forms are blocked by PR #91 and
-checked again by this composer. Forward full top ADR lists, positive drug-to-
-BBW, source-safe single ADR recognition and existing exact/source-approved
-class-coherent Pairwise Shared ADR remain available. Verbal approval of
-correct drug–class and drug–indication pairs is future scope, not shipped here.
+The shared PR #91 form policy blocks no-BBW identification, whole-ADR-list
+identification and complete-list FDA/ADR testing in either direction. New
+Brand/Generic questions are strict FITB. Individual source facts, positive
+BBW, class-common ADR and approved class-coherent Pairwise Shared ADR remain
+available. Negative ADR/FDA forms are held because canonical omission cannot
+establish a defensible negative; there is no invented negative quota. The
+complete audit distinguishes Luis's written-guidance transcription, verbal
+faculty reports and private weekly-quiz calibration evidence in
+`docs/fall-2026-question-form-policy.md`. The private quiz bank is not copied.
 The merged #90 prompt display adapter remains presentation-only; canonical
 prompts, plain answers, matching contracts and Queue identities are preserved.
 
 ## Composition and reproducibility
 
 - Exactly 100 items, exactly ten attributed to each primary source week 1–10.
-  Every week includes all six domains. The four extra weekly slots go to the
+  Every week includes all six domains as a Pharm-let design choice, not a
+  faculty-confirmed per-week domain quota. Faculty-confirmed constraints are
+  100 questions, ten per week, 100 minutes and overall balanced question types
+  (as reported by Luis). The four extra weekly slots go to the
   globally least-represented domains with demonstrated concept capacity, at
   most two slots per domain/week. No redistribution or padding fallback exists.
-- Both choices sample the identical seeded pool: twelve Week Focus draws per
+- Both choices sample the identical seeded pool: twenty-four Week Focus draws per
   week. Balanced does not read history, Queue, memory or time options. Adaptive
   reuses the existing signal/weakness/scoring helpers inside the exact same
   week/domain envelope; it never calls the weekly 6+4 Adaptive composer.
@@ -49,15 +55,23 @@ prompts, plain answers, matching contracts and Queue identities are preserved.
   same source/version/seed and, for Adaptive, the same evidence/time inputs.
   Resume/retry use the full stored payload, not a fresh recomposition.
 
-Current-source fixtures produce 17 questions in each of the first five domains
-and 15 BBW questions. These are product balancing results, not faculty-set
-percentages. Removal of the rejected forms does not prevent ten per week.
+Domain totals follow the capacity-checked envelope, not the observed weekly
+27/20/20/11/11/11 distribution. This is product balancing, not faculty-set
+percentages. The 100-seed corpus retains ten per week after the restrictions.
+Sampling increased from twelve to twenty-four supported draws after the
+stricter forms exposed a seed-dependent capacity failure; no safety rule or
+quota was relaxed. Insufficient capacity still fails closed.
 
 ## Player, history and storage
 
-The hub defaults to Balanced and offers optional Adaptive. The 100-minute
-practice timer is pausable. Optional True Exam Mode keeps drafts editable and
-defers grading/feedback to submission; hints/reveal are unavailable there.
+The hub defaults to Balanced and offers optional Adaptive. The separately
+labeled study timer is pausable. True Exam Mode uses a 100-minute wall-clock
+deadline, cannot pause, keeps drafts editable and defers grading/feedback to
+submission or expiration; hints/reveal are unavailable there. Refresh/resume
+retains the deadline and deducts time away. Expired resumes submit after setup,
+so the question renderer cannot replace the completed results. Older snapshots
+without a deadline derive one from saved time plus remaining seconds; existing
+v1 Final payloads remain readable. Newly generated Finals carry v2 provenance.
 Final-only mobile navigation scrolls inside a compact panel. The initial timer
 is painted before it can be paused.
 
@@ -82,7 +96,7 @@ Storage limits remain browser-dependent; quota failure is tested explicitly.
 
 ## Validation on the completed prototype
 
-All four repository gates pass, including 450/450 tools tests. One hundred
+All four repository gates must pass before delivery. One hundred
 seeded Finals (50 Balanced / 50 Adaptive) pass independent size, week/domain,
 identity, cap, ordering, source and whole-set Brand/Generic leakage assertions.
 Adversarial weakness evidence changes selection while preserving the envelope.
@@ -97,4 +111,4 @@ Separate evidence verifies an entered answer stays ungraded before submission.
 
 Canonical Fall source, written policy, P1 source and Queue store remain unchanged.
 The generator/Adaptive/Final/launcher/hub/engine cache chain and Stats importer
-all use `20261027b`. Live production activation awaits Luis's merge decision.
+all use `20261101b`. Live production activation awaits Luis's merge decision.
