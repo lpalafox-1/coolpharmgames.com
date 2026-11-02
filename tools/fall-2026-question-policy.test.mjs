@@ -22,6 +22,9 @@ function allowed(q) {
   }
   assert.ok(!(m.knowledgeDomain === 'topAdverseReactions' && m.questionVariant === 'identifyDrugByStructuredValue'), q.prompt);
   assert.ok(!(m.knowledgeDomain === 'boxWarning' && m.choicePredicate?.value?.toLowerCase() === 'none'), q.prompt);
+  if (m.knowledgeDomain === 'boxWarning') {
+    for (const value of [q.answer,...q.choices]) assert.notEqual(String(value).trim().toLowerCase(),'none');
+  }
   assert.doesNotMatch(q.prompt, /Which drug has no boxed|Which drug.*(?:full|complete).*?(?:ADR|adverse.reaction).*list|\bNOT\b.*boxed/i);
 }
 test('faculty-rejected forms are absent from raw candidates, materialization, weekly, focus, Adaptive and fresh Boss pools', () => {
@@ -105,4 +108,33 @@ test('six domains and content identity survive all new safe weekly sets without 
     q.forEach(allowed);
   }
   assert.equal(JSON.stringify({drugData,policy}),before);
+});
+
+test('positive BBW forward, inverse and constrained fallback paths never offer None',()=>{
+  const seen=new Set();
+  for(let week=1;week<=10;week++) {
+    const candidates=buildQuestionCandidates({drugData,policy,quizWeek:week,materialType:'new'}).filter(c=>c.domainId==='boxWarning');
+    for(const candidate of candidates)for(let n=0;n<12;n++) {
+      const result=materializeQuestionCandidate({drugData,policy,candidate,rng:createSeededRng(`bbw-${week}-${n}`)});
+      assert.equal(result.status,'materialized');allowed(result.question);
+      seen.add(result.question.metadata.questionVariant||'forward');
+    }
+  }
+  assert.ok(seen.has('forward'));
+  for(let week=1;week<=10;week++)for(let n=0;n<6;n++) {
+    const round=generateFall2026Quiz({drugData,policy,quizWeek:week,mode:'week-focus',questionCount:10,seed:`bbw-calibrated-${week}-${n}`});
+    for(const q of round.questions.filter(q=>q.metadata.knowledgeDomain==='boxWarning')) {allowed(q);seen.add(q.metadata.questionVariant);}
+  }
+  assert.ok(seen.has('boxWarningDrugRecognition'));
+  // Only one positive warning value: forward warning choices cannot use None
+  // to pad capacity. The supported inverse drug-choice fallback may still work.
+  const fixture=structuredClone(drugData);
+  for(const d of fixture.drugs)if(d.boxWarning.toLowerCase()!=='none')d.boxWarning='Supported warning';
+  const source=fixture.drugs.find(d=>d.boxWarning==='Supported warning');
+  const candidate={id:'constrained-bbw',sourceDrugId:source.id,sourceDrugIds:[source.id],sourceDrugQuizWeek:source.quizWeek,requestedQuizWeek:source.quizWeek,materialType:'new',domainId:'boxWarning',questionType:'mcq'};
+  for(let n=0;n<12;n++) {
+    const result=materializeQuestionCandidate({drugData:fixture,policy,candidate,rng:createSeededRng(`bbw-fallback-${n}`)});
+    if(result.status==='materialized')allowed(result.question);
+    else assert.equal(result.status,'unavailable');
+  }
 });

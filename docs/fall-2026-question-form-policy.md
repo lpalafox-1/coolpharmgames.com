@@ -40,7 +40,7 @@ Remix pools (#91), and dependent Balanced/Adaptive Final pools (#92).
 | `notFdaIndicationRecognition` | Which is NOT indicated for X? | Shape observed, specific clinical negatives unproven | HOLD; negative materializer/capacity removed |
 | `singleAdverseReactionRecognition` | Which Top ADR is recorded in the Fall source for X? | Written/observed positive ADR | KEEP atomic forward fallback with all-valid-fact exclusion |
 | `atomicAdverseReactionRecognition` | Which drug has an ADR of X? | Observed positive inverse ADR | KEEP recorded-source scope and synonym rejection |
-| `classCommonAdrRecognition` | Which is a common ADR of class X? | Approved source-supported common form | KEEP exact class/family intersection; reject distractors overlapping the entire member union |
+| `classCommonAdrRecognition` | Which ADR is listed for every member of the X source group in Weeks A–B? | Drug-level canonical intersection supports a bounded source-group claim, not clinical prevalence across an entire class | REVISE wording to the eligible source group/week range; keep exact intersection and reject distractors overlapping the entire member union |
 | `familyNotAdrRecognition` | Which is NOT an ADR of class X? | Shape observed but omission is not a clinical negative | HOLD; remove negative materializer, retain positive class-common path |
 | `pairwiseSharedAdrRecognition` | Which ADR is listed for both X and Y? | Specifically approved class-coherent pair form | KEEP existing coherence, exact shared facts, pair/protected-name guards; no new pairwise domains |
 | class `structuredValueChoices`, `identifyDrugByStructuredValue` | What class does the Fall source list for X? | Written/observed class | KEEP forward and inverse class-only cardinality fallbacks/qualifications |
@@ -48,6 +48,7 @@ Remix pools (#91), and dependent Balanced/Adaptive Final pools (#92).
 | forward MOA, `moaDrugRecognition` | What is the MOA of X? / Which drug has this MOA? | Written/observed MOA | KEEP; reject punctuation-equivalent, contained or highly overlapping MOA choices |
 | forward positive BBW, `boxWarningDrugRecognition` | Which warning is listed for X? | Written/observed positive BBW | KEEP positive facts; exclude ambiguous warning alternatives |
 | forward `none` / inverse no-BBW | Which drug has no boxed warning listed? | Verbal rejection / absence is not positive fact | REMOVE inverse, HOLD forward absence testing; candidate and forged/raw materialization reject |
+| BBW `None` distractor | Which boxed warning is listed for drug X? / None | Absence is not a positive warning and is not needed as a distractor | REMOVE from shared forward distractor builder and reject any surviving `None` choice in the central policy, including fallbacks |
 | new positive multi-ADR clues | Identify drug from three stated ADRs | Observed when uniquely supported | HOLD new implementation; whole-list inverse cannot masquerade as this approved shape |
 | pairwise MOA/BBW/class/FDA or new correctness pairs | No implemented approved template | No specific authorization | HOLD; no new materializer for capacity |
 
