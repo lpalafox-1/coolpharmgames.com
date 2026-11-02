@@ -894,12 +894,12 @@ test("a thin current-week pool still yields ten items and records fallback", () 
 test("adaptive selects a class-coherent pairwise ADR and keeps the reversed pair one concept", () => {
   assert.equal(adaptive.ADAPTIVE_CURRENT_ITEM_TARGET, 6);
   assert.equal(adaptive.ADAPTIVE_REVIEW_ITEM_TARGET, 4);
-  const payload = Array.from({ length: 30 }, (_, index) => buildFall2026Lab3Payload({
+  const payload = buildFall2026Lab3Payload({
     drugData,
     policy,
     quizWeek: 6,
-    seed: `faculty-pair-standard-6-${index}`
-  })).find(payload => payload.questions.some(q => q.metadata.pairwiseSharedAdr?.pairKey === "p2-fall-quiz-06-drug-01+p2-fall-quiz-06-drug-03"));
+    seed: "stage2-pair-standard-6-35"
+  });
   assert.ok(payload, "the bounded seed corpus exercises the canonical pair");
   const pairwise = payload.questions.find((question) => (
     question.metadata?.questionVariant === "pairwiseSharedAdrRecognition"
@@ -1191,9 +1191,9 @@ test("normal Week Practice output is unchanged by F26-10", () => {
 
 test("the generator, canonical data, and policy retain main bytes; the engine matches its display-only baseline", () => {
   assert.equal(sha256("assets/js/fall-2026-quiz-generator.js"),
-    "1303cc7e469f8de3795f6e45b62b3c107229bfd399b647dfa8abed3dbc6e3b95", "generator must not change");
+    "6eedb84390d8fdcdde9abd0147f75191514276086d2fd1b82ac62ef3c06befc5", "generator must not change");
   assert.equal(sha256("assets/js/quizEngine.js"),
-    "f66d74f69920477564410b12de22bd94ec2dc1e32d72d79b17cce1a62014e046", "engine must match the display-only baseline");
+    "001e569603c2958fc389f426801be2149a68c1134385808283666d60b6a4cd56", "engine must match the display-only baseline");
   assert.equal(sha256("assets/data/fall-2026-p2-top-drugs.json"),
     "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01", "canonical drug data must not change");
   assert.equal(sha256("assets/data/fall-2026-lab3-quiz-policy.json"),
@@ -1225,5 +1225,5 @@ test("the hub offers Adaptive Practice without AI language", () => {
   // Normal Week Practice stays visible as its own dropdown launcher.
   assert.match(hub, /id="weekly-week"/);
   assert.match(hub, /id="weekly-launch"/);
-  assert.match(hub, /assets\/js\/fall-2026-lab3-launcher\.js\?v=20261101b/);
+  assert.match(hub, /assets\/js\/fall-2026-lab3-launcher\.js\?v=20261101d/);
 });

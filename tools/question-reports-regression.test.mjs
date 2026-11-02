@@ -10,13 +10,13 @@ import { loadBrowserGlobal } from "./browser-global-harness.mjs";
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const REPORTS_KEY = "pharmlet.question-reports";
 const REPORTS_TOKEN = "20260831b";
-const ENGINE_TOKEN = "20261101b";
-const STATS_TOKEN = "20261101b";
+const ENGINE_TOKEN = "20261101d";
+const STATS_TOKEN = "20261101d";
 const PROTECTED_BASELINES = Object.freeze({
   fallSource: "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01",
   fallPolicy: "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171",
-  fallGenerator: "1303cc7e469f8de3795f6e45b62b3c107229bfd399b647dfa8abed3dbc6e3b95",
-  fallLauncher: "1c4280293a80db17a2fd55ffb4510976d03b21e6a747df6cc7e1ca38a61904e3",
+  fallGenerator: "6eedb84390d8fdcdde9abd0147f75191514276086d2fd1b82ac62ef3c06befc5",
+  fallLauncher: "7305fc2f230c51b561f6734253a3f7fa898b3eb4a849bbe0572fa732fc3c5063",
   masterPool: "1fb50e96e60252a9839406d53bc929e9569d76c0ddc2522aff43adf9bdf2a87c"
 });
 
@@ -199,7 +199,7 @@ test("Week 3 and Week 7 reports preserve existing deterministic reproduction met
 });
 
 test("strict Brand/Generic report metadata and multiple accepted brands survive save/reload", () => {
-  const payload = buildFallPayload(1, "policy-fixture-1-practice-11");
+  const payload = buildFallPayload(1, "stage2-dilt-5");
   const question = payload.questions.find((candidate) => Array.isArray(candidate._acceptedAnswers));
   assert.ok(question, "fixture must contain a multi-brand strict short-answer question");
   const storage = createStorage();

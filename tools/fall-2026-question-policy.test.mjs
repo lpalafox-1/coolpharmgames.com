@@ -64,11 +64,11 @@ test('faculty-rejected forms are absent from raw candidates, materialization, we
   assert.ok(seen.has('boxWarningDrugRecognition'));
 });
 test('all generator importers and cached parents advance together', () => {
-  for (const parent of ['assets/js/fall-2026-lab3-launcher.js', 'assets/js/fall-2026-adaptive-practice.js']) assert.match(read(parent), /fall-2026-quiz-generator\.js\?v=20261101b/);
-  assert.match(read('assets/js/fall-2026-lab3-launcher.js'), /fall-2026-adaptive-practice\.js\?v=20261101b/);
-  assert.match(read('assets/js/quizEngine.js'), /fall-2026-lab3-launcher\.js\?v=20261101b/);
-  assert.match(read('lab3-fall-2026.html'), /fall-2026-lab3-launcher\.js\?v=20261101b/);
-  assert.match(read('quiz.html'), /quizEngine\.js\?v=20261101b/);
+  for (const parent of ['assets/js/fall-2026-lab3-launcher.js', 'assets/js/fall-2026-adaptive-practice.js']) assert.match(read(parent), /fall-2026-quiz-generator\.js\?v=20261101d/);
+  assert.match(read('assets/js/fall-2026-lab3-launcher.js'), /fall-2026-adaptive-practice\.js\?v=20261101d/);
+  assert.match(read('assets/js/quizEngine.js'), /fall-2026-lab3-launcher\.js\?v=20261101d/);
+  assert.match(read('lab3-fall-2026.html'), /fall-2026-lab3-launcher\.js\?v=20261101d/);
+  assert.match(read('quiz.html'), /quizEngine\.js\?v=20261101d/);
 });
 
 test('forged absence-of-warning and insufficient atomic pools fail closed without list fallbacks', () => {

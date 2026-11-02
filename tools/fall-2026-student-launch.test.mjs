@@ -27,8 +27,8 @@ const FALL_LAB3_WEEKS = Array.from({ length: 10 }, (_, index) => index + 1);
 const FALL_UI_BASELINES = Object.freeze({
   drugData: "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01",
   policy: "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171",
-  generator: "1303cc7e469f8de3795f6e45b62b3c107229bfd399b647dfa8abed3dbc6e3b95",
-  launcher: "1c4280293a80db17a2fd55ffb4510976d03b21e6a747df6cc7e1ca38a61904e3"
+  generator: "6eedb84390d8fdcdde9abd0147f75191514276086d2fd1b82ac62ef3c06befc5",
+  launcher: "7305fc2f230c51b561f6734253a3f7fa898b3eb4a849bbe0572fa732fc3c5063"
 });
 
 const LEGACY_HOME_HREFS = [
@@ -270,7 +270,7 @@ test("Weeks 1-10 preserve strict Brand/Generic FITB metadata through activation"
 });
 
 test("a launched multiple-brand FITB keeps strict scoring and accepted answers through the runtime and review queue", () => {
-  const payload = build(1, "policy-fixture-1-practice-11");
+  const payload = build(1, "stage2-dilt-5");
   const launchedQuestion = payload.questions.find((question) => (
     question.metadata?.knowledgeDomain === "brandGeneric"
     && [question.answer, ...(question._acceptedAnswers || [])].includes("Dilt-XR")
@@ -354,7 +354,7 @@ test("the hub shows a Week Focus launcher with its own week select and start con
   assert.doesNotMatch(adaptive, /id="week-focus-week"|id="week-focus-launch"|id="weekly-week"|id="weekly-launch"/);
 
   assert.doesNotMatch(page, /\bdata-week-card\b|\bdata-launch-week\b/);
-  assert.ok(page.includes('src="assets/js/fall-2026-lab3-launcher.js?v=20261101b"'));
+  assert.ok(page.includes('src="assets/js/fall-2026-lab3-launcher.js?v=20261101d"'));
 });
 
 test("the hub has three distinct week selects for Adaptive, Week Focus, and Standard Weekly", () => {
@@ -551,8 +551,8 @@ test("the F26-08 presentation-only change preserves launch wiring, cache tokens,
     "utf8"
   );
 
-  assert.ok(page.includes('src="assets/js/fall-2026-lab3-launcher.js?v=20261101b"'));
-  assert.ok(launcher.includes('from "./fall-2026-quiz-generator.js?v=20261101b"'));
+  assert.ok(page.includes('src="assets/js/fall-2026-lab3-launcher.js?v=20261101d"'));
+  assert.ok(launcher.includes('from "./fall-2026-quiz-generator.js?v=20261101d"'));
   assert.ok(launcher.includes('window.location.assign("quiz.html?id=custom-quiz")'));
   assert.ok(launcher.includes('getElementById("weekly-launch")'));
   assert.doesNotMatch(launcher, /data-launch-week/);

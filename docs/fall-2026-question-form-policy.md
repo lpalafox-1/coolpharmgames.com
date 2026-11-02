@@ -36,11 +36,11 @@ Remix pools (#91), and dependent Balanced/Adaptive Final pools (#92).
 | ADR `identifyDrugByStructuredValue` | Which drug has this full top ADR list? | Faculty verbal rejection | REMOVE inverse capacity, raw and low-distractor fallback |
 | `singleFdaIndicationRecognition` | Which FDA indication is recorded in the Fall source for X? | Written/observed positive FDA | KEEP one exact fact; exclude distractors overlapping any valid source indication |
 | `brandToFdaIndicationRecognition` | Which is an FDA indication for X? | Observed forward FDA | KEEP safe brand stem, atomic fact and all-indication ambiguity guard |
-| `atomicFdaIndicationRecognition` | Which drug is indicated for X? | Observed positive inverse FDA | REVISE to explicit recorded-source scope; positive predicates only |
+| `atomicFdaIndicationRecognition` | Which drug is indicated for X? | Observed positive inverse FDA | KEEP historical canonical identity; render-only recorded-source scope; positive predicates only |
 | `notFdaIndicationRecognition` | Which is NOT indicated for X? | Shape observed, specific clinical negatives unproven | HOLD; negative materializer/capacity removed |
 | `singleAdverseReactionRecognition` | Which Top ADR is recorded in the Fall source for X? | Written/observed positive ADR | KEEP atomic forward fallback with all-valid-fact exclusion |
-| `atomicAdverseReactionRecognition` | Which drug has an ADR of X? | Observed positive inverse ADR | KEEP recorded-source scope and synonym rejection |
-| `classCommonAdrRecognition` | Which ADR is listed for every member of the X source group in Weeks A–B? | Drug-level canonical intersection supports a bounded source-group claim, not clinical prevalence across an entire class | REVISE wording to the eligible source group/week range; keep exact intersection and reject distractors overlapping the entire member union |
+| `atomicAdverseReactionRecognition` | Which drug has an ADR of X? | Observed positive inverse ADR | KEEP historical canonical identity, render-only recorded-source scope and synonym rejection |
+| `classCommonAdrRecognition` | Which is a common ADR of X? (canonical); Which ADR is listed for every member of X source group? (display) | Drug-level intersection supports a bounded source-group claim, not class-wide prevalence | KEEP historical canonical identity; render-only source-group/week scope, with Week N for equal bounds; exact intersection and member-union exclusions remain |
 | `familyNotAdrRecognition` | Which is NOT an ADR of class X? | Shape observed but omission is not a clinical negative | HOLD; remove negative materializer, retain positive class-common path |
 | `pairwiseSharedAdrRecognition` | Which ADR is listed for both X and Y? | Specifically approved class-coherent pair form | KEEP existing coherence, exact shared facts, pair/protected-name guards; no new pairwise domains |
 | class `structuredValueChoices`, `identifyDrugByStructuredValue` | What class does the Fall source list for X? | Written/observed class | KEEP forward and inverse class-only cardinality fallbacks/qualifications |
@@ -65,14 +65,25 @@ Forward facts use the same eligible cohort. Distractors conflicting with any
 valid source fact, including synonyms/overlapping angina (Tenormin), Farxiga
 or Topamax indications, are rejected. MOA similarity only excludes negatives;
 it never establishes positive pharmacology. Generic/source identities remain
-unchanged; revised question text naturally has its own fingerprint.
+unchanged. Stage 2 adds exact-canonical-class protection for nonexhaustive
+ADR/FDA lists: inverse drug choices cannot use same-class siblings as negatives;
+forward fact choices cannot use facts listed for the target or its eligible
+exact-class siblings. Predicate caches and leakage rebuilds share the rule.
+No class projection, family-map expansion or new clinical inference is used.
+
+Unchanged positive inverse FDA/ADR facts and class-group facts retain their
+pre-#91 canonical prompts and answers, so existing fingerprints/performance
+keys match without aliases or storage rewrites. The display adapter alone adds
+source scope. Genuinely new atomic forward questions do not alias old whole-list
+or negative questions. Ten captured pre-#91 fixtures prove continuity with real
+revised generated questions and retained Adaptive weakness classification.
 
 The canonical Fall drug JSON and written quiz policy are unchanged. Existing
 saved attempts and Review Queue identities are preserved. This change governs
 new generation, including fresh Standard Weekly, Week Focus, Adaptive, Boss
 Remix material and future Final pools. Old saved payloads are not migrated.
 Generator, both importing parents, hub, engine dynamic launcher import and
-engine HTML token advance together to `20261101a`; #92 advances its dependent
+engine HTML token advance together to `20261101c`; #92 advances its dependent
 chain after reconciliation. Brand ® remains render-only and never graded.
 
 ## Remaining evidence

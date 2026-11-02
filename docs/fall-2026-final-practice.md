@@ -2,7 +2,7 @@
 
 Owner-requested October 27, 2026. Luis alone controls product decisions and
 merges. This prototype depends on the separate faculty-form policy change
-(5fab17c4c692fe7e62c6f972f3ed309983a3334a, PR #91). It is not a professor-authored
+(46ef4d763199bb90b03123757048168651e4558c, PR #91). It is not a professor-authored
 final blueprint or a deployment claim.
 
 ## Source and faculty boundary
@@ -89,14 +89,43 @@ custom-quiz key. Week/domain summaries count actual outcomes by primary week.
 Scores remain 0–100 for full attempts; review scores describe only the subset.
 
 A source/capacity/quota failure before launch preserves the previous payload
-and does not navigate. Progress-save failure is surfaced in the player. In
-Chrome acceptance, stored payloads were 233,443–244,825 characters and progress
-snapshots 457,197–479,490 characters, including the exact retry payload.
-Storage limits remain browser-dependent; quota failure is tested explicitly.
+and does not navigate. Progress-save failure is surfaced in the player.
+Stage 2 progress format 2 stores the immutable 100-question retry payload once,
+with small question-state deltas for the current/review sets. Legacy full
+snapshots remain readable. A representative browser snapshot shrank from
+446,973 to 233,513 characters; exact retry, accepted answers, marks and drafts
+round-trip without copying a second full question bank.
+
+Cleanup touches only identifiable Final progress. It retains the two newest
+unleased compact snapshots, protects the current route and live-tab leases,
+and expires abandoned Final progress after the existing 12-hour resume window.
+Recent legacy snapshots are retained for that window because an older open
+player cannot advertise a lease. Leases expire after 12 hours, refresh while
+the tab is alive and release on exit. Cleanup rechecks ownership and raw bytes
+before eviction. Active tabs can exceed the inactive retention bound; history,
+Queue, other courses and unrecognized data are never cleanup targets.
+
+A small per-tab session pointer selects that tab's saved payload on reload,
+including Review Missed, when another tab replaced the shared custom-quiz key.
+No additional question-bank copy or alternate learning-history store is used.
+
+Failed history writes show an alert and Retry Saving History action. Until
+history is saved, continuation actions stay disabled, the full completed score
+remains visible and a recovery snapshot is attempted. An additive Final save
+token makes recovery idempotent without changing existing attempt/Stats IDs.
+Retrying history does not replay missed-question signals. Browser quota can
+still prevent persistence; the UI explicitly asks the student to keep the tab
+open instead of claiming the score was saved.
+
+True Exam completion updates the header to the authoritative score and hides
+the old Session Resume notice, active-exam banner and frozen countdown. Review
+or retry restores the appropriate active controls. The existing resume dialog
+now says OK keeps the same deadline; Cancel abandons saved progress and starts
+a new attempt with a new 100-minute clock. The strict deadline is not pausable.
 
 ## Validation on the completed prototype
 
-All four repository gates pass, including 458/458 tools tests. One hundred
+Final Stage 2 gate totals are recorded in the PR description. One hundred
 seeded Finals (50 Balanced / 50 Adaptive) pass independent size, week/domain,
 identity, cap, ordering, source and whole-set Brand/Generic leakage assertions.
 Adversarial weakness evidence changes selection while preserving the envelope.
@@ -115,4 +144,4 @@ deadline/legacy-snapshot restoration, study pause and expired-resume ordering.
 
 Canonical Fall source, written policy, P1 source and Queue store remain unchanged.
 The generator/Adaptive/Final/launcher/hub/engine cache chain and Stats importer
-all use `20261101b`. Live production activation awaits Luis's merge decision.
+all use `20261101d`. Live production activation awaits Luis's merge decision.

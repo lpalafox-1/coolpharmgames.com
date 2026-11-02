@@ -1,7 +1,7 @@
 // Pharm-let practice composition, not a faculty-authored final blueprint.
 // No curriculum facts live here: all questions come from the shared Fall pool.
-import { generateFall2026Quiz, createSeededRng, finalizeFall2026QuestionSet, isFall2026QuestionFormAllowed } from './fall-2026-quiz-generator.js?v=20261101b';
-import { buildAdaptiveSignals, buildConceptWeakness, scoreCandidate, getQuestionFingerprint, getQuestionConceptKey, getQuestionSourceWeeks } from './fall-2026-adaptive-practice.js?v=20261101b';
+import { generateFall2026Quiz, createSeededRng, finalizeFall2026QuestionSet, isFall2026QuestionFormAllowed } from './fall-2026-quiz-generator.js?v=20261101d';
+import { buildAdaptiveSignals, buildConceptWeakness, scoreCandidate, getQuestionFingerprint, getQuestionConceptKey, getQuestionSourceWeeks } from './fall-2026-adaptive-practice.js?v=20261101d';
 export const FINAL_KINDS = Object.freeze({ balanced: 'fall-2026-lab3-final-balanced', adaptive: 'fall-2026-lab3-final-adaptive' });
 export const FINAL_VERSION = 'fall-final100-v2';
 export const FINAL_DOMAINS = Object.freeze(['brandGeneric', 'drugClass', 'fdaIndication', 'mechanismOfAction', 'topAdverseReactions', 'boxWarning']);
