@@ -1474,6 +1474,21 @@ function getFallLab3StudentFacingPromptHtml(question) {
     const prompt = question?.prompt || "";
     if (!isFallLab3DisplayQuestion(question)) return prompt;
     const metadata = getFallLab3QuestionMetadata(question);
+    // Preserve historical canonical prompt+answer identity. Source-scope
+    // clarification belongs only in presentation, including Queue replays.
+    const adr = prompt.match(/^Which drug has an ADR of (<b>.*<\/b>)\?$/);
+    if (adr) return `Which drug has an ADR of ${adr[1]} recorded in the Fall source?`;
+    const indication = prompt.match(/^Which drug is indicated for (<b>.*<\/b>)\?$/);
+    if (indication) return `Which drug has ${indication[1]} recorded as an FDA indication in the Fall source?`;
+    const group = prompt.match(/^Which of the following is a common ADR of (<b>.*<\/b>)\?$/);
+    if (group) {
+        const range = metadata?.closedGroup?.eligibleChoiceQuizWeekRange;
+        const weeks = Array.isArray(range) && range.length === 2
+            ? range[0] === range[1] ? ` in Week ${range[0]}` : ` in Weeks ${range.join("–")}` : "";
+        return `Which ADR is listed for every member of the ${group[1]} source group${weeks}?`;
+    }
+    const repeatedWeek = prompt.match(/^(Which ADR is listed for every member of .* source group) in Weeks (\d+)–\2\?$/);
+    if (repeatedWeek) return `${repeatedWeek[1]} in Week ${repeatedWeek[2]}?`;
     const reference = (html, knownBrand = false) => {
         if (metadata?.stemReference?.type === "generic") return html;
         const brand = metadata?.stemReference?.type === "brand"
@@ -4084,7 +4099,7 @@ function runCompletionAction(actionId) {
             // so this action imports it at click time. The hub registers its
             // own startup on DOMContentLoaded; a click after load does not
             // run that startup or consume continuation requests.
-            const launcherUrl = new URL("assets/js/fall-2026-lab3-launcher.js?v=20261101a", window.location.href).href;
+            const launcherUrl = new URL("assets/js/fall-2026-lab3-launcher.js?v=20261101c", window.location.href).href;
             import(launcherUrl)
                 .then((launcher) => {
                     if (typeof launcher.launchFall2026Lab3WeekFocus !== "function") {
