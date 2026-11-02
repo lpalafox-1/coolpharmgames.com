@@ -1491,6 +1491,8 @@ function getFallLab3StudentFacingPromptHtml(question) {
     // Anchored main templates only: atomic, pairwise, NOT/EXCEPT, and other
     // questions pass through unchanged. Structured inverse values are facts.
     const forward = [
+        [/^Which FDA indication is recorded in the Fall source for (<b>.*<\/b>)\?$/, "Which FDA indication is recorded in the Fall source for"],
+        [/^Which Top ADR is recorded in the Fall source for (<b>.*<\/b>)\?$/, "Which Top ADR is recorded in the Fall source for"],
         [/^(?:Which pharmacologic class is recorded in the Fall source for|What class does the Fall source list for) (<b>.*<\/b>)\?$/, "What is the drug class of"],
         [/^Which (?:complete FDA indication list|full FDA indication list) is recorded for (<b>.*<\/b>)\?$/, "Which full list of FDA-approved indications is associated with"],
         [/^(?:Which mechanism of action belongs to|What is the MOA of) (<b>.*<\/b>)\?$/, "What is the mechanism of action of"],
@@ -4082,7 +4084,7 @@ function runCompletionAction(actionId) {
             // so this action imports it at click time. The hub registers its
             // own startup on DOMContentLoaded; a click after load does not
             // run that startup or consume continuation requests.
-            const launcherUrl = new URL("assets/js/fall-2026-lab3-launcher.js?v=20261027a", window.location.href).href;
+            const launcherUrl = new URL("assets/js/fall-2026-lab3-launcher.js?v=20261101a", window.location.href).href;
             import(launcherUrl)
                 .then((launcher) => {
                     if (typeof launcher.launchFall2026Lab3WeekFocus !== "function") {
