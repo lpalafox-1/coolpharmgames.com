@@ -96,7 +96,7 @@ test('Final history, completion, review identity and score remain distinct from 
 test('cache chain includes the Final composer, both source parents, engine and Stats',()=>{
  assert.match(read('assets/js/fall-2026-lab3-launcher.js'),/fall-2026-final-practice\.js\?v=20261102b/);
  for(const p of ['assets/js/fall-2026-final-practice.js','assets/js/fall-2026-adaptive-practice.js','assets/js/fall-2026-lab3-launcher.js'])assert.match(read(p),/fall-2026-quiz-generator\.js\?v=20261102b/);
- assert.match(read('quiz.html'),/quizEngine\.js\?v=20261102b/);assert.match(read('stats.html'),/stats\.js\?v=20261102b/);
+ assert.match(read('quiz.html'),/quizEngine\.js\?v=20261102c/);assert.match(read('stats.html'),/stats\.js\?v=20261102b/);
 });
 
 test('Stats distinguishes Balanced and Adaptive Finals through lineage and exam/practice mode IDs',()=>{

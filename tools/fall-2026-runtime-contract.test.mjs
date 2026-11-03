@@ -21,7 +21,7 @@ const policy = JSON.parse(
 );
 const APPROVED_ENGINE_BASELINE = Object.freeze({
   reference: "F26-24 Week Focus completion plus PR #90 display-only renderer",
-  sha256: "d0d951bfeab6292565039435065af6e76fdd30edc0f812198b74e1f5657343f0"
+  sha256: "a4411d07591dc127c00f9afba8e7bc70ddf9f5aa5d5557f8efbe301ef4c36325"
 });
 
 function createStorageStub(initialValues = {}) {

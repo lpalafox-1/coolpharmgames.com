@@ -68,7 +68,7 @@ test('all generator importers and cached parents advance together', () => {
   assert.match(read('assets/js/fall-2026-lab3-launcher.js'), /fall-2026-adaptive-practice\.js\?v=20261102b/);
   assert.match(read('assets/js/quizEngine.js'), /fall-2026-lab3-launcher\.js\?v=20261102b/);
   assert.match(read('lab3-fall-2026.html'), /fall-2026-lab3-launcher\.js\?v=20261102b/);
-  assert.match(read('quiz.html'), /quizEngine\.js\?v=20261102b/);
+  assert.match(read('quiz.html'), /quizEngine\.js\?v=20261102c/);
 });
 
 test('forged absence-of-warning and insufficient atomic pools fail closed without list fallbacks', () => {

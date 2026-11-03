@@ -1519,10 +1519,6 @@ function getFallLab3StudentFacingPromptHtml(question) {
     const metadata = getFallLab3QuestionMetadata(question);
     // Preserve historical canonical prompt+answer identity. Source-scope
     // clarification belongs only in presentation, including Queue replays.
-    const adr = prompt.match(/^Which drug has an ADR of (<b>.*<\/b>)\?$/);
-    if (adr) return `Which drug has an ADR of ${adr[1]} recorded in the Fall source?`;
-    const indication = prompt.match(/^Which drug is indicated for (<b>.*<\/b>)\?$/);
-    if (indication) return `Which drug has ${indication[1]} recorded as an FDA indication in the Fall source?`;
     const group = prompt.match(/^Which of the following is a common ADR of (<b>.*<\/b>)\?$/);
     if (group) {
         const range = metadata?.closedGroup?.eligibleChoiceQuizWeekRange;
@@ -1549,8 +1545,8 @@ function getFallLab3StudentFacingPromptHtml(question) {
     // Anchored main templates only: atomic, pairwise, NOT/EXCEPT, and other
     // questions pass through unchanged. Structured inverse values are facts.
     const forward = [
-        [/^Which FDA indication is recorded in the Fall source for (<b>.*<\/b>)\?$/, "Which FDA indication is recorded in the Fall source for"],
-        [/^Which Top ADR is recorded in the Fall source for (<b>.*<\/b>)\?$/, "Which Top ADR is recorded in the Fall source for"],
+        [/^Which FDA indication is recorded in the Fall source for (<b>.*<\/b>)\?$/, "What is an FDA indication of"],
+        [/^Which Top ADR is recorded in the Fall source for (<b>.*<\/b>)\?$/, "What is a Top ADR of"],
         [/^(?:Which pharmacologic class is recorded in the Fall source for|What class does the Fall source list for) (<b>.*<\/b>)\?$/, "What is the drug class of"],
         [/^Which (?:complete FDA indication list|full FDA indication list) is recorded for (<b>.*<\/b>)\?$/, "Which full list of FDA-approved indications is associated with"],
         [/^(?:Which mechanism of action belongs to|What is the MOA of) (<b>.*<\/b>)\?$/, "What is the mechanism of action of"],

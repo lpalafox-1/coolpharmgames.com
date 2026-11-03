@@ -309,24 +309,22 @@ test("policy revision refreshes generator parents and engine cache together", ()
   assert.match(launcher, /fall-2026-adaptive-practice\.js\?v=20261102b/);
   assert.match(read("lab3-fall-2026.html"), /fall-2026-lab3-launcher\.js\?v=20261102b/);
   assert.match(read("assets/js/quizEngine.js"), /new URL\("assets\/js\/fall-2026-lab3-launcher\.js\?v=20261102b"/);
-  assert.match(read("quiz.html"), /quizEngine\.js\?v=20261102b/);
+  assert.match(read("quiz.html"), /quizEngine\.js\?v=20261102c/);
 });
 
 test("student stems use natural wording without visible source-audit language", () => {
   const forwardPrefixes = {
     drugClass: "What is the drug class of ",
-    fdaIndication: "Which FDA indication is recorded in the Fall source for ",
+    fdaIndication: "What is an FDA indication of ",
     mechanismOfAction: "What is the mechanism of action of ",
-    topAdverseReactions: "Which Top ADR is recorded in the Fall source for ",
+    topAdverseReactions: "What is a Top ADR of ",
     boxWarning: "What boxed warning is associated with "
   };
   const seenDomains = new Set();
   let singleIndicationCount = 0;
   for (const quiz of generated) for (const question of quiz.questions) {
     const prompt = engine.getFallLab3StudentFacingPromptHtml(question);
-    if (!["singleFdaIndicationRecognition", "singleAdverseReactionRecognition", "atomicFdaIndicationRecognition", "atomicAdverseReactionRecognition", "classCommonAdrRecognition"].includes(question.metadata.questionVariant)) {
-      assert.doesNotMatch(prompt, /Fall source|recorded (?:in|for)|boxed-warning value/i, question.id);
-    }
+    assert.doesNotMatch(prompt, /Fall source|recorded (?:in|for)|boxed-warning value/i, question.id);
     if (question.metadata.brandGenericDirection === "brandToGeneric") {
       assert.equal(prompt, `What is the generic name of <b>${escapeHtml(question.metadata.sourceBrandName)}®</b>?`);
     }
@@ -361,4 +359,30 @@ test("student stems use natural wording without visible source-audit language", 
   assert.notEqual(rawAdr.question.metadata.questionVariant, "structuredValueChoices");
   assert.equal(rawAdr.question.metadata.knowledgeDomain, "topAdverseReactions");
   assert.ok(singleIndicationCount > 0);
+});
+
+test("plain Fall stems change only the display; canonical prompts and content keys keep main bytes", () => {
+  const metadata = { generatorId: "fall-2026-p2-lab3-deterministic-generator" };
+  for (const [prompt, stemReference, display] of [
+    ["Which drug has an ADR of <b>Increased SCr</b>?", undefined, "Which drug has an ADR of <b>Increased SCr</b>?"],
+    ["Which drug is indicated for <b>Angina</b>?", undefined, "Which drug is indicated for <b>Angina</b>?"],
+    ["Which FDA indication is recorded in the Fall source for <b>Ipratropium+Albuterol</b>?", { type: "generic" }, "What is an FDA indication of <b>Ipratropium+Albuterol</b>?"],
+    ["Which FDA indication is recorded in the Fall source for <b>Zebeta</b>?", { type: "brand", brandName: "Zebeta" }, "What is an FDA indication of <b>Zebeta®</b>?"],
+    ["Which Top ADR is recorded in the Fall source for <b>Amlodipine</b>?", { type: "generic" }, "What is a Top ADR of <b>Amlodipine</b>?"],
+    ["Which Top ADR is recorded in the Fall source for <b>Norvasc</b>?", { type: "brand", brandName: "Norvasc" }, "What is a Top ADR of <b>Norvasc®</b>?"]
+  ]) {
+    const question = { prompt, metadata: { ...metadata, ...(stemReference ? { stemReference } : {}) } };
+    const before = JSON.stringify(question);
+    assert.equal(engine.getFallLab3StudentFacingPromptHtml(question), display);
+    assert.equal(JSON.stringify(question), before);
+  }
+  // Weeks 1-10, Standard and Week Focus, the first two seeds of each run.
+  // Pinned on main at 49cff28, before the phrase left the display.
+  const rows = [];
+  for (const quiz of generated.filter((_, index) => index % 20 < 2)) for (const question of quiz.questions) {
+    assert.doesNotMatch(engine.getFallLab3StudentFacingPromptHtml(question), /Fall source/, question.id);
+    rows.push([question.id, question.prompt, getQuestionFingerprint(question), getPerformanceKey(question)]);
+  }
+  assert.equal(rows.length, 400);
+  assert.equal(createHash("sha256").update(JSON.stringify(rows)).digest("hex"), "3267a9ffa91e1b5999f11b6ed0a01de4edc7a11696d2bd3752ce5141bb1e05e5");
 });
