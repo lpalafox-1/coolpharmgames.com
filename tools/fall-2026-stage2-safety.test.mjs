@@ -100,7 +100,7 @@ test('source-scope and single-week display are render-only for historical prompt
   const q={...old,sourceQuizId:'fall-2026-lab3-practice',metadata:{generatorId:'fall-2026-p2-lab3-deterministic-generator',closedGroup:{eligibleChoiceQuizWeekRange:[3,3]}}};
   const before=JSON.stringify(q),display=e.getFallLab3StudentFacingPromptHtml(q);
   assert.equal(JSON.stringify(q),before);
-  if(/^Which drug (has an ADR|is indicated)/.test(old.prompt))assert.match(display,/recorded.*Fall source/);
+  if(/^Which drug (has an ADR|is indicated)/.test(old.prompt))assert.equal(display,old.prompt);
   if(old.prompt.includes('common ADR')){assert.match(display,/source group in Week 3\?/);assert.doesNotMatch(display,/Weeks 3–3|common ADR of/);}
  }
  const q={prompt:'Which ADR is listed for every member of the <b>Group</b> source group in Weeks 3–3?',sourceQuizId:'fall-2026-lab3-week-3-practice'};
