@@ -309,7 +309,7 @@ test("policy revision refreshes generator parents and engine cache together", ()
   assert.match(launcher, /fall-2026-adaptive-practice\.js\?v=20261102b/);
   assert.match(read("lab3-fall-2026.html"), /fall-2026-lab3-launcher\.js\?v=20261102b/);
   assert.match(read("assets/js/quizEngine.js"), /new URL\("assets\/js\/fall-2026-lab3-launcher\.js\?v=20261102b"/);
-  assert.match(read("quiz.html"), /quizEngine\.js\?v=20261102c/);
+  assert.match(read("quiz.html"), /quizEngine\.js\?v=20261103b/);
 });
 
 test("student stems use natural wording without visible source-audit language", () => {
@@ -317,7 +317,7 @@ test("student stems use natural wording without visible source-audit language", 
     drugClass: "What is the drug class of ",
     fdaIndication: "What is an FDA indication of ",
     mechanismOfAction: "What is the mechanism of action of ",
-    topAdverseReactions: "What is a Top ADR of ",
+    topAdverseReactions: "Which adverse reaction is listed for ",
     boxWarning: "What boxed warning is associated with "
   };
   const seenDomains = new Set();
@@ -368,8 +368,8 @@ test("plain Fall stems change only the display; canonical prompts and content ke
     ["Which drug is indicated for <b>Angina</b>?", undefined, "Which drug is indicated for <b>Angina</b>?"],
     ["Which FDA indication is recorded in the Fall source for <b>Ipratropium+Albuterol</b>?", { type: "generic" }, "What is an FDA indication of <b>Ipratropium+Albuterol</b>?"],
     ["Which FDA indication is recorded in the Fall source for <b>Zebeta</b>?", { type: "brand", brandName: "Zebeta" }, "What is an FDA indication of <b>Zebeta®</b>?"],
-    ["Which Top ADR is recorded in the Fall source for <b>Amlodipine</b>?", { type: "generic" }, "What is a Top ADR of <b>Amlodipine</b>?"],
-    ["Which Top ADR is recorded in the Fall source for <b>Norvasc</b>?", { type: "brand", brandName: "Norvasc" }, "What is a Top ADR of <b>Norvasc®</b>?"]
+    ["Which Top ADR is recorded in the Fall source for <b>Amlodipine</b>?", { type: "generic" }, "Which adverse reaction is listed for <b>Amlodipine</b>?"],
+    ["Which Top ADR is recorded in the Fall source for <b>Norvasc</b>?", { type: "brand", brandName: "Norvasc" }, "Which adverse reaction is listed for <b>Norvasc®</b>?"]
   ]) {
     const question = { prompt, metadata: { ...metadata, ...(stemReference ? { stemReference } : {}) } };
     const before = JSON.stringify(question);
@@ -385,4 +385,34 @@ test("plain Fall stems change only the display; canonical prompts and content ke
   }
   assert.equal(rows.length, 400);
   assert.equal(createHash("sha256").update(JSON.stringify(rows)).digest("hex"), "3267a9ffa91e1b5999f11b6ed0a01de4edc7a11696d2bd3752ce5141bb1e05e5");
+});
+
+test("ADR wording cleanup preserves saved direct and Review Queue identity, including legacy list surfaces", () => {
+  const cases = [
+    ["Which Top ADR is recorded in the Fall source for <b>Lisinopril</b>?", "Which adverse reaction is listed for <b>Lisinopril</b>?"],
+    ["Which full top ADR list is recorded for <b>Lisinopril</b>?", "Which full adverse reaction list is associated with <b>Lisinopril</b>?"],
+    ["Which drug is recorded in the Fall source with this complete top adverse-reaction list?<br><b>Dizziness; Hypotension; Angioedema</b>", "Which drug has this full adverse reaction list?<br><b>Dizziness; Hypotension; Angioedema</b>"]
+  ];
+  for (const [prompt, display] of cases) for (const provenance of [
+    {metadata: {generatorId: "fall-2026-p2-lab3-deterministic-generator", knowledgeDomain: "topAdverseReactions"}},
+    {sourceQuizId: "fall-2026-lab3-week-1-practice"},
+    {sourceQuizId: "fall-2026-lab3-final-adaptive"}
+  ]) {
+    const q = {prompt, answer: "Lisinopril", choices: ["Lisinopril", "Verapamil"], ...provenance};
+    const before = JSON.stringify(q), key = getPerformanceKey(q), fingerprint = getQuestionFingerprint(q);
+    assert.equal(engine.getFallLab3StudentFacingPromptHtml(q), display);
+    assert.equal(JSON.stringify(q), before);
+    assert.equal(getPerformanceKey(q), key);
+    assert.equal(getQuestionFingerprint(q), fingerprint);
+    assert.equal(engine.getFallLab3StudentFacingPromptHtml({prompt, answer: q.answer}), prompt, "non-Fall copy is unchanged");
+  }
+});
+
+test("Final ADR label changes only presentation, retaining the stored domain and counts", () => {
+  const summary = {weeks: {1: {correct: 1, total: 10}}, domains: {topAdverseReactions: {correct: 2, total: 15}}};
+  const before = JSON.stringify(summary);
+  const display = engine.buildFallLab3FinalBreakdownMarkup(summary);
+  assert.match(display, /Adverse Reactions: 2 \/ 15/);
+  assert.doesNotMatch(display, /Top ADR/);
+  assert.equal(JSON.stringify(summary), before);
 });
