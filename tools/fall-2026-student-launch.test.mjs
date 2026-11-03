@@ -564,7 +564,7 @@ test("the F26-08 presentation-only change preserves launch wiring, cache tokens,
   }, FALL_UI_BASELINES);
 });
 
-test("homepage prioritizes current P2 Lab III and labels Weeks 4-10 as study-ahead practice", () => {
+test("homepage prioritizes current P2 Lab III and exposes all ten standard weeks with rules in the Hub", () => {
   const homepage = readFileSync(path.join(repoRoot, "index.html"), "utf8");
   const current = sectionBetween(homepage, "current-semester", "study-tools");
   const fallWeeks = [...homepage.matchAll(/href="lab3-fall-2026\.html\?week=(\d+)"/g)]
@@ -575,13 +575,14 @@ test("homepage prioritizes current P2 Lab III and labels Weeks 4-10 as study-ahe
   assert.match(current, /Top Drugs Reference/);
   assert.ok(current.includes('href="lab3-fall-2026.html"'));
   assert.ok(current.includes('href="top-drugs-quicksheet.html"'));
-  assert.deepEqual([...new Set(fallWeeks)].sort((a, b) => a - b), [1, 2, 3]);
-  assert.doesNotMatch(current, /lab3-fall-2026\.html\?week=(?:4|5|6|7|8|9|10)/);
+  assert.deepEqual([...new Set(fallWeeks)].sort((a, b) => a - b), FALL_LAB3_WEEKS);
+  assert.match(current, /aria-label="Standard Weekly Practice shortcuts"/);
   assert.match(current, /Weeks 1–10/);
-  assert.match(current, /Week 1 is a practice configuration/);
-  assert.match(current, /not a claim about official quiz composition/);
-  assert.match(current, /Weeks 2–10 use 6 new \+ 4 cumulative review/);
-  assert.match(current, /Weeks 4–10.*study[- ]ahead/i);
+  assert.match(current, /Week 1: Week 1 only/);
+  assert.match(current, /Weeks 2–10: 6 new \+ 4 cumulative review/);
+  assert.match(current, /Practice rules &amp; Lab III Hub/);
+  const hub = readFileSync(path.join(repoRoot, "lab3-fall-2026.html"), "utf8");
+  assert.match(hub, /not predictions of exact professor wording/);
 });
 
 test("homepage separates primary study tools, quiet utilities, and chronological P1 coursework", () => {
@@ -608,13 +609,13 @@ test("homepage separates primary study tools, quiet utilities, and chronological
   assert.ok(fall.includes('href="quiz.html?id=top-drugs-final-mockE"'));
 });
 
-test("homepage current semester shows Lab IV Spring 2027 Coming Soon without a launch", () => {
+test("homepage keeps one quiet Lab IV Spring 2027 placeholder below study resources without a launch", () => {
   const homepage = readFileSync(path.join(repoRoot, "index.html"), "utf8");
   const current = sectionBetween(homepage, "current-semester", "study-tools");
   const planned = sectionBetween(homepage, "upcoming-planned");
-  const lab4Start = current.indexOf('id="lab4-coming-soon"');
-  assert.notEqual(lab4Start, -1, "Lab IV placeholder must live in #current-semester");
-  const lab4 = current.slice(lab4Start);
+  const lab4Start = planned.indexOf('id="lab4-coming-soon"');
+  assert.notEqual(lab4Start, -1, "Lab IV placeholder must live in #upcoming-planned");
+  const lab4 = planned.slice(lab4Start);
   const lab4Text = htmlText(lab4);
 
   assert.match(lab4Text, /Lab IV/);
@@ -623,7 +624,9 @@ test("homepage current semester shows Lab IV Spring 2027 Coming Soon without a l
   assert.equal(hrefsIn(lab4).length, 0, "the Lab IV placeholder must not expose a launch");
   assert.doesNotMatch(lab4, /href="quiz\.html/);
   assert.equal(hrefsIn(planned).length, 0, "upcoming-planned still has no hrefs");
-  assert.doesNotMatch(htmlText(planned), /Lab IV/);
+  assert.doesNotMatch(current, /id="lab4-coming-soon"/);
+  assert.equal([...homepage.matchAll(/id="lab4-coming-soon"/g)].length, 1);
+  assert.ok(homepage.indexOf('id="lab4-coming-soon"') > homepage.indexOf('id="study-tools"'));
   assert.ok(homepage.includes('src="assets/js/home.js?v=20260429a"'));
 });
 
@@ -640,7 +643,8 @@ test("homepage keeps compact navigation, planned-content, count, touch-target, a
     );
   }
   assert.equal(hrefsIn(planned).length, 0, "planned content must not expose launch links");
-  assert.match(planned, /No launches yet/);
+  assert.match(planned, /Coming Soon/);
+  assert.match(planned, /No Lab IV content is available yet/);
   assert.match(homepage, /1,723 practice questions/);
   assert.match(homepage, /static quiz library/);
   assert.match(homepage, /\.home-nav-link\{[^}]*min-height:44px/);
