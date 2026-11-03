@@ -1469,7 +1469,7 @@ function buildFallLab3FinalBreakdown(questions = state.questions) {
 
 function buildFallLab3FinalBreakdownMarkup(summary) {
     if (!summary) return "";
-    const labels = { brandGeneric: "Brand / Generic", drugClass: "Drug Class", fdaIndication: "FDA Indication", mechanismOfAction: "MOA", topAdverseReactions: "Top ADRs", boxWarning: "BBW" };
+    const labels = { brandGeneric: "Brand / Generic", drugClass: "Drug Class", fdaIndication: "FDA Indication", mechanismOfAction: "MOA", topAdverseReactions: "Adverse Reactions", boxWarning: "BBW" };
     const rows = (values, week) => Object.entries(values).map(([key, row]) => `<li>${week ? `Week ${escapeHtml(key)}` : escapeHtml(labels[key] || key)}: ${row.correct} / ${row.total}</li>`).join("");
     return `<div class="mt-6 text-left max-w-xl mx-auto"><h3 class="font-bold">Final Practice breakdown</h3><p class="text-sm mt-2">Primary source week; practice composition, not an official final blueprint.</p><div class="grid sm:grid-cols-2 gap-4 mt-3"><ul>${rows(summary.weeks, true)}</ul><ul>${rows(summary.domains, false)}</ul></div></div>`;
 }
@@ -1546,11 +1546,11 @@ function getFallLab3StudentFacingPromptHtml(question) {
     // questions pass through unchanged. Structured inverse values are facts.
     const forward = [
         [/^Which FDA indication is recorded in the Fall source for (<b>.*<\/b>)\?$/, "What is an FDA indication of"],
-        [/^Which Top ADR is recorded in the Fall source for (<b>.*<\/b>)\?$/, "What is a Top ADR of"],
+        [/^Which Top ADR is recorded in the Fall source for (<b>.*<\/b>)\?$/, "Which adverse reaction is listed for"],
         [/^(?:Which pharmacologic class is recorded in the Fall source for|What class does the Fall source list for) (<b>.*<\/b>)\?$/, "What is the drug class of"],
         [/^Which (?:complete FDA indication list|full FDA indication list) is recorded for (<b>.*<\/b>)\?$/, "Which full list of FDA-approved indications is associated with"],
         [/^(?:Which mechanism of action belongs to|What is the MOA of) (<b>.*<\/b>)\?$/, "What is the mechanism of action of"],
-        [/^Which (?:complete top adverse-reaction list|full top ADR list) is recorded for (<b>.*<\/b>)\?$/, "Which full list of top adverse reactions is associated with"],
+        [/^Which (?:complete top adverse-reaction list|full top ADR list) is recorded for (<b>.*<\/b>)\?$/, "Which full adverse reaction list is associated with"],
         [/^(?:Which boxed-warning value belongs to|Which boxed warning is listed for) (<b>.*<\/b>)\?$/, "What boxed warning is associated with"],
         [/^(?:Generic name for|What is the generic for) (<b>.*<\/b>)\?$/, "What is the generic name of", true],
         [/^Which of the following is an FDA indication for (<b>.*<\/b>)\?$/, "Which is an FDA-approved indication for", true]
@@ -1562,7 +1562,7 @@ function getFallLab3StudentFacingPromptHtml(question) {
     const inverse = [
         [/^Which drug (?:is paired with this pharmacologic class in the Fall source|has this class in the Fall source)\?(<br><b>.*<\/b>)$/, "Which drug has this pharmacologic class?"],
         [/^Which drug is recorded in the Fall source with this complete FDA indication list\?(<br><b>.*<\/b>)$/, "Which drug has this full FDA indication list?"],
-        [/^Which drug is recorded in the Fall source with this complete top adverse-reaction list\?(<br><b>.*<\/b>)$/, "Which drug has this full top ADR list?"]
+        [/^Which drug is recorded in the Fall source with this complete top adverse-reaction list\?(<br><b>.*<\/b>)$/, "Which drug has this full adverse reaction list?"]
     ];
     for (const [pattern, wording] of inverse) {
         const match = prompt.match(pattern);
