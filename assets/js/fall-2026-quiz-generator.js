@@ -881,8 +881,19 @@ function drugMatchesChoicePredicate(drug, predicate) {
   fail("UNSUPPORTED_CHOICE_PREDICATE", `Unsupported choice predicate: ${predicate.type}.`);
 }
 
+// Published HCTZ labeling lists hyperuricemia (Precautions / Adverse Reactions).
+// Exclusion only: never add it to canonical answers or broaden class mappings.
+// https://dailymed.nlm.nih.gov/dailymed/fda/fdaDrugXsl.cfm?setid=e3afa83d-c79c-848a-e053-2a95a90ac922&type=display
+function isLabelSupportedHctzHyperuricemia(drug, domainId, value) {
+  return drug.id === "p2-fall-quiz-02-drug-09"
+    && drug.genericName === "Hydrochlorothiazide"
+    && domainId === "topAdverseReactions"
+    && normalizeAtomicFactKey(value) === normalizeAtomicFactKey("Hyperuricemia");
+}
+
 function drugIsSafePredicateNonmatch(drug, predicate, context, quizWeek) {
   if (drugMatchesChoicePredicate(drug, predicate)) return false;
+  if (predicate.type === "arrayContains" && isLabelSupportedHctzHyperuricemia(drug, predicate.domainId, predicate.value)) return false;
   if (predicate.type === "domainValueEquals" && predicate.domainId === "mechanismOfAction") {
     return !moaValuesPotentiallyOverlap(getDomainQuizValue(drug, predicate.domainId), predicate.value);
   }
@@ -2212,7 +2223,8 @@ function getNonexhaustiveFactExclusions(context, sourceDrug, domainId, quizWeek)
   const canonicalClass = getCanonicalDrugClass(sourceDrug.drugClass);
   return getAvailableDrugsThroughWeek(context, quizWeek)
     .filter((drug) => drug.id === sourceDrug.id || (canonicalClass && getCanonicalDrugClass(drug.drugClass) === canonicalClass))
-    .flatMap((drug) => getAtomicDomainValues(drug, domainId));
+    .flatMap((drug) => getAtomicDomainValues(drug, domainId))
+    .concat(isLabelSupportedHctzHyperuricemia(sourceDrug, domainId, "Hyperuricemia") ? ["Hyperuricemia"] : []);
 }
 
 function hasSourceAtomicFactCapacity(context, sourceDrug, domainId, quizWeek, materialType) {

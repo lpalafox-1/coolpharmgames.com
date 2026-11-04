@@ -247,8 +247,10 @@ test("allowed raw structured inverse class and full FDA templates render natural
 });
 
 test("400 seeded payloads reproduce the faculty-form policy revision deterministically", () => {
-  // Repinned for the faculty-verbal form suppression; renderer remains presentation-only.
-  assert.equal(createHash("sha256").update(JSON.stringify(generated)).digest("hex"), "d4b521ff412881fe52658a86a08e720fcfd8a540cd11611264c4a7cf5f8532f0");
+  // PR #96: label-supported HCTZ/hyperuricemia exclusion changes 12/400 fresh
+  // seeded rounds (choices and subsequent RNG ordering/selection). Renderer stays
+  // presentation-only; historical regeneration is asserted in stage2-safety.
+  assert.equal(createHash("sha256").update(JSON.stringify(generated)).digest("hex"), "2c98aeaa36b872119e81721cd69330d123b3f7400c83e723ec3cb7ba73a606dc");
 });
 
 test("Adaptive Week 8, Standard Weekly, and Week Focus render the display convention from canonical payloads", () => {
@@ -299,17 +301,17 @@ test("Boss Remix preserves canonical prompts and renders its brand references on
 
 test("policy revision refreshes generator parents and engine cache together", () => {
   for (const [file, mainHash] of [
-    ["fall-2026-quiz-generator.js", "ba917e7cfcfd602777cebdfd4766b64a5fad6b33874c3e61067114046698e2f2"],
-    ["fall-2026-adaptive-practice.js", "28f807f71b1fb5fcb1ded1ac1cda8be173aaeedbe91b7064d897b6e0211de817"],
-    ["fall-2026-lab3-launcher.js", "631c7a93420a69dca0023b01adae438610aac086e59feeb55796004503b8324f"]
+    ["fall-2026-quiz-generator.js", "1c925a0690dfae28722d0e540d27bd73af5f22b2d469922ca5f9537d02dc23ea"],
+    ["fall-2026-adaptive-practice.js", "666b24966a99fa1ea5d83e626adc0b5f71f034ec4b4bedbd44878d11c6800091"],
+    ["fall-2026-lab3-launcher.js", "4eaa2535a530c1494786ec3e93ad7210942510f51b5a676ec21f09c2cdfb6cc8"]
   ]) assert.equal(createHash("sha256").update(read(`assets/js/${file}`)).digest("hex"), mainHash, `${file}: approved policy baseline`);
   const launcher = read("assets/js/fall-2026-lab3-launcher.js");
   const adaptive = read("assets/js/fall-2026-adaptive-practice.js");
-  for (const parent of [launcher, adaptive]) assert.match(parent, /fall-2026-quiz-generator\.js\?v=20261102b/);
-  assert.match(launcher, /fall-2026-adaptive-practice\.js\?v=20261102b/);
-  assert.match(read("lab3-fall-2026.html"), /fall-2026-lab3-launcher\.js\?v=20261102b/);
-  assert.match(read("assets/js/quizEngine.js"), /new URL\("assets\/js\/fall-2026-lab3-launcher\.js\?v=20261102b"/);
-  assert.match(read("quiz.html"), /quizEngine\.js\?v=20261103b/);
+  for (const parent of [launcher, adaptive]) assert.match(parent, /fall-2026-quiz-generator\.js\?v=20261103c/);
+  assert.match(launcher, /fall-2026-adaptive-practice\.js\?v=20261103c/);
+  assert.match(read("lab3-fall-2026.html"), /fall-2026-lab3-launcher\.js\?v=20261103c/);
+  assert.match(read("assets/js/quizEngine.js"), /new URL\("assets\/js\/fall-2026-lab3-launcher\.js\?v=20261103c"/);
+  assert.match(read("quiz.html"), /quizEngine\.js\?v=20261103c/);
 });
 
 test("student stems use natural wording without visible source-audit language", () => {
@@ -377,14 +379,16 @@ test("plain Fall stems change only the display; canonical prompts and content ke
     assert.equal(JSON.stringify(question), before);
   }
   // Weeks 1-10, Standard and Week Focus, the first two seeds of each run.
-  // Pinned on main at 49cff28, before the phrase left the display.
+  // PR #96 refreshes fresh-generation selection: Week Focus 2 seed 1 changes.
+  // Stored questions are not rewritten; the renderer immutability checks above
+  // and historical prompt/answer regeneration tests remain unchanged.
   const rows = [];
   for (const quiz of generated.filter((_, index) => index % 20 < 2)) for (const question of quiz.questions) {
     assert.doesNotMatch(engine.getFallLab3StudentFacingPromptHtml(question), /Fall source/, question.id);
     rows.push([question.id, question.prompt, getQuestionFingerprint(question), getPerformanceKey(question)]);
   }
   assert.equal(rows.length, 400);
-  assert.equal(createHash("sha256").update(JSON.stringify(rows)).digest("hex"), "3267a9ffa91e1b5999f11b6ed0a01de4edc7a11696d2bd3752ce5141bb1e05e5");
+  assert.equal(createHash("sha256").update(JSON.stringify(rows)).digest("hex"), "01dcdcc12a28017fd78b390e98e53aa691a62c1479e5f14ff24e565c1eaa12df");
 });
 
 test("ADR wording cleanup preserves saved direct and Review Queue identity, including legacy list surfaces", () => {
