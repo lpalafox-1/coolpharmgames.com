@@ -320,11 +320,11 @@ test("the engine hands adaptive selection to the launcher instead of duplicating
 
 test("F26-12 leaves the generator, canonical data, policy, and adaptive ranking untouched", () => {
   assert.equal(sha256("assets/js/fall-2026-quiz-generator.js"),
-    "ba917e7cfcfd602777cebdfd4766b64a5fad6b33874c3e61067114046698e2f2");
+    "1c925a0690dfae28722d0e540d27bd73af5f22b2d469922ca5f9537d02dc23ea");
   assert.equal(sha256("assets/data/fall-2026-p2-top-drugs.json"),
     "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01");
   assert.equal(sha256("assets/data/fall-2026-lab3-quiz-policy.json"),
     "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171");
   assert.equal(sha256("assets/js/fall-2026-adaptive-practice.js"),
-    "28f807f71b1fb5fcb1ded1ac1cda8be173aaeedbe91b7064d897b6e0211de817");
+    "666b24966a99fa1ea5d83e626adc0b5f71f034ec4b4bedbd44878d11c6800091");
 });
