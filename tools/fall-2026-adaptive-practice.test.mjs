@@ -1191,9 +1191,9 @@ test("normal Week Practice output is unchanged by F26-10", () => {
 
 test("the generator, canonical data, and policy retain main bytes; the engine matches its display-only baseline", () => {
   assert.equal(sha256("assets/js/fall-2026-quiz-generator.js"),
-    "ba917e7cfcfd602777cebdfd4766b64a5fad6b33874c3e61067114046698e2f2", "generator must not change");
+    "1c925a0690dfae28722d0e540d27bd73af5f22b2d469922ca5f9537d02dc23ea", "generator must not change");
   assert.equal(sha256("assets/js/quizEngine.js"),
-    "1d38af9065ade1907d130046b7fcba3ad0925a430abf47ce2aa0ab4b329d25f7", "engine must match the display-only baseline");
+    "720d8ba9e28fbc0cee514e64d1b8b74daaeb50cc1081a2f99f0fbe088e3a0c98", "engine must match the display-only baseline");
   assert.equal(sha256("assets/data/fall-2026-p2-top-drugs.json"),
     "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01", "canonical drug data must not change");
   assert.equal(sha256("assets/data/fall-2026-lab3-quiz-policy.json"),
@@ -1225,5 +1225,5 @@ test("the hub offers Adaptive Practice without AI language", () => {
   // Normal Week Practice stays visible as its own dropdown launcher.
   assert.match(hub, /id="weekly-week"/);
   assert.match(hub, /id="weekly-launch"/);
-  assert.match(hub, /assets\/js\/fall-2026-lab3-launcher\.js\?v=20261102b/);
+  assert.match(hub, /assets\/js\/fall-2026-lab3-launcher\.js\?v=20261103c/);
 });

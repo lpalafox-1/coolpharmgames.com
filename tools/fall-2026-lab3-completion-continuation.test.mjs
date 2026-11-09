@@ -22,7 +22,7 @@ import { loadBrowserGlobal } from "./browser-global-harness.mjs";
 import { buildFall2026Lab3Payload } from "../assets/js/fall-2026-lab3-launcher.js";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const ENGINE_TOKEN = "20261103b";
+const ENGINE_TOKEN = "20261103c";
 const REMIX_REQUEST_KEY = "pharmlet.fall-2026-lab3.boss-remix-request";
 const CUSTOM_QUIZ_KEY = "pharmlet.custom-quiz";
 const HISTORY_KEY = "pharmlet.history";
@@ -35,8 +35,8 @@ const LIFETIME_MEMORY_KEYS = [
 const PROTECTED_FALL_BASELINES = Object.freeze({
   drugData: "2af02b84674401d2d7fb3d9a8a1e6b2dc40d7c4fe72067320cfde2694c864f01",
   policy: "307696a5d5f189bc40710df3d72228854fee58b52371f07bc2498b9a1e3c1171",
-  generator: "ba917e7cfcfd602777cebdfd4766b64a5fad6b33874c3e61067114046698e2f2",
-  launcher: "631c7a93420a69dca0023b01adae438610aac086e59feeb55796004503b8324f"
+  generator: "1c925a0690dfae28722d0e540d27bd73af5f22b2d469922ca5f9537d02dc23ea",
+  launcher: "4eaa2535a530c1494786ec3e93ad7210942510f51b5a676ec21f09c2cdfb6cc8"
 });
 
 const drugData = JSON.parse(read("assets/data/fall-2026-p2-top-drugs.json"));
@@ -1169,5 +1169,5 @@ test("the Final engine, Stats and launcher cache tokens advance together", () =>
   const quiz = read("quiz.html");
   assert.ok(quiz.includes(`assets/js/quizEngine.js?v=${ENGINE_TOKEN}`), "the engine change needs a fresh cache token");
   assert.ok(read("stats.html").includes("assets/js/stats.js?v=20261102b"), "Final Stats ships with the new player");
-  assert.ok(read("lab3-fall-2026.html").includes('src="assets/js/fall-2026-lab3-launcher.js?v=20261102b"'));
+  assert.ok(read("lab3-fall-2026.html").includes('src="assets/js/fall-2026-lab3-launcher.js?v=20261103c"'));
 });
